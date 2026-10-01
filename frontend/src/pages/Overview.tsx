@@ -10,7 +10,7 @@ import {
   CartesianGrid,
 } from 'recharts';
 import { dataLoader } from '../utils/dataLoader';
-import { PairSummary, PairSeriesPoint, SignalsToday } from '../types';
+import { PairSummary, PairSeriesPoint, SignalsToday, MetaInfo } from '../types';
 
 export default function Overview() {
   const [pairs, setPairs] = useState<PairSummary[]>([]);
@@ -18,12 +18,14 @@ export default function Overview() {
   const [seriesData, setSeriesData] = useState<PairSeriesPoint[]>([]);
   const [signalsToday, setSignalsToday] = useState<SignalsToday | null>(null);
   const [loading, setLoading] = useState(true);
+  const [meta, setMeta] = useState<MetaInfo | null>(null);
 
   useEffect(() => {
-    Promise.all([dataLoader.getPairs(), dataLoader.getSignalsToday()])
-      .then(([pairsData, sigData]) => {
+    Promise.all([dataLoader.getPairs(), dataLoader.getSignalsToday(), dataLoader.getMeta()])
+      .then(([pairsData, sigData, metaData]) => {
         setPairs(pairsData);
         setSignalsToday(sigData);
+        setMeta(metaData);
         // Find pair with highest |z|
         if (pairsData.length > 0) {
           const sorted = [...pairsData].sort((a, b) => Math.abs(b.z) - Math.abs(a.z));
@@ -76,8 +78,9 @@ export default function Overview() {
   const stopLevelZ = (Math.abs(activePair.chosen_params.ze) + 1.5).toFixed(1);
 
   // Executive summary dynamic metrics pulled directly from JSON
-  const numContracts = meta?.num_contracts ?? meta?.latest_quotes?.length ?? 4;
-  const testMonths = meta?.unseen_test_months ?? 12;
+  const metaAny = meta as any;
+  const numContracts = metaAny?.num_contracts ?? metaAny?.latest_quotes?.length ?? 4;
+  const testMonths = metaAny?.unseen_test_months ?? 12;
   const numPairs = pairs.length;
   const quietCount = pairs.filter((p) => p.status === 'QUIET').length;
   const signalCount = pairs.filter((p) => p.status === 'SIGNAL').length;
