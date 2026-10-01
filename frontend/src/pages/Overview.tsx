@@ -139,7 +139,7 @@ export default function Overview() {
         })}
       </div>
 
-      {/* Q1: What is happening? Live Basis & Cross-Contract Parity */}
+      {/* Q1: What is happening? Basis & Cross-Contract Parity */}
       <div className="flex flex-col gap-space-sm">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-space-xs">
@@ -178,7 +178,7 @@ export default function Overview() {
                   MCX EOD Close
                 </span>
                 <span className="font-data-mono-lg text-data-mono-lg text-on-surface font-semibold">
-                  ₹{seriesData[seriesData.length - 1]?.s !== undefined ? 'Quoted EOD' : '—'}
+                  {activePair.close_a !== undefined ? `₹${activePair.close_a.toLocaleString('en-IN')} / ${activePair.quote_grams_a}g` : '—'}
                 </span>
               </div>
               <div className="flex items-baseline justify-between pt-1 border-t border-surface-variant/30">
@@ -186,7 +186,7 @@ export default function Overview() {
                   Normalized Pure Basis
                 </span>
                 <span className="font-data-mono-md text-data-mono-md text-primary font-bold">
-                  ₹/10g pure standard
+                  {activePair.px_per_10g_pure_a !== undefined ? `₹${activePair.px_per_10g_pure_a.toLocaleString('en-IN', { minimumFractionDigits: 1, maximumFractionDigits: 1 })} / 10g pure` : '—'}
                 </span>
               </div>
               <div className="flex items-center justify-between text-[10px] font-mono text-on-surface-variant">
@@ -218,7 +218,7 @@ export default function Overview() {
                   MCX EOD Close
                 </span>
                 <span className="font-data-mono-lg text-data-mono-lg text-on-surface font-semibold">
-                  Settlement
+                  {activePair.close_b !== undefined ? `₹${activePair.close_b.toLocaleString('en-IN')} / ${activePair.quote_grams_b}g` : '—'}
                 </span>
               </div>
               <div className="flex items-baseline justify-between pt-1 border-t border-surface-variant/30">
@@ -226,7 +226,7 @@ export default function Overview() {
                   Normalized Pure Basis
                 </span>
                 <span className="font-data-mono-md text-data-mono-md text-primary font-bold">
-                  ₹/10g pure standard
+                  {activePair.px_per_10g_pure_b !== undefined ? `₹${activePair.px_per_10g_pure_b.toLocaleString('en-IN', { minimumFractionDigits: 1, maximumFractionDigits: 1 })} / 10g pure` : '—'}
                 </span>
               </div>
               <div className="flex items-center justify-between text-[10px] font-mono text-on-surface-variant">
@@ -299,7 +299,7 @@ export default function Overview() {
             <div className={`px-2 py-0.5 rounded font-data-mono-sm text-data-mono-sm font-semibold uppercase ${
               activePair.status === 'SIGNAL' ? 'bg-primary-container text-on-primary-container' : 'bg-surface-container-highest text-on-surface-variant'
             }`}>
-              {activePair.status}
+              {activePair.status === 'SIGNAL' ? 'INVESTIGATE — candidate' : 'SIGNAL SUPPRESSED'}
             </div>
           </div>
 
@@ -497,7 +497,7 @@ export default function Overview() {
               Universe Cross-Contract Scanner Matrix
             </h3>
             <span className="text-xs text-on-surface-variant font-mono">
-              Live status across all 6 cointegrated pairs · Click row to inspect
+              Status as of 30-Sep-2026 EOD across all 6 pairs · Click row to inspect
             </span>
           </div>
           <span className="font-data-mono-sm text-data-mono-sm text-primary font-mono">
@@ -552,7 +552,7 @@ export default function Overview() {
                       <span className={`px-1.5 py-0.5 rounded text-[10px] uppercase font-bold ${
                         p.status === 'SIGNAL' ? 'bg-secondary text-on-secondary' : 'bg-surface-container-highest text-outline'
                       }`}>
-                        {p.status}
+                        {p.status === 'SIGNAL' ? 'INVESTIGATE — candidate' : 'SIGNAL SUPPRESSED'}
                       </span>
                     </td>
                     <td className="p-2 text-[10px] text-tertiary">

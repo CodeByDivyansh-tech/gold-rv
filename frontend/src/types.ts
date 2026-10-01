@@ -80,6 +80,14 @@ export interface PairSummary {
   display_name: string;
   symbol_a: string;
   symbol_b: string;
+  close_a?: number;
+  close_b?: number;
+  quote_grams_a?: number;
+  quote_grams_b?: number;
+  px_per_10g_pure_a?: number;
+  px_per_10g_pure_b?: number;
+  px_per_g_pure_a?: number;
+  px_per_g_pure_b?: number;
   lot_ratio: string;
   unit_grams: number;
   contracts_label: string;
@@ -253,9 +261,30 @@ export interface BacktestData {
     net_rs: number;
     spread_rs: number;
     gold_rs: number;
-    correlation_to_gold: number;
-    beta_to_gold: number;
+    direct_gold_pnl_pct?: number;
+    pair_correlation_to_gold: number;
+    pair_beta_to_gold: number;
+    pair_n_trades?: number;
+    pair_note?: string;
+    pooled_correlation_to_gold?: number;
+    pooled_beta_to_gold?: number;
+    pooled_n_trades?: number;
+    summary_text?: string;
   };
+}
+
+export interface RegimeRecord {
+  pair_id: string;
+  pair: string;
+  pre_break_mean: number | null;
+  pre_break_text: string;
+  post_break_mean: number | null;
+  post_break_text: string;
+  q1_mean: number | null;
+  q1_min: number | null;
+  q1_max: number | null;
+  q1_text: string;
+  comment: string;
 }
 
 export interface CostMatrixItem {

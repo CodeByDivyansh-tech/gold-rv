@@ -184,11 +184,11 @@ def run_pair_backtest(
         net_bps = (net / notA) * 1e4
         holding_days = tdi[dx] - tdi[d1]
         
-        # Capacity check: flag if lots exceed 5% of thinner leg's volume on signal day
         lots_a = grams / lot_g_a
         lots_b = grams / lot_g_b
         cap_flag = (lots_a > 0.05 * x.at[i, 'vol_a']) or (lots_b > 0.05 * x.at[i, 'vol_b'])
-        
+        gold_ret_bps = (xb['px'] / rb['px'] - 1.0) * 1e4
+
         trades.append({
             'pair': pair_id,
             'sig': sig_date,
@@ -207,6 +207,7 @@ def run_pair_backtest(
             'net': float(net),
             'gross_bps': float(gross_bps),
             'net_bps': float(net_bps),
+            'gold_ret_bps': float(gold_ret_bps),
             'reason': reason,
             'days': int(holding_days),
             'capacity_flag': bool(cap_flag),

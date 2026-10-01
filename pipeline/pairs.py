@@ -14,7 +14,7 @@ def build_pair_series(df: pd.DataFrame,
     """
     sym_a, sym_b, maxgap = PAIR_DEFINITIONS[pair_id]
     
-    cols = ['date', 'expiry', 'px', 'vol', 'oi', 'oi_prev', 'no_trade', 'thin', 'td_to_exp']
+    cols = ['date', 'expiry', 'close', 'px', 'px_per_10g_pure', 'vol', 'oi', 'oi_prev', 'no_trade', 'thin', 'td_to_exp']
     A = df[df['symbol'] == sym_a][cols].copy()
     B = df[df['symbol'] == sym_b][cols].copy()
     
@@ -46,8 +46,8 @@ def build_pair_series(df: pd.DataFrame,
     chosen['spread'] = (chosen['px_a'] / chosen['px_b'] - 1.0 - chosen['c'] * chosen['gap'] / 365.0) * 1e4
     chosen['spread_bps'] = chosen['spread']
     
-    # Spread in ₹ per 10g pure: (px_a - px_b) * 10
-    chosen['spread_rs_10g'] = (chosen['px_a'] - chosen['px_b']) * 10.0
+    # Carry-adjusted spread in ₹ per 10g pure: spread_bps / 10000 * px_b * 10
+    chosen['spread_rs_10g'] = (chosen['spread_bps'] / 10000.0) * chosen['px_b'] * 10.0
     
     # Roll flag: true when chosen contract changes
     chosen['roll'] = (chosen['expiry_a'] != chosen['expiry_a'].shift(1)) | (chosen['expiry_b'] != chosen['expiry_b'].shift(1))

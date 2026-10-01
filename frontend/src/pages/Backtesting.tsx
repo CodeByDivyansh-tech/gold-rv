@@ -306,30 +306,45 @@ export default function Backtesting() {
               </span>
             </div>
             <div className="p-2 rounded bg-surface-container-lowest border border-surface-variant flex flex-col">
-              <span className="text-on-surface-variant text-[10px] uppercase">Gold Beta P&amp;L (0.4% Residual)</span>
+              <span className="text-on-surface-variant text-[10px] uppercase">Direct Gold P&amp;L (≈ 1.4% gross)</span>
               <span className="text-base font-bold mt-1 text-on-surface">
                 ₹{backtestData.attribution.gold_rs.toLocaleString()}
               </span>
             </div>
-            <div className="p-2 rounded bg-surface-container-lowest border border-surface-variant flex flex-col">
-              <span className="text-on-surface-variant text-[10px] uppercase">Correlation to Daily Gold</span>
+            {/* Pooled metrics shown prominently */}
+            <div className="p-2 rounded bg-surface-container-lowest border-2 border-primary/50 flex flex-col">
+              <div className="flex items-center justify-between">
+                <span className="text-primary text-[10px] uppercase font-bold">Pooled Corr to Gold</span>
+                <span className="text-[9px] px-1.5 py-0.5 rounded bg-primary/20 text-primary font-bold">
+                  POOLED (n={backtestData.attribution.pooled_n_trades || 54})
+                </span>
+              </div>
               <span className="text-base font-bold mt-1 text-primary">
-                {backtestData.attribution.correlation_to_gold.toFixed(3)}
+                {backtestData.attribution.pooled_correlation_to_gold !== undefined ? backtestData.attribution.pooled_correlation_to_gold.toFixed(2) : '—'}
               </span>
-              <span className="text-[9px] text-outline">Target ~0.00</span>
+              <span className="text-[9px] text-on-surface-variant">
+                Pooled Beta: {backtestData.attribution.pooled_beta_to_gold !== undefined ? backtestData.attribution.pooled_beta_to_gold.toFixed(2) : '—'}
+              </span>
             </div>
+            {/* Per-pair metrics with unstable note */}
             <div className="p-2 rounded bg-surface-container-lowest border border-surface-variant flex flex-col">
-              <span className="text-on-surface-variant text-[10px] uppercase">Strategy Beta to Gold</span>
-              <span className="text-base font-bold mt-1 text-primary">
-                {backtestData.attribution.beta_to_gold.toFixed(3)}
+              <div className="flex items-center justify-between">
+                <span className="text-on-surface-variant text-[10px] uppercase">Pair Corr to Gold</span>
+                <span className="text-[9px] text-tertiary font-medium">
+                  {backtestData.attribution.pair_note || `${backtestData.attribution.pair_n_trades || 0} trades — unstable`}
+                </span>
+              </div>
+              <span className="text-base font-bold mt-1 text-on-surface">
+                {backtestData.attribution.pair_correlation_to_gold !== undefined ? backtestData.attribution.pair_correlation_to_gold.toFixed(2) : '—'}
               </span>
-              <span className="text-[9px] text-outline">Target ~0.00</span>
+              <span className="text-[9px] text-on-surface-variant">
+                Pair Beta: {backtestData.attribution.pair_beta_to_gold !== undefined ? backtestData.attribution.pair_beta_to_gold.toFixed(2) : '—'}
+              </span>
             </div>
           </div>
 
           <div className="p-space-sm rounded bg-surface-container-lowest border border-surface-variant text-xs font-mono text-on-surface-variant">
-            Gold-price P&amp;L constitutes a negligible fraction (&lt; 2%) of gross P&amp;L.
-            The strategy is genuinely market-neutral; the lack of persistent edge is due to spread decay after trading costs.
+            Gram-neutral by construction (direct gold P&amp;L ≈ 1.4% of gross), but spread moves are linked to large gold shocks (pooled corr −0.24).
           </div>
         </div>
 

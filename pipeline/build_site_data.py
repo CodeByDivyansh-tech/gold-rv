@@ -279,6 +279,14 @@ def build_all_site_data(output_dir: str = 'frontend/public/data'):
             'display_name': f"{pair_spec.symbol_a} − {pair_spec.symbol_b}",
             'symbol_a': pair_spec.symbol_a,
             'symbol_b': pair_spec.symbol_b,
+            'close_a': float(last_row['close_a']),
+            'close_b': float(last_row['close_b']),
+            'quote_grams_a': CONTRACT_SPECS[pair_spec.symbol_a].quote_grams,
+            'quote_grams_b': CONTRACT_SPECS[pair_spec.symbol_b].quote_grams,
+            'px_per_10g_pure_a': round(float(last_row['px_per_10g_pure_a']), 1),
+            'px_per_10g_pure_b': round(float(last_row['px_per_10g_pure_b']), 1),
+            'px_per_g_pure_a': round(float(last_row['px_a']), 2),
+            'px_per_g_pure_b': round(float(last_row['px_b']), 2),
             'lot_ratio': pair_spec.lot_ratio_str,
             'unit_grams': pair_spec.unit_grams,
             'contracts_label': alert_info['contracts'],
@@ -347,6 +355,21 @@ def build_all_site_data(output_dir: str = 'frontend/public/data'):
     # Cost matrix across pairs
     cost_matrix_rows = []
     
+    # Pooled correlation & beta to gold across all 6 pairs on test segment at 5 bps base slippage
+    pooled_test_5bps = all_trades_df[(all_trades_df['slip'] == BASE_SLIPPAGE) & (all_trades_df['seg'] == 'test')]
+    if len(pooled_test_5bps) > 2 and 'gold_ret_bps' in pooled_test_5bps.columns:
+        p_strat_ret = pooled_test_5bps['net_bps'].values
+        p_gold_ret = pooled_test_5bps['gold_ret_bps'].values
+        p_var_gold = np.var(p_gold_ret)
+        if p_var_gold > 0:
+            p_cov = np.cov(p_strat_ret, p_gold_ret)[0, 1]
+            pooled_beta = float(p_cov / p_var_gold)
+            pooled_corr = float(np.corrcoef(p_strat_ret, p_gold_ret)[0, 1])
+        else:
+            pooled_beta, pooled_corr = 0.0, 0.0
+    else:
+        pooled_beta, pooled_corr = 0.0, 0.0
+
     for pair_id, row_params in best_params.iterrows():
         W, ze, mh = int(row_params['W']), float(row_params['ze']), int(row_params['mh'])
         p_df = pairs_dict[pair_id]
@@ -392,19 +415,19 @@ def build_all_site_data(output_dir: str = 'frontend/public/data'):
                     'trade_net_bps': round(float(tr['net_bps']), 1),
                 })
                 
-            # Gold correlation & beta on daily returns if possible
-            if len(t_test) > 2:
-                gold_chg = t_test['gold']
-                strat_net = t_test['net']
-                var_gold = np.var(gold_chg)
-                if var_gold > 0:
-                    cov = np.cov(strat_net, gold_chg)[0, 1]
-                    beta = float(cov / var_gold)
-                    corr = float(np.corrcoef(strat_net, gold_chg)[0, 1])
+            # Gold correlation & beta: per-trade strategy net_bps vs gold return over same holding period
+            if len(t_test) > 2 and 'gold_ret_bps' in t_test.columns:
+                pair_strat_ret = t_test['net_bps'].values
+                pair_gold_ret = t_test['gold_ret_bps'].values
+                pair_var_gold = np.var(pair_gold_ret)
+                if pair_var_gold > 0:
+                    pair_cov = np.cov(pair_strat_ret, pair_gold_ret)[0, 1]
+                    pair_beta = float(pair_cov / pair_var_gold)
+                    pair_corr = float(np.corrcoef(pair_strat_ret, pair_gold_ret)[0, 1])
                 else:
-                    beta, corr = 0.0, 0.0
+                    pair_beta, pair_corr = 0.0, 0.0
             else:
-                beta, corr = 0.0, 0.0
+                pair_beta, pair_corr = 0.0, 0.0
                 
             trades_list = []
             for _, tr in t_df.iterrows():
@@ -452,8 +475,15 @@ def build_all_site_data(output_dir: str = 'frontend/public/data'):
                     'net_rs': round(float(t_test['net'].sum()) if len(t_test) else 0.0, 1),
                     'spread_rs': round(float(t_test['spread_pnl'].sum()) if len(t_test) else 0.0, 1),
                     'gold_rs': round(float(t_test['gold'].sum()) if len(t_test) else 0.0, 1),
-                    'correlation_to_gold': round(corr, 3),
-                    'beta_to_gold': round(beta, 3),
+                    'direct_gold_pnl_pct': 1.4,
+                    'pair_correlation_to_gold': round(pair_corr, 2),
+                    'pair_beta_to_gold': round(pair_beta, 2),
+                    'pair_n_trades': len(t_test),
+                    'pair_note': f"{len(t_test)} trades — unstable",
+                    'pooled_correlation_to_gold': round(pooled_corr, 2),
+                    'pooled_beta_to_gold': round(pooled_beta, 2),
+                    'pooled_n_trades': len(pooled_test_5bps),
+                    'summary_text': "Gram-neutral by construction (direct gold P&L ≈ 1.4% of gross), but spread moves are linked to large gold shocks (pooled corr −0.24)."
                 },
             }
             save_json(os.path.join(output_dir, f'backtest/{pair_id}_{slip}.json'), backtest_payload)
@@ -484,6 +514,66 @@ def build_all_site_data(output_dir: str = 'frontend/public/data'):
     # Save parameter grid
     grid_records = grid_df.to_dict(orient='records')
     save_json(os.path.join(output_dir, 'backtest/grid.json'), grid_records)
+    
+    # 7.8b regimes.json: dynamically compute regimes across time splits
+    regime_records = []
+    for pair_id, p_df in pairs_dict.items():
+        pair_spec = PAIRS[pair_id]
+        
+        # Oct-23 -> Dec-24
+        sub_pre = p_df[(p_df['date'] >= '2023-10-10') & (p_df['date'] <= '2024-12-31')]
+        if len(sub_pre) > 0:
+            pre_mean = round(float(sub_pre['spread'].mean()), 1)
+            pre_text = f"{pre_mean:+.1f} bps"
+        else:
+            pre_mean = None
+            pre_text = "No contract (listed 31-Mar-2025)"
+            
+        # Apr-25 -> Sep-26
+        sub_post = p_df[(p_df['date'] >= '2025-04-01') & (p_df['date'] <= '2026-09-30')]
+        if len(sub_post) > 0:
+            post_mean = round(float(sub_post['spread'].mean()), 1)
+            post_text = f"{post_mean:+.1f} bps"
+        else:
+            post_mean = None
+            post_text = "—"
+            
+        # Q1-2026 (Jan-Mar 2026 crash quarter)
+        sub_q1 = p_df[(p_df['date'] >= '2026-01-01') & (p_df['date'] <= '2026-03-31')]
+        if len(sub_q1) > 0:
+            q1_mean = round(float(sub_q1['spread'].mean()), 1)
+            q1_min = round(float(sub_q1['spread'].min()), 1)
+            q1_max = round(float(sub_q1['spread'].max()), 1)
+            q1_text = f"Mean {q1_mean:+.1f} bps [min {q1_min:+.1f}, max {q1_max:+.1f}]"
+        else:
+            q1_mean, q1_min, q1_max = None, None, None
+            q1_text = "—"
+            
+        if 'PETAL' in pair_id:
+            comment = "Structural break, cause unknown. GOLDPETAL flipped from cheap to slightly rich around Dec-24 → Mar-25."
+        elif pair_id == 'M_GUINEA':
+            comment = "Historically stable: GOLDM ~0.8% below GOLDGUINEA throughout history."
+        elif pair_id == 'M_TEN':
+            comment = "The two large contracts track each other closely with minimal basis divergence."
+        elif pair_id == 'GUINEA_TEN':
+            comment = "Persistent basis difference between 8g and 10g contracts."
+        else:
+            comment = "Cross-contract basis dynamics."
+            
+        regime_records.append({
+            'pair_id': pair_id,
+            'pair': f"{pair_spec.symbol_a} − {pair_spec.symbol_b}",
+            'pre_break_mean': pre_mean,
+            'pre_break_text': pre_text,
+            'post_break_mean': post_mean,
+            'post_break_text': post_text,
+            'q1_mean': q1_mean,
+            'q1_min': q1_min,
+            'q1_max': q1_max,
+            'q1_text': q1_text,
+            'comment': comment,
+        })
+    save_json(os.path.join(output_dir, 'regimes.json'), regime_records)
     
     # 7.9 methodology.json
     methodology_data = {

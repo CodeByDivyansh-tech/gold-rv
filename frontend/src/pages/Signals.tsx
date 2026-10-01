@@ -76,7 +76,7 @@ export default function Signals() {
           <span className={`px-3 py-1 rounded font-mono font-bold text-xs uppercase ${
             activePair.status === 'SIGNAL' ? 'bg-secondary text-on-secondary' : 'bg-surface-container-highest text-outline'
           }`}>
-            {activePair.status}
+            {activePair.status === 'SIGNAL' ? 'INVESTIGATE — candidate' : 'SIGNAL SUPPRESSED'}
           </span>
         </div>
       </div>
@@ -236,7 +236,7 @@ export default function Signals() {
           </div>
 
           <div className="p-space-sm rounded bg-surface-container-lowest border border-surface-variant text-xs font-mono">
-            Status: <span className="text-primary font-bold">{activePair.status}</span>.
+            Status: <span className="text-primary font-bold">{activePair.status === 'SIGNAL' ? 'INVESTIGATE — candidate' : 'SIGNAL SUPPRESSED'}</span>.
             {activePair.failed_gates.length > 0 && (
               <span className="text-tertiary ml-1">
                 Failed gates: {activePair.failed_gates.join(', ')}.

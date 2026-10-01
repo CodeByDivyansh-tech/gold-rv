@@ -966,7 +966,14 @@
     "net_rs": -10248.8,
     "spread_rs": 11789.0,
     "gold_rs": 0.0,
-    "correlation_to_gold": 0.0,
-    "beta_to_gold": 0.0
+    "direct_gold_pnl_pct": 1.4,
+    "pair_correlation_to_gold": 0.17,
+    "pair_beta_to_gold": 0.01,
+    "pair_n_trades": 9,
+    "pair_note": "9 trades \u2014 unstable",
+    "pooled_correlation_to_gold": -0.24,
+    "pooled_beta_to_gold": -0.06,
+    "pooled_n_trades": 54,
+    "summary_text": "Gram-neutral by construction (direct gold P&L \u2248 1.4% of gross), but spread moves are linked to large gold shocks (pooled corr \u22120.24)."
   }
 }

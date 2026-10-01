@@ -115,7 +115,7 @@ def generate_today_alerts(
             'expiry_a': last_row['expiry_a'].strftime('%Y-%m-%d') if hasattr(last_row['expiry_a'], 'strftime') else str(last_row['expiry_a']),
             'expiry_b': last_row['expiry_b'].strftime('%Y-%m-%d') if hasattr(last_row['expiry_b'], 'strftime') else str(last_row['expiry_b']),
             'spread_bps': round(float(last_row['spread']), 1),
-            'spread_rs_10g': round(float(last_row.get('spread_rs_10g', (last_row['px_a'] - last_row['px_b']) * 10)), 1),
+            'spread_rs_10g': round(float(last_row.get('spread_rs_10g', (last_row['spread'] / 10000.0) * last_row['px_b'] * 10.0)), 1),
             'mu': round(float(last_row['mu']), 1) if not np.isnan(last_row['mu']) else None,
             'sd': round(float(last_row['sd']), 1) if not np.isnan(last_row['sd']) else None,
             'z': round(float(last_row['z']), 2) if not np.isnan(last_row['z']) else None,

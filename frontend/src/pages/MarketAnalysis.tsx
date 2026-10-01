@@ -12,12 +12,13 @@ import {
   Legend,
 } from 'recharts';
 import { dataLoader } from '../utils/dataLoader';
-import { ContractsData, CurveData, PairSummary, PairSeriesPoint, MetaInfo } from '../types';
+import { ContractsData, CurveData, PairSummary, PairSeriesPoint, MetaInfo, RegimeRecord } from '../types';
 
 export default function MarketAnalysis() {
   const [contractsData, setContractsData] = useState<ContractsData | null>(null);
   const [curveData, setCurveData] = useState<CurveData | null>(null);
   const [pairs, setPairs] = useState<PairSummary[]>([]);
+  const [regimes, setRegimes] = useState<RegimeRecord[]>([]);
   const [meta, setMeta] = useState<MetaInfo | null>(null);
   const [selectedPairId, setSelectedPairId] = useState<string>('GUINEA_PETAL');
   const [selectedPairData, setSelectedPairData] = useState<PairSeriesPoint[]>([]);
@@ -31,13 +32,15 @@ export default function MarketAnalysis() {
       dataLoader.getPairs(),
       dataLoader.getMeta(),
       dataLoader.getCarryDecomposition('GOLDPETAL'),
+      dataLoader.getRegimes(),
     ])
-      .then(([cData, cvData, pData, mData, dData]) => {
+      .then(([cData, cvData, pData, mData, dData, rData]) => {
         setContractsData(cData);
         setCurveData(cvData);
         setPairs(pData);
         setMeta(mData);
         setDecompData(dData.slice(-60)); // recent 60 observations
+        setRegimes(rData);
         setLoading(false);
       })
       .catch(console.error);
@@ -62,52 +65,6 @@ export default function MarketAnalysis() {
       </div>
     );
   }
-
-  // Quarterly regimes data from Section 3
-  const regimeRows = [
-    {
-      pair: 'GOLDGUINEA − GOLDPETAL',
-      preBreak: '+200 to +260 bps',
-      postBreak: '−30 to 0 bps',
-      janCrash: '+293 bps spike',
-      comment: 'GOLDPETAL flipped from ~2.5% cheap to slightly rich around Dec-24 → Mar-25 (Structural Break).',
-    },
-    {
-      pair: 'GOLDM − GOLDPETAL',
-      preBreak: '+140 to +200 bps',
-      postBreak: '−25 to −95 bps',
-      janCrash: '+389 bps spike',
-      comment: 'Same structural flip in Dec-24/Mar-25. Rolling window absorbs shift after several weeks.',
-    },
-    {
-      pair: 'GOLDM − GOLDGUINEA',
-      preBreak: '−70 to −95 bps',
-      postBreak: '−15 to −100 bps',
-      janCrash: '+256 bps spike',
-      comment: 'Historically stable: GOLDM trades ~0.8% below GOLDGUINEA throughout.',
-    },
-    {
-      pair: 'GOLDTEN − GOLDPETAL',
-      preBreak: 'No Contract (Listed 31-Mar-25)',
-      postBreak: '−40 to −90 bps',
-      janCrash: '+180 bps spike',
-      comment: 'GOLDTEN trades persistently below GOLDPETAL post-listing.',
-    },
-    {
-      pair: 'GOLDM − GOLDTEN',
-      preBreak: 'No Contract (Listed 31-Mar-25)',
-      postBreak: '+5 to +15 bps',
-      janCrash: '±25 bps',
-      comment: 'The two high-liquidity benchmark contracts agree closely with minimal basis divergence.',
-    },
-    {
-      pair: 'GOLDGUINEA − GOLDTEN',
-      preBreak: 'No Contract (Listed 31-Mar-25)',
-      postBreak: '≈ +70 bps',
-      janCrash: '+140 bps spike',
-      comment: 'GOLDGUINEA trades at a premium over GOLDTEN reflect retail coinage delivery demand.',
-    },
-  ];
 
   // Normalized price points for comparison chart
   const pairChartData = selectedPairData.map((pt) => ({
@@ -217,14 +174,14 @@ export default function MarketAnalysis() {
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1 border-t border-surface-variant/40 text-[11px]">
             <div>
-              <span className="text-primary font-bold">Live Example 1 — GOLDM (995 fineness):</span>
+              <span className="text-primary font-bold">Worked example (30-Sep-2026) 1 — GOLDM (995 fineness):</span>
               <br />
               Close: ₹147,908 / 10g · Purity: 0.995
               <br />
               px_per_g_pure = 147,908 / 10 / 0.995 = <span className="text-secondary font-bold">₹14,865.13 / g</span> (₹148,651.26 / 10g pure)
             </div>
             <div>
-              <span className="text-primary font-bold">Live Example 2 — GOLDPETAL (999 fineness):</span>
+              <span className="text-primary font-bold">Worked example (30-Sep-2026) 2 — GOLDPETAL (999 fineness):</span>
               <br />
               Close: ₹14,893 / 1g · Purity: 0.999
               <br />
@@ -262,12 +219,12 @@ export default function MarketAnalysis() {
               </tr>
             </thead>
             <tbody className="divide-y divide-surface-variant/40">
-              {regimeRows.map((r, i) => (
-                <tr key={i} className="hover:bg-surface-container">
+              {regimes.map((r) => (
+                <tr key={r.pair_id} className="hover:bg-surface-container">
                   <td className="p-2 font-bold text-primary">{r.pair}</td>
-                  <td className="p-2 text-on-surface">{r.preBreak}</td>
-                  <td className="p-2 text-secondary font-semibold">{r.postBreak}</td>
-                  <td className="p-2 text-tertiary font-bold">{r.janCrash}</td>
+                  <td className="p-2 text-on-surface">{r.pre_break_text}</td>
+                  <td className="p-2 text-secondary font-semibold">{r.post_break_text}</td>
+                  <td className="p-2 text-tertiary font-bold">{r.q1_text}</td>
                   <td className="p-2 text-[11px] text-on-surface-variant max-w-xs">{r.comment}</td>
                 </tr>
               ))}
