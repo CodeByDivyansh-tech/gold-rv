@@ -1,0 +1,67 @@
+{
+  "coverage_start": "2023-10-10",
+  "coverage_end": "2026-09-30",
+  "trading_dates_count": 768,
+  "rows_count": 11954,
+  "contracts_count": 138,
+  "no_trade_rows_count": 183,
+  "thin_rows_count": 835,
+  "weekend_sessions": [
+    "2023-11-12",
+    "2025-02-01",
+    "2026-02-01"
+  ],
+  "manual_cross_check": {
+    "manual_rows": 5666,
+    "mismatches": 0,
+    "status": "Verified 0 mismatches against manual Bhavcopy downloads"
+  },
+  "latest_quotes": [
+    {
+      "symbol": "GOLDM",
+      "close": 147908.0,
+      "quote_grams": 10,
+      "px_per_10g_pure": 148651.26,
+      "change_rs": -11.0,
+      "change_pct": -0.01,
+      "expiry": "2026-11-05",
+      "vol": 52749,
+      "oi": 44601
+    },
+    {
+      "symbol": "GOLDTEN",
+      "close": 148322.0,
+      "quote_grams": 10,
+      "px_per_10g_pure": 148470.47,
+      "change_rs": 32.0,
+      "change_pct": 0.02,
+      "expiry": "2026-10-30",
+      "vol": 30456,
+      "oi": 31599
+    },
+    {
+      "symbol": "GOLDGUINEA",
+      "close": 119207.0,
+      "quote_grams": 8,
+      "px_per_10g_pure": 149157.91,
+      "change_rs": 48.0,
+      "change_pct": 0.04,
+      "expiry": "2026-10-30",
+      "vol": 12607,
+      "oi": 14377
+    },
+    {
+      "symbol": "GOLDPETAL",
+      "close": 14893.0,
+      "quote_grams": 1,
+      "px_per_10g_pure": 149079.08,
+      "change_rs": 2.0,
+      "change_pct": 0.01,
+      "expiry": "2026-10-30",
+      "vol": 300838,
+      "oi": 207175
+    }
+  ],
+  "build_time": "2026-10-01T19:14:35.969977+00:00",
+  "source": "MCX Bhavcopy (EOD) \u00b7 Data to 30-Sep-2026"
+}

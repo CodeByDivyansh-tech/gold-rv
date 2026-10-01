@@ -1,0 +1,697 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0" name="viewport"/><meta content="web_dashboard" name="shell-type"/><link href="https://fonts.googleapis.com" rel="preconnect"/><link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/><style>@layer base{html,body{margin:0;padding:0;}body{overscroll-behavior:none;}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config={darkMode:"class",theme:{extend:{colors:{"surface-container-highest":"#273647","tertiary-fixed-dim":"#ffb3ad","on-primary-fixed":"#2a1700","surface-container-low":"#0d1c2d","surface-variant":"#273647","on-primary":"#472a00","surface":"#051424","on-error-container":"#ffdad6","on-tertiary-container":"#8d0012","secondary":"#4edea3","primary-fixed-dim":"#ffb95f","on-tertiary-fixed-variant":"#930013","on-secondary":"#003824","tertiary-fixed":"#ffdad7","surface-tint":"#ffb95f","on-tertiary-fixed":"#410004","surface-container-lowest":"#010f1f","on-secondary-container":"#00311f","on-primary-container":"#613b00","inverse-surface":"#d4e4fa","surface-dim":"#051424","on-surface":"#d4e4fa","tertiary-container":"#ff938c","on-tertiary":"#68000a","tertiary":"#ffbcb7","secondary-fixed":"#6ffbbe","outline-variant":"#534434","on-background":"#d4e4fa","outline":"#a08e7a","on-secondary-fixed":"#002113","surface-container-high":"#1c2b3c","background":"#051424","on-secondary-fixed-variant":"#005236","secondary-container":"#00a572","inverse-primary":"#855300","primary-container":"#f59e0b","surface-bright":"#2c3a4c","surface-container":"#122131","secondary-fixed-dim":"#4edea3","on-primary-fixed-variant":"#653e00","on-error":"#690005","error":"#ffb4ab","primary":"#ffc174","inverse-on-surface":"#233143","primary-fixed":"#ffddb8","error-container":"#93000a","on-surface-variant":"#d8c3ad"},borderRadius:{DEFAULT:"0.125rem",lg:"0.25rem",xl:"0.5rem",full:"0.75rem"},spacing:{"space-lg":"0.75rem","space-md":"0.5rem","gutter-compact":"0.125rem","space-sm":"0.25rem","margin":"0.5rem","gutter":"0.25rem","space-xl":"1rem","space-xs":"0.125rem"},fontFamily:{"label-xs":["Inter"],"headline-md":["Inter"],"headline-xl":["Inter"],"body-sm":["Inter"],"body-md":["Inter"],"data-mono-sm":["JetBrains Mono"],"data-mono-lg":["JetBrains Mono"],"headline-lg":["Inter"],"data-mono-xl":["JetBrains Mono"],"data-mono-md":["JetBrains Mono"]},fontSize:{"label-xs":["10px",{lineHeight:"12px",letterSpacing:"0.04em",fontWeight:"600"}],"headline-md":["14px",{lineHeight:"18px",letterSpacing:"0em",fontWeight:"600"}],"headline-xl":["24px",{lineHeight:"28px",letterSpacing:"-0.02em",fontWeight:"700"}],"body-sm":["11px",{lineHeight:"14px",fontWeight:"400"}],"body-md":["12px",{lineHeight:"16px",fontWeight:"400"}],"data-mono-sm":["10px",{lineHeight:"12px",fontWeight:"500"}],"data-mono-lg":["14px",{lineHeight:"18px",letterSpacing:"-0.01em",fontWeight:"600"}],"headline-lg":["18px",{lineHeight:"22px",letterSpacing:"-0.01em",fontWeight:"600"}],"data-mono-xl":["20px",{lineHeight:"24px",letterSpacing:"-0.02em",fontWeight:"700"}],"data-mono-md":["12px",{lineHeight:"16px",fontWeight:"500"}]}}}};</script></head><body class="bg-surface font-body-md text-on-surface antialiased select-none"><header class="fixed top-0 left-0 right-0 z-50 bg-surface-container-lowest border-b border-surface-variant"><div class="h-14 w-full px-space-md flex items-center justify-between gap-space-md"><div class="flex items-center gap-space-md shrink-0"><img alt="Gold Intelligence Terminal Logo" class="h-8 w-auto object-contain" src="https://lh3.googleusercontent.com/aida/AEtjO1UoD4jNURkFiApkMGWAdO-0SnQ5TVgUVnQrINTdxD5qd4hLnOit_V-t17K0RzV-yo2i1D5b8gm0RWpyMgg0XDbqew0ZiCCLny4NQRSX6kFlAmBKto_vV4g7ZZSlWZBDuuhMqJ_zP-itYnHqKUkx6JdWqPfbYZS2m6o1xCJFypj2smW9wPlaQLcre0G2P3-HB5N88oyvunMVNB0BdBW2I5YRzB5ySA2FYhzIf_9r3SpOCTvDiLsLb7q8jXFf"/><div class="flex flex-col"><span class="font-headline-md text-headline-md tracking-wider text-primary">GOLD INTELLIGENCE</span><span class="font-label-xs text-label-xs text-on-surface-variant font-mono uppercase">MCX GOLD RELATIVE-VALUE INTELLIGENCE PLATFORM</span></div></div><div class="hidden xl:flex items-center gap-space-sm px-space-md py-1 rounded bg-surface-container-low border border-surface-variant shrink-0"><div class="flex items-center gap-space-xs font-data-mono-sm text-data-mono-sm text-on-surface"><span class="font-semibold text-primary">MCX DATASET</span><span class="w-1.5 h-1.5 rounded-full bg-secondary"></span><span class="text-secondary font-medium">Loaded</span></div><span class="text-surface-variant">|</span><span class="font-body-sm text-body-sm text-on-surface-variant">Source: MCX Daily Bhavcopy</span><span class="text-surface-variant">|</span><span class="font-body-sm text-body-sm text-on-surface-variant">Data Quality: <span class="text-secondary font-medium">Good</span></span><span class="text-surface-variant">|</span><span class="font-data-mono-sm text-data-mono-sm px-space-xs py-0.5 rounded bg-surface-container-high text-primary font-semibold border border-primary/30">DEMO DATA</span></div><div class="flex items-center gap-space-md shrink-0"><div class="hidden md:flex flex-col items-end"><span class="font-data-mono-sm text-data-mono-sm text-on-surface-variant">LAST SYNC: <span class="text-on-surface font-semibold">31-MAY-2025 23:45 IST</span></span><span class="font-label-xs text-label-xs text-primary font-mono">UNIVERSE: GOLD, GOLDM, GOLDPETAL, GOLDTEN, GOLDGUINEA</span></div><div class="h-6 w-px bg-surface-variant hidden md:block"></div><button class="flex items-center gap-space-xs px-space-sm py-1 rounded bg-surface-container-high hover:bg-surface-container-highest border border-surface-variant text-on-surface hover:text-primary transition-colors font-body-sm text-body-sm"><span class="material-symbols-outlined text-[15px]">file_download</span><span class="hidden sm:inline font-medium">Research Export</span></button></div></div></header><aside class="fixed left-0 top-14 bottom-0 w-64 bg-surface-container-lowest border-r border-surface-variant z-40 flex flex-col justify-between"><div class="flex flex-col"><div class="px-space-md py-space-sm border-b border-surface-variant flex items-center justify-between"><div class="flex flex-col"><span class="font-label-xs text-label-xs uppercase tracking-wider text-primary font-semibold">RESEARCH MODULES</span><span class="font-label-xs text-[9px] text-on-surface-variant uppercase tracking-tight">Quantitative Bullion RV Analytics</span></div><span class="material-symbols-outlined text-[15px] text-primary">insights</span></div><nav class="flex flex-col py-space-xs" data-active-classes="bg-primary-container text-on-primary-container font-semibold border-l-2 border-primary"><a class="flex items-center justify-between px-space-md py-space-sm text-body-md font-body-md text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all" data-path="overview" href="#"><span class="font-medium">01 Overview</span><span class="font-data-mono-sm text-[9px] px-1 py-0.5 rounded bg-surface-container text-on-surface-variant">RV-01</span></a><a aria-current="page" class="flex items-center justify-between px-space-md py-space-sm transition-all bg-primary-container text-on-primary-container font-semibold border-l-2 border-primary" data-path="market-analysis" href="#"><span class="font-medium">02 Market Analysis</span><span class="font-data-mono-sm text-[9px] px-1 py-0.5 rounded bg-surface-container text-on-surface-variant">RV-02</span></a><a class="flex items-center justify-between px-space-md py-space-sm text-body-md font-body-md text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all" data-path="signals" href="#"><span class="font-medium">03 Signals</span><span class="font-data-mono-sm text-[9px] px-1 py-0.5 rounded bg-surface-container text-on-surface-variant">RV-03</span></a><a class="flex items-center justify-between px-space-md py-space-sm text-body-md font-body-md text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all" data-path="backtesting" href="#"><span class="font-medium">04 Backtesting</span><span class="font-data-mono-sm text-[9px] px-1 py-0.5 rounded bg-surface-container text-on-surface-variant">RV-04</span></a><a class="flex items-center justify-between px-space-md py-space-sm text-body-md font-body-md text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all" data-path="data-and-methodology" href="#"><span class="font-medium">05 Data &amp; Methodology</span><span class="font-data-mono-sm text-[9px] px-1 py-0.5 rounded bg-surface-container text-on-surface-variant">RV-05</span></a></nav></div><div class="p-space-sm border-t border-surface-variant bg-surface-container-low"><div class="bg-surface-container p-space-sm rounded border border-surface-variant"><div class="flex items-center justify-between text-label-xs font-label-xs mb-space-xs"><span class="text-on-surface-variant font-semibold uppercase tracking-wider">DATA STATUS</span><div class="flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-secondary"></span><span class="text-secondary font-bold">Dataset Ready</span></div></div><div class="flex flex-col gap-0.5 text-body-sm font-body-sm text-on-surface-variant"><div class="flex items-center justify-between text-[10px]"><span>Source:</span><span class="font-data-mono-sm text-on-surface">MCX Daily Bhavcopy</span></div><div class="flex items-center justify-between text-[10px]"><span>Last Updated:</span><span class="font-data-mono-sm text-on-surface">31 May 2025 EOD</span></div><div class="flex items-center justify-between text-[10px]"><span>Mode:</span><span class="font-data-mono-sm text-primary font-medium">Illustrative Demo Data</span></div></div></div></div></aside><div class="pl-64"><main class="relative pt-14 pb-space-lg w-full min-h-screen bg-surface px-space-md"><div class="flex flex-col w-full">
+<!-- SECTION 1: PAGE HEADER & RESEARCH SCOPE -->
+<section class="mb-space-lg flex flex-col gap-space-xs">
+<div class="flex flex-wrap items-center justify-between gap-space-md bg-surface-container-low p-space-md rounded shadow-sm">
+<div class="flex flex-col gap-0.5">
+<div class="flex items-center gap-space-sm">
+<span class="font-data-mono-sm text-data-mono-sm px-1.5 py-0.5 rounded bg-surface-container-highest text-primary font-semibold">RV-02 ANALYTICAL ENGINE</span>
+<span class="font-data-mono-sm text-data-mono-sm text-secondary flex items-center gap-1">
+<span class="w-1.5 h-1.5 rounded-full bg-secondary animate-pulse"></span>
+            ACTIVE DIVERGENCE DETECTED
+          </span>
+</div>
+<h1 class="font-headline-xl text-headline-xl text-on-surface tracking-tight">Market Analysis &amp; Contract Normalization</h1>
+<p class="font-body-md text-body-md text-on-surface-variant max-w-4xl">
+          Specification alignment, empirical spread dynamics, rolling Z-score distributions, and historical similarity for MCX gold contracts. Strictly quantitative methodology designed for research desks and relative-value validation.
+        </p>
+</div>
+<div class="flex flex-col items-end gap-1">
+<div class="flex items-center gap-space-xs px-space-sm py-1 rounded bg-surface-container text-tertiary font-data-mono-sm text-data-mono-sm">
+<span class="material-symbols-outlined text-[14px]">science</span>
+<span>DEMO DATA — ILLUSTRATIVE QUANTITATIVE RESEARCH</span>
+</div>
+<div class="flex items-center gap-2 text-on-surface-variant font-data-mono-sm text-[10px]">
+<span>UNIVERSE: <strong>MCX GOLDM vs GOLDPETAL</strong></span>
+<span>•</span>
+<span>TIME BASIS: <strong>EOD + 5M INTRADAY BLEND</strong></span>
+</div>
+</div>
+</div>
+</section>
+<!-- SECTION 2: SPECIFICATION DUALITY & CONTRACT NORMALIZATION -->
+<section class="mb-space-lg">
+<div class="bg-surface-container p-space-md rounded shadow-md flex flex-col gap-space-md">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-space-sm">
+<span class="material-symbols-outlined text-primary text-[20px]">scale</span>
+<div>
+<h2 class="font-headline-lg text-headline-lg text-on-surface">Instrument Specification Duality</h2>
+<span class="font-label-xs text-label-xs text-on-surface-variant uppercase tracking-wider">Multi-Tier Lot Size Alignment Matrix</span>
+</div>
+</div>
+<span class="font-data-mono-sm text-data-mono-sm px-2 py-0.5 rounded bg-surface-container-highest text-primary">PARITY BASIS: 10 GRAMS 995 FINENESS</span>
+</div>
+<!-- Specification Comparison Table & Metric Cards -->
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-space-md">
+<!-- GOLDM Card -->
+<div class="bg-surface-container-low p-space-md rounded flex flex-col justify-between">
+<div class="flex items-center justify-between pb-space-xs">
+<div class="flex items-center gap-space-xs">
+<span class="font-headline-md text-headline-md text-primary font-bold">GOLDM (Mini)</span>
+<span class="font-data-mono-sm text-[10px] px-1.5 py-0.5 rounded bg-surface-container-highest text-on-surface">100g Standard Lot</span>
+</div>
+<span class="font-data-mono-sm text-data-mono-sm text-secondary font-semibold">TICK ₹1.00 / 10g</span>
+</div>
+<div class="grid grid-cols-2 sm:grid-cols-3 gap-space-sm my-space-xs font-data-mono-sm text-data-mono-sm">
+<div class="bg-surface-container p-space-xs rounded">
+<span class="block text-on-surface-variant text-[10px] uppercase font-label-xs">Contract Size</span>
+<span class="text-on-surface font-semibold">100 Grams</span>
+</div>
+<div class="bg-surface-container p-space-xs rounded">
+<span class="block text-on-surface-variant text-[10px] uppercase font-label-xs">Purity / Fineness</span>
+<span class="text-on-surface font-semibold">995 (99.50%)</span>
+</div>
+<div class="bg-surface-container p-space-xs rounded">
+<span class="block text-on-surface-variant text-[10px] uppercase font-label-xs">Active Expiry</span>
+<span class="text-on-surface font-semibold">05 JUN 2025</span>
+</div>
+<div class="bg-surface-container p-space-xs rounded">
+<span class="block text-on-surface-variant text-[10px] uppercase font-label-xs">Quotation Unit</span>
+<span class="text-on-surface font-semibold">₹ per 10g</span>
+</div>
+<div class="bg-surface-container p-space-xs rounded">
+<span class="block text-on-surface-variant text-[10px] uppercase font-label-xs">Delivery Mode</span>
+<span class="text-on-surface font-semibold">Compulsory Demat</span>
+</div>
+<div class="bg-surface-container p-space-xs rounded">
+<span class="block text-on-surface-variant text-[10px] uppercase font-label-xs">Lot Multiplier</span>
+<span class="text-primary font-semibold">10x Parity</span>
+</div>
+</div>
+<div class="flex items-center justify-between pt-space-xs bg-surface-container px-space-sm py-1 rounded">
+<span class="font-body-sm text-body-sm text-on-surface-variant">Last Traded Price:</span>
+<span class="font-data-mono-lg text-data-mono-lg text-on-surface font-bold">₹71,480.00 <span class="font-data-mono-sm text-[10px] text-on-surface-variant font-normal">/ 10g</span></span>
+</div>
+</div>
+<!-- GOLDPETAL Card -->
+<div class="bg-surface-container-low p-space-md rounded flex flex-col justify-between">
+<div class="flex items-center justify-between pb-space-xs">
+<div class="flex items-center gap-space-xs">
+<span class="font-headline-md text-headline-md text-primary font-bold">GOLDPETAL (Micro)</span>
+<span class="font-data-mono-sm text-[10px] px-1.5 py-0.5 rounded bg-surface-container-highest text-on-surface">1g Granular Lot</span>
+</div>
+<span class="font-data-mono-sm text-data-mono-sm text-secondary font-semibold">TICK ₹1.00 / 1g</span>
+</div>
+<div class="grid grid-cols-2 sm:grid-cols-3 gap-space-sm my-space-xs font-data-mono-sm text-data-mono-sm">
+<div class="bg-surface-container p-space-xs rounded">
+<span class="block text-on-surface-variant text-[10px] uppercase font-label-xs">Contract Size</span>
+<span class="text-on-surface font-semibold">1 Gram</span>
+</div>
+<div class="bg-surface-container p-space-xs rounded">
+<span class="block text-on-surface-variant text-[10px] uppercase font-label-xs">Purity / Fineness</span>
+<span class="text-on-surface font-semibold">995 (99.50%)</span>
+</div>
+<div class="bg-surface-container p-space-xs rounded">
+<span class="block text-on-surface-variant text-[10px] uppercase font-label-xs">Active Expiry</span>
+<span class="text-on-surface font-semibold">30 JUN 2025</span>
+</div>
+<div class="bg-surface-container p-space-xs rounded">
+<span class="block text-on-surface-variant text-[10px] uppercase font-label-xs">Quotation Unit</span>
+<span class="text-on-surface font-semibold">₹ per 1g</span>
+</div>
+<div class="bg-surface-container p-space-xs rounded">
+<span class="block text-on-surface-variant text-[10px] uppercase font-label-xs">Delivery Mode</span>
+<span class="text-on-surface font-semibold">Vault E-Receipt</span>
+</div>
+<div class="bg-surface-container p-space-xs rounded">
+<span class="block text-on-surface-variant text-[10px] uppercase font-label-xs">Scalar Transformation</span>
+<span class="text-secondary font-semibold">×10 Scaling</span>
+</div>
+</div>
+<div class="flex items-center justify-between pt-space-xs bg-surface-container px-space-sm py-1 rounded">
+<span class="font-body-sm text-body-sm text-on-surface-variant">Raw ₹7,152.00/g → Normalized:</span>
+<span class="font-data-mono-lg text-data-mono-lg text-primary font-bold">₹71,520.00 <span class="font-data-mono-sm text-[10px] text-on-surface-variant font-normal">/ 10g eq</span></span>
+</div>
+</div>
+</div>
+<!-- High-Visibility Theoretical Callout -->
+<div class="bg-surface-container-high p-space-md rounded flex items-start gap-space-md shadow-sm">
+<span class="material-symbols-outlined text-primary text-[24px] mt-0.5 shrink-0">info</span>
+<div class="flex flex-col gap-1">
+<span class="font-headline-md text-headline-md text-primary font-bold uppercase tracking-wider">Why Normalization is Required</span>
+<p class="font-body-md text-body-md text-on-surface">
+            Raw futures quotes cannot be directly subtracted: GOLDM trades in units of <strong class="text-primary">₹ per 10 grams</strong> with a 100g contract multiplier, whereas GOLDPETAL trades in <strong class="text-primary">₹ per 1 gram</strong> with a single-gram multiplier. Direct difference yields an erroneous basis artifact of ₹64,328.00. The analytical engine transforms all GOLDPETAL quotes via the mathematical operator:
+            <span class="inline-block font-data-mono-sm text-data-mono-sm px-2 py-0.5 mx-1 rounded bg-surface-container-lowest text-secondary">
+              P_normalized = P_raw × 10
+            </span>
+            aligning identical physical bullion weights and exposing the true economic spread of <span class="text-secondary font-semibold">+₹40.00 / 10g</span>.
+          </p>
+</div>
+</div>
+</div>
+</section>
+<!-- SECTION 3: PRICE & VOLUME ANALYSIS DUAL-AXIS DASHBOARD -->
+<section class="mb-space-lg grid grid-cols-1 lg:grid-cols-3 gap-space-md">
+<!-- Chart Container (2 Cols) -->
+<div class="lg:col-span-2 bg-surface-container p-space-md rounded shadow-md flex flex-col justify-between">
+<div class="flex items-center justify-between mb-space-sm">
+<div class="flex flex-col">
+<h3 class="font-headline-lg text-headline-lg text-on-surface">Dual-Axis Price Normalization &amp; Trend</h3>
+<span class="font-label-xs text-label-xs text-on-surface-variant font-mono">15-DAY ROLLING DIVERGENCE PATH (MCX JUNE SERIES)</span>
+</div>
+<div class="flex items-center gap-space-sm font-data-mono-sm text-[10px]">
+<span class="flex items-center gap-1.5"><span class="w-3 h-0.5 bg-primary"></span> GOLDM (₹/10g)</span>
+<span class="flex items-center gap-1.5"><span class="w-3 h-0.5 bg-secondary"></span> GOLDPETAL (×10 Eq)</span>
+<span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-sm bg-surface-container-highest"></span> Spread Bar</span>
+</div>
+</div>
+<!-- Vector Visual Chart -->
+<div class="relative w-full h-64 bg-surface-container-low rounded p-2 flex flex-col justify-between overflow-hidden">
+<!-- Grid lines -->
+<div class="absolute inset-0 flex flex-col justify-between pointer-events-none p-4 opacity-20">
+<div class="w-full h-px bg-on-surface-variant"></div>
+<div class="w-full h-px bg-on-surface-variant"></div>
+<div class="w-full h-px bg-on-surface-variant"></div>
+<div class="w-full h-px bg-on-surface-variant"></div>
+<div class="w-full h-px bg-on-surface-variant"></div>
+</div>
+<!-- Inline SVG Visualization -->
+<svg class="w-full h-full relative z-10" preserveaspectratio="none" viewbox="0 0 650 200">
+<defs>
+<lineargradient id="spreadAreaGrad" x1="0" x2="0" y1="0" y2="1">
+<stop offset="0%" stop-color="#4edea3" stop-opacity="0.25"></stop>
+<stop offset="100%" stop-color="#4edea3" stop-opacity="0.0"></stop>
+</lineargradient>
+</defs>
+<!-- Divergence Area Envelope -->
+<polygon fill="url(#spreadAreaGrad)" points="
+            40,140 80,132 130,126 180,135 230,115 280,105 330,95 380,88 430,96 480,82 530,75 580,68 620,52
+            620,92 580,84 530,90 480,95 430,108 380,102 330,108 280,116 230,125 180,142 130,134 80,138 40,144"></polygon>
+<!-- GOLDM Trace (Gold line) -->
+<polyline fill="none" points="40,144 80,138 130,134 180,142 230,125 280,116 330,108 380,102 430,108 480,95 530,90 580,84 620,92" stroke="#ffc174" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"></polyline>
+<!-- GOLDPETAL Normalized Trace (Mint line) -->
+<polyline fill="none" points="40,140 80,132 130,126 180,135 230,115 280,105 330,95 380,88 430,96 480,82 530,75 580,68 620,52" stroke="#4edea3" stroke-dasharray="3,1" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"></polyline>
+<!-- Current Divergence Line -->
+<line stroke="#ffb3ad" stroke-dasharray="2,2" stroke-width="2" x1="620" x2="620" y1="52" y2="92"></line>
+<circle cx="620" cy="52" fill="#4edea3" r="4"></circle>
+<circle cx="620" cy="92" fill="#ffc174" r="4"></circle>
+</svg>
+<!-- Current Price Overlay labels inside chart -->
+<div class="flex items-center justify-between text-[10px] font-data-mono-sm text-on-surface-variant px-2 pt-1 border-t border-surface-container">
+<span>DAY -15 (16 MAY)</span>
+<span>DAY -10 (21 MAY)</span>
+<span>DAY -5 (26 MAY)</span>
+<span>DAY 0 (31 MAY - LAST EOD)</span>
+<span class="text-secondary font-bold">DELTA: +₹40.00 / 10g</span>
+</div>
+</div>
+<!-- Chart Metadata Footer -->
+<div class="grid grid-cols-3 gap-space-sm pt-space-sm mt-space-xs text-center font-data-mono-sm">
+<div class="bg-surface-container-low p-space-xs rounded">
+<span class="block text-on-surface-variant text-[10px]">MIN DISPARITY</span>
+<span class="text-on-surface font-semibold">-₹4.00</span>
+</div>
+<div class="bg-surface-container-low p-space-xs rounded">
+<span class="block text-on-surface-variant text-[10px]">CORRELATION (15D)</span>
+<span class="text-secondary font-semibold">0.9984 (P &lt; 0.001)</span>
+</div>
+<div class="bg-surface-container-low p-space-xs rounded">
+<span class="block text-on-surface-variant text-[10px]">MAX DISPARITY</span>
+<span class="text-tertiary-fixed-dim font-semibold">+₹48.00</span>
+</div>
+</div>
+</div>
+<!-- Volume & Open Interest Liquidity Profile (1 Col) -->
+<div class="bg-surface-container p-space-md rounded shadow-md flex flex-col justify-between">
+<div>
+<div class="flex items-center justify-between pb-space-xs">
+<h3 class="font-headline-lg text-headline-lg text-on-surface">Liquidity Structure</h3>
+<span class="font-label-xs text-label-xs text-secondary font-mono">MCX CLEARED</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant mb-space-md">
+          Volume participation ratio vs. cumulative market open interest concentration across mini and micro tiers.
+        </p>
+<!-- Volume Stacked Visual -->
+<div class="flex flex-col gap-space-md">
+<div>
+<div class="flex items-center justify-between font-data-mono-sm text-data-mono-sm mb-1">
+<span class="text-on-surface">Daily Volume Distribution</span>
+<span class="text-primary font-bold">96.9k Total Lots</span>
+</div>
+<div class="w-full h-5 bg-surface-container-low rounded overflow-hidden flex">
+<div class="h-full bg-primary flex items-center justify-center text-[9px] font-bold text-on-primary" style="width: 15.3%;">15.3%</div>
+<div class="h-full bg-secondary flex items-center justify-center text-[9px] font-bold text-on-secondary" style="width: 84.7%;">84.7% (GOLDPETAL)</div>
+</div>
+<div class="flex justify-between font-data-mono-sm text-[10px] text-on-surface-variant mt-1">
+<span>GOLDM: 14.8k lots</span>
+<span>GOLDPETAL: 82.1k lots</span>
+</div>
+</div>
+<!-- Open Interest Distribution -->
+<div>
+<div class="flex items-center justify-between font-data-mono-sm text-data-mono-sm mb-1">
+<span class="text-on-surface">Open Interest (OI) Depth</span>
+<span class="text-primary font-bold">53,090 Total Contracts</span>
+</div>
+<div class="w-full h-5 bg-surface-container-low rounded overflow-hidden flex">
+<div class="h-full bg-primary flex items-center justify-center text-[9px] font-bold text-on-primary" style="width: 28.1%;">28%</div>
+<div class="h-full bg-secondary flex items-center justify-center text-[9px] font-bold text-on-secondary" style="width: 71.9%;">72% (Micro Lots)</div>
+</div>
+<div class="flex justify-between font-data-mono-sm text-[10px] text-on-surface-variant mt-1">
+<span>GOLDM: 14,890 OI</span>
+<span>GOLDPETAL: 38,200 OI</span>
+</div>
+</div>
+<!-- Turnover Equivalency Insight -->
+<div class="bg-surface-container-low p-space-sm rounded mt-space-xs">
+<span class="font-label-xs text-label-xs text-on-surface-variant uppercase font-semibold">Weight-Equivalent Turnover</span>
+<div class="flex justify-between items-center mt-1">
+<span class="font-data-mono-sm text-data-mono-sm text-on-surface">GOLDM: ₹1,057.9 Cr</span>
+<span class="font-data-mono-sm text-data-mono-sm text-secondary">PETAL: ₹58.7 Cr</span>
+</div>
+<span class="font-body-sm text-[10px] text-on-surface-variant mt-1 block">
+              GOLDPETAL exhibits superior transaction count but lower notional turnover (0.055x of mini desk velocity).
+            </span>
+</div>
+</div>
+</div>
+<div class="pt-space-sm">
+<span class="font-label-xs text-[9px] text-on-surface-variant uppercase font-mono tracking-tight">Source: MCX Bhavcopy Session Statistics</span>
+</div>
+</div>
+</section>
+<!-- SECTION 4: RELATIVE SPREAD & DISPERSION METRICS -->
+<section class="mb-space-lg">
+<div class="bg-surface-container p-space-md rounded shadow-md flex flex-col gap-space-md">
+<div class="flex flex-wrap items-center justify-between gap-space-sm">
+<div class="flex items-center gap-space-sm">
+<span class="material-symbols-outlined text-secondary text-[20px]">show_chart</span>
+<div>
+<h2 class="font-headline-lg text-headline-lg text-on-surface">Relative Spread Dynamics</h2>
+<span class="font-label-xs text-label-xs text-on-surface-variant uppercase tracking-wider">Empirical Differential Series &amp; Volatility Bounds</span>
+</div>
+</div>
+<div class="flex items-center gap-space-xs font-data-mono-sm text-data-mono-sm">
+<span class="px-2 py-0.5 rounded bg-surface-container-highest text-on-surface">WINDOW: 20 SESSIONS</span>
+<span class="px-2 py-0.5 rounded bg-surface-container-highest text-on-surface">ESTIMATOR: ROLLING EWMA</span>
+</div>
+</div>
+<!-- Metric Cards Grid -->
+<div class="grid grid-cols-2 lg:grid-cols-4 gap-space-sm">
+<!-- Current Spread -->
+<div class="bg-surface-container-low p-space-md rounded border-l-2 border-secondary shadow-sm">
+<span class="font-label-xs text-label-xs text-on-surface-variant uppercase">Current Spread (Normalized)</span>
+<div class="flex items-baseline gap-space-xs mt-1">
+<span class="font-data-mono-xl text-data-mono-xl text-secondary font-bold">+₹40.00</span>
+<span class="font-data-mono-sm text-data-mono-sm text-on-surface-variant">/ 10g</span>
+</div>
+<span class="font-body-sm text-[10px] text-secondary mt-1 block">Upper Decile Regime (+2.61σ)</span>
+</div>
+<!-- 20D Mean -->
+<div class="bg-surface-container-low p-space-md rounded border-l-2 border-primary shadow-sm">
+<span class="font-label-xs text-label-xs text-on-surface-variant uppercase">Historical 20D Mean (μ)</span>
+<div class="flex items-baseline gap-space-xs mt-1">
+<span class="font-data-mono-xl text-data-mono-xl text-primary font-bold">+₹15.20</span>
+<span class="font-data-mono-sm text-data-mono-sm text-on-surface-variant">/ 10g</span>
+</div>
+<span class="font-body-sm text-[10px] text-on-surface-variant mt-1 block">Baseline Carrying Premium</span>
+</div>
+<!-- Standard Deviation -->
+<div class="bg-surface-container-low p-space-md rounded border-l-2 border-surface-container-highest shadow-sm">
+<span class="font-label-xs text-label-xs text-on-surface-variant uppercase">Standard Deviation (1σ)</span>
+<div class="flex items-baseline gap-space-xs mt-1">
+<span class="font-data-mono-xl text-data-mono-xl text-on-surface font-bold">₹9.50</span>
+<span class="font-data-mono-sm text-data-mono-sm text-on-surface-variant">dispersion</span>
+</div>
+<span class="font-body-sm text-[10px] text-on-surface-variant mt-1 block">Sample Variance: 90.25 ₹²</span>
+</div>
+<!-- 20D Spread Range -->
+<div class="bg-surface-container-low p-space-md rounded border-l-2 border-tertiary-fixed-dim shadow-sm">
+<span class="font-label-xs text-label-xs text-on-surface-variant uppercase">20D Spread Range</span>
+<div class="flex items-baseline gap-space-xs mt-1">
+<span class="font-data-mono-xl text-data-mono-xl text-tertiary-fixed-dim font-bold">-₹4.00 to +₹48.00</span>
+</div>
+<span class="font-body-sm text-[10px] text-on-surface-variant mt-1 block">Extreme Bandwidth: ₹52.00</span>
+</div>
+</div>
+<!-- Spread Chart Visual: 15-day rolling spread with ±2σ envelope -->
+<div class="bg-surface-container-low p-space-md rounded flex flex-col gap-space-xs">
+<div class="flex justify-between items-center">
+<span class="font-data-mono-sm text-data-mono-sm text-on-surface font-semibold uppercase">15-Day Spread Time Series &amp; Volatility Envelope</span>
+<div class="flex items-center gap-space-md text-[10px] font-data-mono-sm text-on-surface-variant">
+<span class="flex items-center gap-1"><span class="w-3 h-0.5 bg-tertiary"></span> +2σ Threshold (₹34.20)</span>
+<span class="flex items-center gap-1"><span class="w-3 h-0.5 bg-primary"></span> 20D Mean (₹15.20)</span>
+<span class="flex items-center gap-1"><span class="w-3 h-0.5 bg-tertiary"></span> -2σ Threshold (-₹3.80)</span>
+</div>
+</div>
+<div class="relative w-full h-44 bg-surface-container-lowest rounded p-2 overflow-hidden">
+<svg class="w-full h-full" preserveaspectratio="none" viewbox="0 0 600 140">
+<!-- +2 Sigma Line -->
+<line opacity="0.6" stroke="#ffb4ab" stroke-dasharray="4,4" stroke-width="1" x1="20" x2="580" y1="35" y2="35"></line>
+<text fill="#ffb4ab" font-family="JetBrains Mono" font-size="8" x="585" y="38">+2σ</text>
+<!-- Mean Line -->
+<line stroke="#ffc174" stroke-dasharray="2,2" stroke-width="1.5" x1="20" x2="580" y1="75" y2="75"></line>
+<text fill="#ffc174" font-family="JetBrains Mono" font-size="8" x="585" y="78">μ</text>
+<!-- -2 Sigma Line -->
+<line opacity="0.6" stroke="#ffb4ab" stroke-dasharray="4,4" stroke-width="1" x1="20" x2="580" y1="115" y2="115"></line>
+<text fill="#ffb4ab" font-family="JetBrains Mono" font-size="8" x="585" y="118">-2σ</text>
+<!-- Shaded ±2σ Corridor -->
+<rect fill="#273647" height="80" opacity="0.25" width="560" x="20" y="35"></rect>
+<!-- Real Spread Line Path -->
+<polyline fill="none" points="20,80 55,72 90,85 130,68 170,75 210,62 250,55 290,70 330,60 370,48 410,42 450,45 490,32 530,28 570,22" stroke="#4edea3" stroke-linejoin="round" stroke-width="2.5"></polyline>
+<!-- Highlight Current Spread Point -->
+<circle cx="570" cy="22" fill="#4edea3" r="5" stroke="#051424" stroke-width="2"></circle>
+</svg>
+<div class="absolute bottom-1 left-4 right-8 flex justify-between font-data-mono-sm text-[9px] text-on-surface-variant">
+<span>D-15</span>
+<span>D-12</span>
+<span>D-9</span>
+<span>D-6</span>
+<span>D-3</span>
+<span class="text-secondary font-bold">CURRENT: +₹40.00</span>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- SECTION 5: Z-SCORE DEVIATION & STATISTICAL REFERENCE LEVELS -->
+<section class="mb-space-lg">
+<div class="bg-surface-container p-space-md rounded shadow-md flex flex-col gap-space-md">
+<div class="flex flex-wrap items-center justify-between gap-space-sm">
+<div class="flex items-center gap-space-sm">
+<span class="material-symbols-outlined text-primary text-[20px]">analytics</span>
+<div>
+<h2 class="font-headline-lg text-headline-lg text-on-surface">Z-Score Deviation &amp; Reference Levels</h2>
+<span class="font-label-xs text-label-xs text-on-surface-variant uppercase tracking-wider">Normalized Gaussian Dispersion &amp; Extremity Mapping</span>
+</div>
+</div>
+<div class="px-space-md py-1 rounded bg-secondary-container/20 text-secondary border border-secondary/30 font-data-mono-sm text-data-mono-sm flex items-center gap-2">
+<span>CURRENT READING:</span>
+<strong class="font-data-mono-lg text-data-mono-lg">Z = +2.61σ</strong>
+<span class="text-[10px] text-on-surface-variant">(99.55th Percentile)</span>
+</div>
+</div>
+<!-- Statistical Reference Bands Table & Vertical Dispersion Gauge -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-space-md">
+<!-- Gauge Graphic (5 cols) -->
+<div class="lg:col-span-5 bg-surface-container-low p-space-md rounded flex flex-col justify-between">
+<span class="font-label-xs text-label-xs text-on-surface-variant uppercase font-semibold">Standardized Sigma Ladder</span>
+<div class="flex flex-col gap-2 my-space-xs font-data-mono-sm text-data-mono-sm">
+<!-- +3.0 Sigma -->
+<div class="flex items-center justify-between p-space-xs rounded bg-surface-container">
+<span class="text-tertiary-fixed-dim font-bold">+3.0σ Extreme Line</span>
+<span class="text-on-surface">+₹43.70</span>
+<span class="text-[10px] text-on-surface-variant">0.13% prob</span>
+</div>
+<!-- Current Position Banner -->
+<div class="flex items-center justify-between p-space-xs rounded bg-secondary text-on-secondary font-bold shadow-md ring-2 ring-secondary/50 -mx-1">
+<span class="flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">arrow_right</span>
+                CURRENT: Z = +2.61σ
+              </span>
+<span>+₹40.00</span>
+<span class="text-[10px] uppercase tracking-wider">Reference Level</span>
+</div>
+<!-- +2.0 Sigma -->
+<div class="flex items-center justify-between p-space-xs rounded bg-surface-container">
+<span class="text-primary font-semibold">+2.0σ Threshold</span>
+<span class="text-on-surface">+₹34.20</span>
+<span class="text-[10px] text-on-surface-variant">2.28% prob</span>
+</div>
+<!-- Mean 0.0 Sigma -->
+<div class="flex items-center justify-between p-space-xs rounded bg-surface-container">
+<span class="text-on-surface font-semibold">0.0σ Historical Mean</span>
+<span class="text-primary font-bold">+₹15.20</span>
+<span class="text-[10px] text-on-surface-variant">50.00% prob</span>
+</div>
+<!-- -2.0 Sigma -->
+<div class="flex items-center justify-between p-space-xs rounded bg-surface-container">
+<span class="text-primary font-semibold">-2.0σ Threshold</span>
+<span class="text-on-surface">-₹3.80</span>
+<span class="text-[10px] text-on-surface-variant">2.28% prob</span>
+</div>
+<!-- -3.0 Sigma -->
+<div class="flex items-center justify-between p-space-xs rounded bg-surface-container">
+<span class="text-tertiary-fixed-dim font-bold">-3.0σ Extreme Line</span>
+<span class="text-on-surface">-₹13.30</span>
+<span class="text-[10px] text-on-surface-variant">0.13% prob</span>
+</div>
+</div>
+<div class="text-[11px] font-body-sm text-on-surface-variant bg-surface-container p-2 rounded">
+<strong>Descriptive Note:</strong> Z-Score measures the current normalized spread distance from its rolling 20-day mean in standard deviation units. This metric provides empirical state classification and is not an order generation signal.
+          </div>
+</div>
+<!-- Normal Distribution Curve (7 cols) -->
+<div class="lg:col-span-7 bg-surface-container-low p-space-md rounded flex flex-col justify-between">
+<div class="flex justify-between items-center">
+<span class="font-label-xs text-label-xs text-on-surface-variant uppercase font-semibold">Gaussian Probability Density with Current Location</span>
+<span class="font-data-mono-sm text-[10px] text-secondary">Z = (Spread - μ) / σ = (+40 - 15.20) / 9.50 = +2.61</span>
+</div>
+<div class="relative w-full h-48 bg-surface-container-lowest rounded my-space-xs p-2 overflow-hidden flex items-end">
+<svg class="w-full h-full" preserveaspectratio="none" viewbox="0 0 500 150">
+<defs>
+<lineargradient id="bellGrad" x1="0" x2="0" y1="0" y2="1">
+<stop offset="0%" stop-color="#ffc174" stop-opacity="0.3"></stop>
+<stop offset="100%" stop-color="#ffc174" stop-opacity="0.02"></stop>
+</lineargradient>
+</defs>
+<!-- Bell Curve Area -->
+<path d="M 20,140 Q 150,140 210,50 T 250,10 T 290,50 Q 350,140 480,140 Z" fill="url(#bellGrad)" stroke="#ffc174" stroke-width="2"></path>
+<!-- Baseline -->
+<line stroke="#273647" stroke-width="1.5" x1="20" x2="480" y1="140" y2="140"></line>
+<!-- Standard deviation lines -->
+<line stroke="#ffc174" stroke-dasharray="2,2" stroke-width="1" x1="250" x2="250" y1="10" y2="140"></line> <!-- Mean 0 -->
+<line stroke="#ffb4ab" stroke-dasharray="2,2" stroke-width="1" x1="330" x2="330" y1="70" y2="140"></line> <!-- +1 sigma -->
+<line stroke="#ffb4ab" stroke-dasharray="2,2" stroke-width="1" x1="410" x2="410" y1="120" y2="140"></line> <!-- +2 sigma -->
+<line stroke="#ffb4ab" stroke-dasharray="2,2" stroke-width="1" x1="170" x2="170" y1="70" y2="140"></line> <!-- -1 sigma -->
+<line stroke="#ffb4ab" stroke-dasharray="2,2" stroke-width="1" x1="90" x2="90" y1="120" y2="140"></line> <!-- -2 sigma -->
+<!-- Active Value Pin at +2.61 Sigma (~435px) -->
+<line stroke="#4edea3" stroke-width="2" x1="438" x2="438" y1="20" y2="140"></line>
+<polygon fill="#4edea3" points="438,20 433,10 443,10"></polygon>
+</svg>
+<div class="absolute top-4 right-10 bg-surface-container px-2 py-1 rounded border border-secondary/40 text-secondary font-data-mono-sm text-[10px]">
+              Active: +2.61σ (+₹40.00)
+            </div>
+</div>
+<div class="grid grid-cols-5 text-center font-data-mono-sm text-[10px] text-on-surface-variant pt-1 border-t border-surface-container">
+<span>-2σ (-₹3.80)</span>
+<span>-1σ (+₹5.70)</span>
+<span class="text-primary font-bold">μ (+₹15.20)</span>
+<span>+1σ (+₹24.70)</span>
+<span class="text-tertiary-fixed-dim">+2σ (+₹34.20)</span>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- SECTION 6: HISTORICAL SIMILARITY ENGINE -->
+<section class="mb-space-lg">
+<div class="bg-surface-container p-space-md rounded shadow-md flex flex-col gap-space-md">
+<div class="flex flex-wrap items-center justify-between gap-space-sm">
+<div class="flex items-center gap-space-sm">
+<span class="material-symbols-outlined text-primary text-[20px]">history_toggle_off</span>
+<div>
+<h2 class="font-headline-lg text-headline-lg text-on-surface">Historical Similarity Engine</h2>
+<span class="font-label-xs text-label-xs text-on-surface-variant uppercase tracking-wider">Analog Matching Across 18 Similar |Z| ≥ 2.50σ Regimes (24-Month Window)</span>
+</div>
+</div>
+<span class="font-data-mono-sm text-data-mono-sm px-2 py-0.5 rounded bg-surface-container-highest text-secondary">
+          MATCH SAMPLE: N = 18 EVENTS
+        </span>
+</div>
+<!-- Reversion Horizon Distribution Cards & Visuals -->
+<div class="grid grid-cols-1 md:grid-cols-4 gap-space-sm">
+<div class="bg-surface-container-low p-space-sm rounded">
+<div class="flex items-center justify-between">
+<span class="font-label-xs text-[10px] text-on-surface-variant uppercase font-semibold">Immediate Reversion</span>
+<span class="font-data-mono-sm text-data-mono-sm text-secondary font-bold">22.2%</span>
+</div>
+<span class="font-data-mono-lg text-data-mono-lg text-on-surface mt-1 block">&lt; 2 Hours</span>
+<div class="w-full bg-surface-container h-1.5 rounded mt-2 overflow-hidden">
+<div class="bg-secondary h-full" style="width: 22.2%"></div>
+</div>
+<span class="font-body-sm text-[10px] text-on-surface-variant mt-1 block">4 of 18 regimes</span>
+</div>
+<div class="bg-surface-container-low p-space-sm rounded border-l-2 border-primary">
+<div class="flex items-center justify-between">
+<span class="font-label-xs text-[10px] text-on-surface-variant uppercase font-semibold">Median Reversion Horizon</span>
+<span class="font-data-mono-sm text-data-mono-sm text-primary font-bold">55.6%</span>
+</div>
+<span class="font-data-mono-lg text-data-mono-lg text-primary mt-1 block">2 – 6 Hours</span>
+<div class="w-full bg-surface-container h-1.5 rounded mt-2 overflow-hidden">
+<div class="bg-primary h-full" style="width: 55.6%"></div>
+</div>
+<span class="font-body-sm text-[10px] text-on-surface-variant mt-1 block">10 of 18 regimes (Modal class)</span>
+</div>
+<div class="bg-surface-container-low p-space-sm rounded">
+<div class="flex items-center justify-between">
+<span class="font-label-xs text-[10px] text-on-surface-variant uppercase font-semibold">Overnight Carry Reversion</span>
+<span class="font-data-mono-sm text-data-mono-sm text-on-surface font-bold">16.6%</span>
+</div>
+<span class="font-data-mono-lg text-data-mono-lg text-on-surface mt-1 block">Next Session Open</span>
+<div class="w-full bg-surface-container h-1.5 rounded mt-2 overflow-hidden">
+<div class="bg-surface-variant h-full" style="width: 16.6%"></div>
+</div>
+<span class="font-body-sm text-[10px] text-on-surface-variant mt-1 block">3 of 18 regimes</span>
+</div>
+<div class="bg-surface-container-low p-space-sm rounded">
+<div class="flex items-center justify-between">
+<span class="font-label-xs text-[10px] text-on-surface-variant uppercase font-semibold">Regime Breakdown / Drift</span>
+<span class="font-data-mono-sm text-data-mono-sm text-tertiary-fixed-dim font-bold">5.6%</span>
+</div>
+<span class="font-data-mono-lg text-data-mono-lg text-tertiary-fixed-dim mt-1 block">&gt; 24h Non-Reversion</span>
+<div class="w-full bg-surface-container h-1.5 rounded mt-2 overflow-hidden">
+<div class="bg-tertiary-fixed-dim h-full" style="width: 5.6%"></div>
+</div>
+<span class="font-body-sm text-[10px] text-on-surface-variant mt-1 block">1 of 18 regimes (Structural Shift)</span>
+</div>
+</div>
+<!-- Historical Regime Analog Table -->
+<div class="bg-surface-container-low rounded overflow-hidden">
+<div class="p-space-xs bg-surface-container-high flex items-center justify-between font-label-xs text-[10px] text-on-surface-variant uppercase tracking-wider">
+<span>Top Analog Sample Cohort (Matching Parameters: Spread Peak &gt; +₹35, OI Ratio &gt; 2.2x)</span>
+<span>Sample Period: Jun 2023 – May 2025</span>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left font-data-mono-sm text-data-mono-sm">
+<thead class="bg-surface-container text-on-surface-variant text-[10px] uppercase border-b border-surface-container-highest">
+<tr>
+<th class="py-2 px-space-md">Event Date</th>
+<th class="py-2 px-space-md">Pre-Event Spread</th>
+<th class="py-2 px-space-md">Peak Deviation (Z)</th>
+<th class="py-2 px-space-md">Reversion Duration</th>
+<th class="py-2 px-space-md">Post-Reversion Level</th>
+<th class="py-2 px-space-md">Macro Factor Context</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-surface-container text-on-surface">
+<tr class="hover:bg-surface-container/50">
+<td class="py-2 px-space-md font-semibold text-primary">14-MAR-2025</td>
+<td class="py-2 px-space-md">+₹16.00</td>
+<td class="py-2 px-space-md text-secondary">+2.74σ (+₹41.20)</td>
+<td class="py-2 px-space-md">3h 40m</td>
+<td class="py-2 px-space-md">+₹14.80</td>
+<td class="py-2 px-space-md text-on-surface-variant text-[11px]">US CPI Data Release / Granular Retail Spike</td>
+</tr>
+<tr class="hover:bg-surface-container/50">
+<td class="py-2 px-space-md font-semibold text-primary">22-JAN-2025</td>
+<td class="py-2 px-space-md">+₹14.50</td>
+<td class="py-2 px-space-md text-secondary">+2.88σ (+₹42.50)</td>
+<td class="py-2 px-space-md">4h 15m</td>
+<td class="py-2 px-space-md">+₹16.10</td>
+<td class="py-2 px-space-md text-on-surface-variant text-[11px]">MCX Evening Session Liquidity Gap</td>
+</tr>
+<tr class="hover:bg-surface-container/50">
+<td class="py-2 px-space-md font-semibold text-primary">08-NOV-2024</td>
+<td class="py-2 px-space-md">+₹13.80</td>
+<td class="py-2 px-space-md text-secondary">+2.55σ (+₹39.40)</td>
+<td class="py-2 px-space-md">1h 50m</td>
+<td class="py-2 px-space-md">+₹15.00</td>
+<td class="py-2 px-space-md text-on-surface-variant text-[11px]">Diwali Physical Settlement Arbitrage Spike</td>
+</tr>
+<tr class="hover:bg-surface-container/50">
+<td class="py-2 px-space-md font-semibold text-primary">19-AUG-2024</td>
+<td class="py-2 px-space-md">+₹17.20</td>
+<td class="py-2 px-space-md text-tertiary-fixed-dim">+3.12σ (+₹46.80)</td>
+<td class="py-2 px-space-md text-tertiary-fixed-dim">Overnight (18h)</td>
+<td class="py-2 px-space-md">+₹18.40</td>
+<td class="py-2 px-space-md text-on-surface-variant text-[11px]">Union Budget Custom Duty Tariff Adjustment</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<!-- Critical Quantitative Disclosure -->
+<div class="p-space-sm rounded bg-surface-container-high/60 flex items-center gap-space-sm text-on-surface-variant font-body-sm text-[11px]">
+<span class="material-symbols-outlined text-[18px] text-outline">verified_user</span>
+<span>
+<strong class="text-on-surface">Statistical Disclosure:</strong> Historical similarity is descriptive evidence of past MCX contract pricing behavior and does not guarantee future reversion. Spread persistence may occur under structural changes in GST, physical delivery premiums, or delivery center logistical divergence.
+        </span>
+</div>
+</div>
+</section>
+<!-- SECTION 7: TERM STRUCTURE & CALENDAR CARRY MODULE -->
+<section class="mb-space-md">
+<div class="bg-surface-container p-space-md rounded shadow-md flex flex-col gap-space-sm">
+<div class="flex items-center justify-between pb-space-xs">
+<div class="flex items-center gap-space-sm">
+<span class="material-symbols-outlined text-primary text-[20px]">calendar_view_week</span>
+<div>
+<h2 class="font-headline-lg text-headline-lg text-on-surface">Term Structure &amp; Calendar Carry Analysis</h2>
+<span class="font-label-xs text-label-xs text-on-surface-variant uppercase tracking-wider">Multi-Tenor Basis &amp; Liquidity Threshold Filters</span>
+</div>
+</div>
+<span class="font-data-mono-sm text-data-mono-sm px-2 py-0.5 rounded bg-surface-container-high text-primary">ANNUALIZED CONTANGO BASIS: +3.12%</span>
+</div>
+<!-- Term Structure Tenor Cards -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-space-sm mt-space-xs">
+<!-- Jun-25 Tenor -->
+<div class="bg-surface-container-low p-space-sm rounded flex flex-col justify-between">
+<div class="flex justify-between items-center">
+<span class="font-headline-md text-headline-md text-on-surface">Jun-25 (Near Tenor)</span>
+<span class="font-data-mono-sm text-[10px] text-secondary font-bold">BENCHMARK</span>
+</div>
+<div class="my-space-xs font-data-mono-sm">
+<div class="flex justify-between text-data-mono-sm">
+<span class="text-on-surface-variant">LTP (₹/10g):</span>
+<span class="text-on-surface font-semibold">₹71,480</span>
+</div>
+<div class="flex justify-between text-[11px]">
+<span class="text-on-surface-variant">Active OI:</span>
+<span class="text-secondary font-semibold">14,890 lots</span>
+</div>
+<div class="flex justify-between text-[11px]">
+<span class="text-on-surface-variant">Cointegration:</span>
+<span class="text-on-surface font-semibold">Included (ADF p=0.012)</span>
+</div>
+</div>
+<span class="font-label-xs text-[9px] text-secondary uppercase font-mono">Status: Primary Analytical Baseline</span>
+</div>
+<!-- Aug-25 Tenor -->
+<div class="bg-surface-container-low p-space-sm rounded flex flex-col justify-between">
+<div class="flex justify-between items-center">
+<span class="font-headline-md text-headline-md text-on-surface">Aug-25 (Next Tenor)</span>
+<span class="font-data-mono-sm text-[10px] text-primary font-bold">+₹372 Carry</span>
+</div>
+<div class="my-space-xs font-data-mono-sm">
+<div class="flex justify-between text-data-mono-sm">
+<span class="text-on-surface-variant">LTP (₹/10g):</span>
+<span class="text-on-surface font-semibold">₹71,852</span>
+</div>
+<div class="flex justify-between text-[11px]">
+<span class="text-on-surface-variant">Active OI:</span>
+<span class="text-on-surface font-semibold">4,120 lots</span>
+</div>
+<div class="flex justify-between text-[11px]">
+<span class="text-on-surface-variant">Annualized Carry:</span>
+<span class="text-primary font-semibold">+3.12% Contango</span>
+</div>
+</div>
+<span class="font-label-xs text-[9px] text-primary uppercase font-mono">Status: Active Hedge Tenor</span>
+</div>
+<!-- Oct-25 Tenor (Low Liquidity Excluded) -->
+<div class="bg-surface-container-low p-space-sm rounded opacity-80 flex flex-col justify-between">
+<div class="flex justify-between items-center">
+<span class="font-headline-md text-headline-md text-on-surface-variant">Oct-25 (Far Tenor)</span>
+<span class="font-data-mono-sm text-[10px] text-tertiary font-bold">FILTERED OUT</span>
+</div>
+<div class="my-space-xs font-data-mono-sm">
+<div class="flex justify-between text-data-mono-sm">
+<span class="text-on-surface-variant">LTP (₹/10g):</span>
+<span class="text-on-surface-variant font-semibold">₹72,210 (Illiquid)</span>
+</div>
+<div class="flex justify-between text-[11px]">
+<span class="text-on-surface-variant">Active OI:</span>
+<span class="text-tertiary font-semibold">184 lots (&lt; 500 threshold)</span>
+</div>
+<div class="flex justify-between text-[11px]">
+<span class="text-on-surface-variant">Data Reliability:</span>
+<span class="text-tertiary font-semibold">Low Reliability</span>
+</div>
+</div>
+<span class="font-label-xs text-[9px] text-tertiary uppercase font-mono">Status: Excluded from Econometric Model</span>
+</div>
+</div>
+<!-- Liquidity Threshold Governance Note -->
+<div class="mt-space-xs p-space-sm rounded bg-surface-container-low flex items-start gap-space-sm">
+<span class="material-symbols-outlined text-[16px] text-primary mt-0.5 shrink-0">filter_alt</span>
+<p class="font-body-sm text-body-sm text-on-surface-variant">
+<strong class="text-on-surface">Data Reliability Governance:</strong> Far-month contracts with open interest under 500 lots (e.g., Oct-25) are strictly excluded from cointegration calculations and Z-score tracking to prevent noise artifacts caused by sparse order books and wide bid-ask slippage.
+        </p>
+</div>
+</div>
+</section>
+</div></main></div></body></html>

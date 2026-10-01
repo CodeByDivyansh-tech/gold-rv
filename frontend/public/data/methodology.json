@@ -1,0 +1,67 @@
+{
+  "stages": [
+    {
+      "step": 1,
+      "name": "Load & Validate",
+      "desc": "Parse 11,954 rows, strip symbols, check primary keys, filter no-trade days."
+    },
+    {
+      "step": 2,
+      "name": "Normalize",
+      "desc": "Divide close by quote_grams and purity to obtain pure \u20b9/g reference."
+    },
+    {
+      "step": 3,
+      "name": "Implied Carry",
+      "desc": "Extract term structure carry from liquid GOLDPETAL calendar spreads; forward-fill only."
+    },
+    {
+      "step": 4,
+      "name": "Pair Construction",
+      "desc": "Pair contracts with t-1 open interest to avoid look-ahead bias."
+    },
+    {
+      "step": 5,
+      "name": "Point-in-Time z-scores",
+      "desc": "Compute rolling mean and std strictly using t-1 and earlier observations."
+    },
+    {
+      "step": 6,
+      "name": "Five-Gate Alerts",
+      "desc": "Filter trades through history, extreme, edge vs cost, liquidity, and lifecycle gates."
+    },
+    {
+      "step": 7,
+      "name": "Walk-Forward Backtest",
+      "desc": "Freeze parameters on Train segment (2023-10 to 2025-09); execute on Test segment (2025-10 to 2026-09)."
+    },
+    {
+      "step": 8,
+      "name": "Attribution & Costs",
+      "desc": "Mark-to-market separating spread alpha from gold beta after realistic statutory costs and slippage."
+    }
+  ],
+  "split_dates": {
+    "train_start": "2023-10-10",
+    "train_end": "2025-09-30",
+    "test_start": "2025-10-01",
+    "test_end": "2026-09-30"
+  },
+  "point_in_time_rules": [
+    "Rolling z uses only t-1 and earlier observations (shifted window)",
+    "Contract pairing selects max min(OI) as of t-1",
+    "Parameters tuned strictly on in-sample Train data and frozen",
+    "Signals generated at close t execute at close t+1",
+    "Carry rate c_t is forward-filled only; never backward-filled"
+  ],
+  "limitations": [
+    "EOD settlement close is an official reference, not an executable book fill.",
+    "Bhavcopy volume indicates activity but does not measure order-book depth.",
+    "GOLDTEN contracts listed only on 31-Mar-2025, offering limited historical depth.",
+    "Test period contains only 6 to 16 trades per pair; small sample sizes preclude high certainty.",
+    "GOLDPETAL underwent a structural break in Dec-24 / Mar-25 of unknown mechanical cause.",
+    "Headline positive pairs owe their gains entirely to the single violent crisis episode of Jan-2026.",
+    "Exchange transaction charges and statutory rates should be regularly verified against MCX circulars."
+  ],
+  "honest_conclusion": "Cross-contract gold spreads are real, measurable and partly mean-reverting, but after realistic costs no pair shows a statistically significant edge on 12 months of unseen data. The only profits come from a single crisis episode. No persistent edge survives costs."
+}

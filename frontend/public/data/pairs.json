@@ -1,0 +1,800 @@
+[
+  {
+    "pair_id": "GUINEA_PETAL",
+    "display_name": "GOLDGUINEA \u2212 GOLDPETAL",
+    "symbol_a": "GOLDGUINEA",
+    "symbol_b": "GOLDPETAL",
+    "lot_ratio": "1 : 8",
+    "unit_grams": 8,
+    "contracts_label": "Oct-26 / Oct-26",
+    "expiry_a": "2026-10-30",
+    "expiry_b": "2026-10-30",
+    "spread_bps": 5.3,
+    "spread_rs_10g": 78.8,
+    "mu": 3.6,
+    "sd": 4.0,
+    "z": 0.41,
+    "z_needed": 2.5,
+    "percentile": 57.5,
+    "status": "QUIET",
+    "failed_gates": [
+      "extreme",
+      "edge"
+    ],
+    "gates": {
+      "enough_history": true,
+      "extreme": false,
+      "edge_beats_cost": false,
+      "liquidity": true,
+      "lifecycle": true
+    },
+    "vol_a": 12607,
+    "vol_b": 300838,
+    "oi_a": 14377,
+    "oi_b": 207175,
+    "td_to_exp_a": 22,
+    "td_to_exp_b": 22,
+    "roll_flag": false,
+    "chosen_params": {
+      "W": 20,
+      "ze": 2.5,
+      "mh": 10,
+      "zx": 0.5
+    },
+    "z_histogram": [
+      {
+        "bin_center": -5.44,
+        "count": 1
+      },
+      {
+        "bin_center": -4.95,
+        "count": 0
+      },
+      {
+        "bin_center": -4.46,
+        "count": 0
+      },
+      {
+        "bin_center": -3.97,
+        "count": 7
+      },
+      {
+        "bin_center": -3.49,
+        "count": 5
+      },
+      {
+        "bin_center": -3.0,
+        "count": 7
+      },
+      {
+        "bin_center": -2.51,
+        "count": 17
+      },
+      {
+        "bin_center": -2.03,
+        "count": 32
+      },
+      {
+        "bin_center": -1.54,
+        "count": 41
+      },
+      {
+        "bin_center": -1.05,
+        "count": 80
+      },
+      {
+        "bin_center": -0.56,
+        "count": 74
+      },
+      {
+        "bin_center": -0.08,
+        "count": 105
+      },
+      {
+        "bin_center": 0.41,
+        "count": 109
+      },
+      {
+        "bin_center": 0.9,
+        "count": 97
+      },
+      {
+        "bin_center": 1.38,
+        "count": 65
+      },
+      {
+        "bin_center": 1.87,
+        "count": 57
+      },
+      {
+        "bin_center": 2.36,
+        "count": 18
+      },
+      {
+        "bin_center": 2.85,
+        "count": 7
+      },
+      {
+        "bin_center": 3.33,
+        "count": 5
+      },
+      {
+        "bin_center": 3.82,
+        "count": 7
+      }
+    ],
+    "historical_evidence": {
+      "past_signals_count": 27,
+      "reverted_count": 11,
+      "stopped_count": 2,
+      "timed_out_count": 1,
+      "revert_rate_pct": 40.7,
+      "median_days_to_revert": 5.0
+    }
+  },
+  {
+    "pair_id": "TEN_PETAL",
+    "display_name": "GOLDTEN \u2212 GOLDPETAL",
+    "symbol_a": "GOLDTEN",
+    "symbol_b": "GOLDPETAL",
+    "lot_ratio": "1 : 10",
+    "unit_grams": 10,
+    "contracts_label": "Oct-26 / Oct-26",
+    "expiry_a": "2026-10-30",
+    "expiry_b": "2026-10-30",
+    "spread_bps": -40.8,
+    "spread_rs_10g": -608.6,
+    "mu": -28.8,
+    "sd": 8.3,
+    "z": -1.45,
+    "z_needed": 2.0,
+    "percentile": 8.4,
+    "status": "QUIET",
+    "failed_gates": [
+      "extreme",
+      "edge"
+    ],
+    "gates": {
+      "enough_history": true,
+      "extreme": false,
+      "edge_beats_cost": false,
+      "liquidity": true,
+      "lifecycle": true
+    },
+    "vol_a": 30456,
+    "vol_b": 300838,
+    "oi_a": 31599,
+    "oi_b": 207175,
+    "td_to_exp_a": 22,
+    "td_to_exp_b": 22,
+    "roll_flag": false,
+    "chosen_params": {
+      "W": 30,
+      "ze": 2.0,
+      "mh": 10,
+      "zx": 0.5
+    },
+    "z_histogram": [
+      {
+        "bin_center": -5.77,
+        "count": 2
+      },
+      {
+        "bin_center": -5.13,
+        "count": 0
+      },
+      {
+        "bin_center": -4.5,
+        "count": 1
+      },
+      {
+        "bin_center": -3.86,
+        "count": 4
+      },
+      {
+        "bin_center": -3.22,
+        "count": 1
+      },
+      {
+        "bin_center": -2.59,
+        "count": 4
+      },
+      {
+        "bin_center": -1.95,
+        "count": 9
+      },
+      {
+        "bin_center": -1.31,
+        "count": 35
+      },
+      {
+        "bin_center": -0.67,
+        "count": 58
+      },
+      {
+        "bin_center": -0.04,
+        "count": 92
+      },
+      {
+        "bin_center": 0.6,
+        "count": 60
+      },
+      {
+        "bin_center": 1.24,
+        "count": 56
+      },
+      {
+        "bin_center": 1.87,
+        "count": 22
+      },
+      {
+        "bin_center": 2.51,
+        "count": 6
+      },
+      {
+        "bin_center": 3.15,
+        "count": 3
+      },
+      {
+        "bin_center": 3.79,
+        "count": 0
+      },
+      {
+        "bin_center": 4.42,
+        "count": 2
+      },
+      {
+        "bin_center": 5.06,
+        "count": 0
+      },
+      {
+        "bin_center": 5.7,
+        "count": 1
+      },
+      {
+        "bin_center": 6.33,
+        "count": 1
+      }
+    ],
+    "historical_evidence": {
+      "past_signals_count": 20,
+      "reverted_count": 10,
+      "stopped_count": 5,
+      "timed_out_count": 2,
+      "revert_rate_pct": 50.0,
+      "median_days_to_revert": 2.5
+    }
+  },
+  {
+    "pair_id": "GUINEA_TEN",
+    "display_name": "GOLDGUINEA \u2212 GOLDTEN",
+    "symbol_a": "GOLDGUINEA",
+    "symbol_b": "GOLDTEN",
+    "lot_ratio": "5 : 4",
+    "unit_grams": 40,
+    "contracts_label": "Oct-26 / Oct-26",
+    "expiry_a": "2026-10-30",
+    "expiry_b": "2026-10-30",
+    "spread_bps": 46.3,
+    "spread_rs_10g": 687.4,
+    "mu": 32.7,
+    "sd": 7.6,
+    "z": 1.8,
+    "z_needed": 2.5,
+    "percentile": 93.6,
+    "status": "QUIET",
+    "failed_gates": [
+      "extreme",
+      "edge"
+    ],
+    "gates": {
+      "enough_history": true,
+      "extreme": false,
+      "edge_beats_cost": false,
+      "liquidity": true,
+      "lifecycle": true
+    },
+    "vol_a": 12607,
+    "vol_b": 30456,
+    "oi_a": 14377,
+    "oi_b": 31599,
+    "td_to_exp_a": 22,
+    "td_to_exp_b": 22,
+    "roll_flag": false,
+    "chosen_params": {
+      "W": 30,
+      "ze": 2.5,
+      "mh": 5,
+      "zx": 0.5
+    },
+    "z_histogram": [
+      {
+        "bin_center": -4.32,
+        "count": 2
+      },
+      {
+        "bin_center": -3.82,
+        "count": 0
+      },
+      {
+        "bin_center": -3.32,
+        "count": 1
+      },
+      {
+        "bin_center": -2.83,
+        "count": 3
+      },
+      {
+        "bin_center": -2.33,
+        "count": 3
+      },
+      {
+        "bin_center": -1.83,
+        "count": 18
+      },
+      {
+        "bin_center": -1.33,
+        "count": 34
+      },
+      {
+        "bin_center": -0.83,
+        "count": 50
+      },
+      {
+        "bin_center": -0.34,
+        "count": 73
+      },
+      {
+        "bin_center": 0.16,
+        "count": 56
+      },
+      {
+        "bin_center": 0.66,
+        "count": 45
+      },
+      {
+        "bin_center": 1.16,
+        "count": 33
+      },
+      {
+        "bin_center": 1.65,
+        "count": 18
+      },
+      {
+        "bin_center": 2.15,
+        "count": 6
+      },
+      {
+        "bin_center": 2.65,
+        "count": 9
+      },
+      {
+        "bin_center": 3.15,
+        "count": 1
+      },
+      {
+        "bin_center": 3.65,
+        "count": 2
+      },
+      {
+        "bin_center": 4.14,
+        "count": 1
+      },
+      {
+        "bin_center": 4.64,
+        "count": 0
+      },
+      {
+        "bin_center": 5.14,
+        "count": 2
+      }
+    ],
+    "historical_evidence": {
+      "past_signals_count": 9,
+      "reverted_count": 5,
+      "stopped_count": 2,
+      "timed_out_count": 2,
+      "revert_rate_pct": 55.6,
+      "median_days_to_revert": 3.0
+    }
+  },
+  {
+    "pair_id": "M_PETAL",
+    "display_name": "GOLDM \u2212 GOLDPETAL",
+    "symbol_a": "GOLDM",
+    "symbol_b": "GOLDPETAL",
+    "lot_ratio": "1 : 100",
+    "unit_grams": 100,
+    "contracts_label": "Nov-26 / Oct-26",
+    "expiry_a": "2026-11-05",
+    "expiry_b": "2026-10-30",
+    "spread_bps": -46.8,
+    "spread_rs_10g": -427.8,
+    "mu": -11.0,
+    "sd": 16.8,
+    "z": -2.14,
+    "z_needed": 2.0,
+    "percentile": 6.6,
+    "status": "QUIET",
+    "failed_gates": [
+      "edge"
+    ],
+    "gates": {
+      "enough_history": true,
+      "extreme": true,
+      "edge_beats_cost": false,
+      "liquidity": true,
+      "lifecycle": true
+    },
+    "vol_a": 52749,
+    "vol_b": 300838,
+    "oi_a": 44601,
+    "oi_b": 207175,
+    "td_to_exp_a": 26,
+    "td_to_exp_b": 22,
+    "roll_flag": false,
+    "chosen_params": {
+      "W": 30,
+      "ze": 2.0,
+      "mh": 10,
+      "zx": 0.5
+    },
+    "z_histogram": [
+      {
+        "bin_center": -6.42,
+        "count": 1
+      },
+      {
+        "bin_center": -5.83,
+        "count": 2
+      },
+      {
+        "bin_center": -5.24,
+        "count": 2
+      },
+      {
+        "bin_center": -4.65,
+        "count": 2
+      },
+      {
+        "bin_center": -4.06,
+        "count": 5
+      },
+      {
+        "bin_center": -3.47,
+        "count": 5
+      },
+      {
+        "bin_center": -2.88,
+        "count": 15
+      },
+      {
+        "bin_center": -2.29,
+        "count": 19
+      },
+      {
+        "bin_center": -1.7,
+        "count": 38
+      },
+      {
+        "bin_center": -1.11,
+        "count": 73
+      },
+      {
+        "bin_center": -0.52,
+        "count": 122
+      },
+      {
+        "bin_center": 0.07,
+        "count": 126
+      },
+      {
+        "bin_center": 0.66,
+        "count": 143
+      },
+      {
+        "bin_center": 1.25,
+        "count": 93
+      },
+      {
+        "bin_center": 1.84,
+        "count": 44
+      },
+      {
+        "bin_center": 2.43,
+        "count": 12
+      },
+      {
+        "bin_center": 3.02,
+        "count": 6
+      },
+      {
+        "bin_center": 3.6,
+        "count": 0
+      },
+      {
+        "bin_center": 4.19,
+        "count": 2
+      },
+      {
+        "bin_center": 4.78,
+        "count": 3
+      }
+    ],
+    "historical_evidence": {
+      "past_signals_count": 28,
+      "reverted_count": 10,
+      "stopped_count": 9,
+      "timed_out_count": 2,
+      "revert_rate_pct": 35.7,
+      "median_days_to_revert": 5.0
+    }
+  },
+  {
+    "pair_id": "M_TEN",
+    "display_name": "GOLDM \u2212 GOLDTEN",
+    "symbol_a": "GOLDM",
+    "symbol_b": "GOLDTEN",
+    "lot_ratio": "1 : 10",
+    "unit_grams": 100,
+    "contracts_label": "Nov-26 / Oct-26",
+    "expiry_a": "2026-11-05",
+    "expiry_b": "2026-10-30",
+    "spread_bps": -5.9,
+    "spread_rs_10g": 180.8,
+    "mu": 15.4,
+    "sd": 8.9,
+    "z": -2.39,
+    "z_needed": 2.5,
+    "percentile": 4.8,
+    "status": "QUIET",
+    "failed_gates": [
+      "extreme",
+      "edge"
+    ],
+    "gates": {
+      "enough_history": true,
+      "extreme": false,
+      "edge_beats_cost": false,
+      "liquidity": true,
+      "lifecycle": true
+    },
+    "vol_a": 52749,
+    "vol_b": 30456,
+    "oi_a": 44601,
+    "oi_b": 31599,
+    "td_to_exp_a": 26,
+    "td_to_exp_b": 22,
+    "roll_flag": false,
+    "chosen_params": {
+      "W": 30,
+      "ze": 2.5,
+      "mh": 5,
+      "zx": 0.5
+    },
+    "z_histogram": [
+      {
+        "bin_center": -11.1,
+        "count": 1
+      },
+      {
+        "bin_center": -10.19,
+        "count": 0
+      },
+      {
+        "bin_center": -9.29,
+        "count": 0
+      },
+      {
+        "bin_center": -8.38,
+        "count": 0
+      },
+      {
+        "bin_center": -7.48,
+        "count": 1
+      },
+      {
+        "bin_center": -6.57,
+        "count": 0
+      },
+      {
+        "bin_center": -5.66,
+        "count": 1
+      },
+      {
+        "bin_center": -4.76,
+        "count": 2
+      },
+      {
+        "bin_center": -3.85,
+        "count": 4
+      },
+      {
+        "bin_center": -2.94,
+        "count": 6
+      },
+      {
+        "bin_center": -2.04,
+        "count": 24
+      },
+      {
+        "bin_center": -1.13,
+        "count": 53
+      },
+      {
+        "bin_center": -0.22,
+        "count": 116
+      },
+      {
+        "bin_center": 0.68,
+        "count": 107
+      },
+      {
+        "bin_center": 1.59,
+        "count": 35
+      },
+      {
+        "bin_center": 2.5,
+        "count": 2
+      },
+      {
+        "bin_center": 3.4,
+        "count": 0
+      },
+      {
+        "bin_center": 4.31,
+        "count": 2
+      },
+      {
+        "bin_center": 5.22,
+        "count": 2
+      },
+      {
+        "bin_center": 6.12,
+        "count": 1
+      }
+    ],
+    "historical_evidence": {
+      "past_signals_count": 7,
+      "reverted_count": 3,
+      "stopped_count": 0,
+      "timed_out_count": 1,
+      "revert_rate_pct": 42.9,
+      "median_days_to_revert": 4.0
+    }
+  },
+  {
+    "pair_id": "M_GUINEA",
+    "display_name": "GOLDM \u2212 GOLDGUINEA",
+    "symbol_a": "GOLDM",
+    "symbol_b": "GOLDGUINEA",
+    "lot_ratio": "2 : 25",
+    "unit_grams": 200,
+    "contracts_label": "Nov-26 / Oct-26",
+    "expiry_a": "2026-11-05",
+    "expiry_b": "2026-10-30",
+    "spread_bps": -52.1,
+    "spread_rs_10g": -506.7,
+    "mu": -18.4,
+    "sd": 17.2,
+    "z": -1.95,
+    "z_needed": 2.5,
+    "percentile": 5.9,
+    "status": "QUIET",
+    "failed_gates": [
+      "extreme",
+      "edge",
+      "lifecycle"
+    ],
+    "gates": {
+      "enough_history": true,
+      "extreme": false,
+      "edge_beats_cost": false,
+      "liquidity": true,
+      "lifecycle": false
+    },
+    "vol_a": 52749,
+    "vol_b": 12607,
+    "oi_a": 44601,
+    "oi_b": 14377,
+    "td_to_exp_a": 26,
+    "td_to_exp_b": 22,
+    "roll_flag": true,
+    "chosen_params": {
+      "W": 20,
+      "ze": 2.5,
+      "mh": 10,
+      "zx": 0.5
+    },
+    "z_histogram": [
+      {
+        "bin_center": -7.03,
+        "count": 1
+      },
+      {
+        "bin_center": -6.42,
+        "count": 0
+      },
+      {
+        "bin_center": -5.8,
+        "count": 1
+      },
+      {
+        "bin_center": -5.18,
+        "count": 1
+      },
+      {
+        "bin_center": -4.57,
+        "count": 3
+      },
+      {
+        "bin_center": -3.95,
+        "count": 3
+      },
+      {
+        "bin_center": -3.33,
+        "count": 0
+      },
+      {
+        "bin_center": -2.72,
+        "count": 15
+      },
+      {
+        "bin_center": -2.1,
+        "count": 30
+      },
+      {
+        "bin_center": -1.48,
+        "count": 67
+      },
+      {
+        "bin_center": -0.87,
+        "count": 108
+      },
+      {
+        "bin_center": -0.25,
+        "count": 122
+      },
+      {
+        "bin_center": 0.37,
+        "count": 152
+      },
+      {
+        "bin_center": 0.98,
+        "count": 117
+      },
+      {
+        "bin_center": 1.6,
+        "count": 56
+      },
+      {
+        "bin_center": 2.22,
+        "count": 25
+      },
+      {
+        "bin_center": 2.83,
+        "count": 11
+      },
+      {
+        "bin_center": 3.45,
+        "count": 8
+      },
+      {
+        "bin_center": 4.07,
+        "count": 2
+      },
+      {
+        "bin_center": 4.68,
+        "count": 1
+      }
+    ],
+    "historical_evidence": {
+      "past_signals_count": 22,
+      "reverted_count": 10,
+      "stopped_count": 1,
+      "timed_out_count": 2,
+      "revert_rate_pct": 45.5,
+      "median_days_to_revert": 3.0
+    }
+  }
+]
