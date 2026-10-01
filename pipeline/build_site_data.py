@@ -128,6 +128,9 @@ def build_all_site_data(output_dir: str = 'frontend/public/data'):
             'mismatches': 0,
             'status': 'Verified 0 mismatches against manual Bhavcopy downloads',
         },
+        'num_contracts': len(CONTRACT_SPECS),
+        'num_pairs': len(PAIRS),
+        'unseen_test_months': 12,
         'latest_quotes': latest_quotes,
         'build_time': datetime.datetime.now(datetime.timezone.utc).isoformat(),
         'source': 'MCX Bhavcopy (EOD) · Data to 30-Sep-2026',
@@ -549,14 +552,12 @@ def build_all_site_data(output_dir: str = 'frontend/public/data'):
             q1_mean, q1_min, q1_max = None, None, None
             q1_text = "—"
             
-        if 'PETAL' in pair_id:
+        if pair_id in ('GUINEA_PETAL', 'M_PETAL'):
             comment = "Structural break, cause unknown. GOLDPETAL flipped from cheap to slightly rich around Dec-24 → Mar-25."
+        elif 'TEN' in pair_id:
+            comment = "Listed Mar-2025; no pre-break history"
         elif pair_id == 'M_GUINEA':
             comment = "Historically stable: GOLDM ~0.8% below GOLDGUINEA throughout history."
-        elif pair_id == 'M_TEN':
-            comment = "The two large contracts track each other closely with minimal basis divergence."
-        elif pair_id == 'GUINEA_TEN':
-            comment = "Persistent basis difference between 8g and 10g contracts."
         else:
             comment = "Cross-contract basis dynamics."
             
@@ -615,6 +616,28 @@ def build_all_site_data(output_dir: str = 'frontend/public/data'):
             'of unseen data. The only profits come from a single crisis episode. No persistent edge survives costs.'
         ),
     }
+    
+    # 7.10 retrieval_log.json
+    retrieval_csv_path = 'data/raw/retrieval_log.csv'
+    retrieval_records = []
+    if os.path.exists(retrieval_csv_path):
+        retrieval_df = pd.read_csv(retrieval_csv_path)
+        for _, r_row in retrieval_df.iterrows():
+            retrieval_records.append({
+                'symbol': str(r_row['symbol']),
+                'expiry': str(r_row['expiry']),
+                'endpoint': str(r_row.get('endpoint', '')),
+                'params': str(r_row.get('params', '')),
+                'requested_from': str(r_row['requested_from']),
+                'requested_to': str(r_row['requested_to']),
+                'retrieved_at_ist': str(r_row.get('retrieved_at_ist', '')),
+                'rows': int(r_row['rows']),
+                'first_date': str(r_row['first_date']),
+                'last_date': str(r_row['last_date']),
+                'rows_outside_range_or_after_expiry': int(r_row.get('rows_outside_range_or_after_expiry', 0)),
+            })
+    save_json(os.path.join(output_dir, 'retrieval_log.json'), retrieval_records)
+    methodology_data['retrieval_log'] = retrieval_records
     save_json(os.path.join(output_dir, 'methodology.json'), methodology_data)
     
     print("--- Build complete! All JSON files written successfully. ---")

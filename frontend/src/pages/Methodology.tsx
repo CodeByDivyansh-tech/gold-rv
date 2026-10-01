@@ -1,12 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import { dataLoader } from '../utils/dataLoader';
-import { MetaInfo, ContractsData, MethodologyData, CostMatrixItem } from '../types';
+import { MetaInfo, ContractsData, MethodologyData, CostMatrixItem, RetrievalLogItem } from '../types';
 
 export default function Methodology() {
   const [meta, setMeta] = useState<MetaInfo | null>(null);
   const [contractsData, setContractsData] = useState<ContractsData | null>(null);
   const [methodology, setMethodology] = useState<MethodologyData | null>(null);
   const [costMatrix, setCostMatrix] = useState<CostMatrixItem[]>([]);
+  const [retrievalLog, setRetrievalLog] = useState<RetrievalLogItem[]>([]);
+  const [showAllLogs, setShowAllLogs] = useState(false);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -15,12 +17,14 @@ export default function Methodology() {
       dataLoader.getContracts(),
       dataLoader.getMethodology(),
       dataLoader.getCostMatrix(),
+      dataLoader.getRetrievalLog(),
     ])
-      .then(([mData, cData, mthData, cmData]) => {
+      .then(([mData, cData, mthData, cmData, rData]) => {
         setMeta(mData);
         setContractsData(cData);
         setMethodology(mthData);
         setCostMatrix(cmData);
+        setRetrievalLog(rData || []);
         setLoading(false);
       })
       .catch(console.error);
@@ -58,7 +62,7 @@ export default function Methodology() {
               MODULE RV-05 // DATA &amp; METHODOLOGY
             </span>
             <span className="px-1.5 py-0.5 rounded bg-surface-container-high font-data-mono-sm text-[9px] text-secondary font-medium">
-              AUDIT GRADE &amp; PROVENANCE
+              DATA PROVENANCE
             </span>
           </div>
           <h1 className="font-headline-xl text-headline-xl text-on-surface tracking-tight">
@@ -144,6 +148,64 @@ export default function Methodology() {
           were compared row-for-row and column-for-column against the automated API dataset. Close, volume, and open interest
           matched with zero discrepancies.
         </p>
+      </div>
+
+      {/* Data Retrieval Log Table */}
+      <div className="bg-surface-container-low p-space-md rounded border border-surface-variant flex flex-col gap-space-sm font-mono text-xs">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-space-xs border-b border-surface-variant">
+          <div>
+            <div className="flex items-center gap-2">
+              <span className="material-symbols-outlined text-primary text-[18px]">table_chart</span>
+              <h3 className="font-headline-md text-headline-md text-on-surface">
+                Data Retrieval Log
+              </h3>
+            </div>
+            <span className="text-[11px] text-on-surface-variant">
+              MCX Bhavcopy API query log across all {retrievalLog.length || 138} contract-expiry retrieval cycles
+            </span>
+          </div>
+          <button
+            onClick={() => setShowAllLogs(!showAllLogs)}
+            className="px-3 py-1.5 rounded bg-surface-container-high hover:bg-surface-container-highest text-primary font-bold text-xs transition-colors self-start sm:self-auto border border-surface-variant"
+          >
+            {showAllLogs ? 'Show 10 rows' : `Show all ${retrievalLog.length || 138}`}
+          </button>
+        </div>
+
+        <div className="overflow-x-auto max-h-[420px] overflow-y-auto">
+          <table className="w-full text-left font-mono text-xs">
+            <thead className="sticky top-0 bg-surface-container-lowest z-10">
+              <tr className="border-b border-surface-variant text-on-surface-variant">
+                <th className="p-2">SYMBOL</th>
+                <th className="p-2">EXPIRY</th>
+                <th className="p-2">REQUESTED DATE RANGE</th>
+                <th className="p-2 text-right">ROWS RETURNED</th>
+                <th className="p-2">FIRST / LAST DATE</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-surface-variant/40">
+              {(showAllLogs ? retrievalLog : retrievalLog.slice(0, 10)).map((r, idx) => (
+                <tr key={`${r.symbol}_${r.expiry}_${idx}`} className="hover:bg-surface-container">
+                  <td className="p-2 font-bold text-primary">{r.symbol}</td>
+                  <td className="p-2">{r.expiry}</td>
+                  <td className="p-2 text-on-surface-variant">
+                    {r.requested_from} → {r.requested_to}
+                  </td>
+                  <td className="p-2 text-right font-semibold text-secondary">
+                    {r.rows.toLocaleString()}
+                  </td>
+                  <td className="p-2 text-on-surface">
+                    {r.first_date} → {r.last_date}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        <div className="text-[10px] text-on-surface-variant/80 flex items-center justify-between pt-1 border-t border-surface-variant/30">
+          <span>Displaying {showAllLogs ? retrievalLog.length : Math.min(10, retrievalLog.length)} of {retrievalLog.length || 138} contract query records</span>
+          <span>Source: data/raw/retrieval_log.csv</span>
+        </div>
       </div>
 
       {/* Pipeline Progression Stages */}

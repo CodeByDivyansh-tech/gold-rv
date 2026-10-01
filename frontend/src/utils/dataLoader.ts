@@ -12,6 +12,7 @@ import {
   CurveData,
   DecompositionRecord,
   RegimeRecord,
+  RetrievalLogItem,
 } from '../types';
 
 const BASE_URL = './data';
@@ -39,4 +40,5 @@ export const dataLoader = {
   getCurve: () => fetchJson<CurveData>('curve.json'),
   getCarryDecomposition: (symbol: string) => fetchJson<DecompositionRecord[]>(`carry_decomposition/${symbol}.json`),
   getRegimes: () => fetchJson<RegimeRecord[]>('regimes.json'),
+  getRetrievalLog: () => fetchJson<RetrievalLogItem[]>('retrieval_log.json'),
 };

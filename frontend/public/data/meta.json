@@ -16,6 +16,9 @@
     "mismatches": 0,
     "status": "Verified 0 mismatches against manual Bhavcopy downloads"
   },
+  "num_contracts": 4,
+  "num_pairs": 6,
+  "unseen_test_months": 12,
   "latest_quotes": [
     {
       "symbol": "GOLDM",
@@ -62,6 +65,6 @@
       "oi": 207175
     }
   ],
-  "build_time": "2026-10-01T19:38:08.109662+00:00",
+  "build_time": "2026-10-01T21:16:26.738897+00:00",
   "source": "MCX Bhavcopy (EOD) \u00b7 Data to 30-Sep-2026"
 }

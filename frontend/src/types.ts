@@ -27,6 +27,9 @@ export interface MetaInfo {
   latest_quotes: QuoteItem[];
   build_time: string;
   source: string;
+  num_contracts?: number;
+  num_pairs?: number;
+  unseen_test_months?: number;
 }
 
 export interface ContractMasterItem {
@@ -309,6 +312,20 @@ export interface GridItem {
   net_bps: number;
 }
 
+export interface RetrievalLogItem {
+  symbol: string;
+  expiry: string;
+  endpoint?: string;
+  params?: string;
+  requested_from: string;
+  requested_to: string;
+  retrieved_at_ist?: string;
+  rows: number;
+  first_date: string;
+  last_date: string;
+  rows_outside_range_or_after_expiry?: number;
+}
+
 export interface MethodologyData {
   stages: { step: number; name: string; desc: string }[];
   split_dates: {
@@ -320,6 +337,7 @@ export interface MethodologyData {
   point_in_time_rules: string[];
   limitations: string[];
   honest_conclusion: string;
+  retrieval_log?: RetrievalLogItem[];
 }
 
 export interface CurveSnapshotItem {

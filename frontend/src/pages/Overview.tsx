@@ -75,6 +75,17 @@ export default function Overview() {
   const edgeCostRatio = (deviationBps / hurdleBps).toFixed(2);
   const stopLevelZ = (Math.abs(activePair.chosen_params.ze) + 1.5).toFixed(1);
 
+  // Executive summary dynamic metrics pulled directly from JSON
+  const numContracts = meta?.num_contracts ?? meta?.latest_quotes?.length ?? 4;
+  const testMonths = meta?.unseen_test_months ?? 12;
+  const numPairs = pairs.length;
+  const quietCount = pairs.filter((p) => p.status === 'QUIET').length;
+  const signalCount = pairs.filter((p) => p.status === 'SIGNAL').length;
+  const allQuiet = quietCount === numPairs && numPairs > 0;
+  const todayStatusText = allQuiet
+    ? `all ${numPairs} pairs SIGNAL SUPPRESSED`
+    : `${signalCount} INVESTIGATE — candidate, ${quietCount} SIGNAL SUPPRESSED`;
+
   return (
     <div className="flex flex-col gap-space-lg max-w-7xl mx-auto">
       {/* Page Header */}
@@ -109,6 +120,36 @@ export default function Overview() {
               </span>
             </div>
             <div className={`w-3 h-3 rounded-full ${signalsToday?.all_quiet ? 'bg-outline-variant' : 'bg-primary'}`}></div>
+          </div>
+        </div>
+      </div>
+
+      {/* Plain-English Executive Summary Box */}
+      <div className="bg-surface-container-low p-space-md rounded-lg border border-primary/30 flex flex-col gap-2 font-mono text-xs">
+        <div className="flex items-center gap-2 pb-1.5 border-b border-surface-variant/40">
+          <span className="material-symbols-outlined text-primary text-[16px]">info</span>
+          <span className="font-bold text-on-surface uppercase text-[11px] tracking-wider">
+            Executive Summary
+          </span>
+        </div>
+        <div className="flex flex-col gap-2 text-on-surface-variant leading-relaxed">
+          <div className="flex items-start gap-2">
+            <span className="text-primary font-bold min-w-[20px]">(a)</span>
+            <span>
+              <strong className="text-on-surface">what we measure:</strong> price gaps between {numContracts} MCX gold contracts after normalizing to ₹ per gram of pure gold;
+            </span>
+          </div>
+          <div className="flex items-start gap-2">
+            <span className="text-primary font-bold min-w-[20px]">(b)</span>
+            <span>
+              <strong className="text-on-surface">what we found:</strong> no persistent edge survives costs on {testMonths} months of unseen data;
+            </span>
+          </div>
+          <div className="flex items-start gap-2">
+            <span className="text-primary font-bold min-w-[20px]">(c)</span>
+            <span>
+              <strong className="text-on-surface">today:</strong> {todayStatusText}.
+            </span>
           </div>
         </div>
       </div>
