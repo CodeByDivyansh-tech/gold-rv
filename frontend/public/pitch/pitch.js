@@ -75,26 +75,26 @@
   var contractData = {
     GOLDM: {
       name: "GOLDM (100 g)",
-      raw: "Rs 1,47,908 / 10 g (995 pure)",
-      pure: "Rs 1,48,651",
+      raw: "₹1,47,908 / 10 g (995 pure)",
+      pure: "₹1,48,651",
       lot: 100
     },
     GOLDTEN: {
       name: "GOLDTEN (10 g)",
-      raw: "Rs 1,48,322 / 10 g (999)",
-      pure: "Rs 1,48,470",
+      raw: "₹1,48,322 / 10 g (999)",
+      pure: "₹1,48,470",
       lot: 10
     },
     GOLDGUINEA: {
       name: "GOLDGUINEA (8 g)",
-      raw: "Rs 1,19,207 / 8 g (999)",
-      pure: "Rs 1,49,158",
+      raw: "₹1,19,207 / 8 g (999)",
+      pure: "₹1,49,158",
       lot: 8
     },
     GOLDPETAL: {
       name: "GOLDPETAL (1 g)",
-      raw: "Rs 14,893 / 1 g (999)",
-      pure: "Rs 1,49,079",
+      raw: "₹14,893 / 1 g (999)",
+      pure: "₹1,49,079",
       lot: 1
     }
   };
