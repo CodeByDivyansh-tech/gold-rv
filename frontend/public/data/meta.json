@@ -11,10 +11,20 @@
     "2025-02-01",
     "2026-02-01"
   ],
-  "manual_cross_check": {
-    "manual_rows": 5666,
+  "raw_cross_check": {
+    "raw_rows": 11954,
+    "matched_rows": 11954,
+    "value_mismatches": 0,
+    "rows_only_in_raw": 0,
+    "rows_only_in_clean": 0,
     "mismatches": 0,
-    "status": "Verified 0 mismatches against manual Bhavcopy downloads"
+    "fields_compared": [
+      "open",
+      "close",
+      "volume_lots",
+      "open_interest_lots"
+    ],
+    "status": "Raw MCX file vs cleaned data: 11,954 rows compared on open, close, volume and OI, 0 mismatches. Runs on every build."
   },
   "num_contracts": 4,
   "num_pairs": 6,
@@ -65,6 +75,6 @@
       "oi": 207175
     }
   ],
-  "build_time": "2026-10-01T21:16:26.738897+00:00",
+  "build_time": "2026-10-03T14:19:53.945600+00:00",
   "source": "MCX Bhavcopy (EOD) \u00b7 Data to 30-Sep-2026"
 }

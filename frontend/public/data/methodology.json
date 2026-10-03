@@ -3,42 +3,42 @@
     {
       "step": 1,
       "name": "Load & Validate",
-      "desc": "Parse 11,954 rows, strip symbols, check primary keys, filter no-trade days."
+      "desc": "Parse 11,954 rows, strip symbols, check primary keys, compare against the raw MCX file, flag no-trade days."
     },
     {
       "step": 2,
       "name": "Normalize",
-      "desc": "Divide close by quote_grams and purity to obtain pure \u20b9/g reference."
+      "desc": "Divide close by quote grams and purity to get a price per gram of pure gold."
     },
     {
       "step": 3,
       "name": "Implied Carry",
-      "desc": "Extract term structure carry from liquid GOLDPETAL calendar spreads; forward-fill only."
+      "desc": "Estimate the cost of carry from GOLDPETAL calendar spreads; forward-fill only."
     },
     {
       "step": 4,
       "name": "Pair Construction",
-      "desc": "Pair contracts with t-1 open interest to avoid look-ahead bias."
+      "desc": "Pick contracts using the previous day's open interest, so nothing from the future is used."
     },
     {
       "step": 5,
       "name": "Point-in-Time z-scores",
-      "desc": "Compute rolling mean and std strictly using t-1 and earlier observations."
+      "desc": "Rolling mean and spread of each gap use only earlier days."
     },
     {
       "step": 6,
-      "name": "Five-Gate Alerts",
-      "desc": "Filter trades through history, extreme, edge vs cost, liquidity, and lifecycle gates."
+      "name": "One rule: five checks",
+      "desc": "The same five checks drive today's alerts and every backtest trade: enough history, an unusual gap that is not already past the stop-loss, a gap bigger than 2\u00d7 the round-trip cost, liquidity, and contract life."
     },
     {
       "step": 7,
-      "name": "Walk-Forward Backtest",
-      "desc": "Freeze parameters on Train segment (2023-10 to 2025-09); execute on Test segment (2025-10 to 2026-09)."
+      "name": "Walk-Forward Test",
+      "desc": "Settings tuned on Train (2023-10 to 2025-09) and frozen for Test (2025-10 to 2026-09). A pair is traded in Test only if training gave at least 10 trades and a profit."
     },
     {
       "step": 8,
-      "name": "Attribution & Costs",
-      "desc": "Mark-to-market separating spread alpha from gold beta after realistic statutory costs and slippage."
+      "name": "Costs & Attribution",
+      "desc": "Each closed trade is split into spread and gold parts after statutory costs and slippage. No fills on days a leg moved 6% or more."
     }
   ],
   "split_dates": {
@@ -50,20 +50,23 @@
   "point_in_time_rules": [
     "Rolling z uses only t-1 and earlier observations (shifted window)",
     "Contract pairing selects max min(OI) as of t-1",
-    "Parameters tuned strictly on in-sample Train data and frozen",
-    "Signals generated at close t execute at close t+1",
+    "Parameters tuned strictly on in-sample Train data and frozen; the on/off switch also uses Train only",
+    "Signals generated at close t execute at close t+1; exits never fill at the signal's own close",
+    "No fills on days either leg moved 6% or more (prices may be stuck at the daily limit)",
     "Carry rate c_t is forward-filled only; never backward-filled"
   ],
   "limitations": [
     "EOD settlement close is an official reference, not an executable book fill.",
-    "Bhavcopy volume indicates activity but does not measure order-book depth.",
+    "Bhavcopy volume indicates activity but does not measure order-book depth; slippage is assumed, not measured.",
     "GOLDTEN contracts listed only on 31-Mar-2025, offering limited historical depth.",
-    "Test period contains only 6 to 16 trades per pair; small sample sizes preclude high certainty.",
-    "GOLDPETAL underwent a structural break in Dec-24 / Mar-25 of unknown mechanical cause.",
-    "Headline positive pairs owe their gains entirely to the single violent crisis episode of Jan-2026.",
+    "Test period contains only 2 to 5 trades per pair (20 in total); small samples preclude high certainty.",
+    "GOLDPETAL's level shifted around Dec-24 / Mar-25; the cause is not yet confirmed against MCX circulars.",
+    "Trades closed during the Jan\u2013Mar 2026 crash made \u20b91,37,985 of the unseen-year result (\u20b91,13,598 in total).",
+    "When the pair series switches to new contracts, open trades are closed; this adds cost.",
     "Exchange transaction charges and statutory rates should be regularly verified against MCX circulars."
   ],
-  "honest_conclusion": "Cross-contract gold spreads are real, measurable and partly mean-reverting, but after realistic costs no pair shows a statistically significant edge on 12 months of unseen data. The only profits come from a single crisis episode. No persistent edge survives costs.",
+  "honest_conclusion": "Cross-contract gold gaps are real and measurable. With the same five checks the site shows, the rule lost \u20b919,056 over 37 training trades, then made \u20b91,13,598 over 20 unseen-year trades at 5 bps slippage. But trades that closed during the Jan\u2013Mar 2026 crash made \u20b91,37,985; outside it the rule lost \u20b924,387. The result is not proven (t = 1.89, below the usual bar of 2), and training would have switched on only 1 of 6 pairs. No persistent edge is proven after costs.",
+  "original_rule_note": "The original study used only four of the five checks (no cost line). Under it: 54 unseen-year trades, \u20b916,387 at 5 bps. It is kept on the site for comparison only.",
   "retrieval_log": [
     {
       "symbol": "GOLDGUINEA",

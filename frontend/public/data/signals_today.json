@@ -5,6 +5,45 @@
   "round_trip_cost_bps": 24.4,
   "pairs": [
     {
+      "pair_id": "M_PETAL",
+      "date": "2026-09-30",
+      "contracts": "Nov-26 / Oct-26",
+      "expiry_a": "2026-11-05",
+      "expiry_b": "2026-10-30",
+      "spread_bps": -46.8,
+      "spread_rs_10g": -697.8,
+      "mu": -11.0,
+      "sd": 16.8,
+      "z": -2.14,
+      "z_needed": 2.0,
+      "stop_z": 3.5,
+      "hurdle_z": 2.9,
+      "can_signal_now": true,
+      "pair_on": true,
+      "pair_switch_reason": "made money in training",
+      "deviation_bps": 35.8,
+      "hurdle_bps": 48.8,
+      "round_trip_cost_bps": 24.4,
+      "status": "QUIET",
+      "failed_gates": [
+        "edge"
+      ],
+      "gates": {
+        "enough_history": true,
+        "extreme": true,
+        "edge_beats_cost": false,
+        "liquidity": true,
+        "lifecycle": true
+      },
+      "vol_a": 52749,
+      "vol_b": 300838,
+      "oi_a": 44601,
+      "oi_b": 207175,
+      "td_to_exp_a": 26,
+      "td_to_exp_b": 22,
+      "roll_flag": false
+    },
+    {
       "pair_id": "TEN_PETAL",
       "date": "2026-09-30",
       "contracts": "Oct-26 / Oct-26",
@@ -16,13 +55,19 @@
       "sd": 8.3,
       "z": -1.45,
       "z_needed": 2.0,
+      "stop_z": 3.5,
+      "hurdle_z": 5.9,
+      "can_signal_now": false,
+      "pair_on": false,
+      "pair_switch_reason": "only 2 training trades, needs 10",
       "deviation_bps": 12.1,
       "hurdle_bps": 48.8,
       "round_trip_cost_bps": 24.4,
       "status": "QUIET",
       "failed_gates": [
         "extreme",
-        "edge"
+        "edge",
+        "training"
       ],
       "gates": {
         "enough_history": true,
@@ -47,17 +92,23 @@
       "expiry_b": "2026-10-30",
       "spread_bps": 46.3,
       "spread_rs_10g": 687.4,
-      "mu": 32.7,
-      "sd": 7.6,
-      "z": 1.8,
-      "z_needed": 2.5,
-      "deviation_bps": 13.6,
+      "mu": 28.8,
+      "sd": 9.3,
+      "z": 1.89,
+      "z_needed": 2.0,
+      "stop_z": 3.5,
+      "hurdle_z": 5.3,
+      "can_signal_now": false,
+      "pair_on": false,
+      "pair_switch_reason": "only 0 training trades, needs 10",
+      "deviation_bps": 17.5,
       "hurdle_bps": 48.8,
       "round_trip_cost_bps": 24.4,
       "status": "QUIET",
       "failed_gates": [
         "extreme",
-        "edge"
+        "edge",
+        "training"
       ],
       "gates": {
         "enough_history": true,
@@ -86,13 +137,19 @@
       "sd": 8.9,
       "z": -2.39,
       "z_needed": 2.5,
+      "stop_z": 4.0,
+      "hurdle_z": 5.5,
+      "can_signal_now": false,
+      "pair_on": false,
+      "pair_switch_reason": "only 0 training trades, needs 10",
       "deviation_bps": 21.4,
       "hurdle_bps": 48.8,
       "round_trip_cost_bps": 24.4,
       "status": "QUIET",
       "failed_gates": [
         "extreme",
-        "edge"
+        "edge",
+        "training"
       ],
       "gates": {
         "enough_history": true,
@@ -110,40 +167,6 @@
       "roll_flag": false
     },
     {
-      "pair_id": "M_PETAL",
-      "date": "2026-09-30",
-      "contracts": "Nov-26 / Oct-26",
-      "expiry_a": "2026-11-05",
-      "expiry_b": "2026-10-30",
-      "spread_bps": -46.8,
-      "spread_rs_10g": -697.8,
-      "mu": -11.0,
-      "sd": 16.8,
-      "z": -2.14,
-      "z_needed": 2.0,
-      "deviation_bps": 35.8,
-      "hurdle_bps": 48.8,
-      "round_trip_cost_bps": 24.4,
-      "status": "QUIET",
-      "failed_gates": [
-        "edge"
-      ],
-      "gates": {
-        "enough_history": true,
-        "extreme": true,
-        "edge_beats_cost": false,
-        "liquidity": true,
-        "lifecycle": true
-      },
-      "vol_a": 52749,
-      "vol_b": 300838,
-      "oi_a": 44601,
-      "oi_b": 207175,
-      "td_to_exp_a": 26,
-      "td_to_exp_b": 22,
-      "roll_flag": false
-    },
-    {
       "pair_id": "M_GUINEA",
       "date": "2026-09-30",
       "contracts": "Nov-26 / Oct-26",
@@ -155,6 +178,11 @@
       "sd": 17.2,
       "z": -1.95,
       "z_needed": 2.5,
+      "stop_z": 4.0,
+      "hurdle_z": 2.8,
+      "can_signal_now": true,
+      "pair_on": false,
+      "pair_switch_reason": "only 9 training trades, needs 10",
       "deviation_bps": 33.7,
       "hurdle_bps": 48.8,
       "round_trip_cost_bps": 24.4,
@@ -162,7 +190,8 @@
       "failed_gates": [
         "extreme",
         "edge",
-        "lifecycle"
+        "lifecycle",
+        "training"
       ],
       "gates": {
         "enough_history": true,
@@ -191,13 +220,19 @@
       "sd": 4.0,
       "z": 0.41,
       "z_needed": 2.5,
+      "stop_z": 4.0,
+      "hurdle_z": 12.3,
+      "can_signal_now": false,
+      "pair_on": false,
+      "pair_switch_reason": "only 9 training trades, needs 10",
       "deviation_bps": 1.6,
       "hurdle_bps": 48.8,
       "round_trip_cost_bps": 24.4,
       "status": "QUIET",
       "failed_gates": [
         "extreme",
-        "edge"
+        "edge",
+        "training"
       ],
       "gates": {
         "enough_history": true,

@@ -1,24 +1,50 @@
-<!DOCTYPE html>
-<html lang="en" class="dark">
+<!doctype html>
+<html lang="en">
   <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>MCX Gold RV Intelligence Platform</title>
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <link rel="alternate icon" href="/favicon.ico" />
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Gold RV Intelligence</title>
+    <meta name="description" content="Same gold, four prices: how far MCX's four gold contracts drift apart, and whether any gap is worth trading after costs." />
+    <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+    <link rel="alternate icon" href="favicon.ico" />
+    <link rel="apple-touch-icon" href="apple-touch-icon.png" />
+    <meta name="theme-color" content="#070D14" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Gold RV Intelligence" />
+    <meta property="og:description" content="Same gold, four prices. A cost-aware, walk-forward study of MCX gold contracts." />
+    <meta property="og:image" content="https://gold-rv.vercel.app/og-image.png" />
+    <meta property="og:url" content="https://gold-rv.vercel.app/" />
+    <meta name="twitter:card" content="summary_large_image" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap"
-      rel="stylesheet"
-    />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"
-      rel="stylesheet"
-    />
+    <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+    <style>
+      html, body { margin: 0; background: #070D14; color: #EAF0F6; }
+      html.light, html.light body { background: #F3F5F8; color: #0C1622; }
+      body { font-family: 'Geist', 'Segoe UI', system-ui, -apple-system, sans-serif; -webkit-font-smoothing: antialiased; }
+      .boot { min-height: 100vh; display: grid; place-items: center; }
+      .boot svg { width: 72px; height: auto; animation: boot 1.2s ease-in-out infinite alternate; }
+      @keyframes boot { from { opacity: .35 } to { opacity: 1 } }
+      @media (prefers-reduced-motion: reduce) { .boot svg { animation: none } }
+      .boot-error { margin: 15vh auto; max-width: 420px; padding: 24px; display: flex; flex-direction: column; gap: 12px; font-size: 16px; }
+      .boot-error button { align-self: flex-start; min-height: 44px; padding: 0 16px; border-radius: 12px; border: 0; background: #F2A93B; color: #1A1204; font: 600 14px inherit; cursor: pointer; }
+    </style>
+    <script>
+      // Paint the saved theme before the page loads, so there is no flash
+      try {
+        var t = localStorage.getItem('grv-theme');
+        if (t === 'light' || (!t && window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches)) document.documentElement.className = 'light';
+      } catch (e) {}
+    </script>
   </head>
-  <body class="bg-surface font-body-md text-on-surface antialiased select-none min-h-screen">
-    <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
+  <body>
+    <div id="app">
+      <div class="boot" role="status" aria-label="Loading Gold RV Intelligence">
+        <svg viewBox="8 18 48 28" aria-hidden="true"><path fill="#F2A93B" d="M8 28L12 18H44L48 28Z M16 46L20 36H52L56 46Z"/></svg>
+      </div>
+    </div>
+    <noscript><p style="padding: 24px">Gold RV Intelligence needs JavaScript to draw its charts.</p></noscript>
+    <script src="app/dc.js"></script>
+    <script src="app/main.js"></script>
   </body>
 </html>

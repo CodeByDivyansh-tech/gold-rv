@@ -1,0 +1,370 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Gold RV Intelligence: Signals</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&amp;family=Geist+Mono:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:inherit}a:hover{color:inherit}
+button:focus-visible,a:focus-visible,input:focus-visible{outline:2px solid #F2A93B;outline-offset:2px}
+.rail{display:flex}.phonebar{display:none}.tabbar{display:none}.headmeta{display:flex}.wide{display:block}.cards{display:none}
+.scrub{position:absolute;inset:0;width:100%;height:100%;background:transparent;border:0;padding:0;margin:0;cursor:crosshair;touch-action:pan-y;border-radius:8px}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+@media (max-width: 899px){.rail{display:none}.phonebar{display:flex}.tabbar{display:flex}.headmeta{display:none}.wide{display:none}.cards{display:flex}.pagepad{padding-bottom:104px !important}}
+</style>
+</helmet>
+<div style="--bg: {{t.bg}}; --panel: {{t.panel}}; --raised: {{t.raised}}; --line: {{t.line}}; --fg: {{t.fg}}; --muted: {{t.muted}}; --gold: {{t.gold}}; --glow: {{t.glow}}; --ongold: {{t.ongold}}; --up: {{t.up}}; --down: {{t.down}}; background: var(--bg); color: var(--fg); font-family: 'Geist', 'Segoe UI', system-ui, sans-serif; min-height: 100vh; display: flex; align-items: stretch">
+
+  <aside class="rail" style="flex: 0 0 248px; box-sizing: border-box; background: var(--panel); border-right: 1px solid var(--line); padding: 22px 14px; flex-direction: column; gap: 28px">
+    <a href="Home.dc.html" style="display: flex; align-items: center; gap: 10px; text-decoration: none; padding: 0 8px">
+      <svg viewBox="0 0.76 242.26 49.24" role="img" aria-label="Gold RV Intelligence" style="width: 176px; height: auto; display: block"><path d="M8 28L12 18H44L48 28Z M16 46L20 36H52L56 46Z" transform="translate(0 5.19) scale(1.44203) translate(-8 -18)" style="fill: var(--gold)"></path><path d="M102.27 31.42Q97.36 31.42 93.83 29.49Q90.3 27.56 88.39 24.07Q86.48 20.58 86.48 15.92Q86.48 11.3 88.41 7.79Q90.34 4.29 93.76 2.31Q97.19 0.34 101.72 0.34Q105.46 0.34 108.42 1.68Q111.38 3.03 113.21 5.36Q115.04 7.69 115.37 10.76H108.91Q108.49 8.28 106.57 6.87Q104.66 5.46 101.81 5.46Q99.16 5.46 97.19 6.7Q95.21 7.94 94.12 10.25Q93.03 12.56 93.03 15.8Q93.03 19.16 94.12 21.53Q95.21 23.9 97.33 25.14Q99.46 26.38 102.56 26.38Q105.08 26.38 106.85 25.75Q108.61 25.12 109.54 23.99L115.67 26.42Q113.23 28.86 110.02 30.14Q106.81 31.42 102.27 31.42ZM109.2 26.42V18.11L110.5 19.41H102.52V14.45H115.67V26.42ZM129.11 31.42Q125.58 31.42 122.91 30.01Q120.25 28.61 118.75 26.07Q117.26 23.52 117.26 20.21Q117.26 16.89 118.75 14.41Q120.25 11.93 122.91 10.55Q125.58 9.16 129.11 9.16Q132.68 9.16 135.34 10.55Q138.01 11.93 139.48 14.41Q140.95 16.89 140.95 20.21Q140.95 23.52 139.46 26.07Q137.97 28.61 135.3 30.01Q132.64 31.42 129.11 31.42ZM129.11 26.46Q130.58 26.46 131.77 25.71Q132.97 24.95 133.69 23.54Q134.4 22.14 134.4 20.16Q134.4 17.27 132.87 15.69Q131.33 14.12 129.11 14.12Q126.88 14.12 125.35 15.71Q123.82 17.31 123.82 20.16Q123.82 22.14 124.53 23.54Q125.24 24.95 126.44 25.71Q127.64 26.46 129.11 26.46ZM143.47 31V0.76H149.77V31ZM169.13 31V26.25L169.55 26.34Q169.13 28.65 167.05 30.03Q164.98 31.42 162.08 31.42Q159.14 31.42 156.97 30.05Q154.81 28.69 153.64 26.21Q152.46 23.73 152.46 20.37Q152.46 16.97 153.68 14.45Q154.9 11.93 157.1 10.55Q159.31 9.16 162.25 9.16Q165.31 9.16 167.22 10.59Q169.13 12.02 169.47 14.49L169.01 14.54V0.76H175.31V31ZM164.09 26.38Q166.32 26.38 167.71 24.8Q169.09 23.23 169.09 20.29Q169.09 17.35 167.68 15.78Q166.28 14.2 164.01 14.2Q161.83 14.2 160.42 15.8Q159.01 17.39 159.01 20.33Q159.01 23.27 160.42 24.83Q161.83 26.38 164.09 26.38ZM186.06 31V0.76H199.58Q202.86 0.76 205.3 1.87Q207.73 2.99 209.08 5Q210.42 7.02 210.42 9.71Q210.42 12.35 209.08 14.35Q207.73 16.34 205.3 17.45Q202.86 18.57 199.58 18.57H191.18V13.82H199.42Q201.73 13.82 202.96 12.75Q204.2 11.68 204.2 9.75Q204.2 7.77 202.99 6.74Q201.77 5.72 199.42 5.72H192.53V31ZM203.11 31 190.97 15.29H197.82L211.85 31ZM223.19 31 212.35 0.76H219.07L227.35 25.96H226.55L234.86 0.76H241.25L230.41 31Z" style="fill: var(--fg)"></path><path d="M87.56 50V49.12H89.42V43.43H87.56V42.55H92.18V43.43H90.32V49.12H92.18V50ZM96.27 50V42.55H97.55L100.2 48.97V42.55H101.1V50H99.82L97.18 43.57V50ZM107.06 50V43.43H104.78V42.55H110.24V43.43H107.96V50ZM114.12 50V42.55H118.66V43.43H115.03V45.83H118.53V46.69H115.03V49.12H118.74V50ZM123.05 50V42.55H123.95V49.58L123.5 49.12H127.67V50ZM131.87 50V42.55H132.77V49.58L132.32 49.12H136.49V50ZM140.48 50V49.12H142.34V43.43H140.48V42.55H145.1V43.43H143.24V49.12H145.1V50ZM151.59 50.17Q150.8 50.17 150.18 49.73Q149.57 49.3 149.21 48.43Q148.86 47.56 148.86 46.28Q148.86 45.08 149.19 44.2Q149.52 43.33 150.14 42.85Q150.76 42.38 151.63 42.38Q152.31 42.38 152.84 42.68Q153.37 42.99 153.73 43.53Q154.09 44.07 154.24 44.77L153.3 44.83Q153.12 44.14 152.7 43.7Q152.29 43.26 151.63 43.26Q151.05 43.26 150.64 43.61Q150.23 43.96 150.02 44.64Q149.8 45.32 149.8 46.28Q149.8 47.24 150.02 47.91Q150.24 48.58 150.66 48.93Q151.07 49.29 151.67 49.29Q152.21 49.29 152.59 49.01Q152.97 48.73 153.19 48.23Q153.41 47.73 153.43 47.09H151.65V46.23H154.27V50H153.43L153.39 48.24L153.64 48.32Q153.5 48.86 153.24 49.28Q152.98 49.7 152.58 49.93Q152.17 50.17 151.59 50.17ZM158.22 50V42.55H162.76V43.43H159.13V45.83H162.63V46.69H159.13V49.12H162.84V50ZM166.83 50V42.55H168.11L170.76 48.97V42.55H171.66V50H170.38L167.74 43.57V50ZM178.09 50.17Q177.2 50.17 176.58 49.7Q175.96 49.22 175.64 48.35Q175.32 47.48 175.32 46.28Q175.32 45.08 175.64 44.2Q175.96 43.33 176.58 42.85Q177.2 42.38 178.09 42.38Q179.08 42.38 179.77 43.02Q180.46 43.67 180.69 44.82L179.73 44.89Q179.55 44.08 179.11 43.67Q178.68 43.26 178.09 43.26Q177.49 43.26 177.09 43.61Q176.68 43.96 176.47 44.64Q176.26 45.32 176.26 46.28Q176.26 47.24 176.47 47.91Q176.68 48.58 177.09 48.93Q177.49 49.29 178.09 49.29Q178.74 49.29 179.19 48.83Q179.64 48.38 179.8 47.49L180.76 47.54Q180.56 48.77 179.85 49.47Q179.15 50.17 178.09 50.17ZM184.68 50V42.55H189.22V43.43H185.59V45.83H189.09V46.69H185.59V49.12H189.3V50Z" style="fill: var(--muted)"></path></svg>
+    </a>
+    <nav aria-label="Main" style="display: flex; flex-direction: column; gap: 20px; font-size: 14px">
+      <div style="display: flex; flex-direction: column; gap: 2px">
+        <span style="font-size: 12px; color: var(--muted); padding: 0 12px 6px">Start</span>
+        <a href="Home.dc.html" style="display: flex; align-items: center; gap: 10px; text-decoration: none; padding: 10px 12px; border-radius: 10px"><svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true" style="fill: none; stroke: currentColor; stroke-width: 1.8px; stroke-linecap: round; stroke-linejoin: round"><path d="M3 11.5 12 4l9 7.5"></path><path d="M5.5 10v10h13V10"></path></svg>Home</a>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 2px">
+        <span style="font-size: 12px; color: var(--muted); padding: 0 12px 6px">Understand</span>
+        <a href="Today.dc.html" style="display: flex; align-items: center; gap: 10px; text-decoration: none; padding: 10px 12px; border-radius: 10px"><svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true" style="fill: none; stroke: currentColor; stroke-width: 1.8px; stroke-linecap: round; stroke-linejoin: round"><rect x="3.5" y="5" width="17" height="15" rx="2"></rect><path d="M3.5 10h17M8 3v4M16 3v4"></path></svg>Today</a>
+        <a href="Market.dc.html" style="display: flex; align-items: center; gap: 10px; text-decoration: none; padding: 10px 12px; border-radius: 10px"><svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true" style="fill: none; stroke: currentColor; stroke-width: 1.8px; stroke-linecap: round; stroke-linejoin: round"><path d="M4 19.5h16"></path><path d="M5 15l4-5 4 3 6-7"></path></svg>Market</a>
+        <a href="Pairs.dc.html" style="display: flex; align-items: center; gap: 10px; text-decoration: none; padding: 10px 12px; border-radius: 10px"><svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true" style="fill: none; stroke: currentColor; stroke-width: 1.8px; stroke-linecap: round; stroke-linejoin: round"><path d="M6 7.5h12l-3-3M18 16.5H6l3 3"></path></svg>Pair Explorer</a>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 2px">
+        <span style="font-size: 12px; color: var(--muted); padding: 0 12px 6px">Deep dive</span>
+        <a href="Signals.dc.html" aria-current="page" style="display: flex; align-items: center; gap: 10px; text-decoration: none; padding: 10px 12px; border-radius: 10px; background: var(--glow); color: var(--gold); font-weight: 600"><svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true" style="fill: none; stroke: currentColor; stroke-width: 1.8px; stroke-linecap: round; stroke-linejoin: round"><circle cx="12" cy="12" r="8.5"></circle><path d="M8.5 12.3l2.4 2.4 4.6-4.9"></path></svg>Signals</a>
+        <a href="Backtesting.dc.html" style="display: flex; align-items: center; gap: 10px; text-decoration: none; padding: 10px 12px; border-radius: 10px"><svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true" style="fill: none; stroke: currentColor; stroke-width: 1.8px; stroke-linecap: round; stroke-linejoin: round"><path d="M3.5 12a8.5 8.5 0 1 0 2.6-6.1"></path><path d="M3.5 4.5v4.5H8"></path><path d="M12 8v4.2l2.8 1.8"></path></svg>Backtesting</a>
+        <a href="Data.dc.html" style="display: flex; align-items: center; gap: 10px; text-decoration: none; padding: 10px 12px; border-radius: 10px"><svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true" style="fill: none; stroke: currentColor; stroke-width: 1.8px; stroke-linecap: round; stroke-linejoin: round"><ellipse cx="12" cy="6" rx="7" ry="2.8"></ellipse><path d="M5 6v12c0 1.6 3.1 2.8 7 2.8s7-1.2 7-2.8V6"></path><path d="M5 12c0 1.6 3.1 2.8 7 2.8s7-1.2 7-2.8"></path></svg>Data</a>
+      </div>
+    </nav>
+    <p style="margin: auto 0 0; font-size: 12px; line-height: 1.5; color: var(--muted); padding: 0 12px">End-of-day data from MCX Bhavcopy. A research project, not investment advice.</p>
+  </aside>
+
+  <div style="flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column">
+    <div class="phonebar" style="align-items: center; justify-content: space-between; gap: 12px; padding: 10px 16px; border-bottom: 1px solid var(--line); background: var(--panel)">
+      <a href="Home.dc.html" style="display: flex; align-items: center; gap: 10px; text-decoration: none">
+        <svg viewBox="8 18 48 28" aria-hidden="true" style="width: 34px; height: auto; display: block; flex: none"><path d="M8 28L12 18H44L48 28Z M16 46L20 36H52L56 46Z" style="fill: var(--gold)"></path></svg>
+        <span style="display: flex; flex-direction: column; line-height: 1.2"><svg viewBox="0 0.26 158.04 40.74" role="img" aria-label="Gold RV Intelligence" style="width: 78px; height: auto; display: block; margin-bottom: 2px"><path d="M17.05 31.42Q12.14 31.42 8.61 29.49Q5.08 27.56 3.17 24.07Q1.26 20.58 1.26 15.92Q1.26 11.3 3.19 7.79Q5.12 4.29 8.55 2.31Q11.97 0.34 16.51 0.34Q20.24 0.34 23.2 1.68Q26.17 3.03 27.99 5.36Q29.82 7.69 30.16 10.76H23.69Q23.27 8.28 21.36 6.87Q19.45 5.46 16.59 5.46Q13.94 5.46 11.97 6.7Q10 7.94 8.9 10.25Q7.81 12.56 7.81 15.8Q7.81 19.16 8.9 21.53Q10 23.9 12.12 25.14Q14.24 26.38 17.35 26.38Q19.87 26.38 21.63 25.75Q23.39 25.12 24.32 23.99L30.45 26.42Q28.01 28.86 24.8 30.14Q21.59 31.42 17.05 31.42ZM23.98 26.42V18.11L25.28 19.41H17.3V14.45H30.45V26.42ZM43.89 31.42Q40.36 31.42 37.7 30.01Q35.03 28.61 33.54 26.07Q32.05 23.52 32.05 20.21Q32.05 16.89 33.54 14.41Q35.03 11.93 37.7 10.55Q40.36 9.16 43.89 9.16Q47.46 9.16 50.13 10.55Q52.79 11.93 54.26 14.41Q55.73 16.89 55.73 20.21Q55.73 23.52 54.24 26.07Q52.75 28.61 50.09 30.01Q47.42 31.42 43.89 31.42ZM43.89 26.46Q45.36 26.46 46.56 25.71Q47.75 24.95 48.47 23.54Q49.18 22.14 49.18 20.16Q49.18 17.27 47.65 15.69Q46.12 14.12 43.89 14.12Q41.66 14.12 40.13 15.71Q38.6 17.31 38.6 20.16Q38.6 22.14 39.31 23.54Q40.03 24.95 41.22 25.71Q42.42 26.46 43.89 26.46ZM58.25 31V0.76H64.55V31ZM83.92 31V26.25L84.34 26.34Q83.92 28.65 81.84 30.03Q79.76 31.42 76.86 31.42Q73.92 31.42 71.76 30.05Q69.59 28.69 68.42 26.21Q67.24 23.73 67.24 20.37Q67.24 16.97 68.46 14.45Q69.68 11.93 71.88 10.55Q74.09 9.16 77.03 9.16Q80.09 9.16 82.01 10.59Q83.92 12.02 84.25 14.49L83.79 14.54V0.76H90.09V31ZM78.88 26.38Q81.1 26.38 82.49 24.8Q83.87 23.23 83.87 20.29Q83.87 17.35 82.47 15.78Q81.06 14.2 78.79 14.2Q76.61 14.2 75.2 15.8Q73.79 17.39 73.79 20.33Q73.79 23.27 75.2 24.83Q76.61 26.38 78.88 26.38ZM100.84 31V0.76H114.37Q117.64 0.76 120.08 1.87Q122.51 2.99 123.86 5Q125.2 7.02 125.2 9.71Q125.2 12.35 123.86 14.35Q122.51 16.34 120.08 17.45Q117.64 18.57 114.37 18.57H105.97V13.82H114.2Q116.51 13.82 117.75 12.75Q118.99 11.68 118.99 9.75Q118.99 7.77 117.77 6.74Q116.55 5.72 114.2 5.72H107.31V31ZM117.89 31 105.76 15.29H112.6L126.63 31ZM137.97 31 127.13 0.76H133.85L142.13 25.96H141.33L149.65 0.76H156.03L145.19 31Z" style="fill: var(--fg)"></path></svg><span style="font-size: 12px; color: var(--muted)">Last settlement {{asOfText}}</span></span>
+      </a>
+      <button type="button" onClick="{{openDl}}" aria-label="Download data or a statement" title="Download" style="width: 44px; height: 44px; flex: none; margin-left: auto; border-radius: 12px; border: 1px solid var(--line); background: var(--raised); color: var(--fg); display: grid; place-items: center; cursor: pointer; padding: 0"><svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true" style="fill: none; stroke: currentColor; stroke-width: 2px; stroke-linecap: round; stroke-linejoin: round"><path d="M12 4v11M7 10.5l5 5 5-5M5 20h14"></path></svg></button>
+      <button type="button" onClick="{{toggle}}" aria-label="{{themeLabel}}" title="{{themeLabel}}" style="width: 44px; height: 44px; flex: none; border-radius: 12px; border: 1px solid var(--line); background: var(--raised); color: var(--fg); display: grid; place-items: center; cursor: pointer; padding: 0">
+        <sc-if value="{{dark}}" hint-placeholder-val="{{ true }}"><svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true" style="fill: none; stroke: currentColor; stroke-width: 1.8px; stroke-linecap: round"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"></path></svg></sc-if>
+        <sc-if value="{{light}}" hint-placeholder-val="{{ false }}"><svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true" style="fill: none; stroke: currentColor; stroke-width: 1.8px; stroke-linejoin: round"><path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"></path></svg></sc-if>
+      </button>
+    </div>
+
+    <main class="pagepad" style="flex: 1 1 auto; box-sizing: border-box; width: 100%; max-width: 1240px; margin: 0 auto; padding: 32px clamp(16px, 4vw, 48px) 48px; display: flex; flex-direction: column; gap: 24px">
+
+      <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-start; gap: 20px">
+        <div style="display: flex; flex-direction: column; gap: 12px; max-width: 720px">
+          <h1 style="margin: 0; font-size: clamp(30px, 4vw, 44px); font-weight: 600; letter-spacing: -0.03em; line-height: 1.05">Why is it quiet?</h1>
+          <p style="margin: 0; font-size: 16px; line-height: 1.6; color: var(--muted); max-width: 62ch">A signal fires only when all five checks pass on the same day. Here is today's result for each pair, in plain words, and every trade the backtest took for it.</p>
+        </div>
+        <div class="headmeta" style="align-items: center; gap: 12px">
+          <button type="button" onClick="{{openDl}}" style="min-height: 44px; padding: 0 16px; border-radius: 12px; border: 1px solid var(--line); background: var(--panel); color: var(--fg); font: 600 14px 'Geist', system-ui, sans-serif; cursor: pointer; display: flex; align-items: center; gap: 8px"><svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true" style="fill: none; stroke: currentColor; stroke-width: 2px; stroke-linecap: round; stroke-linejoin: round"><path d="M12 4v11M7 10.5l5 5 5-5M5 20h14"></path></svg>Download</button>
+          <span style="font-size: 13px; color: var(--muted); border: 1px solid var(--line); border-radius: 999px; padding: 8px 14px">Last settlement <span style="color: var(--fg); font-family: 'Geist Mono', ui-monospace, monospace">{{asOfText}}</span></span>
+          <button type="button" onClick="{{toggle}}" aria-label="{{themeLabel}}" title="{{themeLabel}}" style="width: 44px; height: 44px; border-radius: 12px; border: 1px solid var(--line); background: var(--panel); color: var(--fg); display: grid; place-items: center; cursor: pointer; padding: 0">
+            <sc-if value="{{dark}}" hint-placeholder-val="{{ true }}"><svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true" style="fill: none; stroke: currentColor; stroke-width: 1.8px; stroke-linecap: round"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"></path></svg></sc-if>
+            <sc-if value="{{light}}" hint-placeholder-val="{{ false }}"><svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true" style="fill: none; stroke: currentColor; stroke-width: 1.8px; stroke-linejoin: round"><path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"></path></svg></sc-if>
+          </button>
+        </div>
+      </div>
+
+      <sc-if value="{{loading}}" hint-placeholder-val="{{ false }}">
+        <p style="margin: 0; padding: 48px 0; color: var(--muted); font-size: 15px">Loading today's checks…</p>
+      </sc-if>
+
+      <sc-if value="{{failed}}" hint-placeholder-val="{{ false }}">
+        <div role="alert" style="background: var(--panel); border: 1px solid var(--down); border-radius: 16px; padding: 18px 20px; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px"><span style="display: flex; flex-direction: column; gap: 4px"><span style="font-weight: 600; font-size: 16px">The data didn't load</span><span style="font-size: 14px; color: var(--muted)">Check your internet connection, then try again.</span></span><button type="button" onClick="{{retry}}" style="min-height: 44px; padding: 0 16px; border-radius: 12px; border: 0; background: var(--gold); color: var(--ongold); font: 600 14px 'Geist', system-ui, sans-serif; cursor: pointer">Try again</button></div>
+      </sc-if>
+      <sc-if value="{{ready}}" hint-placeholder-val="{{ true }}">
+        <div role="group" aria-label="Choose a pair" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(180px, 100%), 1fr)); gap: 8px">
+          <sc-for list="{{chips}}" as="c" hint-placeholder-count="6">
+            <button type="button" onClick="{{c.pick}}" aria-pressed="{{c.pressed}}" style="{{c.style}}">
+              <span style="font-weight: 600; font-size: 14px">{{c.label}}</span>
+              <span style="font-size: 12px; opacity: 0.85">{{c.status}}</span>
+            </button>
+          </sc-for>
+        </div>
+
+        <div style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; background: var(--panel); border: 1px solid var(--line); border-radius: 18px; padding: 18px 20px">
+          <div style="display: flex; flex-direction: column; gap: 4px">
+            <span style="font-size: 13px; color: var(--muted)">{{status.pair}} · contracts {{status.contracts}}</span>
+            <span style="font-size: 22px; font-weight: 600; letter-spacing: -0.01em">{{status.title}}</span>
+          </div>
+          <span style="font-size: 14px; color: var(--muted); max-width: 52ch; line-height: 1.5">{{status.text}}</span>
+        </div>
+
+        <section aria-label="The five checks" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(200px, 100%), 1fr)); gap: 12px">
+          <sc-for list="{{gates}}" as="g" hint-placeholder-count="5">
+            <article style="background: var(--panel); border: 1px solid {{g.border}}; border-radius: 18px; padding: 18px; display: flex; flex-direction: column; gap: 10px">
+              <div style="display: flex; justify-content: space-between; align-items: center; gap: 8px">
+                <span style="font-size: 12px; color: var(--muted)">Check {{g.n}}</span>
+                <span style="display: flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 600; padding: 4px 10px; border-radius: 999px; background: {{g.badgeBg}}; color: {{g.badgeFg}}">
+                  <sc-if value="{{g.pass}}" hint-placeholder-val="{{ true }}"><svg width="14" height="14" viewBox="0 0 24 24" aria-hidden="true" style="fill: none; stroke: currentColor; stroke-width: 2.4px; stroke-linecap: round; stroke-linejoin: round"><path d="M5 12.5l4.5 4.5L19 7.5"></path></svg></sc-if>
+                  <sc-if value="{{g.fail}}" hint-placeholder-val="{{ false }}"><svg width="14" height="14" viewBox="0 0 24 24" aria-hidden="true" style="fill: none; stroke: currentColor; stroke-width: 2.4px; stroke-linecap: round"><path d="M6 6l12 12M18 6L6 18"></path></svg></sc-if>
+                  {{g.word}}
+                </span>
+              </div>
+              <span style="font-size: 17px; font-weight: 600">{{g.title}}</span>
+              <span style="font-size: 14px; line-height: 1.55; color: var(--muted)">{{g.text}}</span>
+            </article>
+          </sc-for>
+        </section>
+
+        <div style="display: flex; flex-wrap: wrap; gap: 14px; align-items: stretch">
+          <section aria-labelledby="meter-h" style="flex: 999 1 520px; min-width: 0; background: var(--panel); border: 1px solid var(--line); border-radius: 20px; padding: clamp(18px, 2.5vw, 26px); display: flex; flex-direction: column; gap: 18px">
+            <div style="display: flex; flex-direction: column; gap: 4px">
+              <h2 id="meter-h" style="margin: 0; font-size: 18px; font-weight: 600">Does the gap beat the cost?</h2>
+              <span style="font-size: 13px; color: var(--muted)">Check 3 for {{status.pair}}, drawn to scale.</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; align-items: flex-end; gap: 12px; flex-wrap: wrap">
+              <span style="display: flex; flex-direction: column; gap: 2px"><span style="font-size: 12px; color: var(--muted)">Gap from normal</span><span style="font-family: 'Geist Mono', ui-monospace, monospace; font-size: 30px; font-weight: 600">{{meter.dev}} bps</span><span style="font-size: 12px; color: var(--muted)">{{meter.devRs}}</span></span>
+              <span style="display: flex; flex-direction: column; gap: 2px; align-items: flex-end"><span style="font-size: 12px; color: var(--muted)">Needed to trade</span><span style="font-family: 'Geist Mono', ui-monospace, monospace; font-size: 30px; font-weight: 600; color: var(--gold)">{{meter.hurdle}} bps</span><span style="font-size: 12px; color: var(--muted)">2 × {{meter.rt}} bps round trip</span></span>
+            </div>
+            <div style="position: relative; height: 36px; background: var(--raised); border-radius: 10px; overflow: hidden">
+              <div style="position: absolute; left: 0; top: 0; bottom: 0; width: {{meter.devW}}; background: {{meter.fill}}; border-radius: 10px"></div>
+              <div style="position: absolute; top: 0; bottom: 0; left: {{meter.hurdleX}}; width: 3px; margin-left: -1px; background: var(--gold); box-shadow: 0 0 10px var(--gold)"></div>
+            </div>
+            <div style="display: flex; justify-content: space-between; font-size: 12px; color: var(--muted); font-family: 'Geist Mono', ui-monospace, monospace">
+              <span>0 bps</span><span>{{meter.gapText}}</span><span>{{meter.max}} bps</span>
+            </div>
+          </section>
+
+          <section aria-labelledby="cost-h" style="flex: 1 1 320px; background: var(--panel); border: 1px solid var(--line); border-radius: 20px; padding: 22px; display: flex; flex-direction: column; gap: 12px">
+            <div style="display: flex; flex-direction: column; gap: 4px">
+              <h2 id="cost-h" style="margin: 0; font-size: 16px; font-weight: 600">What one round trip costs</h2>
+              <span style="font-size: 13px; color: var(--muted); line-height: 1.5">Buying and selling both legs, ₹10 lakh each, in bps of one leg.</span>
+            </div>
+            <sc-for list="{{costs}}" as="c" hint-placeholder-count="7">
+              <div style="display: flex; justify-content: space-between; gap: 12px; font-size: 14px; padding: 6px 0; border-bottom: 1px solid var(--line)">
+                <span style="display: flex; flex-direction: column; gap: 2px"><span>{{c.name}}</span><span style="font-size: 12px; color: var(--muted)">{{c.how}}</span></span>
+                <span style="font-family: 'Geist Mono', ui-monospace, monospace; white-space: nowrap">{{c.bps}}</span>
+              </div>
+            </sc-for>
+            <div style="display: flex; justify-content: space-between; gap: 12px; font-size: 15px; font-weight: 600; padding-top: 4px">
+              <span>Total round trip</span><span style="font-family: 'Geist Mono', ui-monospace, monospace">{{costTotal}} bps</span>
+            </div>
+            <p style="margin: 0; font-size: 12px; color: var(--muted); line-height: 1.5">{{costNote}}</p>
+          </section>
+        </div>
+
+        <section aria-labelledby="past-h" style="display: flex; flex-direction: column; gap: 12px">
+          <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 8px">
+            <h2 id="past-h" style="margin: 0; font-size: 18px; font-weight: 600">Every trade the backtest took for this pair</h2>
+            <span style="font-size: 13px; color: var(--muted)">{{pastCount}}</span>
+          </div>
+          <p style="margin: 0; font-size: 13px; line-height: 1.6; color: var(--muted)">{{pastNote}}</p>
+          <div class="cards" style="flex-direction: column; gap: 8px">
+            <sc-for list="{{past}}" as="r" hint-placeholder-count="6">
+              <div style="background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 12px 14px; display: flex; flex-direction: column; gap: 6px">
+                <div style="display: flex; justify-content: space-between; align-items: baseline; gap: 8px"><span style="font-family: 'Geist Mono', ui-monospace, monospace; font-size: 13px">{{r.date}}</span><span style="font-family: 'Geist Mono', ui-monospace, monospace; font-weight: 600; color: {{r.color}}">{{r.rs}}</span></div>
+                <span style="font-size: 13px">{{r.dir}}</span>
+                <div style="display: flex; flex-wrap: wrap; justify-content: space-between; gap: 6px; font-size: 12px; color: var(--muted)"><span>{{r.outcome}} · {{r.held}} · z {{r.z}}</span><span style="font-family: 'Geist Mono', ui-monospace, monospace">{{r.bps}}</span></div>
+                <span style="{{r.segStyle}}; align-self: flex-start">{{r.seg}}</span>
+              </div>
+            </sc-for>
+          </div>
+          <div class="wide" style="overflow-x: auto; border: 1px solid var(--line); border-radius: 16px; background: var(--panel)">
+            <table style="width: 100%; min-width: 760px; border-collapse: collapse; font-size: 13px">
+              <thead>
+                <tr style="text-align: left; color: var(--muted); font-size: 12px">
+                  <th style="padding: 12px 14px; font-weight: 500">Signal</th>
+                  <th style="padding: 12px 10px; font-weight: 500">Held</th>
+                  <th style="padding: 12px 10px; font-weight: 500">Trade</th>
+                  <th style="padding: 12px 10px; font-weight: 500; text-align: right">z</th>
+                  <th style="padding: 12px 10px; font-weight: 500">Outcome</th>
+                  <th style="padding: 12px 10px; font-weight: 500; text-align: right">Result</th>
+                  <th style="padding: 12px 14px; font-weight: 500">Period</th>
+                </tr>
+              </thead>
+              <tbody>
+                <sc-for list="{{past}}" as="r" hint-placeholder-count="8">
+                  <tr style="border-top: 1px solid var(--line)">
+                    <td style="padding: 11px 14px; font-family: 'Geist Mono', ui-monospace, monospace; white-space: nowrap">{{r.date}}</td>
+                    <td style="padding: 11px 10px; color: var(--muted); white-space: nowrap">{{r.held}}</td>
+                    <td style="padding: 11px 10px">{{r.dir}}</td>
+                    <td style="padding: 11px 10px; text-align: right; font-family: 'Geist Mono', ui-monospace, monospace">{{r.z}}</td>
+                    <td style="padding: 11px 10px"><span style="font-size: 12px; padding: 4px 8px; border-radius: 999px; background: var(--raised); white-space: nowrap">{{r.outcome}}</span></td>
+                    <td style="padding: 11px 10px; text-align: right; white-space: nowrap"><span style="display: flex; flex-direction: column; align-items: flex-end; gap: 1px"><span style="font-family: 'Geist Mono', ui-monospace, monospace; font-weight: 600; color: {{r.color}}">{{r.rs}}</span><span style="font-family: 'Geist Mono', ui-monospace, monospace; font-size: 12px; color: var(--muted)">{{r.bps}}</span></span></td>
+                    <td style="padding: 11px 14px"><span style="{{r.segStyle}}">{{r.seg}}</span></td>
+                  </tr>
+                </sc-for>
+              </tbody>
+            </table>
+          </div>
+          <sc-if value="{{morePast.show}}" hint-placeholder-val="{{ false }}">
+            <button type="button" onClick="{{morePast.toggle}}" aria-expanded="{{morePast.expanded}}" style="align-self: flex-start; min-height: 44px; padding: 0 16px; border-radius: 12px; border: 1px solid var(--line); background: var(--panel); color: var(--fg); font: 600 14px 'Geist', system-ui, sans-serif; cursor: pointer">{{morePast.label}}</button>
+          </sc-if>
+        </section>
+      </sc-if>
+    </main>
+
+    <footer style="border-top: 1px solid var(--line); padding: 20px clamp(16px, 4vw, 48px) 28px; display: flex; flex-wrap: wrap; justify-content: space-between; gap: 10px; font-size: 13px; color: var(--muted)">
+      <span>Team NEXORA · Hack in Hills '26 · Research project, not investment advice</span>
+      <span>Data: MCX Bhavcopy, end of day · <a href="https://github.com/CodeByDivyansh-tech/gold-rv">Data &amp; code on GitHub</a></span>
+    </footer>
+  </div>
+
+  <nav class="tabbar" aria-label="Main" style="position: fixed; left: 0; right: 0; bottom: 0; z-index: 20; background: var(--panel); border-top: 1px solid var(--line); padding: 6px 8px 10px; justify-content: space-around">
+    <a href="Home.dc.html" style="flex: 1; min-height: 52px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; text-decoration: none; font-size: 11px; color: var(--muted)"><svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true" style="fill: none; stroke: currentColor; stroke-width: 1.8px; stroke-linecap: round; stroke-linejoin: round"><path d="M3 11.5 12 4l9 7.5"></path><path d="M5.5 10v10h13V10"></path></svg>Home</a>
+    <a href="Today.dc.html" style="flex: 1; min-height: 52px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; text-decoration: none; font-size: 11px; color: var(--muted)"><svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true" style="fill: none; stroke: currentColor; stroke-width: 1.8px; stroke-linecap: round; stroke-linejoin: round"><rect x="3.5" y="5" width="17" height="15" rx="2"></rect><path d="M3.5 10h17M8 3v4M16 3v4"></path></svg>Today</a>
+    <a href="Market.dc.html" style="flex: 1; min-height: 52px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; text-decoration: none; font-size: 11px; color: var(--muted)"><svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true" style="fill: none; stroke: currentColor; stroke-width: 1.8px; stroke-linecap: round; stroke-linejoin: round"><path d="M4 19.5h16"></path><path d="M5 15l4-5 4 3 6-7"></path></svg>Market</a>
+    <a href="Pairs.dc.html" style="flex: 1; min-height: 52px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; text-decoration: none; font-size: 11px; color: var(--muted)"><svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true" style="fill: none; stroke: currentColor; stroke-width: 1.8px; stroke-linecap: round; stroke-linejoin: round"><path d="M6 7.5h12l-3-3M18 16.5H6l3 3"></path></svg>Pairs</a>
+    <button type="button" onClick="{{openMore}}" aria-expanded="{{moreExpanded}}" style="flex: 1; min-height: 52px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; border: 0; background: transparent; font: 600 11px 'Geist', system-ui, sans-serif; color: var(--gold); cursor: pointer"><svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true" style="fill: currentColor"><circle cx="5" cy="12" r="1.7"></circle><circle cx="12" cy="12" r="1.7"></circle><circle cx="19" cy="12" r="1.7"></circle></svg>More</button>
+  </nav>
+  <sc-if value="{{more}}" hint-placeholder-val="{{ false }}">
+    <div style="position: fixed; inset: 0; z-index: 30; background: rgba(0,0,0,0.45); display: flex; flex-direction: column; justify-content: flex-end">
+      <div role="dialog" aria-label="More pages" style="background: var(--panel); border-top: 1px solid var(--line); border-radius: 20px 20px 0 0; padding: 18px 16px 28px; display: flex; flex-direction: column; gap: 6px">
+        <div style="display: flex; justify-content: space-between; align-items: center; padding: 0 4px 8px">
+          <span style="font-weight: 600; font-size: 16px">Deep dive</span>
+          <button type="button" onClick="{{closeMore}}" style="min-height: 44px; padding: 0 14px; border-radius: 12px; border: 1px solid var(--line); background: var(--raised); color: var(--fg); font: 500 14px 'Geist', system-ui, sans-serif; cursor: pointer">Close</button>
+        </div>
+        <a href="Signals.dc.html" aria-current="page" style="text-decoration: none; padding: 14px 12px; border-radius: 12px; background: var(--glow); color: var(--gold); font-weight: 600; font-size: 15px">Signals: why it's quiet</a>
+        <a href="Backtesting.dc.html" style="text-decoration: none; padding: 14px 12px; border-radius: 12px; background: var(--raised); font-size: 15px">Backtesting: did it make money?</a>
+        <a href="Data.dc.html" style="text-decoration: none; padding: 14px 12px; border-radius: 12px; background: var(--raised); font-size: 15px">Data: where the numbers come from</a>
+      </div>
+    </div>
+  </sc-if>
+  <sc-if value="{{dl}}" hint-placeholder-val="{{ false }}">
+    <dc-import name="DownloadPanel" dark="{{dark}}" on-close="{{closeDl}}" start-what="trades" start-pair="{{dlPair}}" hint-size="100%,100%"></dc-import>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"startDark":{"editor":"boolean","default":true},"startPair":{"editor":"enum","options":["M_TEN","M_PETAL","M_GUINEA","TEN_PETAL","GUINEA_TEN","GUINEA_PETAL"],"default":"M_TEN"},"$preview":{"width":1440,"height":2400}}'>
+class Component extends DCLogic {
+  componentDidMount() {
+    let saved = null;
+    try { saved = localStorage.getItem('grv-theme'); } catch (e) {}
+    if (saved) this.setState({ dark: saved === 'dark' });
+    else { try { if (window.matchMedia) this.setState({ dark: window.matchMedia('(prefers-color-scheme: dark)').matches }); } catch (e) {} }
+    fetch('data/site-data.json')
+      .then((r) => r.json())
+      .then((d) => this.setState({ D: d }))
+      .catch(() => this.setState({ failed: true }));
+  }
+
+  tokens(dark) {
+    return dark
+      ? { bg: '#070D14', panel: '#0F1822', raised: '#18232F', line: '#1E2B38', fg: '#EAF0F6', muted: '#93A3B4', gold: '#F2A93B', glow: 'rgba(242,169,59,0.12)', ongold: '#1A1204', up: '#4FD1A1', down: '#FF8F85', passBg: 'rgba(79,209,161,0.14)', failBg: 'rgba(255,143,133,0.14)' }
+      : { bg: '#F3F5F8', panel: '#FFFFFF', raised: '#E9EDF2', line: '#DCE2E9', fg: '#0C1622', muted: '#55636F', gold: '#975600', glow: 'rgba(151,86,0,0.10)', ongold: '#FFFFFF', up: '#0B7A55', down: '#B42318', passBg: 'rgba(11,122,85,0.10)', failBg: 'rgba(180,35,24,0.10)' };
+  }
+
+  srs(n) { return (n < 0 ? '−' : '+') + '₹' + Math.abs(Math.round(n)).toLocaleString('en-IN'); }
+  sgn(n, d) { return (n < 0 ? '−' : '+') + Math.abs(n).toFixed(d); }
+  fd(s) { const M = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']; const p = s.split('-'); return (+p[2]) + ' ' + M[+p[1] - 1] + ' ' + p[0]; }
+  fs(s) { const M = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']; const p = s.split('-'); return (+p[2]) + ' ' + M[+p[1] - 1]; }
+
+  renderVals() {
+    const st = this.state || {};
+    const dark = st.dark ?? (this.props.startDark ?? true);
+    const t = this.tokens(dark);
+    const shell = {
+      t, dark, light: !dark, asOfText: st.D ? this.fd(st.D.asOf) : '…',
+      themeLabel: dark ? 'Switch to light mode' : 'Switch to dark mode',
+      toggle: () => { try { localStorage.setItem('grv-theme', dark ? 'light' : 'dark'); } catch (e) {} this.setState({ dark: !dark }); },
+      more: !!st.more, moreExpanded: st.more ? 'true' : 'false',
+      openMore: () => this.setState({ more: true }), closeMore: () => this.setState({ more: false }),
+      dl: !!st.dl, openDl: () => this.setState({ dl: true, more: false }), closeDl: () => this.setState({ dl: false }), dlPair: st.pair || this.props.startPair || 'M_TEN',
+      retry: () => { this.setState({ failed: false }); this.componentDidMount(); }
+    };
+    const D = st.D;
+    if (!D) return { ...shell, loading: !st.failed, failed: !!st.failed, ready: false };
+
+    const ORDER = ['M_TEN', 'M_PETAL', 'M_GUINEA', 'GUINEA_TEN', 'TEN_PETAL', 'GUINEA_PETAL'];
+    const TD = {}; D.today.forEach((x) => { TD[x.id] = x; });
+    const pid = st.pair || this.props.startPair || 'M_TEN';
+    const p = TD[pid];
+    // 'training' is the walk-forward switch, not one of the five market checks
+    const checksFailed = (x) => x.failed.filter((f) => f !== 'training');
+    const chips = ORDER.map((id) => {
+      const on = id === pid, x = TD[id];
+      const k = checksFailed(x).length;
+      return {
+        label: x.label, pressed: on ? 'true' : 'false', pick: () => this.setState({ pair: id }),
+        status: (k ? 'Quiet · ' + k + ' of 5 failed' : (x.pairOn ? 'Signal · all 5 passed' : 'All 5 passed')) + (x.pairOn ? '' : ' · off'),
+        style: 'min-height: 56px; padding: 10px 14px; border-radius: 14px; cursor: pointer; text-align: left; display: flex; flex-direction: column; gap: 3px; font-family: \'Geist\', system-ui, sans-serif; ' +
+          (on ? 'background: var(--glow); color: var(--gold); border: 1px solid var(--gold)' : 'background: var(--panel); color: var(--fg); border: 1px solid var(--line)')
+      };
+    });
+
+    const N = { enough_history: 'History', extreme: 'Extreme gap', edge: 'Beats costs', liquidity: 'Liquidity', lifecycle: 'Timing' };
+    const failedNames = checksFailed(p).map((f) => N[f] || f);
+    const offText = p.pairOn ? '' : ' Training also switched this pair off (' + p.switchWhy + ').';
+    const status = {
+      pair: p.label, contracts: p.contracts,
+      title: failedNames.length ? 'Quiet: ' + failedNames.length + ' of 5 checks failed' : (p.pairOn ? 'Signal: all 5 checks passed' : 'Quiet: switched off in training'),
+      text: failedNames.length
+        ? 'Failed: ' + failedNames.join(', ') + '. One failed check is enough to stay quiet, so the model takes no trade today.' + offText
+        : (p.pairOn ? 'All five checks passed. The trade would be entered at tomorrow\'s close.' : 'All five checks passed, but training switched this pair off (' + p.switchWhy + '), so the model takes no trade.')
+    };
+    const g = p.gates;
+    const n0 = (x) => x.toLocaleString('en-IN');
+    const mk = (n, ok, title, text) => ({
+      n, pass: ok, fail: !ok, word: ok ? 'Pass' : 'Fail', title, text,
+      badgeBg: ok ? t.passBg : t.failBg, badgeFg: ok ? 'var(--up)' : 'var(--down)', border: ok ? 'var(--line)' : 'var(--down)'
+    });
+    const absz = Math.abs(p.z);
+    const gates = [
+      mk(1, g.enough_history, 'Enough history', g.enough_history ? 'There is a full window of past days to measure what normal looks like for this pair.' : 'Not enough past days yet to know what normal looks like for this pair.'),
+      mk(2, g.extreme, 'Extreme gap', 'The gap is ' + absz.toFixed(2) + ' standard deviations from normal. It needs at least ' + p.zNeed.toFixed(1) + ', and less than ' + p.stopZ.toFixed(1) + ', where the stop-loss sits.'),
+      mk(3, g.edge_beats_cost, 'Beats costs', 'The gap from normal is ' + p.dev.toFixed(1) + ' bps. It must be at least ' + p.hurdle.toFixed(1) + ' bps, twice the round-trip cost.' +
+        (p.canSignal ? '' : ' Gaps here are so calm right now that ' + p.hurdle.toFixed(1) + ' bps is ' + p.hurdleZ.toFixed(1) + ' standard deviations, past the stop-loss at ' + p.stopZ.toFixed(1) + ', so this pair cannot signal until it gets more volatile.')),
+      mk(4, g.liquidity, 'Liquidity', 'Traded ' + n0(p.volA) + ' and ' + n0(p.volB) + ' lots, with ' + n0(p.oiA) + ' and ' + n0(p.oiB) + ' open. Minimum: ' + D.minVol + ' traded and ' + D.minOi + ' open.'),
+      mk(5, g.lifecycle, 'Timing', (p.roll ? 'Today is a contract-roll day. ' : 'Not a roll day. ') + p.tdA + ' and ' + p.tdB + ' trading days left to expiry. Minimum: ' + D.minTd + ', to stay clear of the delivery period.')
+    ];
+
+    const maxB = Math.max(60, Math.ceil(Math.max(p.dev, p.hurdle) * 1.2 / 10) * 10);
+    const meter = {
+      dev: p.dev.toFixed(1), hurdle: p.hurdle.toFixed(1), rt: p.rt.toFixed(1), max: maxB,
+      devRs: 'about ₹' + Math.round(p.dev / 1e4 * 148500).toLocaleString('en-IN') + ' per 10 g of pure gold',
+      devW: (Math.min(1, p.dev / maxB) * 100).toFixed(1) + '%', hurdleX: (p.hurdle / maxB * 100).toFixed(1) + '%',
+      fill: p.dev >= p.hurdle ? 'var(--gold)' : 'var(--muted)',
+      gapText: p.dev >= p.hurdle ? 'passes by ' + (p.dev - p.hurdle).toFixed(1) + ' bps' : 'short by ' + (p.hurdle - p.dev).toFixed(1) + ' bps'
+    };
+
+    // The breakdown comes from the pipeline's own cost settings (built into the data file and checked against it).
+    const costs = D.costs.map((c) => ({ name: c.name, how: c.how, bps: c.bps.toFixed(2) }));
+    const costTotal = D.costTotal.toFixed(2);
+    const slipShare = Math.round(D.costs[0].bps / D.costTotal * 100);
+    const costNote = 'Slippage is ' + slipShare + '% of the cost. It is our assumption, not a measured fill. Backtesting shows what happens at 0, 2 and 10 bps.';
+
+    const OUT = { revert: 'Back to normal', stop: 'Stop-loss', time: 'Time limit', roll: 'Contract roll', expiry: 'Near expiry' };
+    const hist = D.history.filter((h) => h.pair === pid).sort((a, b) => (a.date < b.date ? 1 : -1));
+    const SHOW = 10;
+    const allPast = !!st.allPast;
+    const morePast = {
+      show: hist.length > SHOW, expanded: allPast ? 'true' : 'false',
+      label: allPast ? 'Show the latest ' + SHOW : 'Show all ' + hist.length + ' trades',
+      toggle: () => this.setState({ allPast: !allPast })
+    };
+    const past = hist.slice(0, allPast ? hist.length : SHOW).map((h) => ({
+      date: this.fd(h.date), held: this.fs(h.entry_date) + ' → ' + this.fs(h.exit_date) + ' (' + h.holding_days + ' d)',
+      dir: (h.direction.indexOf('Short A') === 0 ? 'Sell ' + p.a + ', buy ' + p.b : 'Buy ' + p.a + ', sell ' + p.b),
+      z: this.sgn(h.z, 2), outcome: OUT[h.outcome] || h.outcome,
+      rs: this.srs(h.net_rs), bps: this.sgn(h.net_bps, 1) + ' bps', color: h.net_rs > 0 ? 'var(--up)' : 'var(--down)',
+      seg: h.seg === 'test' ? 'Unseen test' : 'Training',
+      segStyle: 'font-size: 12px; padding: 4px 8px; border-radius: 999px; white-space: nowrap; ' + (h.seg === 'test' ? 'background: var(--glow); color: var(--gold)' : 'background: var(--raised); color: var(--muted)')
+    }));
+    const wins = hist.filter((h) => h.net_rs > 0).length;
+    const pastCount = hist.length
+      ? hist.length + (hist.length === 1 ? ' trade' : ' trades') + ' since ' + this.fd(hist[hist.length - 1].date) + ' · ' + wins + ' made money after costs'
+      : 'No trades';
+    const sw = D.pairs[pid].switch;
+    const pastNote = 'Every trade here passed all five checks on its signal day, the same rule as today\'s alert. It never entered past the stop-loss and never bought or sold on a day either contract moved ' + D.rule.maxMove.toFixed(0) + '% or more. ' +
+      (hist.length ? '' : 'This pair never met all five at once. ') +
+      'Training switch: ' + (sw.on ? 'on' : 'off') + ' (' + sw.reason + ').';
+
+    return { ...shell, loading: false, ready: true, chips, status, gates, meter, costs, costTotal, costNote, past, pastCount, pastNote, morePast };
+  }
+}
+</script>
+</body>
+</html>

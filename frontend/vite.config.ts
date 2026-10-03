@@ -1,11 +1,7 @@
 import { defineConfig } from 'vite'
-import react from '@vitejs/plugin-react'
 
-// https://vitejs.dev/config/
+// The site is plain HTML + JS (see public/app). Vite is only used for `npm run dev`.
 export default defineConfig({
-  plugins: [react()],
   base: './',
-  server: {
-    port: 3000,
-  }
+  server: { port: 3000 },
 })

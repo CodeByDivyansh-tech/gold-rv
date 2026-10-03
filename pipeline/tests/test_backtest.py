@@ -7,9 +7,11 @@ from pipeline.load import load_clean_bhavcopy
 from pipeline.carry import compute_reference_carry
 from pipeline.pairs import build_all_pairs
 from pipeline.backtest import prepare_contract_lookup, run_grid_search, run_all_scenarios
+from pipeline.config import LEGACY_RULE
 
 def test_backtest_reproduces_reference_summary():
-    """Pipeline must reproduce reference/reference_summary.csv: trade counts exact; mean bps within ±1."""
+    """The ORIGINAL study (LEGACY_RULE: 4 checks, no cost line) must still reproduce
+    reference/reference_summary.csv: trade counts exact; mean bps within ±1."""
     ref_summary_path = 'reference/reference_summary.csv'
     assert os.path.exists(ref_summary_path), f"Reference summary not found at {ref_summary_path}"
     ref_df = pd.read_csv(ref_summary_path).set_index(['pair', 'slip', 'seg'])
@@ -20,8 +22,8 @@ def test_backtest_reproduces_reference_summary():
     pairs = build_all_pairs(df, carry_series)
     P = prepare_contract_lookup(df)
     
-    grid_df, best_params = run_grid_search(pairs, P, dates, tdi)
-    all_trades, summary_df = run_all_scenarios(pairs, best_params, P, dates, tdi)
+    grid_df, best_params = run_grid_search(pairs, P, dates, tdi, rule=LEGACY_RULE)
+    all_trades, summary_df = run_all_scenarios(pairs, best_params, P, dates, tdi, rule=LEGACY_RULE)
     
     # Verify index match
     assert len(summary_df) == len(ref_df), f"Summary rows count mismatch: {len(summary_df)} vs {len(ref_df)}"

@@ -1,0 +1,282 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Gold RV Intelligence: Download</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&amp;family=Geist+Mono:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+</style>
+</helmet>
+<div style="{{rootStyle}}">
+  <div role="dialog" aria-modal="true" aria-labelledby="dl-h" onKeyDown="{{onKey}}" style="width: 100%; max-width: 600px; max-height: calc(100vh - 32px); overflow-y: auto; box-sizing: border-box; background: var(--panel); border: 1px solid var(--line); border-radius: 22px; box-shadow: 0 24px 64px rgba(0,0,0,0.35); padding: 22px; display: flex; flex-direction: column; gap: 18px; color: var(--fg); font-family: 'Geist', 'Segoe UI', system-ui, sans-serif">
+    <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 12px">
+      <div style="display: flex; flex-direction: column; gap: 4px">
+        <h2 id="dl-h" style="margin: 0; font-size: 20px; font-weight: 600; letter-spacing: -0.01em">Download</h2>
+        <span style="font-size: 13px; color: var(--muted)">Pick what you want. Every file uses the same data as this site, as of {{asOf}}.</span>
+      </div>
+      <button type="button" onClick="{{close}}" aria-label="Close" style="width: 44px; height: 44px; flex: none; border-radius: 12px; border: 1px solid var(--line); background: var(--raised); color: var(--fg); display: grid; place-items: center; cursor: pointer; padding: 0"><svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true" style="fill: none; stroke: currentColor; stroke-width: 2px; stroke-linecap: round"><path d="M6 6l12 12M18 6L6 18"></path></svg></button>
+    </div>
+
+    <sc-if value="{{loading}}" hint-placeholder-val="{{ false }}">
+      <p style="margin: 0; color: var(--muted); font-size: 14px">Loading…</p>
+    </sc-if>
+
+    <sc-if value="{{ready}}" hint-placeholder-val="{{ true }}">
+      <fieldset style="border: 0; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px">
+        <legend style="font-size: 13px; font-weight: 600; padding: 0 0 8px">1. What do you want?</legend>
+        <sc-for list="{{whats}}" as="w" hint-placeholder-count="5">
+          <button type="button" onClick="{{w.pick}}" aria-pressed="{{w.pressed}}" style="{{w.style}}">
+            <span style="display: flex; flex-direction: column; gap: 2px; text-align: left"><span style="font-weight: 600; font-size: 14px">{{w.title}}</span><span style="font-size: 12px; color: var(--muted)">{{w.desc}}</span></span>
+            <span style="width: 18px; height: 18px; flex: none; border-radius: 50%; box-sizing: border-box; border: {{w.ring}}; background: {{w.dot}}"></span>
+          </button>
+        </sc-for>
+      </fieldset>
+
+      <sc-if value="{{showPair}}" hint-placeholder-val="{{ true }}">
+        <div style="display: flex; flex-direction: column; gap: 8px">
+          <span id="dl-pair" style="font-size: 13px; font-weight: 600">2. Which pair?</span>
+          <div role="group" aria-labelledby="dl-pair" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(170px, 100%), 1fr)); gap: 6px">
+            <sc-for list="{{pairs}}" as="p" hint-placeholder-count="7">
+              <button type="button" onClick="{{p.pick}}" aria-pressed="{{p.pressed}}" style="{{p.style}}">{{p.label}}</button>
+            </sc-for>
+          </div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{showPeriod}}" hint-placeholder-val="{{ true }}">
+        <div style="display: flex; flex-direction: column; gap: 8px">
+          <span id="dl-period" style="font-size: 13px; font-weight: 600">{{periodStep}}. Which period?</span>
+          <div role="group" aria-labelledby="dl-period" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(120px, 100%), 1fr)); gap: 6px">
+            <sc-for list="{{periods}}" as="p" hint-placeholder-count="4">
+              <button type="button" onClick="{{p.pick}}" aria-pressed="{{p.pressed}}" style="{{p.style}}">{{p.label}}</button>
+            </sc-for>
+          </div>
+        </div>
+      </sc-if>
+
+      <div style="display: flex; flex-direction: column; gap: 8px">
+        <span id="dl-format" style="font-size: 13px; font-weight: 600">{{formatStep}}. Which format?</span>
+        <div role="group" aria-labelledby="dl-format" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(200px, 100%), 1fr)); gap: 6px">
+          <sc-for list="{{formats}}" as="f" hint-placeholder-count="2">
+            <button type="button" onClick="{{f.pick}}" aria-pressed="{{f.pressed}}" style="{{f.style}}"><span style="font-weight: 600; font-size: 14px">{{f.label}}</span><span style="font-size: 12px; color: var(--muted)">{{f.desc}}</span></button>
+          </sc-for>
+        </div>
+      </div>
+
+      <div style="display: flex; flex-direction: column; gap: 8px; background: var(--raised); border-radius: 14px; padding: 12px 14px">
+        <div style="display: flex; justify-content: space-between; gap: 8px; font-size: 12px; color: var(--muted)"><span>Preview</span><span>{{preview.count}}</span></div>
+        <div style="overflow-x: auto">
+          <table style="border-collapse: collapse; font-size: 12px; font-family: 'Geist Mono', ui-monospace, monospace; white-space: nowrap">
+            <thead><tr><sc-for list="{{preview.head}}" as="h" hint-placeholder-count="5"><th style="text-align: left; font-weight: 600; padding: 4px 12px 4px 0">{{h.v}}</th></sc-for></tr></thead>
+            <tbody>
+              <sc-for list="{{preview.rows}}" as="r" hint-placeholder-count="4">
+                <tr><sc-for list="{{r.cells}}" as="c" hint-placeholder-count="5"><td style="padding: 3px 12px 3px 0; color: var(--muted)">{{c.v}}</td></sc-for></tr>
+              </sc-for>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px">
+        <span style="font-size: 12px; color: var(--muted); font-family: 'Geist Mono', ui-monospace, monospace; overflow-wrap: anywhere">{{filename}}</span>
+        <button type="button" onClick="{{download}}" style="min-height: 48px; padding: 0 22px; border-radius: 14px; border: 0; background: var(--gold); color: var(--ongold); font: 600 15px 'Geist', system-ui, sans-serif; cursor: pointer; display: flex; align-items: center; gap: 8px"><svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true" style="fill: none; stroke: currentColor; stroke-width: 2px; stroke-linecap: round; stroke-linejoin: round"><path d="M12 4v11M7 10.5l5 5 5-5M5 20h14"></path></svg>Download</button>
+      </div>
+      <sc-if value="{{hasStatus}}" hint-placeholder-val="{{ false }}">
+        <p role="status" style="margin: 0; font-size: 13px; line-height: 1.5; color: {{statusColor}}">{{status}}</p>
+      </sc-if>
+      <p style="margin: 0; font-size: 12px; line-height: 1.5; color: var(--muted)">Research data, not investment advice. Printable statements open in your browser: use Print, then Save as PDF.</p>
+    </sc-if>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"dark":{"editor":"boolean","default":true},"onClose":{"editor":null},"startWhat":{"editor":"enum","options":["today","prices","trades","backtest","report"],"default":"trades"},"startPair":{"editor":null},"$preview":{"width":640,"height":980}}'>
+class Component extends DCLogic {
+  componentDidMount() {
+    fetch('data/site-data.json')
+      .then((r) => r.json())
+      .then((d) => this.setState({ D: d }))
+      .catch(() => this.setState({ failed: true }));
+  }
+
+  fd(s) { const M = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']; const p = s.split('-'); return (+p[2]) + ' ' + M[+p[1] - 1] + ' ' + p[0]; }
+  esc(v) { const s = v == null ? '' : String(v); return /[",\n]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s; }
+  html(v) { return String(v == null ? '' : v).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
+  rs(n) { return (n < 0 ? '-' : '') + 'Rs ' + Math.abs(Math.round(n)).toLocaleString('en-IN'); }
+
+  // Builds {head, rows, title} for the chosen file. Values stay plain (no ₹ signs) so spreadsheets read them as numbers.
+  table(D, what, pair, period) {
+    const from = period === '3m' ? D.pure4.d[Math.max(0, D.pure4.d.length - 63)] : period === '1y' ? D.pure4.d[Math.max(0, D.pure4.d.length - 252)] : period === 'test' ? D.split.test_start : D.start;
+    const inP = (d) => d >= from && d <= D.asOf;
+    const WHY = { revert: 'Back to normal', stop: 'Stop-loss', time: 'Time limit', roll: 'Contract roll', expiry: 'Near expiry' };
+    if (what === 'today') {
+      return { title: 'Today\'s six pairs', head: ['Pair', 'Contracts', 'Spread (bps)', 'Spread (Rs per 10 g)', 'Normal level (bps)', 'Gap from normal (bps)', 'Cost line (bps)', 'z', 'z needed', 'Status', 'Checks failed'],
+        rows: D.today.map((p) => [p.label, p.contracts, p.spread, p.spreadRs, p.mu, p.dev, p.hurdle, p.z, p.zNeed, p.failed.length ? 'Quiet' : 'Signal', p.failed.join('; ')]) };
+    }
+    if (what === 'prices') {
+      const P = D.pure4, rows = [];
+      P.d.forEach((d, i) => { if (inP(d)) rows.push([d, P.GOLDM[i], P.GOLDTEN[i], P.GOLDGUINEA[i], P.GOLDPETAL[i]]); });
+      return { title: 'Price of 10 g of pure gold by contract', head: ['Date', 'GOLDM', 'GOLDTEN', 'GOLDGUINEA', 'GOLDPETAL'], rows };
+    }
+    if (what === 'trades') {
+      const ids = pair === 'ALL' ? Object.keys(D.pairs) : [pair];
+      let list = [];
+      ids.forEach((id) => D.pairs[id].trades.forEach((t) => list.push({ id, t })));
+      list = list.filter((x) => inP(x.t.e)).sort((a, b) => (a.t.e < b.t.e ? -1 : 1));
+      let run = 0;
+      const rows = list.map(({ id, t }) => {
+        run += t.net; const P = D.pairs[id];
+        return [t.e, t.x, P.label, t.side < 0 ? 'Sell ' + P.a + ', buy ' + P.b : 'Buy ' + P.a + ', sell ' + P.b, t.z, t.days, WHY[t.why] || t.why, t.net, t.bps, Math.round(run), t.seg === 'test' ? 'Unseen test' : 'Training'];
+      });
+      return { title: 'Trade statement', head: ['Entered', 'Closed', 'Pair', 'Trade', 'z', 'Days', 'Why it closed', 'Result after costs (Rs)', 'Result (bps)', 'Running total (Rs)', 'Period'], rows };
+    }
+    if (what === 'backtest') {
+      const rows = [];
+      Object.keys(D.backtest).forEach((id) => ['0', '2', '5', '10'].forEach((s) => {
+        const T = D.backtest[id][s].test;
+        rows.push([D.pairs[id].label, s, T.n_trades, Math.round(T.hit_rate * 100), T.gross_bps, T.net_bps, Math.round(T.net_rs), T.t_stat]);
+      }));
+      return { title: 'Backtest on the unseen year', head: ['Pair', 'Slippage (bps)', 'Trades', 'Won (%)', 'Before costs (bps)', 'After costs (bps)', 'Total after costs (Rs)', 't-statistic'], rows };
+    }
+    return { title: 'Research report', head: ['Section', 'Contents'], rows: [['Verdict', 'No persistent edge proven after costs'], ['Today', 'Six pairs against the cost line'], ['Backtest', 'Unseen year, all pairs at 5 bps'], ['Costs', 'Round trip ' + D.costTotal.toFixed(1) + ' bps'], ['Data', D.meta.rows + ' daily settlements, ' + D.meta.mismatches + ' mismatches']] };
+  }
+
+  // The leading byte-order mark makes Excel read the file as UTF-8 (so "·" and "–" display correctly).
+  csv(t) { return '﻿' + [t.head].concat(t.rows).map((r) => r.map((v) => this.esc(v)).join(',')).join('\n') + '\n'; }
+
+  statement(D, what, pair, periodLabel, t) {
+    const style = 'body{font-family:Georgia,serif;color:#111;margin:40px;max-width:900px}h1{font-size:26px;margin:0 0 4px}h2{font-size:17px;margin:28px 0 8px}p,li{font-size:13px;line-height:1.55}table{border-collapse:collapse;width:100%;font:12px/1.4 ui-monospace,Menlo,monospace}th,td{border-bottom:1px solid #ccc;padding:5px 8px;text-align:left}th{background:#f2f2f2}.muted{color:#555}.box{border:1px solid #bbb;border-radius:8px;padding:12px 14px;margin:14px 0}@media print{body{margin:16mm}}';
+    const tbl = (h, rows) => '<table><thead><tr>' + h.map((x) => '<th>' + this.html(x) + '</th>').join('') + '</tr></thead><tbody>' + rows.map((r) => '<tr>' + r.map((x) => '<td>' + this.html(x) + '</td>').join('') + '</tr>').join('') + '</tbody></table>';
+    const head = '<!doctype html><html lang="en"><head><meta charset="utf-8"><title>Gold RV Intelligence: ' + this.html(t.title) + '</title><style>' + style + '</style></head><body>';
+    const logo = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0.76 242.26 49.24" width="200" role="img" aria-label="Gold RV Intelligence"><path d="M8 28L12 18H44L48 28Z M16 46L20 36H52L56 46Z" transform="translate(0 5.19) scale(1.44203) translate(-8 -18)" fill="#975600"/><path d="M102.27 31.42Q97.36 31.42 93.83 29.49Q90.3 27.56 88.39 24.07Q86.48 20.58 86.48 15.92Q86.48 11.3 88.41 7.79Q90.34 4.29 93.76 2.31Q97.19 0.34 101.72 0.34Q105.46 0.34 108.42 1.68Q111.38 3.03 113.21 5.36Q115.04 7.69 115.37 10.76H108.91Q108.49 8.28 106.57 6.87Q104.66 5.46 101.81 5.46Q99.16 5.46 97.19 6.7Q95.21 7.94 94.12 10.25Q93.03 12.56 93.03 15.8Q93.03 19.16 94.12 21.53Q95.21 23.9 97.33 25.14Q99.46 26.38 102.56 26.38Q105.08 26.38 106.85 25.75Q108.61 25.12 109.54 23.99L115.67 26.42Q113.23 28.86 110.02 30.14Q106.81 31.42 102.27 31.42ZM109.2 26.42V18.11L110.5 19.41H102.52V14.45H115.67V26.42ZM129.11 31.42Q125.58 31.42 122.91 30.01Q120.25 28.61 118.75 26.07Q117.26 23.52 117.26 20.21Q117.26 16.89 118.75 14.41Q120.25 11.93 122.91 10.55Q125.58 9.16 129.11 9.16Q132.68 9.16 135.34 10.55Q138.01 11.93 139.48 14.41Q140.95 16.89 140.95 20.21Q140.95 23.52 139.46 26.07Q137.97 28.61 135.3 30.01Q132.64 31.42 129.11 31.42ZM129.11 26.46Q130.58 26.46 131.77 25.71Q132.97 24.95 133.69 23.54Q134.4 22.14 134.4 20.16Q134.4 17.27 132.87 15.69Q131.33 14.12 129.11 14.12Q126.88 14.12 125.35 15.71Q123.82 17.31 123.82 20.16Q123.82 22.14 124.53 23.54Q125.24 24.95 126.44 25.71Q127.64 26.46 129.11 26.46ZM143.47 31V0.76H149.77V31ZM169.13 31V26.25L169.55 26.34Q169.13 28.65 167.05 30.03Q164.98 31.42 162.08 31.42Q159.14 31.42 156.97 30.05Q154.81 28.69 153.64 26.21Q152.46 23.73 152.46 20.37Q152.46 16.97 153.68 14.45Q154.9 11.93 157.1 10.55Q159.31 9.16 162.25 9.16Q165.31 9.16 167.22 10.59Q169.13 12.02 169.47 14.49L169.01 14.54V0.76H175.31V31ZM164.09 26.38Q166.32 26.38 167.71 24.8Q169.09 23.23 169.09 20.29Q169.09 17.35 167.68 15.78Q166.28 14.2 164.01 14.2Q161.83 14.2 160.42 15.8Q159.01 17.39 159.01 20.33Q159.01 23.27 160.42 24.83Q161.83 26.38 164.09 26.38ZM186.06 31V0.76H199.58Q202.86 0.76 205.3 1.87Q207.73 2.99 209.08 5Q210.42 7.02 210.42 9.71Q210.42 12.35 209.08 14.35Q207.73 16.34 205.3 17.45Q202.86 18.57 199.58 18.57H191.18V13.82H199.42Q201.73 13.82 202.96 12.75Q204.2 11.68 204.2 9.75Q204.2 7.77 202.99 6.74Q201.77 5.72 199.42 5.72H192.53V31ZM203.11 31 190.97 15.29H197.82L211.85 31ZM223.19 31 212.35 0.76H219.07L227.35 25.96H226.55L234.86 0.76H241.25L230.41 31Z" fill="#0C1622"/><path d="M87.56 50V49.12H89.42V43.43H87.56V42.55H92.18V43.43H90.32V49.12H92.18V50ZM96.27 50V42.55H97.55L100.2 48.97V42.55H101.1V50H99.82L97.18 43.57V50ZM107.06 50V43.43H104.78V42.55H110.24V43.43H107.96V50ZM114.12 50V42.55H118.66V43.43H115.03V45.83H118.53V46.69H115.03V49.12H118.74V50ZM123.05 50V42.55H123.95V49.58L123.5 49.12H127.67V50ZM131.87 50V42.55H132.77V49.58L132.32 49.12H136.49V50ZM140.48 50V49.12H142.34V43.43H140.48V42.55H145.1V43.43H143.24V49.12H145.1V50ZM151.59 50.17Q150.8 50.17 150.18 49.73Q149.57 49.3 149.21 48.43Q148.86 47.56 148.86 46.28Q148.86 45.08 149.19 44.2Q149.52 43.33 150.14 42.85Q150.76 42.38 151.63 42.38Q152.31 42.38 152.84 42.68Q153.37 42.99 153.73 43.53Q154.09 44.07 154.24 44.77L153.3 44.83Q153.12 44.14 152.7 43.7Q152.29 43.26 151.63 43.26Q151.05 43.26 150.64 43.61Q150.23 43.96 150.02 44.64Q149.8 45.32 149.8 46.28Q149.8 47.24 150.02 47.91Q150.24 48.58 150.66 48.93Q151.07 49.29 151.67 49.29Q152.21 49.29 152.59 49.01Q152.97 48.73 153.19 48.23Q153.41 47.73 153.43 47.09H151.65V46.23H154.27V50H153.43L153.39 48.24L153.64 48.32Q153.5 48.86 153.24 49.28Q152.98 49.7 152.58 49.93Q152.17 50.17 151.59 50.17ZM158.22 50V42.55H162.76V43.43H159.13V45.83H162.63V46.69H159.13V49.12H162.84V50ZM166.83 50V42.55H168.11L170.76 48.97V42.55H171.66V50H170.38L167.74 43.57V50ZM178.09 50.17Q177.2 50.17 176.58 49.7Q175.96 49.22 175.64 48.35Q175.32 47.48 175.32 46.28Q175.32 45.08 175.64 44.2Q175.96 43.33 176.58 42.85Q177.2 42.38 178.09 42.38Q179.08 42.38 179.77 43.02Q180.46 43.67 180.69 44.82L179.73 44.89Q179.55 44.08 179.11 43.67Q178.68 43.26 178.09 43.26Q177.49 43.26 177.09 43.61Q176.68 43.96 176.47 44.64Q176.26 45.32 176.26 46.28Q176.26 47.24 176.47 47.91Q176.68 48.58 177.09 48.93Q177.49 49.29 178.09 49.29Q178.74 49.29 179.19 48.83Q179.64 48.38 179.8 47.49L180.76 47.54Q180.56 48.77 179.85 49.47Q179.15 50.17 178.09 50.17ZM184.68 50V42.55H189.22V43.43H185.59V45.83H189.09V46.69H185.59V49.12H189.3V50Z" fill="#55636F"/></svg>';
+    const top = '<div style="margin:0 0 14px">' + logo + '</div><p class="muted">' + this.html(t.title) + ' · data as of ' + this.fd(D.asOf) + ' · MCX Bhavcopy end-of-day settlements</p>';
+    const foot = '<p class="muted" style="margin-top:32px">Team NEXORA · Hack in Hills \'26 · Research project, not investment advice. Results include all MCX costs and 5 bps slippage per order unless stated. Source: github.com/CodeByDivyansh-tech/gold-rv</p></body></html>';
+    if (what === 'trades') {
+      const net = t.rows.reduce((a, r) => a + r[7], 0), won = t.rows.filter((r) => r[7] > 0).length;
+      const label = pair === 'ALL' ? 'All six pairs' : D.pairs[pair].label;
+      const summary = '<div class="box"><p><b>' + this.html(label) + '</b> · ' + this.html(periodLabel) + '</p><p>' + t.rows.length + ' trades · ' + won + ' made money after costs · total after costs <b>' + this.rs(net) + '</b></p></div>';
+      return head + top + summary + tbl(t.head, t.rows.map((r) => r.slice(0, 7).concat([this.rs(r[7]), r[8], this.rs(r[9]), r[10]]))) + foot;
+    }
+    // full research report
+    const pooled = D.pooled['5'];
+    const today = D.today.map((p) => [p.label, p.dev, p.hurdle, p.status === 'SIGNAL' ? 'Signal' : 'Quiet', p.failed.join(', ') || 'none']);
+    const bt = Object.keys(D.backtest).map((id) => { const T = D.backtest[id]['5'].test; return [D.pairs[id].label, T.n_trades, Math.round(T.hit_rate * 100) + '%', T.net_bps, this.rs(T.net_rs), T.t_stat]; });
+    const RC = D.rule.current, RO = D.rule.original;
+    const slip = ['0', '2', '5', '10'].map((s) => [s + ' bps', RC[s].test_n, this.rs(RC[s].test_net_rs), this.rs(RC[s].crash_net_rs), this.rs(RC[s].ex_crash_net_rs), RC[s].test_t == null ? '–' : RC[s].test_t]);
+    const rules = [['Five checks (what the site shows)', RC['5'].train_n, this.rs(RC['5'].train_net_rs), RC['5'].test_n, this.rs(RC['5'].test_net_rs), this.rs(RC['5'].ex_crash_net_rs)],
+      ['Original study: four checks, no cost line', RO['5'].train_n, this.rs(RO['5'].train_net_rs), RO['5'].test_n, this.rs(RO['5'].test_net_rs), this.rs(RO['5'].ex_crash_net_rs)],
+      ['Five checks + training switch', '–', '–', RC['5'].switched_on_n, this.rs(RC['5'].switched_on_net_rs), '–']];
+    return head + top +
+      '<div class="box"><p><b>Verdict: no persistent edge proven after costs.</b></p><p>' + this.html(D.conclusion) + '</p></div>' +
+      '<h2>Today (' + this.fd(D.asOf) + '): gap from normal vs cost line, in bps</h2>' + tbl(['Pair', 'Gap from normal', 'Cost line', 'Status', 'Checks failed'], today) +
+      '<h2>Unseen year (' + this.fd(D.split.test_start) + ' to ' + this.fd(D.split.test_end) + '), 5 bps slippage</h2>' + tbl(['Pair', 'Trades', 'Won', 'Average (bps)', 'Total after costs', 't-statistic'], bt) +
+      '<h2>All pairs together, by slippage (unseen year)</h2>' + tbl(['Slippage per order', 'Trades', 'Total after costs', 'Closed during the ' + D.events.crashShort, 'All other trades', 't-statistic'], slip) +
+      '<p>Pooled at our 5 bps assumption: ' + pooled.n + ' trades, ' + pooled.bps.toFixed(1) + ' bps average after costs.</p>' +
+      '<h2>One rule for alerts and backtest, at 5 bps</h2>' + tbl(['Rule', 'Training trades', 'Training result', 'Unseen trades', 'Unseen result', 'Outside the crash'], rules) +
+      '<h2>Cost of one round trip (bps of one ₹10 lakh leg)</h2>' + tbl(['Item', 'How', 'bps'], D.costs.map((c) => [c.name, c.how, c.bps.toFixed(2)])) +
+      '<h2>Data</h2><p>' + D.meta.rows.toLocaleString('en-IN') + ' daily settlements, ' + D.meta.contracts + ' contracts, ' + D.meta.days + ' trading days (' + this.fd(D.start) + ' to ' + this.fd(D.asOf) + '). ' + this.html(D.meta.checkText) + '</p>' +
+      '<h2>Limits</h2><ul>' + D.limits.map((l) => '<li>' + this.html(l) + '</li>').join('') + '</ul>' + foot;
+  }
+
+  async save(filename, data) {
+    try {
+      const dl = window.claude && window.claude.use
+        ? await Promise.race([window.claude.use('downloads'), new Promise((r) => setTimeout(() => r(null), 2500))])
+        : null;
+      if (dl) { await dl.save({ filename, data }); return 'Saved ' + filename + '.'; }
+    } catch (e) {
+      if (e && e.code === 'declined') return 'Download cancelled.';
+      if (e && e.code === 'rate_limited') return 'A download prompt is already open. Finish it first.';
+    }
+    try {
+      const url = URL.createObjectURL(new Blob([data], { type: filename.endsWith('.csv') ? 'text/csv' : 'text/html' }));
+      const a = document.createElement('a'); a.href = url; a.download = filename; a.click();
+      setTimeout(() => URL.revokeObjectURL(url), 4000);
+      return 'Your download should start now: ' + filename + '.';
+    } catch (e) {
+      return 'Downloads are blocked in this preview. They work on the live website.';
+    }
+  }
+
+  renderVals() {
+    const st = this.state || {};
+    const dark = this.props.dark ?? true;
+    const t = dark
+      ? { bg: '#070D14', panel: '#0F1822', raised: '#18232F', line: '#1E2B38', fg: '#EAF0F6', muted: '#93A3B4', gold: '#F2A93B', glow: 'rgba(242,169,59,0.12)', ongold: '#1A1204', up: '#4FD1A1', down: '#FF8F85' }
+      : { bg: '#F3F5F8', panel: '#FFFFFF', raised: '#E9EDF2', line: '#DCE2E9', fg: '#0C1622', muted: '#55636F', gold: '#975600', glow: 'rgba(151,86,0,0.10)', ongold: '#FFFFFF', up: '#0B7A55', down: '#B42318' };
+    const vars = Object.keys(t).map((k) => '--' + k + ': ' + t[k]).join('; ');
+    const overlay = typeof this.props.onClose === 'function';
+    const rootStyle = vars + '; font-family: \'Geist\', system-ui, sans-serif; ' + (overlay
+      ? 'position: fixed; inset: 0; z-index: 50; background: rgba(3,8,14,0.6); display: flex; align-items: center; justify-content: center; padding: 16px; box-sizing: border-box'
+      : 'min-height: 100vh; background: var(--bg); display: flex; align-items: center; justify-content: center; padding: 24px; box-sizing: border-box');
+    const close = () => { if (overlay) this.props.onClose(); };
+    const base = { rootStyle, close, onKey: (e) => { if (e.key === 'Escape') close(); } };
+    const D = st.D;
+    if (!D) return { ...base, loading: true, ready: false, asOf: '…' };
+
+    const what = st.what || this.props.startWhat || 'trades';
+    const pair = st.pair || this.props.startPair || 'ALL';
+    const period = st.period || 'all';
+    const WH = [
+      ['today', 'Today\'s pairs', 'All six pairs: gap, cost line, checks'],
+      ['prices', 'Gold prices', 'Daily price of 10 g pure gold, all four contracts'],
+      ['trades', 'Trade statement', 'Every trade with result and running total'],
+      ['backtest', 'Backtest results', 'Unseen year, every pair at 0, 2, 5, 10 bps'],
+      ['report', 'Full research report', 'Verdict, today, backtest, costs and data limits']
+    ];
+    const opt = (on) => 'min-height: 44px; border-radius: 12px; cursor: pointer; font-family: \'Geist\', system-ui, sans-serif; color: var(--fg); ' + (on ? 'background: var(--glow); border: 1px solid var(--gold)' : 'background: transparent; border: 1px solid var(--line)');
+    const whats = WH.map(([id, title, desc]) => ({
+      title, desc, pressed: id === what ? 'true' : 'false', pick: () => this.setState({ what: id, status: '' }),
+      ring: id === what ? '5px solid var(--gold)' : '2px solid var(--muted)', dot: 'var(--panel)',
+      style: opt(id === what) + '; display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 10px 14px'
+    }));
+    const showPair = what === 'trades', showPeriod = what === 'trades' || what === 'prices';
+    const pairs = [{ id: 'ALL', label: 'All six pairs' }].concat(Object.keys(D.pairs).map((id) => ({ id, label: D.pairs[id].label })))
+      .map((p) => ({ label: p.label, pressed: p.id === pair ? 'true' : 'false', pick: () => this.setState({ pair: p.id, status: '' }), style: opt(p.id === pair) + '; font-size: 13px; font-weight: 500; padding: 0 10px' }));
+    const PER = [['3m', 'Last 3 months'], ['1y', 'Last year'], ['test', 'Unseen test year'], ['all', 'Everything']];
+    const periodLabel = (PER.find((p) => p[0] === period) || PER[3])[1];
+    const periods = PER.map(([id, label]) => ({ label, pressed: id === period ? 'true' : 'false', pick: () => this.setState({ period: id, status: '' }), style: opt(id === period) + '; font-size: 13px; font-weight: 500; padding: 0 10px' }));
+    const canPrint = what === 'trades' || what === 'report';
+    const csvOnly = what !== 'report';
+    let format = st.format || (what === 'report' ? 'html' : 'csv');
+    if (!canPrint) format = 'csv';
+    if (!csvOnly) format = 'html';
+    const FM = [];
+    if (csvOnly) FM.push(['csv', 'Spreadsheet (CSV)', 'Opens in Excel or Google Sheets']);
+    if (canPrint) FM.push(['html', 'Printable statement', 'Open, then Print → Save as PDF']);
+    const formats = FM.map(([id, label, desc]) => ({ label, desc, pressed: id === format ? 'true' : 'false', pick: () => this.setState({ format: id, status: '' }), style: opt(id === format) + '; display: flex; flex-direction: column; align-items: flex-start; gap: 2px; padding: 10px 14px' }));
+
+    const tb = this.table(D, what, pair, period);
+    const slug = (s) => s.toLowerCase().replace(/'/g, '').replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+    const parts = ['gold-rv', slug(tb.title)];
+    if (showPair) parts.push(pair === 'ALL' ? 'all-pairs' : slug(D.pairs[pair].label));
+    if (showPeriod) parts.push(slug(periodLabel));
+    parts.push(D.asOf);
+    const filename = parts.join('_') + (format === 'csv' ? '.csv' : '.html');
+    const preview = {
+      count: what === 'report' ? 'Report sections' : tb.rows.length.toLocaleString('en-IN') + (tb.rows.length === 1 ? ' row' : ' rows') + (tb.rows.length > 4 ? ', first 4 shown' : ''),
+      head: tb.head.slice(0, 5).map((v) => ({ v })),
+      rows: tb.rows.slice(0, 4).map((r) => ({ cells: r.slice(0, 5).map((v) => ({ v: v == null ? '–' : v })) }))
+    };
+    const download = async () => {
+      if (!tb.rows.length) { this.setState({ status: 'Nothing to download for this choice. Try a longer period.', bad: true }); return; }
+      const data = format === 'csv' ? this.csv(tb) : this.statement(D, what, pair, periodLabel, tb);
+      const msg = await this.save(filename, data);
+      this.setState({ status: msg, bad: /blocked|cancelled|already/.test(msg) });
+    };
+    return {
+      ...base, loading: false, ready: true, asOf: this.fd(D.asOf), whats, showPair, showPeriod, pairs, periods,
+      periodStep: showPair ? 3 : 2, formatStep: (showPair ? 3 : 2) + (showPeriod ? 1 : 0), formats, preview, filename, download,
+      hasStatus: !!st.status, status: st.status || '', statusColor: st.bad ? 'var(--down)' : 'var(--up)'
+    };
+  }
+}
+</script>
+</body>
+</html>

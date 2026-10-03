@@ -1,0 +1,553 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Gold RV Intelligence: Backtesting</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&amp;family=Geist+Mono:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:inherit}a:hover{color:inherit}
+button:focus-visible,a:focus-visible,input:focus-visible{outline:2px solid #F2A93B;outline-offset:2px}
+.rail{display:flex}.phonebar{display:none}.tabbar{display:none}.headmeta{display:flex}.wide{display:block}.cards{display:none}
+.scrub{position:absolute;inset:0;width:100%;height:100%;background:transparent;border:0;padding:0;margin:0;cursor:crosshair;touch-action:pan-y;border-radius:8px}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+@media (max-width: 899px){.rail{display:none}.phonebar{display:flex}.tabbar{display:flex}.headmeta{display:none}.wide{display:none}.cards{display:flex}.pagepad{padding-bottom:104px !important}}
+</style>
+</helmet>
+<div style="--bg: {{t.bg}}; --panel: {{t.panel}}; --raised: {{t.raised}}; --line: {{t.line}}; --fg: {{t.fg}}; --muted: {{t.muted}}; --gold: {{t.gold}}; --glow: {{t.glow}}; --ongold: {{t.ongold}}; --up: {{t.up}}; --down: {{t.down}}; background: var(--bg); color: var(--fg); font-family: 'Geist', 'Segoe UI', system-ui, sans-serif; min-height: 100vh; display: flex; align-items: stretch">
+
+  <aside class="rail" style="flex: 0 0 248px; box-sizing: border-box; background: var(--panel); border-right: 1px solid var(--line); padding: 22px 14px; flex-direction: column; gap: 28px">
+    <a href="Home.dc.html" style="display: flex; align-items: center; gap: 10px; text-decoration: none; padding: 0 8px">
+      <svg viewBox="0 0.76 242.26 49.24" role="img" aria-label="Gold RV Intelligence" style="width: 176px; height: auto; display: block"><path d="M8 28L12 18H44L48 28Z M16 46L20 36H52L56 46Z" transform="translate(0 5.19) scale(1.44203) translate(-8 -18)" style="fill: var(--gold)"></path><path d="M102.27 31.42Q97.36 31.42 93.83 29.49Q90.3 27.56 88.39 24.07Q86.48 20.58 86.48 15.92Q86.48 11.3 88.41 7.79Q90.34 4.29 93.76 2.31Q97.19 0.34 101.72 0.34Q105.46 0.34 108.42 1.68Q111.38 3.03 113.21 5.36Q115.04 7.69 115.37 10.76H108.91Q108.49 8.28 106.57 6.87Q104.66 5.46 101.81 5.46Q99.16 5.46 97.19 6.7Q95.21 7.94 94.12 10.25Q93.03 12.56 93.03 15.8Q93.03 19.16 94.12 21.53Q95.21 23.9 97.33 25.14Q99.46 26.38 102.56 26.38Q105.08 26.38 106.85 25.75Q108.61 25.12 109.54 23.99L115.67 26.42Q113.23 28.86 110.02 30.14Q106.81 31.42 102.27 31.42ZM109.2 26.42V18.11L110.5 19.41H102.52V14.45H115.67V26.42ZM129.11 31.42Q125.58 31.42 122.91 30.01Q120.25 28.61 118.75 26.07Q117.26 23.52 117.26 20.21Q117.26 16.89 118.75 14.41Q120.25 11.93 122.91 10.55Q125.58 9.16 129.11 9.16Q132.68 9.16 135.34 10.55Q138.01 11.93 139.48 14.41Q140.95 16.89 140.95 20.21Q140.95 23.52 139.46 26.07Q137.97 28.61 135.3 30.01Q132.64 31.42 129.11 31.42ZM129.11 26.46Q130.58 26.46 131.77 25.71Q132.97 24.95 133.69 23.54Q134.4 22.14 134.4 20.16Q134.4 17.27 132.87 15.69Q131.33 14.12 129.11 14.12Q126.88 14.12 125.35 15.71Q123.82 17.31 123.82 20.16Q123.82 22.14 124.53 23.54Q125.24 24.95 126.44 25.71Q127.64 26.46 129.11 26.46ZM143.47 31V0.76H149.77V31ZM169.13 31V26.25L169.55 26.34Q169.13 28.65 167.05 30.03Q164.98 31.42 162.08 31.42Q159.14 31.42 156.97 30.05Q154.81 28.69 153.64 26.21Q152.46 23.73 152.46 20.37Q152.46 16.97 153.68 14.45Q154.9 11.93 157.1 10.55Q159.31 9.16 162.25 9.16Q165.31 9.16 167.22 10.59Q169.13 12.02 169.47 14.49L169.01 14.54V0.76H175.31V31ZM164.09 26.38Q166.32 26.38 167.71 24.8Q169.09 23.23 169.09 20.29Q169.09 17.35 167.68 15.78Q166.28 14.2 164.01 14.2Q161.83 14.2 160.42 15.8Q159.01 17.39 159.01 20.33Q159.01 23.27 160.42 24.83Q161.83 26.38 164.09 26.38ZM186.06 31V0.76H199.58Q202.86 0.76 205.3 1.87Q207.73 2.99 209.08 5Q210.42 7.02 210.42 9.71Q210.42 12.35 209.08 14.35Q207.73 16.34 205.3 17.45Q202.86 18.57 199.58 18.57H191.18V13.82H199.42Q201.73 13.82 202.96 12.75Q204.2 11.68 204.2 9.75Q204.2 7.77 202.99 6.74Q201.77 5.72 199.42 5.72H192.53V31ZM203.11 31 190.97 15.29H197.82L211.85 31ZM223.19 31 212.35 0.76H219.07L227.35 25.96H226.55L234.86 0.76H241.25L230.41 31Z" style="fill: var(--fg)"></path><path d="M87.56 50V49.12H89.42V43.43H87.56V42.55H92.18V43.43H90.32V49.12H92.18V50ZM96.27 50V42.55H97.55L100.2 48.97V42.55H101.1V50H99.82L97.18 43.57V50ZM107.06 50V43.43H104.78V42.55H110.24V43.43H107.96V50ZM114.12 50V42.55H118.66V43.43H115.03V45.83H118.53V46.69H115.03V49.12H118.74V50ZM123.05 50V42.55H123.95V49.58L123.5 49.12H127.67V50ZM131.87 50V42.55H132.77V49.58L132.32 49.12H136.49V50ZM140.48 50V49.12H142.34V43.43H140.48V42.55H145.1V43.43H143.24V49.12H145.1V50ZM151.59 50.17Q150.8 50.17 150.18 49.73Q149.57 49.3 149.21 48.43Q148.86 47.56 148.86 46.28Q148.86 45.08 149.19 44.2Q149.52 43.33 150.14 42.85Q150.76 42.38 151.63 42.38Q152.31 42.38 152.84 42.68Q153.37 42.99 153.73 43.53Q154.09 44.07 154.24 44.77L153.3 44.83Q153.12 44.14 152.7 43.7Q152.29 43.26 151.63 43.26Q151.05 43.26 150.64 43.61Q150.23 43.96 150.02 44.64Q149.8 45.32 149.8 46.28Q149.8 47.24 150.02 47.91Q150.24 48.58 150.66 48.93Q151.07 49.29 151.67 49.29Q152.21 49.29 152.59 49.01Q152.97 48.73 153.19 48.23Q153.41 47.73 153.43 47.09H151.65V46.23H154.27V50H153.43L153.39 48.24L153.64 48.32Q153.5 48.86 153.24 49.28Q152.98 49.7 152.58 49.93Q152.17 50.17 151.59 50.17ZM158.22 50V42.55H162.76V43.43H159.13V45.83H162.63V46.69H159.13V49.12H162.84V50ZM166.83 50V42.55H168.11L170.76 48.97V42.55H171.66V50H170.38L167.74 43.57V50ZM178.09 50.17Q177.2 50.17 176.58 49.7Q175.96 49.22 175.64 48.35Q175.32 47.48 175.32 46.28Q175.32 45.08 175.64 44.2Q175.96 43.33 176.58 42.85Q177.2 42.38 178.09 42.38Q179.08 42.38 179.77 43.02Q180.46 43.67 180.69 44.82L179.73 44.89Q179.55 44.08 179.11 43.67Q178.68 43.26 178.09 43.26Q177.49 43.26 177.09 43.61Q176.68 43.96 176.47 44.64Q176.26 45.32 176.26 46.28Q176.26 47.24 176.47 47.91Q176.68 48.58 177.09 48.93Q177.49 49.29 178.09 49.29Q178.74 49.29 179.19 48.83Q179.64 48.38 179.8 47.49L180.76 47.54Q180.56 48.77 179.85 49.47Q179.15 50.17 178.09 50.17ZM184.68 50V42.55H189.22V43.43H185.59V45.83H189.09V46.69H185.59V49.12H189.3V50Z" style="fill: var(--muted)"></path></svg>
+    </a>
+    <nav aria-label="Main" style="display: flex; flex-direction: column; gap: 20px; font-size: 14px">
+      <div style="display: flex; flex-direction: column; gap: 2px">
+        <span style="font-size: 12px; color: var(--muted); padding: 0 12px 6px">Start</span>
+        <a href="Home.dc.html" style="display: flex; align-items: center; gap: 10px; text-decoration: none; padding: 10px 12px; border-radius: 10px"><svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true" style="fill: none; stroke: currentColor; stroke-width: 1.8px; stroke-linecap: round; stroke-linejoin: round"><path d="M3 11.5 12 4l9 7.5"></path><path d="M5.5 10v10h13V10"></path></svg>Home</a>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 2px">
+        <span style="font-size: 12px; color: var(--muted); padding: 0 12px 6px">Understand</span>
+        <a href="Today.dc.html" style="display: flex; align-items: center; gap: 10px; text-decoration: none; padding: 10px 12px; border-radius: 10px"><svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true" style="fill: none; stroke: currentColor; stroke-width: 1.8px; stroke-linecap: round; stroke-linejoin: round"><rect x="3.5" y="5" width="17" height="15" rx="2"></rect><path d="M3.5 10h17M8 3v4M16 3v4"></path></svg>Today</a>
+        <a href="Market.dc.html" style="display: flex; align-items: center; gap: 10px; text-decoration: none; padding: 10px 12px; border-radius: 10px"><svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true" style="fill: none; stroke: currentColor; stroke-width: 1.8px; stroke-linecap: round; stroke-linejoin: round"><path d="M4 19.5h16"></path><path d="M5 15l4-5 4 3 6-7"></path></svg>Market</a>
+        <a href="Pairs.dc.html" style="display: flex; align-items: center; gap: 10px; text-decoration: none; padding: 10px 12px; border-radius: 10px"><svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true" style="fill: none; stroke: currentColor; stroke-width: 1.8px; stroke-linecap: round; stroke-linejoin: round"><path d="M6 7.5h12l-3-3M18 16.5H6l3 3"></path></svg>Pair Explorer</a>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 2px">
+        <span style="font-size: 12px; color: var(--muted); padding: 0 12px 6px">Deep dive</span>
+        <a href="Signals.dc.html" style="display: flex; align-items: center; gap: 10px; text-decoration: none; padding: 10px 12px; border-radius: 10px"><svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true" style="fill: none; stroke: currentColor; stroke-width: 1.8px; stroke-linecap: round; stroke-linejoin: round"><circle cx="12" cy="12" r="8.5"></circle><path d="M8.5 12.3l2.4 2.4 4.6-4.9"></path></svg>Signals</a>
+        <a href="Backtesting.dc.html" aria-current="page" style="display: flex; align-items: center; gap: 10px; text-decoration: none; padding: 10px 12px; border-radius: 10px; background: var(--glow); color: var(--gold); font-weight: 600"><svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true" style="fill: none; stroke: currentColor; stroke-width: 1.8px; stroke-linecap: round; stroke-linejoin: round"><path d="M3.5 12a8.5 8.5 0 1 0 2.6-6.1"></path><path d="M3.5 4.5v4.5H8"></path><path d="M12 8v4.2l2.8 1.8"></path></svg>Backtesting</a>
+        <a href="Data.dc.html" style="display: flex; align-items: center; gap: 10px; text-decoration: none; padding: 10px 12px; border-radius: 10px"><svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true" style="fill: none; stroke: currentColor; stroke-width: 1.8px; stroke-linecap: round; stroke-linejoin: round"><ellipse cx="12" cy="6" rx="7" ry="2.8"></ellipse><path d="M5 6v12c0 1.6 3.1 2.8 7 2.8s7-1.2 7-2.8V6"></path><path d="M5 12c0 1.6 3.1 2.8 7 2.8s7-1.2 7-2.8"></path></svg>Data</a>
+      </div>
+    </nav>
+    <p style="margin: auto 0 0; font-size: 12px; line-height: 1.5; color: var(--muted); padding: 0 12px">End-of-day data from MCX Bhavcopy. A research project, not investment advice.</p>
+  </aside>
+
+  <div style="flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column">
+    <div class="phonebar" style="align-items: center; justify-content: space-between; gap: 12px; padding: 10px 16px; border-bottom: 1px solid var(--line); background: var(--panel)">
+      <a href="Home.dc.html" style="display: flex; align-items: center; gap: 10px; text-decoration: none">
+        <svg viewBox="8 18 48 28" aria-hidden="true" style="width: 34px; height: auto; display: block; flex: none"><path d="M8 28L12 18H44L48 28Z M16 46L20 36H52L56 46Z" style="fill: var(--gold)"></path></svg>
+        <span style="display: flex; flex-direction: column; line-height: 1.2"><svg viewBox="0 0.26 158.04 40.74" role="img" aria-label="Gold RV Intelligence" style="width: 78px; height: auto; display: block; margin-bottom: 2px"><path d="M17.05 31.42Q12.14 31.42 8.61 29.49Q5.08 27.56 3.17 24.07Q1.26 20.58 1.26 15.92Q1.26 11.3 3.19 7.79Q5.12 4.29 8.55 2.31Q11.97 0.34 16.51 0.34Q20.24 0.34 23.2 1.68Q26.17 3.03 27.99 5.36Q29.82 7.69 30.16 10.76H23.69Q23.27 8.28 21.36 6.87Q19.45 5.46 16.59 5.46Q13.94 5.46 11.97 6.7Q10 7.94 8.9 10.25Q7.81 12.56 7.81 15.8Q7.81 19.16 8.9 21.53Q10 23.9 12.12 25.14Q14.24 26.38 17.35 26.38Q19.87 26.38 21.63 25.75Q23.39 25.12 24.32 23.99L30.45 26.42Q28.01 28.86 24.8 30.14Q21.59 31.42 17.05 31.42ZM23.98 26.42V18.11L25.28 19.41H17.3V14.45H30.45V26.42ZM43.89 31.42Q40.36 31.42 37.7 30.01Q35.03 28.61 33.54 26.07Q32.05 23.52 32.05 20.21Q32.05 16.89 33.54 14.41Q35.03 11.93 37.7 10.55Q40.36 9.16 43.89 9.16Q47.46 9.16 50.13 10.55Q52.79 11.93 54.26 14.41Q55.73 16.89 55.73 20.21Q55.73 23.52 54.24 26.07Q52.75 28.61 50.09 30.01Q47.42 31.42 43.89 31.42ZM43.89 26.46Q45.36 26.46 46.56 25.71Q47.75 24.95 48.47 23.54Q49.18 22.14 49.18 20.16Q49.18 17.27 47.65 15.69Q46.12 14.12 43.89 14.12Q41.66 14.12 40.13 15.71Q38.6 17.31 38.6 20.16Q38.6 22.14 39.31 23.54Q40.03 24.95 41.22 25.71Q42.42 26.46 43.89 26.46ZM58.25 31V0.76H64.55V31ZM83.92 31V26.25L84.34 26.34Q83.92 28.65 81.84 30.03Q79.76 31.42 76.86 31.42Q73.92 31.42 71.76 30.05Q69.59 28.69 68.42 26.21Q67.24 23.73 67.24 20.37Q67.24 16.97 68.46 14.45Q69.68 11.93 71.88 10.55Q74.09 9.16 77.03 9.16Q80.09 9.16 82.01 10.59Q83.92 12.02 84.25 14.49L83.79 14.54V0.76H90.09V31ZM78.88 26.38Q81.1 26.38 82.49 24.8Q83.87 23.23 83.87 20.29Q83.87 17.35 82.47 15.78Q81.06 14.2 78.79 14.2Q76.61 14.2 75.2 15.8Q73.79 17.39 73.79 20.33Q73.79 23.27 75.2 24.83Q76.61 26.38 78.88 26.38ZM100.84 31V0.76H114.37Q117.64 0.76 120.08 1.87Q122.51 2.99 123.86 5Q125.2 7.02 125.2 9.71Q125.2 12.35 123.86 14.35Q122.51 16.34 120.08 17.45Q117.64 18.57 114.37 18.57H105.97V13.82H114.2Q116.51 13.82 117.75 12.75Q118.99 11.68 118.99 9.75Q118.99 7.77 117.77 6.74Q116.55 5.72 114.2 5.72H107.31V31ZM117.89 31 105.76 15.29H112.6L126.63 31ZM137.97 31 127.13 0.76H133.85L142.13 25.96H141.33L149.65 0.76H156.03L145.19 31Z" style="fill: var(--fg)"></path></svg><span style="font-size: 12px; color: var(--muted)">Last settlement {{asOfText}}</span></span>
+      </a>
+      <button type="button" onClick="{{openDl}}" aria-label="Download data or a statement" title="Download" style="width: 44px; height: 44px; flex: none; margin-left: auto; border-radius: 12px; border: 1px solid var(--line); background: var(--raised); color: var(--fg); display: grid; place-items: center; cursor: pointer; padding: 0"><svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true" style="fill: none; stroke: currentColor; stroke-width: 2px; stroke-linecap: round; stroke-linejoin: round"><path d="M12 4v11M7 10.5l5 5 5-5M5 20h14"></path></svg></button>
+      <button type="button" onClick="{{toggle}}" aria-label="{{themeLabel}}" title="{{themeLabel}}" style="width: 44px; height: 44px; flex: none; border-radius: 12px; border: 1px solid var(--line); background: var(--raised); color: var(--fg); display: grid; place-items: center; cursor: pointer; padding: 0">
+        <sc-if value="{{dark}}" hint-placeholder-val="{{ true }}"><svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true" style="fill: none; stroke: currentColor; stroke-width: 1.8px; stroke-linecap: round"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"></path></svg></sc-if>
+        <sc-if value="{{light}}" hint-placeholder-val="{{ false }}"><svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true" style="fill: none; stroke: currentColor; stroke-width: 1.8px; stroke-linejoin: round"><path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"></path></svg></sc-if>
+      </button>
+    </div>
+
+    <main class="pagepad" style="flex: 1 1 auto; box-sizing: border-box; width: 100%; max-width: 1240px; margin: 0 auto; padding: 32px clamp(16px, 4vw, 48px) 48px; display: flex; flex-direction: column; gap: 24px">
+
+      <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-start; gap: 20px">
+        <div style="display: flex; flex-direction: column; gap: 12px; max-width: 720px">
+          <h1 style="margin: 0; font-size: clamp(30px, 4vw, 44px); font-weight: 600; letter-spacing: -0.03em; line-height: 1.05">Did it make money?</h1>
+          <p style="margin: 0; font-size: 16px; line-height: 1.6; color: var(--muted); max-width: 62ch">We tuned the model on two years of data, froze its settings, then tested it on twelve months it had never seen, with every MCX cost and slippage included.</p>
+        </div>
+        <div class="headmeta" style="align-items: center; gap: 12px">
+          <button type="button" onClick="{{openDl}}" style="min-height: 44px; padding: 0 16px; border-radius: 12px; border: 1px solid var(--line); background: var(--panel); color: var(--fg); font: 600 14px 'Geist', system-ui, sans-serif; cursor: pointer; display: flex; align-items: center; gap: 8px"><svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true" style="fill: none; stroke: currentColor; stroke-width: 2px; stroke-linecap: round; stroke-linejoin: round"><path d="M12 4v11M7 10.5l5 5 5-5M5 20h14"></path></svg>Download</button>
+          <span style="font-size: 13px; color: var(--muted); border: 1px solid var(--line); border-radius: 999px; padding: 8px 14px">Last settlement <span style="color: var(--fg); font-family: 'Geist Mono', ui-monospace, monospace">{{asOfText}}</span></span>
+          <button type="button" onClick="{{toggle}}" aria-label="{{themeLabel}}" title="{{themeLabel}}" style="width: 44px; height: 44px; border-radius: 12px; border: 1px solid var(--line); background: var(--panel); color: var(--fg); display: grid; place-items: center; cursor: pointer; padding: 0">
+            <sc-if value="{{dark}}" hint-placeholder-val="{{ true }}"><svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true" style="fill: none; stroke: currentColor; stroke-width: 1.8px; stroke-linecap: round"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"></path></svg></sc-if>
+            <sc-if value="{{light}}" hint-placeholder-val="{{ false }}"><svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true" style="fill: none; stroke: currentColor; stroke-width: 1.8px; stroke-linejoin: round"><path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"></path></svg></sc-if>
+          </button>
+        </div>
+      </div>
+
+      <sc-if value="{{loading}}" hint-placeholder-val="{{ false }}">
+        <p style="margin: 0; padding: 48px 0; color: var(--muted); font-size: 15px">Loading backtest results…</p>
+      </sc-if>
+
+      <sc-if value="{{failed}}" hint-placeholder-val="{{ false }}">
+        <div role="alert" style="background: var(--panel); border: 1px solid var(--down); border-radius: 16px; padding: 18px 20px; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px"><span style="display: flex; flex-direction: column; gap: 4px"><span style="font-weight: 600; font-size: 16px">The data didn't load</span><span style="font-size: 14px; color: var(--muted)">Check your internet connection, then try again.</span></span><button type="button" onClick="{{retry}}" style="min-height: 44px; padding: 0 16px; border-radius: 12px; border: 0; background: var(--gold); color: var(--ongold); font: 600 14px 'Geist', system-ui, sans-serif; cursor: pointer">Try again</button></div>
+      </sc-if>
+      <sc-if value="{{ready}}" hint-placeholder-val="{{ true }}">
+        <div style="display: flex; flex-wrap: wrap; gap: 14px; align-items: stretch">
+          <section aria-labelledby="verdict-h" style="flex: 1 1 380px; background: var(--panel); border: 1px solid var(--line); border-radius: 20px; padding: clamp(20px, 3vw, 30px); display: flex; flex-direction: column; gap: 14px">
+            <span style="font-size: 13px; color: var(--muted)">The verdict</span>
+            <h2 id="verdict-h" style="margin: 0; font-size: clamp(24px, 3vw, 32px); font-weight: 600; letter-spacing: -0.02em; line-height: 1.15">No persistent edge proven after costs.</h2>
+            <p style="margin: 0; font-size: 15px; line-height: 1.65; color: var(--muted)">{{conclusion}}</p>
+          </section>
+
+          <section aria-labelledby="slip-h" style="flex: 999 1 460px; min-width: 0; background: var(--panel); border: 1px solid var(--line); border-radius: 20px; padding: clamp(18px, 2.5vw, 26px); display: flex; flex-direction: column; gap: 14px">
+            <div style="display: flex; flex-direction: column; gap: 4px">
+              <h2 id="slip-h" style="margin: 0; font-size: 18px; font-weight: 600">Take out one crash and it loses</h2>
+              <span style="font-size: 13px; color: var(--muted); line-height: 1.5">Unseen-year result after costs, all six pairs, split by when each trade closed ({{pooledN}} trades).</span>
+            </div>
+            <div style="display: flex; flex-wrap: wrap; gap: 8px 18px; font-size: 13px; color: var(--muted)">
+              <span style="display: inline-flex; align-items: center; gap: 6px"><span style="width: 12px; height: 12px; border-radius: 3px; background: var(--gold)"></span>Closed during the {{crashShort}}</span>
+              <span style="display: inline-flex; align-items: center; gap: 6px"><span style="width: 12px; height: 12px; border-radius: 3px; background: var(--muted)"></span>Every other trade</span>
+            </div>
+            <div style="position: relative; height: 200px; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 18px; padding: 0 6px">
+              <div style="position: absolute; left: 0; right: 0; top: {{zeroY}}; height: 1px; background: var(--muted); opacity: 0.6"></div>
+              <sc-for list="{{slipBars}}" as="b" hint-placeholder-count="4">
+                <div style="position: relative; height: 100%">
+                  <div style="position: absolute; left: 10%; width: 36%; top: {{b.cTop}}; height: {{b.cH}}; background: var(--gold); border-radius: 5px"></div>
+                  <div style="position: absolute; right: 10%; width: 36%; top: {{b.rTop}}; height: {{b.rH}}; background: var(--muted); border-radius: 5px; outline: {{b.ring}}; outline-offset: 2px"></div>
+                </div>
+              </sc-for>
+            </div>
+            <div style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 18px; padding: 0 6px; text-align: center">
+              <sc-for list="{{slipBars}}" as="b" hint-placeholder-count="4">
+                <span style="display: flex; flex-direction: column; gap: 2px; font-size: 12px; color: var(--muted)"><span style="font-family: 'Geist Mono', ui-monospace, monospace; color: var(--fg); font-weight: {{b.weight}}">at {{b.slip}}</span><span style="font-family: 'Geist Mono', ui-monospace, monospace; color: var(--gold)">{{b.crash}}</span><span style="font-family: 'Geist Mono', ui-monospace, monospace; color: {{b.restColor}}">{{b.rest}}</span></span>
+              </sc-for>
+            </div>
+            <p style="margin: 0; font-size: 14px; line-height: 1.6">{{splitText}}</p>
+          </section>
+        </div>
+
+        <section aria-labelledby="rule-h" style="background: var(--panel); border: 1px solid var(--line); border-radius: 20px; padding: clamp(18px, 2.5vw, 26px); display: flex; flex-direction: column; gap: 14px">
+          <div style="display: flex; flex-direction: column; gap: 4px">
+            <h2 id="rule-h" style="margin: 0; font-size: 18px; font-weight: 600">One rule for alerts and backtest</h2>
+            <span style="font-size: 13px; color: var(--muted); line-height: 1.6; max-width: 80ch">{{ruleIntro}}</span>
+          </div>
+          <div style="overflow-x: auto; border: 1px solid var(--line); border-radius: 14px">
+            <table style="width: 100%; min-width: 720px; border-collapse: collapse; font-size: 14px">
+              <thead>
+                <tr style="text-align: left; color: var(--muted); font-size: 12px">
+                  <th style="padding: 12px 14px; font-weight: 500">Rule</th>
+                  <th style="padding: 12px 10px; font-weight: 500; text-align: right">Training trades</th>
+                  <th style="padding: 12px 10px; font-weight: 500; text-align: right">Training result</th>
+                  <th style="padding: 12px 10px; font-weight: 500; text-align: right">Unseen trades</th>
+                  <th style="padding: 12px 10px; font-weight: 500; text-align: right">Unseen result</th>
+                  <th style="padding: 12px 10px; font-weight: 500; text-align: right">Outside the crash</th>
+                  <th style="padding: 12px 14px; font-weight: 500; text-align: right">t-statistic</th>
+                </tr>
+              </thead>
+              <tbody>
+                <sc-for list="{{ruleRows}}" as="r" hint-placeholder-count="3">
+                  <tr style="border-top: 1px solid var(--line); background: {{r.bg}}">
+                    <td style="padding: 12px 14px; font-weight: {{r.weight}}">{{r.name}}</td>
+                    <td style="padding: 12px 10px; text-align: right; font-family: 'Geist Mono', ui-monospace, monospace">{{r.trn}}</td>
+                    <td style="padding: 12px 10px; text-align: right; font-family: 'Geist Mono', ui-monospace, monospace; color: {{r.trColor}}">{{r.trRs}}</td>
+                    <td style="padding: 12px 10px; text-align: right; font-family: 'Geist Mono', ui-monospace, monospace">{{r.ten}}</td>
+                    <td style="padding: 12px 10px; text-align: right; font-family: 'Geist Mono', ui-monospace, monospace; color: {{r.teColor}}">{{r.teRs}}</td>
+                    <td style="padding: 12px 10px; text-align: right; font-family: 'Geist Mono', ui-monospace, monospace; color: {{r.exColor}}">{{r.exRs}}</td>
+                    <td style="padding: 12px 14px; text-align: right; font-family: 'Geist Mono', ui-monospace, monospace">{{r.t}}</td>
+                  </tr>
+                </sc-for>
+              </tbody>
+            </table>
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 8px">
+            <span style="font-size: 13px; color: var(--muted)">{{switchIntro}}</span>
+            <div style="display: flex; flex-wrap: wrap; gap: 8px">
+              <sc-for list="{{switchChips}}" as="w" hint-placeholder-count="6">
+                <span style="display: inline-flex; flex-direction: column; gap: 2px; padding: 8px 12px; border-radius: 12px; border: 1px solid {{w.border}}; background: {{w.bg}}; font-size: 13px"><span style="font-weight: 600; color: {{w.color}}">{{w.label}} · {{w.state}}</span><span style="font-size: 12px; color: var(--muted)">{{w.why}}</span></span>
+              </sc-for>
+            </div>
+          </div>
+        </section>
+
+        <section aria-label="Choose what to test" style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-end; gap: 14px; background: var(--panel); border: 1px solid var(--line); border-radius: 18px; padding: 16px 18px">
+          <div role="group" aria-label="Pair" style="display: flex; flex-wrap: wrap; gap: 6px">
+            <sc-for list="{{chips}}" as="c" hint-placeholder-count="6">
+              <button type="button" onClick="{{c.pick}}" aria-pressed="{{c.pressed}}" style="{{c.style}}">{{c.label}}</button>
+            </sc-for>
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 6px">
+            <span style="font-size: 12px; color: var(--muted)">Slippage per order</span>
+            <div role="group" aria-label="Slippage" style="display: flex; gap: 4px">
+              <sc-for list="{{slips}}" as="s" hint-placeholder-count="4">
+                <button type="button" onClick="{{s.pick}}" aria-pressed="{{s.pressed}}" style="{{s.style}}">{{s.label}}</button>
+              </sc-for>
+            </div>
+          </div>
+        </section>
+
+        <section aria-label="Results on the unseen year" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(170px, 100%), 1fr)); gap: 12px">
+          <sc-for list="{{kpis}}" as="k" hint-placeholder-count="5">
+            <div style="background: var(--panel); border: 1px solid var(--line); border-radius: 16px; padding: 16px 18px; display: flex; flex-direction: column; gap: 6px">
+              <span style="font-size: 13px; color: var(--muted)">{{k.label}}</span>
+              <span style="font-family: 'Geist Mono', ui-monospace, monospace; font-size: 24px; font-weight: 600; letter-spacing: -0.02em; color: {{k.color}}">{{k.value}}</span>
+              <span style="font-size: 12px; color: var(--muted)">{{k.note}}</span>
+            </div>
+          </sc-for>
+        </section>
+        <sc-if value="{{mismatch.on}}" hint-placeholder-val="{{ false }}">
+          <p style="margin: 0; font-size: 14px; line-height: 1.6; background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 12px 16px">{{mismatch.text}}</p>
+        </sc-if>
+
+        <section aria-labelledby="eq-h" style="background: var(--panel); border: 1px solid var(--line); border-radius: 20px; padding: clamp(18px, 2.5vw, 26px); display: flex; flex-direction: column; gap: 14px">
+          <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-start; gap: 12px">
+            <div style="display: flex; flex-direction: column; gap: 4px">
+              <h2 id="eq-h" style="margin: 0; font-size: 18px; font-weight: 600">{{eq.title}}</h2>
+              <span style="font-size: 13px; color: var(--muted)">Running total in ₹, updated each time a trade closes. Training and unseen test on one timeline.</span>
+            </div>
+            <div style="display: flex; gap: 16px; font-size: 12px; color: var(--muted); align-items: center">
+              <span style="display: flex; align-items: center; gap: 6px"><span style="width: 16px; height: 2px; background: var(--gold)"></span>After costs</span>
+              <span style="display: flex; align-items: center; gap: 6px"><span style="width: 16px; height: 0; border-top: 2px dotted var(--fg)"></span>Before costs</span>
+            </div>
+          </div>
+          <div style="position: relative; height: 320px">
+            <div style="position: absolute; top: 0; bottom: 0; left: {{eq.testX}}; right: 0; background: var(--glow); border-left: 1px dashed var(--gold); pointer-events: none"></div>
+            <span style="position: absolute; z-index: 1; top: 6px; left: {{eq.testX}}; padding-left: 8px; font-size: 12px; color: var(--gold); pointer-events: none">Unseen test starts {{eq.testDate}}</span>
+            <div style="position: absolute; top: 0; bottom: 0; left: {{eq.crashX}}; width: {{eq.crashW}}; background: var(--raised); opacity: 0.85; pointer-events: none"></div>
+            <span style="position: absolute; bottom: 6px; left: {{eq.crashX}}; padding-left: 6px; font-size: 12px; color: var(--muted); pointer-events: none">{{eq.crashLabel}}</span>
+            <svg viewBox="0 0 1000 320" preserveAspectRatio="none" role="img" aria-label="{{eq.aria}}" style="position: absolute; inset: 0; width: 100%; height: 100%; display: block; overflow: visible">
+              <path d="{{eq.zero}}" style="fill: none; stroke: var(--muted); stroke-width: 1px; stroke-dasharray: 4 4; vector-effect: non-scaling-stroke; opacity: 0.7"></path>
+              <path d="{{eq.gross}}" style="fill: none; stroke: var(--fg); stroke-width: 1.25px; stroke-dasharray: 2 3; vector-effect: non-scaling-stroke; opacity: 0.6"></path>
+              <path d="{{eq.net}}" style="fill: none; stroke: var(--gold); stroke-width: 2.25px; vector-effect: non-scaling-stroke; stroke-linejoin: round"></path>
+            </svg>
+            <span style="position: absolute; right: 0; top: {{eq.zeroY}}; transform: translateY(-120%); font-size: 11px; color: var(--muted); font-family: 'Geist Mono', ui-monospace, monospace">₹0</span>
+            <sc-if value="{{hover.on}}" hint-placeholder-val="{{ false }}">
+              <div style="position: absolute; top: 0; bottom: 0; left: {{hover.x}}; width: 1px; background: var(--muted); opacity: 0.6; pointer-events: none"></div>
+              <div style="position: absolute; top: {{hover.y}}; left: {{hover.x}}; width: 10px; height: 10px; margin: -5px 0 0 -5px; border-radius: 50%; background: var(--gold); box-shadow: 0 0 0 3px var(--panel); pointer-events: none"></div>
+              <div style="position: absolute; top: 30px; left: {{hover.x}}; transform: {{hover.shift}}; background: var(--raised); border: 1px solid var(--line); border-radius: 10px; padding: 8px 10px; font-size: 12px; white-space: nowrap; pointer-events: none; display: flex; flex-direction: column; gap: 3px">
+                <span style="color: var(--muted)">Trade closed {{hover.date}} · {{hover.seg}}</span>
+                <span>This trade <span style="font-family: 'Geist Mono', ui-monospace, monospace; font-weight: 600; color: {{hover.color}}">{{hover.net}}</span></span>
+                <span>Running total <span style="font-family: 'Geist Mono', ui-monospace, monospace">{{hover.cum}}</span></span>
+              </div>
+            </sc-if>
+            <button type="button" class="scrub" aria-label="{{eq.scrubLabel}}" onPointerMove="{{eq.move}}" onPointerDown="{{eq.move}}" onPointerLeave="{{eq.leave}}" onKeyDown="{{eq.key}}"></button>
+            <span class="sr" aria-live="polite">{{hover.say}}</span>
+          </div>
+          <div style="display: flex; justify-content: space-between; gap: 8px; font-size: 12px; color: var(--muted); font-family: 'Geist Mono', ui-monospace, monospace">
+            <span>{{eq.start}}</span><span>Low {{eq.low}} · High {{eq.high}}</span><span>{{eq.end}}</span>
+          </div>
+          <p style="margin: 0; font-size: 14px; line-height: 1.6">{{eq.note}}</p>
+        </section>
+
+        <div style="display: flex; flex-wrap: wrap; gap: 14px; align-items: flex-start">
+          <section aria-labelledby="stress-h" style="flex: 999 1 520px; min-width: 0; display: flex; flex-direction: column; gap: 12px">
+            <div style="display: flex; flex-direction: column; gap: 4px">
+              <h2 id="stress-h" style="margin: 0; font-size: 18px; font-weight: 600">Same trades, different costs</h2>
+              <span style="font-size: 13px; color: var(--muted)">{{stressNote}}</span>
+            </div>
+            <div class="cards" style="flex-direction: column; gap: 8px">
+              <sc-for list="{{stress}}" as="r" hint-placeholder-count="4">
+                <div style="background: {{r.cardBg}}; border: 1px solid var(--line); border-radius: 14px; padding: 12px 14px; display: flex; flex-direction: column; gap: 6px">
+                  <div style="display: flex; justify-content: space-between; align-items: baseline; gap: 8px"><span style="font-weight: {{r.weight}}; font-size: 14px">{{r.slip}}</span><span style="font-family: 'Geist Mono', ui-monospace, monospace; font-weight: 600; color: {{r.color}}">{{r.rs}}</span></div>
+                  <span style="font-size: 12px; color: var(--muted)">{{r.n}} trades · before costs {{r.gross}} · after costs <span style="color: {{r.color}}">{{r.net}}</span> · won {{r.hit}}</span>
+                </div>
+              </sc-for>
+            </div>
+            <div class="wide" style="overflow-x: auto; border: 1px solid var(--line); border-radius: 16px; background: var(--panel)">
+              <table style="width: 100%; min-width: 560px; border-collapse: collapse; font-size: 14px">
+                <thead>
+                  <tr style="text-align: left; color: var(--muted); font-size: 12px">
+                    <th style="padding: 12px 14px; font-weight: 500">Slippage per order</th>
+                    <th style="padding: 12px 10px; font-weight: 500; text-align: right">Trades</th>
+                    <th style="padding: 12px 10px; font-weight: 500; text-align: right">Before costs</th>
+                    <th style="padding: 12px 10px; font-weight: 500; text-align: right">After costs</th>
+                    <th style="padding: 12px 10px; font-weight: 500; text-align: right">Total ₹</th>
+                    <th style="padding: 12px 14px; font-weight: 500; text-align: right">Won</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <sc-for list="{{stress}}" as="r" hint-placeholder-count="4">
+                    <tr style="border-top: 1px solid var(--line); background: {{r.bg}}">
+                      <td style="padding: 12px 14px; font-weight: {{r.weight}}">{{r.slip}}</td>
+                      <td style="padding: 12px 10px; text-align: right; font-family: 'Geist Mono', ui-monospace, monospace">{{r.n}}</td>
+                      <td style="padding: 12px 10px; text-align: right; font-family: 'Geist Mono', ui-monospace, monospace">{{r.gross}}</td>
+                      <td style="padding: 12px 10px; text-align: right; font-family: 'Geist Mono', ui-monospace, monospace; color: {{r.color}}">{{r.net}}</td>
+                      <td style="padding: 12px 10px; text-align: right; font-family: 'Geist Mono', ui-monospace, monospace; color: {{r.color}}">{{r.rs}}</td>
+                      <td style="padding: 12px 14px; text-align: right; font-family: 'Geist Mono', ui-monospace, monospace">{{r.hit}}</td>
+                    </tr>
+                  </sc-for>
+                </tbody>
+              </table>
+            </div>
+          </section>
+
+          <section aria-labelledby="attr-h" style="flex: 1 1 320px; background: var(--panel); border: 1px solid var(--line); border-radius: 20px; padding: 22px; display: flex; flex-direction: column; gap: 14px">
+            <div style="display: flex; flex-direction: column; gap: 4px">
+              <h2 id="attr-h" style="margin: 0; font-size: 16px; font-weight: 600">Where the result came from</h2>
+              <span style="font-size: 13px; color: var(--muted)">Unseen test, {{slipText}} slippage.</span>
+            </div>
+            <sc-for list="{{attr}}" as="a" hint-placeholder-count="4">
+              <div style="display: flex; flex-direction: column; gap: 6px">
+                <div style="display: flex; justify-content: space-between; gap: 8px; font-size: 14px">
+                  <span style="font-weight: {{a.weight}}">{{a.name}}</span>
+                  <span style="font-family: 'Geist Mono', ui-monospace, monospace; color: {{a.color}}">{{a.value}}</span>
+                </div>
+                <div style="position: relative; height: 8px; background: var(--raised); border-radius: 6px">
+                  <div style="position: absolute; top: 0; bottom: 0; left: 50%; width: 1px; background: var(--muted)"></div>
+                  <div style="position: absolute; top: 0; bottom: 0; left: {{a.left}}; width: {{a.width}}; background: {{a.color}}; border-radius: 6px"></div>
+                </div>
+              </div>
+            </sc-for>
+            <p style="margin: 0; font-size: 13px; line-height: 1.6; color: var(--muted)">{{attrNote}}</p>
+          </section>
+        </div>
+
+        <p style="margin: 0; font-size: 13px; color: var(--muted); line-height: 1.6; background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 14px 16px">{{settings}}</p>
+      </sc-if>
+    </main>
+
+    <footer style="border-top: 1px solid var(--line); padding: 20px clamp(16px, 4vw, 48px) 28px; display: flex; flex-wrap: wrap; justify-content: space-between; gap: 10px; font-size: 13px; color: var(--muted)">
+      <span>Team NEXORA · Hack in Hills '26 · Research project, not investment advice</span>
+      <span>Data: MCX Bhavcopy, end of day · <a href="https://github.com/CodeByDivyansh-tech/gold-rv">Data &amp; code on GitHub</a></span>
+    </footer>
+  </div>
+
+  <nav class="tabbar" aria-label="Main" style="position: fixed; left: 0; right: 0; bottom: 0; z-index: 20; background: var(--panel); border-top: 1px solid var(--line); padding: 6px 8px 10px; justify-content: space-around">
+    <a href="Home.dc.html" style="flex: 1; min-height: 52px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; text-decoration: none; font-size: 11px; color: var(--muted)"><svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true" style="fill: none; stroke: currentColor; stroke-width: 1.8px; stroke-linecap: round; stroke-linejoin: round"><path d="M3 11.5 12 4l9 7.5"></path><path d="M5.5 10v10h13V10"></path></svg>Home</a>
+    <a href="Today.dc.html" style="flex: 1; min-height: 52px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; text-decoration: none; font-size: 11px; color: var(--muted)"><svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true" style="fill: none; stroke: currentColor; stroke-width: 1.8px; stroke-linecap: round; stroke-linejoin: round"><rect x="3.5" y="5" width="17" height="15" rx="2"></rect><path d="M3.5 10h17M8 3v4M16 3v4"></path></svg>Today</a>
+    <a href="Market.dc.html" style="flex: 1; min-height: 52px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; text-decoration: none; font-size: 11px; color: var(--muted)"><svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true" style="fill: none; stroke: currentColor; stroke-width: 1.8px; stroke-linecap: round; stroke-linejoin: round"><path d="M4 19.5h16"></path><path d="M5 15l4-5 4 3 6-7"></path></svg>Market</a>
+    <a href="Pairs.dc.html" style="flex: 1; min-height: 52px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; text-decoration: none; font-size: 11px; color: var(--muted)"><svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true" style="fill: none; stroke: currentColor; stroke-width: 1.8px; stroke-linecap: round; stroke-linejoin: round"><path d="M6 7.5h12l-3-3M18 16.5H6l3 3"></path></svg>Pairs</a>
+    <button type="button" onClick="{{openMore}}" aria-expanded="{{moreExpanded}}" style="flex: 1; min-height: 52px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; border: 0; background: transparent; font: 600 11px 'Geist', system-ui, sans-serif; color: var(--gold); cursor: pointer"><svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true" style="fill: currentColor"><circle cx="5" cy="12" r="1.7"></circle><circle cx="12" cy="12" r="1.7"></circle><circle cx="19" cy="12" r="1.7"></circle></svg>More</button>
+  </nav>
+  <sc-if value="{{more}}" hint-placeholder-val="{{ false }}">
+    <div style="position: fixed; inset: 0; z-index: 30; background: rgba(0,0,0,0.45); display: flex; flex-direction: column; justify-content: flex-end">
+      <div role="dialog" aria-label="More pages" style="background: var(--panel); border-top: 1px solid var(--line); border-radius: 20px 20px 0 0; padding: 18px 16px 28px; display: flex; flex-direction: column; gap: 6px">
+        <div style="display: flex; justify-content: space-between; align-items: center; padding: 0 4px 8px">
+          <span style="font-weight: 600; font-size: 16px">Deep dive</span>
+          <button type="button" onClick="{{closeMore}}" style="min-height: 44px; padding: 0 14px; border-radius: 12px; border: 1px solid var(--line); background: var(--raised); color: var(--fg); font: 500 14px 'Geist', system-ui, sans-serif; cursor: pointer">Close</button>
+        </div>
+        <a href="Signals.dc.html" style="text-decoration: none; padding: 14px 12px; border-radius: 12px; background: var(--raised); font-size: 15px">Signals: why it's quiet</a>
+        <a href="Backtesting.dc.html" aria-current="page" style="text-decoration: none; padding: 14px 12px; border-radius: 12px; background: var(--glow); color: var(--gold); font-weight: 600; font-size: 15px">Backtesting: did it make money?</a>
+        <a href="Data.dc.html" style="text-decoration: none; padding: 14px 12px; border-radius: 12px; background: var(--raised); font-size: 15px">Data: where the numbers come from</a>
+      </div>
+    </div>
+  </sc-if>
+  <sc-if value="{{dl}}" hint-placeholder-val="{{ false }}">
+    <dc-import name="DownloadPanel" dark="{{dark}}" on-close="{{closeDl}}" start-what="backtest" start-pair="{{dlPair}}" hint-size="100%,100%"></dc-import>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"startDark":{"editor":"boolean","default":true},"startPair":{"editor":"enum","options":["M_PETAL","M_TEN","M_GUINEA","TEN_PETAL","GUINEA_TEN","GUINEA_PETAL"],"default":"M_PETAL"},"$preview":{"width":1440,"height":2600}}'>
+class Component extends DCLogic {
+  componentDidMount() {
+    let saved = null;
+    try { saved = localStorage.getItem('grv-theme'); } catch (e) {}
+    if (saved) this.setState({ dark: saved === 'dark' });
+    else { try { if (window.matchMedia) this.setState({ dark: window.matchMedia('(prefers-color-scheme: dark)').matches }); } catch (e) {} }
+    fetch('data/site-data.json')
+      .then((r) => r.json())
+      .then((d) => this.setState({ D: d }))
+      .catch(() => this.setState({ failed: true }));
+  }
+
+  tokens(dark) {
+    return dark
+      ? { bg: '#070D14', panel: '#0F1822', raised: '#18232F', line: '#1E2B38', fg: '#EAF0F6', muted: '#93A3B4', gold: '#F2A93B', glow: 'rgba(242,169,59,0.12)', ongold: '#1A1204', up: '#4FD1A1', down: '#FF8F85' }
+      : { bg: '#F3F5F8', panel: '#FFFFFF', raised: '#E9EDF2', line: '#DCE2E9', fg: '#0C1622', muted: '#55636F', gold: '#975600', glow: 'rgba(151,86,0,0.10)', ongold: '#FFFFFF', up: '#0B7A55', down: '#B42318' };
+  }
+
+  stepHover(e, n, big) {
+    const cur = (this.state || {}).hover;
+    let i = cur == null ? n - 1 : cur;
+    if (e.key === 'ArrowLeft') i -= 1; else if (e.key === 'ArrowRight') i += 1;
+    else if (e.key === 'PageUp') i -= big; else if (e.key === 'PageDown') i += big;
+    else if (e.key === 'Home') i = 0; else if (e.key === 'End') i = n - 1;
+    else if (e.key === 'Escape') { this.setState({ hover: null }); return; }
+    else return;
+    e.preventDefault();
+    this.setState({ hover: Math.max(0, Math.min(n - 1, i)) });
+  }
+
+  srs(n) { return (n < 0 ? '−' : '+') + '₹' + Math.abs(Math.round(n)).toLocaleString('en-IN'); }
+  sgn(n, d) { return (n < 0 ? '−' : '+') + Math.abs(n).toFixed(d); }
+  fd(s) { const M = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']; const p = s.split('-'); return (+p[2]) + ' ' + M[+p[1] - 1] + ' ' + p[0]; }
+
+  renderVals() {
+    const st = this.state || {};
+    const dark = st.dark ?? (this.props.startDark ?? true);
+    const t = this.tokens(dark);
+    const shell = {
+      t, dark, light: !dark, asOfText: st.D ? this.fd(st.D.asOf) : '…',
+      themeLabel: dark ? 'Switch to light mode' : 'Switch to dark mode',
+      toggle: () => { try { localStorage.setItem('grv-theme', dark ? 'light' : 'dark'); } catch (e) {} this.setState({ dark: !dark }); },
+      more: !!st.more, moreExpanded: st.more ? 'true' : 'false',
+      openMore: () => this.setState({ more: true }), closeMore: () => this.setState({ more: false }),
+      dl: !!st.dl, openDl: () => this.setState({ dl: true, more: false }), closeDl: () => this.setState({ dl: false }), dlPair: st.pair || this.props.startPair || 'M_PETAL',
+      retry: () => { this.setState({ failed: false }); this.componentDidMount(); }
+    };
+    const D = st.D;
+    if (!D) return { ...shell, loading: !st.failed, failed: !!st.failed, ready: false };
+
+    // unseen-year result split by the crash, at each slippage (from the pipeline's rule comparison)
+    const spSL = ['0', '2', '5', '10'];
+    const spRC = D.rule.current, spRO = D.rule.original;
+    const spLakh = (n) => (n < 0 ? '−' : '+') + '₹' + (Math.abs(n) / 1e5).toFixed(2) + 'L';
+    const spVals = spSL.flatMap((s) => [spRC[s].crash_net_rs, spRC[s].ex_crash_net_rs]);
+    const spTop = Math.max(1, ...spVals), spBot = Math.min(-1, ...spVals), spSpan = spTop - spBot;
+    const spYOf = (v) => (spTop - v) / spSpan * 100;
+    const zeroY = spYOf(0).toFixed(2) + '%';
+    const spBarPos = (v) => ({ spTop: (v >= 0 ? spYOf(v) : spYOf(0)).toFixed(2) + '%', h: (Math.abs(v) / spSpan * 100).toFixed(2) + '%' });
+    const slipBars = spSL.map((s) => {
+      const c = spBarPos(spRC[s].crash_net_rs), r = spBarPos(spRC[s].ex_crash_net_rs), base = s === '5';
+      return {
+        slip: s + ' bps' + (base ? ' (ours)' : ''), weight: base ? '700' : '500', ring: base ? '2px solid var(--gold)' : '0',
+        cTop: c.spTop, cH: c.h, rTop: r.spTop, rH: r.h,
+        crash: spLakh(spRC[s].crash_net_rs), rest: spLakh(spRC[s].ex_crash_net_rs), restColor: spRC[s].ex_crash_net_rs >= 0 ? 'var(--up)' : 'var(--down)'
+      };
+    });
+    const spRsA = (n) => '₹' + Math.abs(Math.round(n)).toLocaleString('en-IN');
+    const spB5 = spRC['5'];
+    const splitText = 'At our 5 bps assumption, the ' + spB5.crash_n + ' trades that closed during the crash made ' + spRsA(spB5.crash_net_rs) + '. The other ' + spB5.ex_crash_n + ' ' + (spB5.ex_crash_net_rs < 0 ? 'lost ' : 'made ') + spRsA(spB5.ex_crash_net_rs) + '. In training the same rule ' + (spB5.train_net_rs < 0 ? 'lost ' : 'made ') + spRsA(spB5.train_net_rs) + ' over ' + spB5.train_n + ' trades.';
+
+    const spTTxt = (v) => (v == null ? '–' : this.sgn(v, 2));
+    const spCol = (v) => (v >= 0 ? 'var(--up)' : 'var(--down)');
+    const spOnPairs = Object.keys(D.rule.switch).filter((k) => D.rule.switch[k].on);
+    const ruleRows = [
+      { name: 'Five checks: what this site shows', weight: '600', bg: 'var(--glow)', r: spB5, sw: false },
+      { name: 'Original study: four checks, no cost line', weight: '400', bg: 'transparent', r: spRO['5'], sw: false },
+      { name: 'Five checks + training switch (' + spOnPairs.map((k) => D.pairs[k].label).join(', ') + ')', weight: '400', bg: 'transparent', r: spB5, sw: true }
+    ].map((x) => x.sw
+      ? { name: x.name, weight: x.weight, bg: x.bg, trn: '–', trRs: '–', trColor: 'var(--muted)', ten: String(x.r.switched_on_n), teRs: this.srs(x.r.switched_on_net_rs), teColor: spCol(x.r.switched_on_net_rs), exRs: '–', exColor: 'var(--muted)', t: '–' }
+      : { name: x.name, weight: x.weight, bg: x.bg, trn: String(x.r.train_n), trRs: this.srs(x.r.train_net_rs), trColor: spCol(x.r.train_net_rs), ten: String(x.r.test_n), teRs: this.srs(x.r.test_net_rs), teColor: spCol(x.r.test_net_rs), exRs: this.srs(x.r.ex_crash_net_rs), exColor: spCol(x.r.ex_crash_net_rs), t: spTTxt(x.r.test_t) });
+    const ruleIntro = 'Every backtest trade now passes the same five checks as today\'s alert, including the ' + D.rule.hurdle.toFixed(1) + ' bps cost line. It never enters a gap already past its stop-loss, never buys or sells on a day either contract moved ' + D.rule.maxMove.toFixed(0) + '% or more, and never fills an exit at the close that triggered it. All results at 5 bps slippage; "outside the crash" leaves out trades that closed during the ' + D.events.crashShort + '.';
+    const switchIntro = 'Training switch: a pair is traded in the unseen year only if its frozen settings made at least ' + D.rule.minTrain + ' trades and a profit in training.';
+    const switchChips = ['M_PETAL', 'M_GUINEA', 'M_TEN', 'GUINEA_TEN', 'TEN_PETAL', 'GUINEA_PETAL'].map((k) => {
+      const w = D.rule.switch[k];
+      return { label: D.pairs[k].label, state: w.on ? 'On' : 'Off', why: w.reason.charAt(0).toUpperCase() + w.reason.slice(1),
+        color: w.on ? 'var(--gold)' : 'var(--fg)', border: w.on ? 'var(--gold)' : 'var(--line)', bg: w.on ? 'var(--glow)' : 'transparent' };
+    });
+
+    // controls
+    const ORDER = ['M_PETAL', 'M_GUINEA', 'M_TEN', 'GUINEA_TEN', 'TEN_PETAL', 'GUINEA_PETAL'];
+    const pid = st.pair || this.props.startPair || 'M_PETAL';
+    const slip = st.slip || '5';
+    const chipStyle = (on) => 'min-height: 40px; padding: 0 12px; border-radius: 10px; cursor: pointer; font: 500 13px \'Geist\', system-ui, sans-serif; ' +
+      (on ? 'background: var(--glow); color: var(--gold); border: 1px solid var(--gold)' : 'background: transparent; color: var(--fg); border: 1px solid var(--line)');
+    const chips = ORDER.map((id) => ({ label: D.pairs[id].label, pressed: id === pid ? 'true' : 'false', pick: () => this.setState({ pair: id, hover: null }), style: chipStyle(id === pid) }));
+    const slips = spSL.map((s) => ({ label: s + ' bps', pressed: s === slip ? 'true' : 'false', pick: () => this.setState({ slip: s, hover: null }), style: chipStyle(s === slip).replace('padding: 0 12px', 'padding: 0 10px') }));
+
+    const B = D.backtest[pid][slip];
+    const T = B.test;
+    const none = T.n_trades === 0;
+    const kpis = none ? [
+      { label: 'Trades in the unseen year', value: '0', note: 'This pair never passed all five checks', color: 'var(--fg)' },
+      { label: 'Won', value: '–', note: '', color: 'var(--muted)' },
+      { label: 'Average per trade', value: '–', note: '', color: 'var(--muted)' },
+      { label: 'Total after costs', value: '–', note: '', color: 'var(--muted)' },
+      { label: 't-statistic', value: '–', note: 'Nothing to test', color: 'var(--muted)' }
+    ] : [
+      { label: 'Trades in the unseen year', value: String(T.n_trades), note: T.n_trades < 20 ? 'Small sample: read with care' : '', color: 'var(--fg)' },
+      { label: 'Won', value: Math.round(T.hit_rate * 100) + '%', note: 'after costs', color: 'var(--fg)' },
+      { label: 'Average per trade', value: this.sgn(T.net_bps, 1) + ' bps', note: 'every trade counts equally · before costs ' + this.sgn(T.gross_bps, 1) + ' bps', color: T.net_bps >= 0 ? 'var(--up)' : 'var(--down)' },
+      { label: 'Total after costs', value: this.srs(T.net_rs), note: 'bigger trades count more · costs paid ' + this.srs(-T.cost_rs).replace('−', ''), color: T.net_rs >= 0 ? 'var(--up)' : 'var(--down)' },
+      { label: 't-statistic', value: this.sgn(T.t_stat, 2), note: Math.abs(T.t_stat) >= 2 ? (T.t_stat < 0 ? 'Significant loss' : 'Significant gain') : 'Not significant (needs ±2)', color: 'var(--fg)' }
+    ];
+
+    // equity curve on a real time axis, stepping when each trade closes
+    const W = 1000, H = 320, pad = 16;
+    const t0 = Date.parse(D.start), t1 = Date.parse(D.asOf);
+    const X = (d) => ((Date.parse(d) - t0) / (t1 - t0)) * W;
+    const cur = B.curve;
+    const vals = [0].concat(cur.map((c) => c[3]), cur.map((c) => c[4]));
+    const lo = Math.min(...vals), hi = Math.max(...vals), sp = (hi - lo) || 1;
+    const Y = (v) => pad + (1 - (v - lo) / sp) * (H - 2 * pad);
+    let net = 'M0 ' + Y(0).toFixed(1), gross = 'M0 ' + Y(0).toFixed(1), pn = 0, pg = 0;
+    cur.forEach((c) => {
+      const x = X(c[1]).toFixed(1);
+      net += ' L' + x + ' ' + Y(pn).toFixed(1) + ' L' + x + ' ' + Y(c[3]).toFixed(1);
+      gross += ' L' + x + ' ' + Y(pg).toFixed(1) + ' L' + x + ' ' + Y(c[4]).toFixed(1);
+      pn = c[3]; pg = c[4];
+    });
+    net += ' L' + W + ' ' + Y(pn).toFixed(1); gross += ' L' + W + ' ' + Y(pg).toFixed(1);
+    const EV = D.events;
+    const crashTrades = cur.filter((c) => c[1] >= EV.crashStart && c[1] <= EV.crashEnd);
+    const crashSum = crashTrades.reduce((a, c) => a + c[2], 0);
+    const testNet = cur.filter((c) => c[5] === 'test').reduce((a, c) => a + c[2], 0);
+    const abs = (n) => '₹' + Math.abs(Math.round(n)).toLocaleString('en-IN');
+    const crashPart = crashTrades.length
+      ? 'Trades closed during the ' + EV.crashLabel + ' ' + (crashSum >= 0 ? 'made ' : 'lost ') + abs(crashSum) + '.'
+      : 'No trades closed during the ' + EV.crashLabel + '.';
+    let note;
+    const nTest = cur.filter((c) => c[5] === 'test').length;
+    if (nTest === 0) note = 'No trades in the unseen year: this pair never passed all five checks there.';
+    else if (testNet > 0 && crashSum >= testNet) note = 'Trades closed during the ' + EV.crashLabel + ' made ' + abs(crashSum) + ', more than this pair\'s whole unseen-year profit of ' + abs(testNet) + '. Without the crash, it loses money.';
+    else if (testNet > 0) note = 'The unseen year made ' + abs(testNet) + ' after costs. ' + crashPart;
+    else note = 'The unseen year lost ' + abs(testNet) + ' after costs. ' + crashPart;
+    const hv = st.hover;
+    let hover = { on: false };
+    if (hv != null && hv < cur.length) {
+      const c = cur[hv], f = X(c[1]) / W;
+      hover = {
+        on: true, x: (f * 100).toFixed(2) + '%', y: (Y(c[3]) / H * 100).toFixed(2) + '%', shift: f > 0.7 ? 'translateX(calc(-100% - 10px))' : 'translateX(10px)',
+        date: this.fd(c[1]), seg: c[5] === 'test' ? 'unseen test' : 'training', net: this.srs(c[2]), cum: this.srs(c[3]), color: c[2] > 0 ? 'var(--up)' : 'var(--down)'
+      };
+    }
+    const xs = cur.map((c) => X(c[1]) / W);
+    const eq = {
+      title: D.pairs[pid].label + ' at ' + slip + ' bps slippage',
+      net, gross, zero: 'M0 ' + Y(0).toFixed(1) + ' L' + W + ' ' + Y(0).toFixed(1), zeroY: (Y(0) / H * 100).toFixed(2) + '%',
+      testX: (X(D.split.test_start) / W * 100).toFixed(2) + '%', testDate: this.fd(D.split.test_start),
+      crashX: (X(EV.crashStart) / W * 100).toFixed(2) + '%', crashW: ((X(EV.crashEnd) - X(EV.crashStart)) / W * 100).toFixed(2) + '%', crashLabel: EV.crashShort,
+      start: this.fd(D.start), end: this.fd(D.asOf), low: this.srs(lo), high: this.srs(hi), note,
+      aria: 'Running total after costs for ' + D.pairs[pid].label + ' from ' + this.fd(D.start) + ' to ' + this.fd(D.asOf) + ', ending at ' + this.srs(pn),
+      move: (e) => {
+        if (!xs.length) return;
+        const r = e.currentTarget.getBoundingClientRect(); const f = (e.clientX - r.left) / r.width;
+        let best = 0, bd = Infinity; xs.forEach((x, i) => { const d = Math.abs(x - f); if (d < bd) { bd = d; best = i; } });
+        this.setState({ hover: best });
+      },
+      leave: (e) => { if (e && e.pointerType === 'touch') return; this.setState({ hover: null }); },
+      key: (e) => { if (cur.length) this.stepHover(e, cur.length, 5); },
+      scrubLabel: 'Running total chart. Tap or drag on it, or use the left and right arrow keys, to step through the trades.'
+    };
+    hover.say = hover.on ? 'Trade closed ' + hover.date + ' (' + hover.seg + '): ' + hover.net + ', running total ' + hover.cum : '';
+    const mismatch = {
+      on: (T.net_bps >= 0) !== (T.net_rs >= 0),
+      text: 'Why the average and the total disagree: the average counts every trade equally, while the rupee total gives bigger trades more weight. Here the bigger trades did ' + (T.net_rs >= 0 ? 'better' : 'worse') + ' than the small ones.'
+    };
+
+    const rows = D.costMatrix.filter((r) => r.pair_id === pid);
+    const stress = rows.map((r) => ({
+      slip: r.slip_bps + ' bps' + (String(r.slip_bps) === '5' ? ' (our assumption)' : ''), weight: String(r.slip_bps) === slip ? '700' : '400',
+      bg: String(r.slip_bps) === slip ? 'var(--glow)' : 'transparent', cardBg: String(r.slip_bps) === slip ? 'var(--glow)' : 'var(--panel)',
+      n: r.trades, gross: this.sgn(r.gross_bps, 1) + ' bps', net: this.sgn(r.net_bps, 1) + ' bps', rs: this.srs(r.net_rs),
+      hit: Math.round(r.hit_rate * 100) + '%', color: r.net_rs >= 0 ? 'var(--up)' : 'var(--down)'
+    }));
+    const beP = rows.length ? rows[0].breakeven_slip_bps : 0;
+    const nRows = rows.length ? rows[0].trades : 0;
+    const stressNote = nRows === 0 ? 'Unseen year only. No trades to stress-test.'
+      : (beP > 0 ? 'Unseen year only. This pair breaks even at about ' + beP.toFixed(1) + ' bps of slippage per order' + (beP > 10 ? ' (beyond the range we tested, so a rough figure).' : '.')
+        : 'Unseen year only. This pair loses money even with no slippage.');
+
+    const A = B.attr;
+    const parts = [
+      { name: 'Spread moves (what we bet on)', v: A.spread_rs },
+      { name: 'Gold price moves (leftover exposure)', v: A.gold_rs },
+      { name: 'Costs and slippage', v: -A.costs_rs },
+      { name: 'Result after costs', v: A.net_rs, total: true }
+    ];
+    const mx = Math.max(...parts.map((x) => Math.abs(x.v))) || 1;
+    const attr = parts.map((x) => {
+      const w = Math.abs(x.v) / mx * 50;
+      return {
+        name: x.name, weight: x.total ? '600' : '400', value: this.srs(x.v), color: x.v >= 0 ? 'var(--up)' : 'var(--down)',
+        left: (x.v >= 0 ? 50 : 50 - w).toFixed(2) + '%', width: w.toFixed(2) + '%'
+      };
+    });
+    const attrNote = 'Gold price moves are ' + A.direct_gold_pnl_pct + '% of the gross result: both legs hold the same grams of gold, so the trade barely depends on where gold goes. Across all ' + A.pooled_n_trades + ' unseen trades the correlation with gold is ' + this.sgn(A.pooled_correlation_to_gold, 2) + '.';
+
+    const pr = B.params;
+    const settings = 'Settings for ' + D.pairs[pid].label + ', chosen on ' + this.fd(D.split.train_start) + ' to ' + this.fd(D.split.train_end) + ' and then frozen: ' + pr.W + '-day window, enter at |z| ≥ ' + pr.ze + ', exit at |z| ≤ ' + pr.zx + ', hold at most ' + pr.mh + ' days, ₹10 lakh per leg, stop-loss at |z| ≥ ' + pr.stop_z + '. A trade needs all five checks: an unusual gap below the stop-loss, a gap of at least ' + pr.hurdle_bps + ' bps (the cost line), liquid contracts and at least ' + D.minTd + ' trading days to expiry. Signals are decided at one day\'s close and filled at the next day\'s close, never on a day either contract moved ' + pr.max_fill_move_pct.toFixed(0) + '% or more.';
+
+    return {
+      ...shell, loading: false, ready: true, conclusion: D.conclusion, pooledN: D.pooled['5'].n, slipBars, zeroY, splitText,
+      crashShort: D.events.crashShort, ruleRows, ruleIntro, switchIntro, switchChips, chips, slips, kpis, mismatch, eq, hover, stress, stressNote, attr, attrNote, settings,
+      slipText: slip + ' bps'
+    };
+  }
+}
+</script>
+</body>
+</html>

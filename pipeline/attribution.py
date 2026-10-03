@@ -109,8 +109,10 @@ def compute_attribution_metrics(trades_df: pd.DataFrame) -> Dict[str, Any]:
     net_bps = float(trades_df['net_bps'].mean())
     avg_days = float(trades_df['days'].mean())
     
-    # Cumulative net P&L equity curve for max drawdown
-    cum_net = trades_df['net'].cumsum()
+    # Closed-trade equity curve for max drawdown, in exit order, starting from zero
+    # (fix: the old curve started at the first trade, so an opening loss was not counted)
+    ordered = trades_df.sort_values('exit') if 'exit' in trades_df.columns else trades_df
+    cum_net = np.concatenate([[0.0], ordered['net'].cumsum().values])
     cum_max = np.maximum.accumulate(cum_net)
     drawdowns = cum_max - cum_net
     max_dd = float(drawdowns.max()) if len(drawdowns) else 0.0

@@ -27,7 +27,8 @@
     "status": "QUIET",
     "failed_gates": [
       "extreme",
-      "edge"
+      "edge",
+      "training"
     ],
     "gates": {
       "enough_history": true,
@@ -132,12 +133,12 @@
       }
     ],
     "historical_evidence": {
-      "past_signals_count": 27,
-      "reverted_count": 11,
-      "stopped_count": 2,
-      "timed_out_count": 1,
-      "revert_rate_pct": 40.7,
-      "median_days_to_revert": 5.0
+      "past_signals_count": 11,
+      "reverted_count": 5,
+      "stopped_count": 1,
+      "timed_out_count": 0,
+      "revert_rate_pct": 45.5,
+      "median_days_to_revert": 3.0
     }
   },
   {
@@ -168,7 +169,8 @@
     "status": "QUIET",
     "failed_gates": [
       "extreme",
-      "edge"
+      "edge",
+      "training"
     ],
     "gates": {
       "enough_history": true,
@@ -273,12 +275,12 @@
       }
     ],
     "historical_evidence": {
-      "past_signals_count": 20,
-      "reverted_count": 10,
-      "stopped_count": 5,
+      "past_signals_count": 6,
+      "reverted_count": 4,
+      "stopped_count": 0,
       "timed_out_count": 2,
-      "revert_rate_pct": 50.0,
-      "median_days_to_revert": 2.5
+      "revert_rate_pct": 66.7,
+      "median_days_to_revert": 5.0
     }
   },
   {
@@ -301,15 +303,16 @@
     "expiry_b": "2026-10-30",
     "spread_bps": 46.3,
     "spread_rs_10g": 687.4,
-    "mu": 32.7,
-    "sd": 7.6,
-    "z": 1.8,
-    "z_needed": 2.5,
-    "percentile": 93.6,
+    "mu": 28.8,
+    "sd": 9.3,
+    "z": 1.89,
+    "z_needed": 2.0,
+    "percentile": 90.5,
     "status": "QUIET",
     "failed_gates": [
       "extreme",
-      "edge"
+      "edge",
+      "training"
     ],
     "gates": {
       "enough_history": true,
@@ -326,100 +329,100 @@
     "td_to_exp_b": 22,
     "roll_flag": false,
     "chosen_params": {
-      "W": 30,
-      "ze": 2.5,
-      "mh": 5,
+      "W": 10,
+      "ze": 2.0,
+      "mh": 10,
       "zx": 0.5
     },
     "z_histogram": [
       {
-        "bin_center": -4.32,
-        "count": 2
+        "bin_center": -11.41,
+        "count": 1
       },
       {
-        "bin_center": -3.82,
+        "bin_center": -10.54,
         "count": 0
       },
       {
-        "bin_center": -3.32,
-        "count": 1
-      },
-      {
-        "bin_center": -2.83,
-        "count": 3
-      },
-      {
-        "bin_center": -2.33,
-        "count": 3
-      },
-      {
-        "bin_center": -1.83,
-        "count": 18
-      },
-      {
-        "bin_center": -1.33,
-        "count": 34
-      },
-      {
-        "bin_center": -0.83,
-        "count": 50
-      },
-      {
-        "bin_center": -0.34,
-        "count": 73
-      },
-      {
-        "bin_center": 0.16,
-        "count": 56
-      },
-      {
-        "bin_center": 0.66,
-        "count": 45
-      },
-      {
-        "bin_center": 1.16,
-        "count": 33
-      },
-      {
-        "bin_center": 1.65,
-        "count": 18
-      },
-      {
-        "bin_center": 2.15,
-        "count": 6
-      },
-      {
-        "bin_center": 2.65,
-        "count": 9
-      },
-      {
-        "bin_center": 3.15,
-        "count": 1
-      },
-      {
-        "bin_center": 3.65,
-        "count": 2
-      },
-      {
-        "bin_center": 4.14,
-        "count": 1
-      },
-      {
-        "bin_center": 4.64,
+        "bin_center": -9.66,
         "count": 0
       },
       {
-        "bin_center": 5.14,
+        "bin_center": -8.79,
+        "count": 0
+      },
+      {
+        "bin_center": -7.91,
+        "count": 0
+      },
+      {
+        "bin_center": -7.04,
+        "count": 0
+      },
+      {
+        "bin_center": -6.16,
+        "count": 0
+      },
+      {
+        "bin_center": -5.29,
+        "count": 0
+      },
+      {
+        "bin_center": -4.41,
+        "count": 0
+      },
+      {
+        "bin_center": -3.54,
+        "count": 5
+      },
+      {
+        "bin_center": -2.66,
+        "count": 11
+      },
+      {
+        "bin_center": -1.79,
+        "count": 41
+      },
+      {
+        "bin_center": -0.91,
+        "count": 72
+      },
+      {
+        "bin_center": -0.04,
+        "count": 102
+      },
+      {
+        "bin_center": 0.84,
+        "count": 79
+      },
+      {
+        "bin_center": 1.71,
+        "count": 40
+      },
+      {
+        "bin_center": 2.59,
+        "count": 16
+      },
+      {
+        "bin_center": 3.46,
+        "count": 4
+      },
+      {
+        "bin_center": 4.34,
+        "count": 4
+      },
+      {
+        "bin_center": 5.21,
         "count": 2
       }
     ],
     "historical_evidence": {
-      "past_signals_count": 9,
-      "reverted_count": 5,
-      "stopped_count": 2,
-      "timed_out_count": 2,
-      "revert_rate_pct": 55.6,
-      "median_days_to_revert": 3.0
+      "past_signals_count": 5,
+      "reverted_count": 4,
+      "stopped_count": 0,
+      "timed_out_count": 0,
+      "revert_rate_pct": 80.0,
+      "median_days_to_revert": 2.0
     }
   },
   {
@@ -554,12 +557,12 @@
       }
     ],
     "historical_evidence": {
-      "past_signals_count": 28,
+      "past_signals_count": 21,
       "reverted_count": 10,
-      "stopped_count": 9,
+      "stopped_count": 4,
       "timed_out_count": 2,
-      "revert_rate_pct": 35.7,
-      "median_days_to_revert": 5.0
+      "revert_rate_pct": 47.6,
+      "median_days_to_revert": 6.0
     }
   },
   {
@@ -590,7 +593,8 @@
     "status": "QUIET",
     "failed_gates": [
       "extreme",
-      "edge"
+      "edge",
+      "training"
     ],
     "gates": {
       "enough_history": true,
@@ -695,12 +699,12 @@
       }
     ],
     "historical_evidence": {
-      "past_signals_count": 7,
-      "reverted_count": 3,
+      "past_signals_count": 0,
+      "reverted_count": 0,
       "stopped_count": 0,
-      "timed_out_count": 1,
-      "revert_rate_pct": 42.9,
-      "median_days_to_revert": 4.0
+      "timed_out_count": 0,
+      "revert_rate_pct": 0.0,
+      "median_days_to_revert": 0.0
     }
   },
   {
@@ -732,7 +736,8 @@
     "failed_gates": [
       "extreme",
       "edge",
-      "lifecycle"
+      "lifecycle",
+      "training"
     ],
     "gates": {
       "enough_history": true,
@@ -751,7 +756,7 @@
     "chosen_params": {
       "W": 20,
       "ze": 2.5,
-      "mh": 10,
+      "mh": 5,
       "zx": 0.5
     },
     "z_histogram": [
@@ -837,12 +842,12 @@
       }
     ],
     "historical_evidence": {
-      "past_signals_count": 22,
-      "reverted_count": 10,
-      "stopped_count": 1,
-      "timed_out_count": 2,
-      "revert_rate_pct": 45.5,
-      "median_days_to_revert": 3.0
+      "past_signals_count": 14,
+      "reverted_count": 5,
+      "stopped_count": 0,
+      "timed_out_count": 4,
+      "revert_rate_pct": 35.7,
+      "median_days_to_revert": 4.0
     }
   }
 ]

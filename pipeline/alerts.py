@@ -7,6 +7,8 @@ from pipeline.config import (
     MIN_ENTRY_TD,
     MIN_VOLUME_LOTS,
     MIN_OI_LOTS,
+    HURDLE_MULTIPLE,
+    STOP_Z_BUFFER,
 )
 from pipeline.attribution import calculate_round_trip_cost_bps
 
@@ -19,7 +21,7 @@ def evaluate_pair_gates(
     """
     Evaluates 5 gates from Section 6 for a given pair row:
     1. Enough history: >= W prior observations
-    2. Extreme: |z| >= z_entry
+    2. Extreme: z_entry <= |z| < z_entry + STOP_Z_BUFFER (unusual, but not already past the stop-loss)
     3. Edge beats cost: |spread - mu| >= 2 * round_trip_cost_bps
     4. Liquidity: both legs volume >= 25 lots and OI >= 50, not thin
     5. Lifecycle: both legs >= 7 trading days to expiry, not a roll day
@@ -36,14 +38,14 @@ def evaluate_pair_gates(
         failed_reasons.append('history')
         
     # Gate 2: Extreme
-    is_extreme = has_history and (abs(z) >= ze)
+    is_extreme = has_history and (abs(z) >= ze) and (abs(z) < ze + STOP_Z_BUFFER)
     gates['extreme'] = is_extreme
     if not is_extreme:
         failed_reasons.append('extreme')
         
     # Gate 3: Edge beats cost
     deviation_bps = abs(row['spread'] - mu) if has_history else 0.0
-    hurdle_bps = 2.0 * round_trip_cost_bps
+    hurdle_bps = HURDLE_MULTIPLE * round_trip_cost_bps
     edge_beats_cost = has_history and (deviation_bps >= hurdle_bps)
     gates['edge_beats_cost'] = edge_beats_cost
     if not edge_beats_cost:
@@ -73,12 +75,15 @@ def generate_today_alerts(
     pairs_dict: Dict[str, pd.DataFrame],
     best_params: pd.DataFrame,
     as_of_date: pd.Timestamp = None,
+    switch: Dict[str, Dict[str, Any]] = None,
 ) -> Dict[str, Any]:
     """
     Evaluates alerts across all pairs for the latest date (Section 6).
+    switch: walk-forward on/off per pair (backtest.walk_forward_switch). A pair that training
+    switched off never signals, even if all five market checks pass.
     """
     rt_cost_bps = calculate_round_trip_cost_bps(slip_bps=BASE_SLIPPAGE)
-    hurdle_bps = 2.0 * rt_cost_bps
+    hurdle_bps = HURDLE_MULTIPLE * rt_cost_bps
     
     pairs_alerts = []
     
@@ -104,6 +109,12 @@ def generate_today_alerts(
         is_signal, failed_reasons, gates = evaluate_pair_gates(
             last_row, W=W, ze=ze, round_trip_cost_bps=rt_cost_bps
         )
+        sw = (switch or {}).get(pair_id, {'on': True, 'reason': 'no switch applied'})
+        if not sw['on']:
+            is_signal = False
+            failed_reasons = failed_reasons + ['training']
+        sd_now = float(last_row['sd']) if not np.isnan(last_row['sd']) else float('nan')
+        hurdle_z = (hurdle_bps / sd_now) if sd_now and not np.isnan(sd_now) else float('nan')
         
         exp_a_str = last_row['expiry_a'].strftime('%b-%y') if hasattr(last_row['expiry_a'], 'strftime') else str(last_row['expiry_a'])
         exp_b_str = last_row['expiry_b'].strftime('%b-%y') if hasattr(last_row['expiry_b'], 'strftime') else str(last_row['expiry_b'])
@@ -120,6 +131,11 @@ def generate_today_alerts(
             'sd': round(float(last_row['sd']), 1) if not np.isnan(last_row['sd']) else None,
             'z': round(float(last_row['z']), 2) if not np.isnan(last_row['z']) else None,
             'z_needed': ze,
+            'stop_z': round(ze + STOP_Z_BUFFER, 2),
+            'hurdle_z': round(hurdle_z, 1) if not np.isnan(hurdle_z) else None,
+            'can_signal_now': bool(not np.isnan(hurdle_z) and hurdle_z < ze + STOP_Z_BUFFER),
+            'pair_on': bool(sw['on']),
+            'pair_switch_reason': sw['reason'],
             'deviation_bps': round(abs(float(last_row['spread'] - last_row['mu'])), 1) if not np.isnan(last_row['mu']) else 0.0,
             'hurdle_bps': round(hurdle_bps, 1),
             'round_trip_cost_bps': round(rt_cost_bps, 1),

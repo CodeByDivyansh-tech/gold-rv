@@ -4,7 +4,7 @@ import json
 import datetime
 import numpy as np
 import pandas as pd
-from typing import Dict, List, Any
+from typing import Dict, List, Any, Optional
 
 from pipeline.config import (
     CONTRACT_SPECS,
@@ -18,6 +18,12 @@ from pipeline.config import (
     BASE_SLIPPAGE,
     SLIPPAGE_SCENARIOS,
     NOTIONAL_PER_LEG,
+    LEGACY_RULE,
+    ALERT_RULE,
+    HURDLE_MULTIPLE,
+    STOP_Z_BUFFER,
+    MAX_FILL_MOVE,
+    MIN_TRAIN_TRADES,
 )
 from pipeline.load import load_clean_bhavcopy
 from pipeline.carry import compute_reference_carry, compute_carry_decomposition
@@ -27,6 +33,8 @@ from pipeline.backtest import (
     run_grid_search,
     run_all_scenarios,
     run_pair_backtest,
+    walk_forward_switch,
+    hurdle_bps,
 )
 from pipeline.attribution import (
     calculate_round_trip_cost_bps,
@@ -59,6 +67,72 @@ def save_json(filepath: str, data: Any):
     with open(filepath, 'w', encoding='utf-8') as f:
         json.dump(data, f, indent=2, cls=CustomJSONEncoder)
 
+def cross_check_raw_vs_clean(df: pd.DataFrame, raw_path: str = 'data/raw/mcx_bhavcopy_raw_api.csv') -> Dict[str, Any]:
+    """Compares every row of the raw MCX download with the cleaned dataset the pipeline uses.
+    Replaces an earlier hard-coded 'verified' claim with a check that runs on every build."""
+    if not os.path.exists(raw_path):
+        return {'raw_rows': 0, 'matched_rows': 0, 'mismatches': None,
+                'status': 'Raw file not present in this build; cross-check not run.'}
+    raw = pd.read_csv(raw_path)
+    raw['date'] = pd.to_datetime(raw['Date'], format='%m/%d/%Y')
+    raw['expiry'] = pd.to_datetime(raw['ExpiryDate'], format='%d%b%Y')
+    raw['symbol'] = raw['Symbol'].astype(str).str.strip()
+    m = raw.merge(df[['symbol', 'expiry', 'date', 'open', 'close', 'vol', 'oi']],
+                  on=['symbol', 'expiry', 'date'], how='outer', indicator=True)
+    both = m[m['_merge'] == 'both']
+    bad = ((both['Close'] != both['close']) | (both['Open'] != both['open'])
+           | (both['Volume'] != both['vol']) | (both['OpenInterest'] != both['oi']))
+    only_raw = int((m['_merge'] == 'left_only').sum())
+    only_clean = int((m['_merge'] == 'right_only').sum())
+    n_bad = int(bad.sum()) + only_raw + only_clean
+    return {
+        'raw_rows': int(len(raw)),
+        'matched_rows': int(len(both)),
+        'value_mismatches': int(bad.sum()),
+        'rows_only_in_raw': only_raw,
+        'rows_only_in_clean': only_clean,
+        'mismatches': n_bad,
+        'fields_compared': ['open', 'close', 'volume_lots', 'open_interest_lots'],
+        'status': (f"Raw MCX file vs cleaned data: {len(both):,} rows compared on open, close, volume and OI, "
+                   f"{n_bad} mismatch{'es' if n_bad != 1 else ''}. Runs on every build."),
+    }
+
+CRASH_START, CRASH_END, CRASH_LABEL = '2026-01-01', '2026-03-31', 'Jan–Mar 2026 crash'
+
+def _tstat(x: pd.Series) -> Optional[float]:
+    x = pd.Series(x, dtype=float)
+    if len(x) < 3 or x.std(ddof=1) == 0:
+        return None
+    return round(float(x.mean() / (x.std(ddof=1) / np.sqrt(len(x)))), 2)
+
+def summarize_rule(trades: pd.DataFrame, switch: Optional[Dict[str, Dict[str, Any]]] = None) -> Dict[str, Any]:
+    """Train/Test totals per slippage, the crash split and (if given) the walk-forward switch result."""
+    out: Dict[str, Any] = {}
+    for slip in SLIPPAGE_SCENARIOS:
+        a = trades[trades['slip'] == slip] if len(trades) else trades
+        tr = a[a['seg'] == 'train'] if len(a) else a
+        te = a[a['seg'] == 'test'] if len(a) else a
+        crash = te[(te['exit'] >= CRASH_START) & (te['exit'] <= CRASH_END)] if len(te) else te
+        rest = te.drop(crash.index) if len(te) else te
+        row = {
+            'train_n': int(len(tr)), 'train_net_rs': round(float(tr['net'].sum()), 1) if len(tr) else 0.0,
+            'train_avg_bps': round(float(tr['net_bps'].mean()), 1) if len(tr) else None,
+            'test_n': int(len(te)), 'test_net_rs': round(float(te['net'].sum()), 1) if len(te) else 0.0,
+            'test_avg_bps': round(float(te['net_bps'].mean()), 1) if len(te) else None,
+            'test_t': _tstat(te['net_bps']) if len(te) else None,
+            'test_hit': round(float((te['net'] > 0).mean()), 3) if len(te) else None,
+            'crash_n': int(len(crash)), 'crash_net_rs': round(float(crash['net'].sum()), 1) if len(crash) else 0.0,
+            'ex_crash_n': int(len(rest)), 'ex_crash_net_rs': round(float(rest['net'].sum()), 1) if len(rest) else 0.0,
+            'ex_crash_t': _tstat(rest['net_bps']) if len(rest) else None,
+        }
+        if switch is not None:
+            on = [k for k, v in switch.items() if v['on']]
+            ton = te[te['pair'].isin(on)] if len(te) else te
+            row.update({'switched_on_pairs': on, 'switched_on_n': int(len(ton)),
+                        'switched_on_net_rs': round(float(ton['net'].sum()), 1) if len(ton) else 0.0})
+        out[str(slip)] = row
+    return out
+
 def build_all_site_data(output_dir: str = 'frontend/public/data'):
     """Executes the full pipeline and writes all Section 8.1 JSON files."""
     print("--- 1. Loading and normalizing Bhavcopy data ---")
@@ -74,23 +148,30 @@ def build_all_site_data(output_dir: str = 'frontend/public/data'):
     print("--- 3. Constructing pair series ---")
     pairs_dict = build_all_pairs(df, carry_series)
     
-    print("--- 4. Running grid search on Train & selecting parameters ---")
-    grid_df, best_params = run_grid_search(pairs_dict, P, dates, tdi)
+    print("--- 4. Running grid search on Train & selecting parameters (same rule as the alerts) ---")
+    grid_df, best_params = run_grid_search(pairs_dict, P, dates, tdi, rule=ALERT_RULE)
     print("Chosen parameters on TRAIN (5 bps slippage):")
     print(best_params)
     
     print("--- 5. Simulating walk-forward backtest across slippage scenarios ---")
-    all_trades_df, summary_df = run_all_scenarios(pairs_dict, best_params, P, dates, tdi)
+    all_trades_df, summary_df = run_all_scenarios(pairs_dict, best_params, P, dates, tdi, rule=ALERT_RULE)
+    switch = walk_forward_switch(all_trades_df, list(pairs_dict.keys()))
+    print("Walk-forward switch (decided on Train only):", {k: v['on'] for k, v in switch.items()})
+
+    # Original study (4 checks, no cost gate) kept only for comparison on the site
+    legacy_grid_df, legacy_params = run_grid_search(pairs_dict, P, dates, tdi, rule=LEGACY_RULE)
+    legacy_trades_df, _ = run_all_scenarios(pairs_dict, legacy_params, P, dates, tdi, rule=LEGACY_RULE)
     
     print("--- 6. Computing alerts & contract lifecycle ---")
-    alerts_today = generate_today_alerts(pairs_dict, best_params)
+    alerts_today = generate_today_alerts(pairs_dict, best_params, switch=switch)
     signals_history = generate_signals_history(all_trades_df)
     lifecycle_df = compute_contract_lifecycle(df)
     
     print(f"--- 7. Writing JSON files to {output_dir} ---")
     
     # 7.1 meta.json
-    weekend_dates = ['2023-11-12', '2025-02-01', '2026-02-01']
+    weekend_dates = [pd.Timestamp(d).strftime('%Y-%m-%d') for d in dates if pd.Timestamp(d).weekday() >= 5]
+    raw_check = cross_check_raw_vs_clean(df)
     # Latest quotes for replacement tape (Section 10.2)
     latest_quotes = []
     for sym in ['GOLDM', 'GOLDTEN', 'GOLDGUINEA', 'GOLDPETAL']:
@@ -123,17 +204,13 @@ def build_all_site_data(output_dir: str = 'frontend/public/data'):
         'no_trade_rows_count': int(df['no_trade'].sum()),
         'thin_rows_count': int(df['thin'].sum()),
         'weekend_sessions': weekend_dates,
-        'manual_cross_check': {
-            'manual_rows': 5666,
-            'mismatches': 0,
-            'status': 'Verified 0 mismatches against manual Bhavcopy downloads',
-        },
+        'raw_cross_check': raw_check,
         'num_contracts': len(CONTRACT_SPECS),
         'num_pairs': len(PAIRS),
         'unseen_test_months': 12,
         'latest_quotes': latest_quotes,
         'build_time': datetime.datetime.now(datetime.timezone.utc).isoformat(),
-        'source': 'MCX Bhavcopy (EOD) · Data to 30-Sep-2026',
+        'source': f"MCX Bhavcopy (EOD) · Data to {pd.Timestamp(last_date).strftime('%d-%b-%Y')}",
     }
     save_json(os.path.join(output_dir, 'meta.json'), meta_data)
     
@@ -373,6 +450,9 @@ def build_all_site_data(output_dir: str = 'frontend/public/data'):
     else:
         pooled_beta, pooled_corr = 0.0, 0.0
 
+    gold_share_pooled = (float(pooled_test_5bps['gold'].abs().sum() / pooled_test_5bps['gross'].abs().sum() * 100.0)
+                         if len(pooled_test_5bps) and pooled_test_5bps['gross'].abs().sum() > 0 else 0.0)
+
     for pair_id, row_params in best_params.iterrows():
         W, ze, mh = int(row_params['W']), float(row_params['ze']), int(row_params['mh'])
         p_df = pairs_dict[pair_id]
@@ -381,7 +461,7 @@ def build_all_site_data(output_dir: str = 'frontend/public/data'):
         slip_trades_test = {}
         
         for slip in SLIPPAGE_SCENARIOS:
-            t_df = run_pair_backtest(pair_id, p_df, P, dates, tdi, W, ze, mh, slip_bps=slip)
+            t_df = run_pair_backtest(pair_id, p_df, P, dates, tdi, W, ze, mh, slip_bps=slip, rule=ALERT_RULE)
             if not t_df.empty:
                 t_df['seg'] = np.where(t_df['entry'] <= t_end, 'train', 'test')
                 t_train = t_df[t_df['seg'] == 'train']
@@ -466,7 +546,11 @@ def build_all_site_data(output_dir: str = 'frontend/public/data'):
                     'zx': 0.5,
                     'mh': mh,
                     'notional_per_leg': NOTIONAL_PER_LEG,
+                    'hurdle_bps': round(hurdle_bps(), 1),
+                    'stop_z': round(ze + STOP_Z_BUFFER, 2),
+                    'max_fill_move_pct': round(MAX_FILL_MOVE * 100, 1),
                 },
+                'switch': switch[pair_id],
                 'metrics_all': compute_attribution_metrics(t_df),
                 'metrics_train': compute_attribution_metrics(t_train),
                 'metrics_test': compute_attribution_metrics(t_test),
@@ -478,7 +562,7 @@ def build_all_site_data(output_dir: str = 'frontend/public/data'):
                     'net_rs': round(float(t_test['net'].sum()) if len(t_test) else 0.0, 1),
                     'spread_rs': round(float(t_test['spread_pnl'].sum()) if len(t_test) else 0.0, 1),
                     'gold_rs': round(float(t_test['gold'].sum()) if len(t_test) else 0.0, 1),
-                    'direct_gold_pnl_pct': 1.4,
+                    'direct_gold_pnl_pct': round(float(t_test['gold'].abs().sum() / t_test['gross'].abs().sum() * 100.0), 1) if len(t_test) and t_test['gross'].abs().sum() > 0 else 0.0,
                     'pair_correlation_to_gold': round(pair_corr, 2),
                     'pair_beta_to_gold': round(pair_beta, 2),
                     'pair_n_trades': len(t_test),
@@ -486,7 +570,9 @@ def build_all_site_data(output_dir: str = 'frontend/public/data'):
                     'pooled_correlation_to_gold': round(pooled_corr, 2),
                     'pooled_beta_to_gold': round(pooled_beta, 2),
                     'pooled_n_trades': len(pooled_test_5bps),
-                    'summary_text': "Gram-neutral by construction (direct gold P&L ≈ 1.4% of gross), but spread moves are linked to large gold shocks (pooled corr −0.24)."
+                    'summary_text': (f"Equal grams on both legs, so direct gold P&L is small "
+                                     f"({gold_share_pooled:.1f}% of gross across all pairs in Test). "
+                                     f"Correlation of trade returns with gold moves: {pooled_corr:+.2f} (pooled)."),
                 },
             }
             save_json(os.path.join(output_dir, f'backtest/{pair_id}_{slip}.json'), backtest_payload)
@@ -553,11 +639,14 @@ def build_all_site_data(output_dir: str = 'frontend/public/data'):
             q1_text = "—"
             
         if pair_id in ('GUINEA_PETAL', 'M_PETAL'):
-            comment = "Structural break, cause unknown. GOLDPETAL flipped from cheap to slightly rich around Dec-24 → Mar-25."
+            comment = ("Level shift around Dec-24 → Mar-25: GOLDPETAL moved from cheap to slightly rich. "
+                       "Cause not yet confirmed; a move this size usually means a change in contract terms, "
+                       "so check MCX circulars for that period.")
         elif 'TEN' in pair_id:
             comment = "Listed Mar-2025; no pre-break history"
         elif pair_id == 'M_GUINEA':
-            comment = "Historically stable: GOLDM ~0.8% below GOLDGUINEA throughout history."
+            comment = (f"Fairly stable: GOLDM averaged {float(p_df['spread'].mean()):+.1f} bps vs GOLDGUINEA "
+                       f"(carry-adjusted) over the whole period.")
         else:
             comment = "Cross-contract basis dynamics."
             
@@ -576,17 +665,62 @@ def build_all_site_data(output_dir: str = 'frontend/public/data'):
         })
     save_json(os.path.join(output_dir, 'regimes.json'), regime_records)
     
-    # 7.9 methodology.json
+    # 7.9 rule_comparison.json + methodology.json (numbers computed, not typed in)
+    new_sum = summarize_rule(all_trades_df, switch)
+    old_sum = summarize_rule(legacy_trades_df)
+    rule_comparison = {
+        'crash': {'start': CRASH_START, 'end': CRASH_END, 'label': CRASH_LABEL},
+        'hurdle_bps': round(hurdle_bps(), 1),
+        'stop_buffer_z': STOP_Z_BUFFER,
+        'max_fill_move_pct': round(MAX_FILL_MOVE * 100, 1),
+        'min_train_trades': MIN_TRAIN_TRADES,
+        'switch': switch,
+        'current_rule': {'name': 'All five checks (what the site shows)', 'params': best_params.reset_index().to_dict(orient='records'), 'by_slip': new_sum},
+        'original_rule': {'name': 'Original study: 4 checks, no cost line', 'params': legacy_params.reset_index().to_dict(orient='records'), 'by_slip': old_sum},
+    }
+    save_json(os.path.join(output_dir, 'backtest/rule_comparison.json'), rule_comparison)
+
+    b = new_sum[str(BASE_SLIPPAGE)]
+    o = old_sum[str(BASE_SLIPPAGE)]
+    def rs(v: float) -> str:
+        """Indian digit grouping: ₹1,13,598."""
+        n = str(int(abs(v) + 0.5))  # round half up, same as the website's Math.round
+        if len(n) > 3:
+            head, tail = n[:-3], n[-3:]
+            parts = []
+            while len(head) > 2:
+                parts.insert(0, head[-2:])
+                head = head[:-2]
+            if head:
+                parts.insert(0, head)
+            n = ','.join(parts) + ',' + tail
+        return ('−' if v < 0 else '') + '₹' + n
+    on_pairs = [k for k, v in switch.items() if v['on']]
+    per_pair_n = all_trades_df[(all_trades_df['slip'] == BASE_SLIPPAGE) & (all_trades_df['seg'] == 'test')].groupby('pair').size()
+    t_txt = f"t = {b['test_t']:.2f}" if b['test_t'] is not None else 't-stat not available'
+    sig_txt = 'below the usual bar of 2' if (b['test_t'] is None or abs(b['test_t']) < 2) else 'above the usual bar of 2'
+    if b['test_net_rs'] > 0 and b['crash_net_rs'] >= b['test_net_rs']:
+        crash_txt = (f"trades that closed during the {CRASH_LABEL} made {rs(b['crash_net_rs'])}; "
+                     f"outside it the rule {'lost ' + rs(-b['ex_crash_net_rs']) if b['ex_crash_net_rs'] < 0 else 'made ' + rs(b['ex_crash_net_rs'])}")
+    else:
+        crash_txt = f"trades that closed during the {CRASH_LABEL} made {rs(b['crash_net_rs'])}"
+    honest = (
+        f"Cross-contract gold gaps are real and measurable. With the same five checks the site shows, "
+        f"the rule {'made' if b['train_net_rs'] > 0 else 'lost'} {rs(abs(b['train_net_rs']))} over {b['train_n']} training trades, "
+        f"then {'made' if b['test_net_rs'] > 0 else 'lost'} {rs(abs(b['test_net_rs']))} over {b['test_n']} unseen-year trades "
+        f"at {BASE_SLIPPAGE} bps slippage. But {crash_txt}. The result is not proven ({t_txt}, {sig_txt}), and training "
+        f"would have switched on only {len(on_pairs)} of 6 pairs. No persistent edge is proven after costs."
+    )
     methodology_data = {
         'stages': [
-            {'step': 1, 'name': 'Load & Validate', 'desc': 'Parse 11,954 rows, strip symbols, check primary keys, filter no-trade days.'},
-            {'step': 2, 'name': 'Normalize', 'desc': 'Divide close by quote_grams and purity to obtain pure ₹/g reference.'},
-            {'step': 3, 'name': 'Implied Carry', 'desc': 'Extract term structure carry from liquid GOLDPETAL calendar spreads; forward-fill only.'},
-            {'step': 4, 'name': 'Pair Construction', 'desc': 'Pair contracts with t-1 open interest to avoid look-ahead bias.'},
-            {'step': 5, 'name': 'Point-in-Time z-scores', 'desc': 'Compute rolling mean and std strictly using t-1 and earlier observations.'},
-            {'step': 6, 'name': 'Five-Gate Alerts', 'desc': 'Filter trades through history, extreme, edge vs cost, liquidity, and lifecycle gates.'},
-            {'step': 7, 'name': 'Walk-Forward Backtest', 'desc': 'Freeze parameters on Train segment (2023-10 to 2025-09); execute on Test segment (2025-10 to 2026-09).'},
-            {'step': 8, 'name': 'Attribution & Costs', 'desc': 'Mark-to-market separating spread alpha from gold beta after realistic statutory costs and slippage.'},
+            {'step': 1, 'name': 'Load & Validate', 'desc': f'Parse {len(df):,} rows, strip symbols, check primary keys, compare against the raw MCX file, flag no-trade days.'},
+            {'step': 2, 'name': 'Normalize', 'desc': 'Divide close by quote grams and purity to get a price per gram of pure gold.'},
+            {'step': 3, 'name': 'Implied Carry', 'desc': 'Estimate the cost of carry from GOLDPETAL calendar spreads; forward-fill only.'},
+            {'step': 4, 'name': 'Pair Construction', 'desc': 'Pick contracts using the previous day\'s open interest, so nothing from the future is used.'},
+            {'step': 5, 'name': 'Point-in-Time z-scores', 'desc': 'Rolling mean and spread of each gap use only earlier days.'},
+            {'step': 6, 'name': 'One rule: five checks', 'desc': f'The same five checks drive today\'s alerts and every backtest trade: enough history, an unusual gap that is not already past the stop-loss, a gap bigger than {HURDLE_MULTIPLE:.0f}× the round-trip cost, liquidity, and contract life.'},
+            {'step': 7, 'name': 'Walk-Forward Test', 'desc': f'Settings tuned on Train ({TRAIN_START[:7]} to {TRAIN_END[:7]}) and frozen for Test ({TEST_START[:7]} to {TEST_END[:7]}). A pair is traded in Test only if training gave at least {MIN_TRAIN_TRADES} trades and a profit.'},
+            {'step': 8, 'name': 'Costs & Attribution', 'desc': f'Each closed trade is split into spread and gold parts after statutory costs and slippage. No fills on days a leg moved {MAX_FILL_MOVE*100:.0f}% or more.'},
         ],
         'split_dates': {
             'train_start': TRAIN_START,
@@ -597,23 +731,25 @@ def build_all_site_data(output_dir: str = 'frontend/public/data'):
         'point_in_time_rules': [
             'Rolling z uses only t-1 and earlier observations (shifted window)',
             'Contract pairing selects max min(OI) as of t-1',
-            'Parameters tuned strictly on in-sample Train data and frozen',
-            'Signals generated at close t execute at close t+1',
+            'Parameters tuned strictly on in-sample Train data and frozen; the on/off switch also uses Train only',
+            'Signals generated at close t execute at close t+1; exits never fill at the signal\'s own close',
+            f'No fills on days either leg moved {MAX_FILL_MOVE*100:.0f}% or more (prices may be stuck at the daily limit)',
             'Carry rate c_t is forward-filled only; never backward-filled',
         ],
         'limitations': [
             'EOD settlement close is an official reference, not an executable book fill.',
-            'Bhavcopy volume indicates activity but does not measure order-book depth.',
+            'Bhavcopy volume indicates activity but does not measure order-book depth; slippage is assumed, not measured.',
             'GOLDTEN contracts listed only on 31-Mar-2025, offering limited historical depth.',
-            'Test period contains only 6 to 16 trades per pair; small sample sizes preclude high certainty.',
-            'GOLDPETAL underwent a structural break in Dec-24 / Mar-25 of unknown mechanical cause.',
-            'Headline positive pairs owe their gains entirely to the single violent crisis episode of Jan-2026.',
+            f'Test period contains only {int(per_pair_n.min()) if len(per_pair_n) else 0} to {int(per_pair_n.max()) if len(per_pair_n) else 0} trades per pair ({b["test_n"]} in total); small samples preclude high certainty.',
+            'GOLDPETAL\'s level shifted around Dec-24 / Mar-25; the cause is not yet confirmed against MCX circulars.',
+            f'Trades closed during the {CRASH_LABEL} made {rs(b["crash_net_rs"])} of the unseen-year result ({rs(b["test_net_rs"])} in total).',
+            'When the pair series switches to new contracts, open trades are closed; this adds cost.',
             'Exchange transaction charges and statutory rates should be regularly verified against MCX circulars.',
         ],
-        'honest_conclusion': (
-            'Cross-contract gold spreads are real, measurable and partly mean-reverting, '
-            'but after realistic costs no pair shows a statistically significant edge on 12 months '
-            'of unseen data. The only profits come from a single crisis episode. No persistent edge survives costs.'
+        'honest_conclusion': honest,
+        'original_rule_note': (
+            f"The original study used only four of the five checks (no cost line). Under it: {o['test_n']} unseen-year trades, "
+            f"{rs(o['test_net_rs'])} at {BASE_SLIPPAGE} bps. It is kept on the site for comparison only."
         ),
     }
     
@@ -639,6 +775,10 @@ def build_all_site_data(output_dir: str = 'frontend/public/data'):
     save_json(os.path.join(output_dir, 'retrieval_log.json'), retrieval_records)
     methodology_data['retrieval_log'] = retrieval_records
     save_json(os.path.join(output_dir, 'methodology.json'), methodology_data)
+    
+    print("--- 8. Writing site-data.json for the website ---")
+    from pipeline.build_web_data import build_web_data
+    build_web_data(output_dir)
     
     print("--- Build complete! All JSON files written successfully. ---")
 

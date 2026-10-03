@@ -112,3 +112,16 @@ CTT_RATE = 0.0001                   # 0.01% on sell side
 STAMP_DUTY_RATE = 0.00002           # 0.002% on buy side
 GST_RATE = 0.18                     # 18% on (brokerage + exchange + sebi)
 THIN_SLIPPAGE_MULTIPLIER = 3.0      # 3x slippage when thin
+
+# Section 5.9: one trading rule for both today's alerts and the backtest (audit fix, Oct-2026)
+# The backtest used to check only 4 of the 5 alert gates (no cost hurdle), could enter
+# beyond its own stop-loss, and could fill on extreme-move days. ALERT_RULE fixes all three.
+HURDLE_MULTIPLE = 2.0      # gap from normal must be >= 2 x round-trip cost (at BASE_SLIPPAGE)
+STOP_Z_BUFFER = 1.5        # stop-loss at |z| >= z_entry + 1.5; never enter at or beyond it
+MAX_FILL_MOVE = 0.06       # no fills on a day either leg moved 6%+ (price may be stuck at the daily limit)
+FILL_SEARCH_TD = 10        # trading days to look ahead for the next fillable exit day
+MIN_TRAIN_TRADES = 10      # walk-forward switch: a pair is traded in Test only if its chosen
+                           # setting made >= 10 trades AND a positive net (after costs) in Train
+
+LEGACY_RULE = {'use_hurdle': False, 'entry_band': False, 'max_fill_move': None}   # original study (reference_summary.csv)
+ALERT_RULE = {'use_hurdle': True, 'entry_band': True, 'max_fill_move': MAX_FILL_MOVE}  # the rule the site shows

@@ -1,0 +1,55 @@
+// Runs every page's logic against the real site-data.json in many UI states.
+// No dependencies: `node tests/pages.test.mjs` (or `npm test`) from frontend/.
+import { readFileSync } from 'node:fs'
+import assert from 'node:assert/strict'
+
+const D = JSON.parse(readFileSync('public/data/site-data.json', 'utf8'))
+const PAIRS = ['M_TEN', 'M_PETAL', 'M_GUINEA', 'TEN_PETAL', 'GUINEA_TEN', 'GUINEA_PETAL']
+const SLIPS = ['0', '2', '5', '10']
+
+class DCLogic { setState(o) { this.state = { ...(this.state || {}), ...(typeof o === 'function' ? o(this.state) : o) } } }
+
+function load(name) {
+  const src = readFileSync(`public/pages/${name}.dc.html`, 'utf8')
+  const code = src.match(/<script type="text\/x-dc" data-dc-script[^>]*>([\s\S]*?)<\/script>/)[1]
+  assert.ok(!/_blob\//.test(src), `${name}: still points at a design-canvas data file`)
+  return new Function('DCLogic', code + '\nreturn Component;')(DCLogic)
+}
+
+const states = {
+  Home: [{}, { range: '1M', hover: 5 }, { range: '3Y', hover: 100 }, { dark: false }],
+  Today: [{}, { ri: 0 }, { ri: 60 }, { ri: 120, speed: 2 }],
+  Market: [{}, { range: '3M', hover: 10 }, { range: '3Y', hover: 150 }],
+  Pairs: PAIRS.flatMap((pair) => [{ pair }, { pair, hover: 20, allTrades: true }]),
+  Signals: PAIRS.map((pair) => ({ pair, allPast: true })),
+  Backtesting: PAIRS.flatMap((pair) => SLIPS.map((slip) => ({ pair, slip, hover: 0 }))),
+  Data: [{}, { all: true }],
+  DownloadPanel: ['today', 'prices', 'trades', 'backtest', 'report'].flatMap((what) =>
+    ['3m', 'all'].map((period) => ({ what, period, pair: 'ALL' }))),
+}
+
+let runs = 0
+for (const [name, list] of Object.entries(states)) {
+  const C = load(name)
+  for (const st of list) {
+    const c = new C()
+    c.props = name === 'DownloadPanel' ? { dark: true, onClose: () => {} } : {}
+    c.state = { D, ...st }
+    const v = c.renderVals()
+    assert.ok(v && v.ready !== false, `${name} ${JSON.stringify(st)} did not reach the ready state`)
+    const text = JSON.stringify(v, (k, x) => (typeof x === 'function' ? undefined : x))
+    assert.ok(!/\bNaN\b|undefined|\[object Object\]/.test(text), `${name} ${JSON.stringify(st)} shows NaN/undefined`)
+    runs++
+  }
+  // loading and failed states draw too
+  const c = new C(); c.props = {}; c.state = {}
+  assert.ok(c.renderVals(), `${name} loading state`)
+}
+
+// The headline answer follows all five checks, not just the cost line
+{
+  const C = load('Home'); const c = new C(); c.props = {}; c.state = { D }
+  const signals = D.today.filter((p) => p.status === 'SIGNAL').length
+  assert.equal(c.renderVals().answer.word === 'No.', signals === 0)
+}
+console.log(`pages ok: ${runs} page states rendered against site-data.json`)
