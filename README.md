@@ -4,9 +4,11 @@
 [![Python Pipeline](https://img.shields.io/badge/Pipeline-Python%203.11%2B%20%7C%20Pandas%20%7C%20NumPy-blue)](#python-pipeline)
 [![Frontend](https://img.shields.io/badge/Frontend-Static%20HTML%20%7C%20no%20runtime%20deps-orange)](#3-how-to-run-locally)
 [![Acceptance Tests](https://img.shields.io/badge/Tests-Pytest%20Passing-brightgreen)](#acceptance-tests)
+[![Pitch Presentation](https://img.shields.io/badge/Pitch-Interactive%203D%20Deck-gold)](https://gold-rv.vercel.app/pitch/)
 
 **Hack in Hills '26 · Problem 03: Commodity Derivatives Intelligence**  
-A production-grade, audit-ready relative-value (RV) research terminal across MCX Gold derivatives (`GOLDM`, `GOLDTEN`, `GOLDGUINEA`, `GOLDPETAL`).
+A production-grade, audit-ready relative-value (RV) research terminal across MCX Gold derivatives (`GOLDM`, `GOLDTEN`, `GOLDGUINEA`, `GOLDPETAL`).  
+• **Judge Pitch Deck**: [Interactive 3D Pitch Presentation](https://gold-rv.vercel.app/pitch/) (`/pitch/`)
 
 ---
 
