@@ -26,7 +26,7 @@ if (typeof gsap !== 'undefined' && gsap.ticker) {
 const state = {
   currentStage: 'opening', // 'opening' | '3d-bars' | 'slides'
   currentSlide: 1,
-  totalSlides: 8,
+  totalSlides: 17,
   voiceEnabled: true,
   mascotVisible: true,
   notesVisible: false,
@@ -36,30 +36,48 @@ const state = {
   pointer: { x: window.innerWidth / 2, y: window.innerHeight / 2, ndcX: 0, ndcY: 0 },
 };
 
-// Spoken voice lines for Goldie
+// Spoken voice lines for Goldie (All 17 Slides)
 const spokenLines = {
   opening: "Hi judges! I'm Goldie. MCX sells the same gold in four sizes, at four different prices. Team NEXORA asked one question: is the gap real money, or a mirage?",
   stage2: "Look at the raw prices. They seem far apart. Now watch me price them the same way. The real gap is only six hundred eighty-seven rupees per ten grams.",
   1: "Meet Team NEXORA. Divyansh built the data and quant pipeline, Ishant built the frontend, and Noni led research and the pitch.",
   2: "Big raw gap, tiny real gap. Lot sizes, purity, expiry and costs all hide the truth, and backtests can easily cheat by peeking at the future.",
-  3: "Our solution covers all five directions of the brief: relative value, the futures curve and carry, walk-forward testing, quiet alerts, and contract lifecycle.",
-  4: "All the heavy work happens once, in a Python pipeline. The website reads one file, so there is no server and nothing can crash while you watch.",
-  5: "Here is a real example from thirty September. The gap is unusual, but it is only thirty-five point eight basis points, and a trade needs forty-eight point eight. One failed check is enough. So I stay quiet.",
-  6: "On twelve months the model never saw, the rule made twenty trades and one lakh thirteen thousand rupees. But the t-statistic is only one point eight nine, and training lost money. Take out one crash, and the rule loses. So no persistent edge is proven after costs.",
-  7: "The market is growing fast: gold futures turnover grew three point four times in a year. Our next step is a forward test with real fills.",
-  8: "Thank you, judges! Please try the live website while we take your questions.",
+  3: "Step one: price every contract the same way. When we divide by purity and quote grams, the gap shrinks from one lakh thirty-four thousand rupees to just six hundred eighty-seven rupees.",
+  4: "Step two: track the gap over three years. Notice the gold dots: eight trades won big during the twenty twenty-six crash, but outside that crash, trades were flat or negative.",
+  5: "Step three: the z-score. We only look when the gap is more than two standard deviations from normal. Today, only the mini versus petal pair flags at minus two point one four.",
+  6: "Step four: the cost hurdle. Even if the z-score flags, the gap must beat forty-eight point eight basis points of round-trip costs. Today, thirty-five point eight basis points fails this check.",
+  7: "Here is a real example from thirty September. The gap is unusual, but it is only thirty-five point eight basis points, and a trade needs forty-eight point eight. One failed check is enough. So I stay quiet.",
+  8: "Step five: the walk-forward test. We train on twenty-four months, lock every rule, and test on twelve unseen months. No peeking, and signals at today's close only execute tomorrow.",
+  9: "The headline results look good: twenty trades, one lakh thirteen thousand rupees profit, and a Sharpe of one point eight nine. But is it real?",
+  10: "Break it down by pair. Mini versus petal made fifty-two thousand rupees. Guinea versus petal made twenty-eight thousand. Four of five pairs made money, but sample sizes are tiny.",
+  11: "Where did the profit come from? Look at the three-D columns: eight trades during the twenty twenty-six crash made one lakh thirty-eight thousand rupees. The other twelve trades lost twenty-four thousand. One crash carried the strategy.",
+  12: "Slippage is deadly. At our baseline of five basis points, the strategy barely survives. If slippage doubles to ten basis points, test profit drops to thirty-three thousand rupees and training loses even more.",
+  13: "The normal gap isn't constant. Look at guinea versus petal: the gap shifted from two hundred basis points down to one basis point. A static model breaks when market structure shifts.",
+  14: "Zero runtime servers. A Python pipeline processes eleven thousand nine hundred fifty-four rows with eighteen automated tests, producing static JSON. Nothing can crash during the demo.",
+  15: "MCX gold trading grew three point four times in a single year, reaching twenty-eight thousand crore rupees daily. The market is large and growing.",
+  16: "Four key takeaways: normalization matters, costs dominate, crash attribution reveals the truth, and clean data is non-negotiable. Our next step is paper trading with live tick data.",
+  17: "Thank you, judges! Please try the live terminal at gold-r-v dot vercel dot app while we take your questions.",
 };
 
 // Speaker Notes for Judges / Presenter (N key)
 const speakerNotes = {
   1: "Welcome judges. Team NEXORA built Gold RV Intelligence to investigate cross-contract commodity pricing on MCX. We mathematically normalized all four gold contracts to pure gold and tested whether cross-contract spreads survive real-world execution costs. Our headline finding is simple and honest: the gaps are real, but a proven edge after costs is not.",
   2: "Raw quotes look wildly dispersed—over 1.3 lakh rupees apart—because MCX quotes 1g, 8g, 10g, and 100g in different quote units and purities. Once normalized to pure gold, the actual gap is only 687 rupees, or 46 basis points. The problem is that once you account for real trading costs, carry, and liquidity, this apparent arbitrage completely evaporates.",
-  3: "Our solution evaluates all contracts on equal footing with mathematical normalization, carry decomposition, and a strict five-gate hurdle. We use the exact same logic for alerts and backtesting, verified by 18 automated tests. Most importantly, we never look ahead: signals generated at close t fill strictly at close t+1.",
-  4: "The system runs as an audit-ready, static pipeline with zero runtime server dependencies. Data is ingested from official MCX Bhavcopy, cleaned of exchange formatting quirks, and verified across 11,954 rows. Signals are computed strictly out-of-sample, and the entire platform deploys as static JSON to Vercel.",
-  5: "This live example from September 30, 2026 demonstrates our discipline. The z-score of 2.14 exceeds the 2.0 hurdle, but the gap of 35.8 basis points is less than twice our round-trip transaction costs of 48.8 basis points. The gate fails, so the system stays quiet rather than generating unprofitable churn.",
-  6: "This is our most crucial slide. While the fixed rule appears profitable on unseen data with plus 1.13 lakh rupees, deeper attribution reveals that all the profit came from just eight trades during the January 2026 crash, while the remaining twelve trades lost money. With a t-statistic of 1.89 and negative training performance, no persistent edge is proven after realistic costs.",
-  7: "MCX gold futures trading has exploded more than threefold to over 28,000 crore rupees daily. The commercial opportunity spans retail traders, jewellery hedgers, and institutional prop desks. Our immediate roadmap focuses on forward-testing with live order books to measure actual execution slippage before expanding to silver contracts.",
-  8: "Thank you judges for your time and thoughtful evaluation. We invite you to test the live terminal at gold-rv.vercel.app or inspect the complete, audited codebase on GitHub. We are now open for your questions.",
+  3: "Slide 3 explains our mathematical normalization. MCX quotes 1g, 8g, 10g, and 100g contracts in different quote units and purities (995 vs 999). By dividing close price by quote grams and purity, we bring every contract to an identical 10g pure gold baseline. This collapses the superficial ₹1,34,186 raw gap down to an honest ₹687 (46.2 bps).",
+  4: "Slide 4 shows the 3-year historical time series of the GOLDM-GOLDPETAL gap. Over 750 trading days, the gap fluctuates around its rolling mean within a 2-sigma band. Most importantly, look at the distribution of trades: 8 trades during the Q1 2026 crash delivered ₹1,37,985 in gains, while the 12 trades outside the crash netted -₹24,387.",
+  5: "Slide 5 introduces the statistical entry rule: the Z-score. A trade is only considered when the spread deviates more than 2 standard deviations from its rolling mean. In today's snapshot, only GOLDM vs GOLDPETAL passes this first hurdle at z = -2.14, while all 5 other pairs sit within the normal zone.",
+  6: "Slide 6 breaks down our transaction cost hurdle. Cross-contract trades pay exchange turnover charges, SEBI turnover fees, stamp duty, STT/CTT, GST, and realistic bid-ask slippage (5 bps per leg). The round-trip cost is 24.4 bps, requiring a minimum gap of 2x cost = 48.8 bps before entering. Today's gap of 35.8 bps fails this gate.",
+  7: "This live example from September 30, 2026 demonstrates our discipline. The z-score of 2.14 exceeds the 2.0 hurdle, but the gap of 35.8 basis points is less than twice our round-trip transaction costs of 48.8 basis points. The gate fails, so the system stays quiet rather than generating unprofitable churn.",
+  8: "Slide 8 details our walk-forward validation framework. We train on 24 months (Oct 2023 - Sep 2025) and evaluate on 12 unseen months (Oct 2025 - Sep 2026). Five strict safeguards eliminate look-ahead bias: t+1 execution, zero parameter tuning on test data, liquidity volume filters, and strict cost deductions.",
+  9: "Slide 9 presents our test-set performance metrics: 20 trades, +₹1,13,598 net profit, Sharpe 1.89, and max drawdown -₹19,056. However, training lost -₹34,812. Under rigorous statistical standards, an out-of-sample t-statistic under 2.0 and negative training performance mean no persistent edge is proven.",
+  10: "Slide 10 decomposes results across all 6 contract pairs. GOLDM-GOLDPETAL contributed +₹52,883 across 5 trades, while GOLDGUINEA-GOLDPETAL contributed +₹28,348 across 5 trades. Five pairs were profitable, but low trade counts (2 to 5 per pair) make statistical significance impossible to claim.",
+  11: "Slide 11 delivers our crucial honest attribution. In the 3D columns, the 8 crash trades in Jan-Mar 2026 generated +₹1,37,985, while all other 12 trades lost -₹24,387. The waterfall chart on the right shows how gross spread profits of ₹1,85,431 are reduced by ₹73,578 in real execution costs to leave ₹1,13,598 net.",
+  12: "Slide 12 tests robustness across varying slippage assumptions: 0 bps, 2 bps, 5 bps (our baseline), and 10 bps. While zero slippage shows +₹1,67,110 profit, doubling slippage to 10 bps cuts test profit to +₹33,391 and worsens training losses to -₹56,419. Breakeven slippage is approximately 3.8 bps.",
+  13: "Slide 13 reveals why static relative value models fail in commodity markets: structural basis drift. GOLDGUINEA vs GOLDPETAL quarterly average basis collapsed from 201 bps down to 1 bps over two years. A rule relying on a fixed historical 'normal' will suffer catastrophic drawdowns during regime shifts.",
+  14: "Slide 14 details our zero-runtime-server architecture. Our automated Python pipeline ingests official MCX Bhavcopy, normalizes contract specifications, and verifies data integrity across 11,954 rows and 138 contracts with 18 automated tests. The entire output compiles to static JSON for instant offline delivery.",
+  15: "Slide 15 highlights the commercial scale. MCX gold futures turnover surged 3.4x to ₹28,340 crore daily, with gold accounting for 57% of total exchange bullion turnover. This massive liquidity pool makes even modest relative value strategies viable for proprietary trading desks and hedgers.",
+  16: "Slide 16 summarizes our key takeaways and engineering roadmap. The four core principles: normalize first, respect costs, attribute profits honestly, and automate tests. Our roadmap outlines immediate live paper trading, near-term tick-level slippage measurement, and later cross-commodity expansion to silver.",
+  17: "Thank you judges for your time and thoughtful evaluation. We invite you to explore the live terminal at gold-rv.vercel.app or review our audited codebase on GitHub. We are now open for your questions.",
 };
 
 // 4 Contracts Data
@@ -246,203 +264,189 @@ class GoldieMascot {
     this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
     this.renderer.toneMappingExposure = 1.25;
 
-    // RoomEnvironment (PMREMGenerator) for brilliant, realistic reflections
+    // RoomEnvironment (PMREMGenerator) for brilliant reflections
     try {
-      const pmremGenerator = new THREE.PMREMGenerator(this.renderer);
-      pmremGenerator.compileEquirectangularShader();
-      const roomEnv = new RoomEnvironment();
-      this.scene.environment = pmremGenerator.fromScene(roomEnv, 0.04).texture;
-      roomEnv.dispose();
-      pmremGenerator.dispose();
+      const pmrem = new THREE.PMREMGenerator(this.renderer);
+      this.scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
     } catch (e) {
-      console.warn("RoomEnvironment PMREM not supported; using standard lights.", e);
+      // fallback
     }
 
-    // Warm Key & Soft Fill Lighting
-    const keyLight = new THREE.DirectionalLight(0xFFF2C2, 2.6);
-    keyLight.position.set(2.5, 3.5, 4);
+    // High quality studio lights
+    const keyLight = new THREE.DirectionalLight(0xFFF0D0, 2.8);
+    keyLight.position.set(4, 5, 4);
     this.scene.add(keyLight);
 
-    const fillLight = new THREE.DirectionalLight(0xFFD67A, 1.6);
-    fillLight.position.set(-3, 1.5, 2.5);
-    this.scene.add(fillLight);
-
-    const rimLight = new THREE.DirectionalLight(0xF2A93B, 1.5);
-    rimLight.position.set(0, -3, -2);
+    const rimLight = new THREE.DirectionalLight(0xF2A93B, 2.2);
+    rimLight.position.set(-4, -2, -3);
     this.scene.add(rimLight);
 
-    const ambLight = new THREE.AmbientLight(0x5A4018, 0.9);
+    const ambLight = new THREE.AmbientLight(0xFFE8B8, 1.4);
     this.scene.add(ambLight);
 
-    this.buildCharacter();
-    this.scheduleBlink();
+    this.buildGoldie();
+    this.startBlinking();
     this.animate();
   }
 
-  buildCharacter() {
+  buildGoldie() {
     this.bodyGroup = new THREE.Group();
     this.scene.add(this.bodyGroup);
 
-    // Bright, shiny gold: color #F2A93B, metalness 0.6, roughness 0.3
+    // Ultra-polished metallic gold material (#F2A93B)
     const goldMat = new THREE.MeshStandardMaterial({
       color: 0xF2A93B,
-      metalness: 0.6,
-      roughness: 0.3,
+      metalness: 0.85,
+      roughness: 0.18,
     });
 
-    // 1. Bottom Bar (Shifted Right)
-    const bottomGeom = new RoundedBoxGeometry(1.4, 0.65, 0.6, 4, 0.1);
+    // Bottom Gold Bar (shifted right)
+    const bottomGeom = new RoundedBoxGeometry(2.1, 0.72, 1.05, 5, 0.14);
     const bottomBar = new THREE.Mesh(bottomGeom, goldMat);
-    bottomBar.position.set(0.3, -0.45, 0);
+    bottomBar.position.set(0.24, -0.42, 0);
     this.bodyGroup.add(bottomBar);
 
-    // 2. Top Bar
-    const topGeom = new RoundedBoxGeometry(1.4, 0.72, 0.6, 4, 0.12);
+    // Top Gold Bar
+    const topGeom = new RoundedBoxGeometry(2.1, 0.86, 1.05, 5, 0.16);
     const topBar = new THREE.Mesh(topGeom, goldMat);
-    topBar.position.set(0, 0.15, 0);
+    topBar.position.set(-0.2, 0.38, 0.05);
     this.bodyGroup.add(topBar);
 
-    // 3. Eyes (White Spheres)
-    const eyeMat = new THREE.MeshStandardMaterial({
-      color: 0xFFFFFF,
-      roughness: 0.1,
-      metalness: 0.05,
-    });
-    const eyeGeom = new THREE.SphereGeometry(0.16, 24, 24);
+    // Eyes
+    const eyeWhiteMat = new THREE.MeshBasicMaterial({ color: 0xFFFFFF });
+    const eyeGeom = new THREE.SphereGeometry(0.26, 24, 24);
 
-    this.eyeLGroup = new THREE.Group();
-    this.eyeLGroup.position.set(-0.28, 0.22, 0.31);
-    const eyeL = new THREE.Mesh(eyeGeom, eyeMat);
-    this.eyeLGroup.add(eyeL);
+    const eyeL = new THREE.Mesh(eyeGeom, eyeWhiteMat);
+    eyeL.position.set(-0.52, 0.44, 0.52);
+    eyeL.scale.set(1, 1.25, 0.7);
+    this.bodyGroup.add(eyeL);
 
-    this.eyeRGroup = new THREE.Group();
-    this.eyeRGroup.position.set(0.28, 0.22, 0.31);
-    const eyeR = new THREE.Mesh(eyeGeom, eyeMat);
-    this.eyeRGroup.add(eyeR);
+    const eyeR = new THREE.Mesh(eyeGeom, eyeWhiteMat);
+    eyeR.position.set(0.12, 0.44, 0.52);
+    eyeR.scale.set(1, 1.25, 0.7);
+    this.bodyGroup.add(eyeR);
 
-    // 4. Pupils (Glossy Black Spheres)
-    const pupilMat = new THREE.MeshBasicMaterial({ color: 0x05080C });
-    const pupilGeom = new THREE.SphereGeometry(0.075, 16, 16);
+    // Pupils
+    const pupilMat = new THREE.MeshBasicMaterial({ color: 0x070D14 });
+    const pupilGeom = new THREE.SphereGeometry(0.12, 16, 16);
 
     this.pupilL = new THREE.Mesh(pupilGeom, pupilMat);
-    this.pupilL.position.set(0, 0, 0.13);
-    this.eyeLGroup.add(this.pupilL);
+    this.pupilL.position.set(-0.52, 0.44, 0.65);
+    this.bodyGroup.add(this.pupilL);
 
     this.pupilR = new THREE.Mesh(pupilGeom, pupilMat);
-    this.pupilR.position.set(0, 0, 0.13);
-    this.eyeRGroup.add(this.pupilR);
+    this.pupilR.position.set(0.12, 0.44, 0.65);
+    this.bodyGroup.add(this.pupilR);
 
-    this.bodyGroup.add(this.eyeLGroup);
-    this.bodyGroup.add(this.eyeRGroup);
+    // Catchlights (sparkle)
+    const glintMat = new THREE.MeshBasicMaterial({ color: 0xFFFFFF });
+    const glintGeom = new THREE.SphereGeometry(0.04, 8, 8);
 
-    // 5. Mouth (Small Torus Smile)
-    const mouthGeom = new THREE.TorusGeometry(0.08, 0.025, 8, 16, Math.PI);
-    const mouthMat = new THREE.MeshBasicMaterial({ color: 0x4A2C00 });
-    this.mouth = new THREE.Mesh(mouthGeom, mouthMat);
-    this.mouth.rotation.x = Math.PI;
-    this.mouth.position.set(0, 0.02, 0.32);
-    this.bodyGroup.add(this.mouth);
+    const glintL = new THREE.Mesh(glintGeom, glintMat);
+    glintL.position.set(-0.56, 0.49, 0.72);
+    this.bodyGroup.add(glintL);
 
-    // 6. Cheeks (Cute subtle blush)
-    const cheekMat = new THREE.MeshBasicMaterial({ color: 0xFF8F85, transparent: true, opacity: 0.5 });
-    const cheekGeom = new THREE.CircleGeometry(0.055, 16);
+    const glintR = new THREE.Mesh(glintGeom, glintMat);
+    glintR.position.set(0.08, 0.49, 0.72);
+    this.bodyGroup.add(glintR);
+
+    // Cheeks
+    const cheekMat = new THREE.MeshBasicMaterial({ color: 0xFF8F85, transparent: true, opacity: 0.55 });
+    const cheekGeom = new THREE.SphereGeometry(0.12, 12, 12);
+
     const cheekL = new THREE.Mesh(cheekGeom, cheekMat);
-    cheekL.position.set(-0.48, 0.08, 0.31);
+    cheekL.position.set(-0.84, 0.22, 0.48);
+    cheekL.scale.set(1, 0.5, 0.5);
     this.bodyGroup.add(cheekL);
 
     const cheekR = new THREE.Mesh(cheekGeom, cheekMat);
-    cheekR.position.set(0.48, 0.08, 0.31);
+    cheekR.position.set(0.44, 0.22, 0.48);
+    cheekR.scale.set(1, 0.5, 0.5);
     this.bodyGroup.add(cheekR);
 
-    // 7. Waving Arm (for Slide 8)
-    const armGeom = new RoundedBoxGeometry(0.35, 0.16, 0.16, 3, 0.05);
+    // Animated Mouth (talking animation)
+    const mouthMat = new THREE.MeshBasicMaterial({ color: 0x3D2400 });
+    const mouthGeom = new THREE.CylinderGeometry(0.1, 0.1, 0.05, 16);
+    this.mouth = new THREE.Mesh(mouthGeom, mouthMat);
+    this.mouth.rotation.x = Math.PI / 2;
+    this.mouth.position.set(-0.2, 0.16, 0.56);
+    this.mouth.scale.set(1.4, 0.25, 0.6);
+    this.bodyGroup.add(this.mouth);
+
+    // Small Gold Waving Arm
+    const armGeom = new RoundedBoxGeometry(0.25, 0.65, 0.25, 3, 0.06);
     this.waveArm = new THREE.Mesh(armGeom, goldMat);
-    this.waveArm.position.set(0.85, 0.22, 0);
-    this.waveArm.rotation.z = 0.4;
-    this.waveArm.visible = false;
+    this.waveArm.position.set(0.95, 0.35, 0.1);
+    this.waveArm.rotation.z = -0.4;
     this.bodyGroup.add(this.waveArm);
   }
 
-  scheduleBlink() {
-    const delay = 3000 + Math.random() * 3000;
-    this.blinkTimer = setTimeout(() => {
-      this.blink();
-      this.scheduleBlink();
-    }, delay);
-  }
-
-  blink() {
-    if (!this.eyeLGroup || !this.eyeRGroup) return;
-    gsap.to([this.eyeLGroup.scale, this.eyeRGroup.scale], {
-      y: 0.08,
-      duration: 0.09,
-      yoyo: true,
-      repeat: 1,
-      ease: 'power2.inOut',
-    });
+  startBlinking() {
+    const doBlink = () => {
+      if (this.pupilL && this.pupilR) {
+        gsap.to([this.pupilL.scale, this.pupilR.scale], {
+          y: 0.08,
+          duration: 0.1,
+          yoyo: true,
+          repeat: 1,
+          ease: 'power2.inOut',
+          onComplete: () => {
+            const nextDelay = 2200 + Math.random() * 3400;
+            this.blinkTimer = setTimeout(doBlink, nextDelay);
+          }
+        });
+      }
+    };
+    this.blinkTimer = setTimeout(doBlink, 2500);
   }
 
   setSpeaking(speaking) {
     this.isSpeaking = speaking;
-    if (!speaking && this.mouth) {
-      gsap.to(this.mouth.scale, { x: 1, y: 1, duration: 0.2 });
-    }
   }
 
   setWaving(waving) {
-    if (!this.waveArm) return;
-    this.waveArm.visible = waving;
+    if (this.waveArm) {
+      if (waving) {
+        gsap.to(this.waveArm.rotation, {
+          z: 0.6,
+          duration: 0.35,
+          yoyo: true,
+          repeat: 6,
+          ease: 'sine.inOut',
+          onComplete: () => {
+            gsap.to(this.waveArm.rotation, { z: -0.4, duration: 0.4 });
+          }
+        });
+      }
+    }
   }
 
   update(time) {
-    if (!this.bodyGroup) return;
+    // 1. Hover & Gentle breathing float
+    if (this.bodyGroup) {
+      this.bodyGroup.position.y = Math.sin(time * 2.2) * 0.08;
+      this.bodyGroup.rotation.y = (state.pointer.ndcX * 0.35);
+      this.bodyGroup.rotation.x = -(state.pointer.ndcY * 0.2);
+    }
 
-    // Gentle floating idle bobbing
-    const bob = Math.sin(time * 2.2) * 0.06;
-    this.bodyGroup.position.y = bob;
+    // 2. Cursor-Following Pupils (look directly at cursor)
+    if (this.pupilL && this.pupilR) {
+      const offsetX = state.pointer.ndcX * 0.08;
+      const offsetY = state.pointer.ndcY * 0.06;
+      this.pupilL.position.x = -0.52 + offsetX;
+      this.pupilL.position.y = 0.44 + offsetY;
+      this.pupilR.position.x = 0.12 + offsetX;
+      this.pupilR.position.y = 0.44 + offsetY;
+    }
 
-    // Pupil Tracking in 3D: Convert screen coordinates to mascot angle
-    const wrap = document.getElementById('goldie-canvas-wrap');
-    if (wrap) {
-      const rect = wrap.getBoundingClientRect();
-      const centerX = rect.left + rect.width / 2;
-      const centerY = rect.top + rect.height / 2;
-      const dx = state.pointer.x - centerX;
-      const dy = state.pointer.y - centerY;
-      const dist = Math.hypot(dx, dy);
-
-      // Max eye travel inside white sphere
-      const maxTravel = 0.06;
-      const travel = Math.min(dist * 0.0003, maxTravel);
-      const angle = Math.atan2(dy, dx);
-
-      const targetX = Math.cos(angle) * travel;
-      const targetY = -Math.sin(angle) * travel;
-
-      if (this.pupilL && this.pupilR) {
-        this.pupilL.position.x += (targetX - this.pupilL.position.x) * 0.2;
-        this.pupilL.position.y += (targetY - this.pupilL.position.y) * 0.2;
-        this.pupilR.position.x += (targetX - this.pupilR.position.x) * 0.2;
-        this.pupilR.position.y += (targetY - this.pupilR.position.y) * 0.2;
+    // 3. Mouth talking animation while speaking
+    if (this.mouth) {
+      if (this.isSpeaking) {
+        const talkScale = 0.3 + Math.abs(Math.sin(time * 14)) * 0.85;
+        this.mouth.scale.y = talkScale;
+      } else {
+        this.mouth.scale.y = 0.25;
       }
-
-      // Tilt slightly toward cursor when close
-      const tiltX = (dy / window.innerHeight) * 0.25;
-      const tiltY = (dx / window.innerWidth) * 0.35;
-      this.bodyGroup.rotation.x += (tiltX - this.bodyGroup.rotation.x) * 0.1;
-      this.bodyGroup.rotation.y += (tiltY - this.bodyGroup.rotation.y) * 0.1;
-    }
-
-    // Mouth animation while speaking
-    if (this.isSpeaking && this.mouth) {
-      const mouthScale = 1.0 + Math.sin(time * 16) * 0.65;
-      this.mouth.scale.y = Math.max(0.4, mouthScale);
-      this.bodyGroup.position.y += Math.sin(time * 14) * 0.02; // joyful talking bounce
-    }
-
-    // Arm waving on Slide 8
-    if (this.waveArm && this.waveArm.visible) {
-      this.waveArm.rotation.z = 0.5 + Math.sin(time * 8) * 0.45;
     }
 
     this.renderer.render(this.scene, this.camera);
@@ -461,7 +465,7 @@ class GoldieMascot {
 let goldieMascot = null;
 
 // ============================================================
-// DEDICATED 3D RESULTS COLUMNS (#crash-columns-canvas)
+// DEDICATED 3D RESULTS COLUMNS (#crash-columns-canvas on Slide 11)
 // ============================================================
 
 class CrashColumnsRenderer {
@@ -540,7 +544,6 @@ class CrashColumnsRenderer {
     this.scene.add(zeroLine);
 
     // 1. Gold/Green Rising Column: +₹1,37,985 (8 Crash Trades)
-    // Target height: 2.0 units above floor (y = 0)
     const crashGeom = new RoundedBoxGeometry(0.95, 1.0, 0.95, 4, 0.06);
     const crashMat = new THREE.MeshStandardMaterial({
       color: 0x4FD1A1,
@@ -555,7 +558,6 @@ class CrashColumnsRenderer {
     this.scene.add(this.colCrash);
 
     // 2. Bright Red Dipping Column: -₹24,387 (12 Other Trades)
-    // Target height: 0.355 units below floor (17.75%, ~18% of gold/green column to scale)
     const otherGeom = new RoundedBoxGeometry(0.95, 1.0, 0.95, 4, 0.06);
     const otherMat = new THREE.MeshStandardMaterial({
       color: 0xFF8F85,
@@ -600,67 +602,63 @@ class CrashColumnsRenderer {
   triggerAnimation() {
     if (!this.colCrash || !this.colOther) return;
 
-    gsap.killTweensOf(this.colCrash.scale);
-    gsap.killTweensOf(this.colOther.scale);
+    const targetCrashH = 2.0;
+    const targetOtherH = 0.355; // 17.75% to scale
 
-    // Reset scales
     this.colCrash.scale.set(1.0, 0.001, 1.0);
     this.colCrash.position.y = 0.001;
 
     this.colOther.scale.set(1.0, 0.001, 1.0);
     this.colOther.position.y = -0.001;
 
-    // Animate Gold/Green column rising for +₹1,37,985
-    const targetCrashH = 2.0;
     gsap.to(this.colCrash.scale, {
       y: targetCrashH,
-      duration: 1.4,
-      ease: 'power2.out',
+      duration: 1.5,
+      ease: 'power3.out',
       onUpdate: () => {
         this.colCrash.position.y = this.colCrash.scale.y * 0.5;
       }
     });
 
-    // Animate Bright Red column dipping below floor for -₹24,387 (height ~18% to scale)
-    const targetOtherH = 0.355;
     gsap.to(this.colOther.scale, {
       y: targetOtherH,
-      duration: 1.4,
-      ease: 'power2.out',
+      duration: 1.3,
+      delay: 0.25,
+      ease: 'power3.out',
       onUpdate: () => {
         this.colOther.position.y = -(this.colOther.scale.y * 0.5);
       }
     });
   }
 
-  update(time) {
-    // Gentle camera orbit
-    if (this.camera) {
-      this.camera.position.x = Math.sin(time * 0.4) * 0.35;
-      this.camera.lookAt(0, 0.15, 0);
-    }
-    this.renderer.render(this.scene, this.camera);
-  }
-
   animateLoop() {
     const clock = new THREE.Clock();
-    const renderLoop = () => {
-      requestAnimationFrame(renderLoop);
-      this.update(clock.getElapsedTime());
+    const loop = () => {
+      requestAnimationFrame(loop);
+      const time = clock.getElapsedTime();
+
+      // Gentle camera orbit
+      if (this.camera) {
+        this.camera.position.x = Math.sin(time * 0.4) * 0.45;
+        this.camera.lookAt(0, 0.2, 0);
+      }
+      if (this.renderer && this.scene && this.camera) {
+        this.renderer.render(this.scene, this.camera);
+      }
     };
-    renderLoop();
+    loop();
   }
 }
 
 let crashColumnsRenderer = null;
 
 // ============================================================
-// MAIN WEBGL 3D WORLD (#bg-canvas)
+// MAIN 3D SCENE (STAGE 1 OPENING & STAGE 2 BARS)
 // ============================================================
 
 class Main3DWorld {
   constructor() {
-    this.canvas = document.getElementById('bg-canvas');
+    this.canvas = document.getElementById('webgl-canvas');
     if (!this.canvas) return;
 
     this.scene = null;
@@ -668,8 +666,12 @@ class Main3DWorld {
     this.renderer = null;
     this.composer = null;
     this.particleSystem = null;
+    this.particlePositions = [];
+    this.particleTargets = [];
+    this.particleSpeeds = [];
+    this.barsGroup = null;
     this.contractBars = {};
-    this.slide8Logo = null;
+    this.slide17Logo = null;
     this.raycaster = new THREE.Raycaster();
     this.hoveredBar = null;
 
@@ -680,114 +682,153 @@ class Main3DWorld {
     const width = window.innerWidth;
     const height = window.innerHeight;
 
+    // 1. Scene & Camera
     this.scene = new THREE.Scene();
-    this.scene.fog = new THREE.FogExp2(0x000000, 0.015);
+    this.scene.background = new THREE.Color(0x000000);
 
     this.camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 100);
     this.camera.position.set(0, 0.2, 12.5);
 
+    // 2. WebGL Renderer
     this.renderer = new THREE.WebGLRenderer({
       canvas: this.canvas,
       antialias: true,
-      alpha: true,
-      powerPreference: 'high-performance'
+      powerPreference: 'high-performance',
+      alpha: false,
     });
     this.renderer.setSize(width, height);
     this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    this.renderer.toneMappingExposure = 1.1;
+    this.renderer.toneMappingExposure = 1.25;
 
-    // Post-processing UnrealBloomPass
+    // 3. Post-Processing: UnrealBloomPass
     try {
-      this.composer = new EffectComposer(this.renderer);
       const renderPass = new RenderPass(this.scene, this.camera);
-      this.composer.addPass(renderPass);
-
       const bloomPass = new UnrealBloomPass(
         new THREE.Vector2(width, height),
-        0.5,   // bloom strength
-        0.35,  // radius
-        0.85   // threshold
+        0.45,  // subtle strength
+        0.5,   // radius
+        0.82   // threshold
       );
+      this.composer = new EffectComposer(this.renderer);
+      this.composer.addPass(renderPass);
       this.composer.addPass(bloomPass);
     } catch (e) {
-      console.warn("EffectComposer bloom disabled; direct render used.", e);
       this.composer = null;
     }
 
-    this.setupLighting();
+    // 4. Lights
+    const ambientLight = new THREE.AmbientLight(0x221B12, 1.2);
+    this.scene.add(ambientLight);
+
+    const dirLight = new THREE.DirectionalLight(0xFFE5A3, 2.2);
+    dirLight.position.set(5, 8, 7);
+    this.scene.add(dirLight);
+
+    const rimLight = new THREE.DirectionalLight(0x975600, 1.6);
+    rimLight.position.set(-6, -4, -5);
+    this.scene.add(rimLight);
+
+    this.pointLight = new THREE.PointLight(0xF2A93B, 2.0, 20);
+    this.pointLight.position.set(0, 2, 4);
+    this.scene.add(this.pointLight);
+
+    // 5. Environment Map
+    try {
+      const pmrem = new THREE.PMREMGenerator(this.renderer);
+      this.scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
+    } catch (e) {}
+
+    // 6. Build Elements
     this.setupParticles();
     this.setupContractBars();
-    this.setupSlide8Visuals();
+    this.setupSlide17Visuals();
 
+    // 7. Event Listeners
     window.addEventListener('resize', () => this.onResize());
     window.addEventListener('pointermove', (e) => this.onPointerMove(e));
 
     this.animate();
   }
 
-  setupLighting() {
-    const ambientLight = new THREE.AmbientLight(0x18232F, 1.2);
-    this.scene.add(ambientLight);
-
-    this.keyLight = new THREE.DirectionalLight(0xFFF4D0, 2.5);
-    this.keyLight.position.set(6, 8, 8);
-    this.scene.add(this.keyLight);
-
-    this.rimLight = new THREE.DirectionalLight(0xF2A93B, 2.0);
-    this.rimLight.position.set(-6, -4, -6);
-    this.scene.add(this.rimLight);
-
-    this.pointLight = new THREE.PointLight(0xF2A93B, 1.2, 30);
-    this.pointLight.position.set(0, 2, 6);
-    this.scene.add(this.pointLight);
-  }
-
   setupParticles() {
-    // 1200 gold particles: smaller (size 0.8px, sizeAttenuation: false) and dimmer (opacity 0.35)
-    const count = 1200;
-    const geometry = new THREE.BufferGeometry();
+    const count = 1800;
+    const geom = new THREE.BufferGeometry();
     const positions = new Float32Array(count * 3);
-    const targetPositions = new Float32Array(count * 3);
+    const targets = new Float32Array(count * 3);
+    const colors = new Float32Array(count * 3);
     const speeds = new Float32Array(count);
+
+    const goldPalette = [
+      new THREE.Color(0xF2A93B),
+      new THREE.Color(0xFFE082),
+      new THREE.Color(0xDCA335),
+      new THREE.Color(0xB56E0D),
+    ];
 
     for (let i = 0; i < count; i++) {
       const i3 = i * 3;
-      positions[i3] = (Math.random() - 0.5) * 28;
-      positions[i3 + 1] = (Math.random() - 0.5) * 18;
-      positions[i3 + 2] = (Math.random() - 0.5) * 20;
+      // Start in a wide cinematic space
+      positions[i3] = (Math.random() - 0.5) * 24;
+      positions[i3 + 1] = (Math.random() - 0.5) * 16;
+      positions[i3 + 2] = (Math.random() - 0.5) * 12;
 
-      if (i < count / 2) {
-        // Top bar
-        targetPositions[i3] = (Math.random() - 0.5) * 4.2;
-        targetPositions[i3 + 1] = 0.8 + (Math.random() - 0.5) * 1.3;
-        targetPositions[i3 + 2] = (Math.random() - 0.5) * 0.8;
+      // Targets: Form the Nexora Logo (2 Gold Bars, bottom one shifted right)
+      const isTopBar = i < count * 0.5;
+      let tx, ty, tz;
+      if (isTopBar) {
+        tx = -0.5 + (Math.random() - 0.5) * 3.6;
+        ty = 0.7 + (Math.random() - 0.5) * 0.95;
+        tz = (Math.random() - 0.5) * 0.4;
       } else {
-        // Bottom bar (nudged right)
-        targetPositions[i3] = 0.9 + (Math.random() - 0.5) * 4.2;
-        targetPositions[i3 + 1] = -0.8 + (Math.random() - 0.5) * 1.3;
-        targetPositions[i3 + 2] = (Math.random() - 0.5) * 0.8;
+        tx = 0.5 + (Math.random() - 0.5) * 3.6; // shifted right
+        ty = -0.7 + (Math.random() - 0.5) * 0.95;
+        tz = (Math.random() - 0.5) * 0.4;
       }
+      targets[i3] = tx;
+      targets[i3 + 1] = ty;
+      targets[i3 + 2] = tz;
 
-      speeds[i] = 0.5 + Math.random() * 0.8;
+      const col = goldPalette[Math.floor(Math.random() * goldPalette.length)];
+      colors[i3] = col.r;
+      colors[i3 + 1] = col.g;
+      colors[i3 + 2] = col.b;
+
+      speeds[i] = 0.3 + Math.random() * 0.7;
     }
 
-    geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-    this.particleTargets = targetPositions;
-    this.particleSpeeds = speeds;
+    geom.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+    geom.setAttribute('color', new THREE.BufferAttribute(colors, 3));
 
-    // Fixed 0.8px particle size, opacity 0.35
-    const pMaterial = new THREE.PointsMaterial({
-      color: 0xF2A93B,
-      size: 0.8,
-      sizeAttenuation: false,
+    // Particle texture
+    const pCanvas = document.createElement('canvas');
+    pCanvas.width = 32;
+    pCanvas.height = 32;
+    const pCtx = pCanvas.getContext('2d');
+    const grad = pCtx.createRadialGradient(16, 16, 0, 16, 16, 16);
+    grad.addColorStop(0, 'rgba(255,255,255,1)');
+    grad.addColorStop(0.35, 'rgba(242,169,59,0.85)');
+    grad.addColorStop(1, 'rgba(0,0,0,0)');
+    pCtx.fillStyle = grad;
+    pCtx.fillRect(0, 0, 32, 32);
+    const pTexture = new THREE.CanvasTexture(pCanvas);
+
+    const mat = new THREE.PointsMaterial({
+      size: 0.9,
+      vertexColors: true,
+      map: pTexture,
       transparent: true,
       opacity: 0.35,
       blending: THREE.AdditiveBlending,
+      depthWrite: false,
     });
 
-    this.particleSystem = new THREE.Points(geometry, pMaterial);
+    this.particleSystem = new THREE.Points(geom, mat);
     this.scene.add(this.particleSystem);
+
+    this.particlePositions = positions;
+    this.particleTargets = targets;
+    this.particleSpeeds = speeds;
   }
 
   setupContractBars() {
@@ -813,11 +854,11 @@ class Main3DWorld {
     });
   }
 
-  setupSlide8Visuals() {
-    this.slide8Logo = new THREE.Group();
-    this.scene.add(this.slide8Logo);
-    this.slide8Logo.visible = false;
-    this.slide8Logo.position.set(0, 0.6, -3);
+  setupSlide17Visuals() {
+    this.slide17Logo = new THREE.Group();
+    this.scene.add(this.slide17Logo);
+    this.slide17Logo.visible = false;
+    this.slide17Logo.position.set(0, 0.6, -3);
 
     const goldMat = new THREE.MeshStandardMaterial({
       color: 0xF2A93B,
@@ -828,11 +869,11 @@ class Main3DWorld {
     const barGeom = new RoundedBoxGeometry(3.2, 1.2, 0.9, 4, 0.14);
     const topBar = new THREE.Mesh(barGeom, goldMat);
     topBar.position.set(-0.35, 0.7, 0);
-    this.slide8Logo.add(topBar);
+    this.slide17Logo.add(topBar);
 
     const bottomBar = new THREE.Mesh(barGeom, goldMat);
     bottomBar.position.set(0.45, -0.7, 0); // shifted right!
-    this.slide8Logo.add(bottomBar);
+    this.slide17Logo.add(bottomBar);
   }
 
   onResize() {
@@ -921,12 +962,12 @@ class Main3DWorld {
 
     if (stage === 'opening') {
       this.barsGroup.visible = false;
-      this.slide8Logo.visible = false;
+      if (this.slide17Logo) this.slide17Logo.visible = false;
       document.body.classList.remove('stage-3d-active');
       gsap.to(this.camera.position, { x: 0, y: 0.2, z: 12.5, duration: 1.2 });
     } else if (stage === '3d-bars') {
       this.barsGroup.visible = true;
-      this.slide8Logo.visible = false;
+      if (this.slide17Logo) this.slide17Logo.visible = false;
       document.body.classList.add('stage-3d-active');
       gsap.to(this.camera.position, { x: 0, y: 0.6, z: 12.0, duration: 1.2, ease: 'power3.out' });
       voiceController.speak(spokenLines.stage2);
@@ -937,9 +978,9 @@ class Main3DWorld {
   }
 
   animateSlideVisuals(slideNum) {
-    if (this.slide8Logo) {
-      this.slide8Logo.visible = (slideNum === 8);
-      if (goldieMascot) goldieMascot.setWaving(slideNum === 8);
+    if (this.slide17Logo) {
+      this.slide17Logo.visible = (slideNum === 17);
+      if (goldieMascot) goldieMascot.setWaving(slideNum === 17);
     }
   }
 
@@ -984,9 +1025,9 @@ class Main3DWorld {
       });
     }
 
-    // 4. Slide 8 Logo slow spin
-    if (this.slide8Logo && this.slide8Logo.visible) {
-      this.slide8Logo.rotation.y = Math.sin(time * 0.6) * 0.25;
+    // 4. Slide 17 Logo slow spin
+    if (this.slide17Logo && this.slide17Logo.visible) {
+      this.slide17Logo.rotation.y = Math.sin(time * 0.6) * 0.25;
     }
 
     // 5. Point light drift
@@ -1016,7 +1057,7 @@ class Main3DWorld {
 let main3DWorld = null;
 
 // ============================================================
-// PRESENTATION SLIDES MANAGER (KEYNOTE STYLE)
+// PRESENTATION SLIDES MANAGER (KEYNOTE STYLE - 17 SLIDES)
 // ============================================================
 
 class PitchDeckManager {
@@ -1029,6 +1070,7 @@ class PitchDeckManager {
     this.notesPanel = document.getElementById('speaker-notes-panel');
     this.notesContent = document.getElementById('notes-content');
     this.goldieWrap = document.getElementById('goldie-canvas-wrap');
+    this.failsafeTimeout = null;
 
     this.bindEvents();
     this.updateNotes();
@@ -1062,6 +1104,23 @@ class PitchDeckManager {
     const btnBack3D = document.getElementById('btn-back-3d');
     if (btnBack3D) {
       btnBack3D.addEventListener('click', () => this.goTo3DScene());
+    }
+
+    const btnOpenGrid = document.getElementById('btn-open-grid');
+    if (btnOpenGrid) {
+      btnOpenGrid.addEventListener('click', () => this.toggleGridModal());
+    }
+
+    const btnCloseGrid = document.getElementById('btn-close-grid');
+    if (btnCloseGrid) {
+      btnCloseGrid.addEventListener('click', () => this.toggleGridModal(false));
+    }
+
+    const modal = document.getElementById('overview-grid-modal');
+    if (modal) {
+      modal.addEventListener('click', (e) => {
+        if (e.target === modal || e.target.id === 'grid-backdrop') this.toggleGridModal(false);
+      });
     }
 
     const btnToggleNotes = document.getElementById('btn-toggle-notes');
@@ -1137,7 +1196,22 @@ class PitchDeckManager {
 
       case 'Escape':
         e.preventDefault();
+        const gridModal = document.getElementById('overview-grid-modal');
+        if (gridModal && gridModal.classList.contains('open')) {
+          this.toggleGridModal(false);
+          return;
+        }
+        if (state.notesVisible) {
+          this.toggleNotes(false);
+          return;
+        }
         this.goTo3DScene();
+        break;
+
+      case 'g':
+      case 'G':
+        e.preventDefault();
+        this.toggleGridModal();
         break;
 
       case 'n':
@@ -1172,10 +1246,66 @@ class PitchDeckManager {
       case '6':
       case '7':
       case '8':
+      case '9':
         e.preventDefault();
         const slideNum = parseInt(e.key, 10);
         this.goToPitch(slideNum);
         break;
+    }
+  }
+
+  buildOverviewGrid() {
+    const gridEl = document.getElementById('overview-grid-cards');
+    if (!gridEl) return;
+    gridEl.innerHTML = '';
+
+    const slideMeta = [
+      { num: 1, tag: "Title & Team", title: "Cross-Contract Relative Value" },
+      { num: 2, tag: "The Problem", title: "Four Contracts, Four Prices" },
+      { num: 3, tag: "Step 1", title: "Price Every Contract The Same Way" },
+      { num: 4, tag: "Step 2", title: "Watch The Gap Over Three Years" },
+      { num: 5, tag: "Step 3", title: "The Z-Score: How Unusual Is Today?" },
+      { num: 6, tag: "Step 4", title: "The Cost & Margin Hurdle" },
+      { num: 7, tag: "Live Example", title: "The 5 Safeguard Checks" },
+      { num: 8, tag: "Step 5", title: "The Walk-Forward Test" },
+      { num: 9, tag: "Headline Results", title: "Out-Of-Sample Performance" },
+      { num: 10, tag: "Attribution", title: "Results Broken Down By Pair" },
+      { num: 11, tag: "Attribution", title: "Where Did The Profit Come From?" },
+      { num: 12, tag: "Sensitivity", title: "Execution Slippage Sensitivity" },
+      { num: 13, tag: "Market Reality", title: "The 'Normal' Gap Moves Over Time" },
+      { num: 14, tag: "Engineering", title: "Architecture & Data Quality" },
+      { num: 15, tag: "Commercial Scope", title: "Market Opportunity & Scale" },
+      { num: 16, tag: "Summary", title: "Key Takeaways & Future Scope" },
+      { num: 17, tag: "Conclusion", title: "Thank You & Live Terminal" }
+    ];
+
+    slideMeta.forEach((meta) => {
+      const card = document.createElement('div');
+      card.className = `grid-slide-card ${meta.num === state.currentSlide ? 'active-slide-card' : ''}`;
+      card.dataset.targetSlide = meta.num;
+      card.innerHTML = `
+        <div class="grid-card-top-row">
+          <span class="grid-card-num">Slide ${meta.num}</span>
+          <span class="grid-card-tag">${meta.tag}</span>
+        </div>
+        <div class="grid-card-title">${meta.title}</div>
+      `;
+      card.addEventListener('click', () => {
+        this.goToPitch(meta.num);
+        this.toggleGridModal(false);
+      });
+      gridEl.appendChild(card);
+    });
+  }
+
+  toggleGridModal(forceState) {
+    const modal = document.getElementById('overview-grid-modal');
+    if (!modal) return;
+    const isOpen = typeof forceState === 'boolean' ? forceState : !modal.classList.contains('open');
+    modal.classList.toggle('open', isOpen);
+
+    if (isOpen) {
+      this.buildOverviewGrid();
     }
   }
 
@@ -1216,10 +1346,16 @@ class PitchDeckManager {
       const idx = parseInt(panel.dataset.slide, 10);
       if (idx === slideNum) {
         panel.classList.add('active');
-        const animElements = panel.querySelectorAll('.keynote-h1, .keynote-lead, .roster-card, .price-tile, .direction-box, .stat-cell-cinematic, .market-box-cinematic, .check-hero-card, .thank-you-big, .links-row, .crash-columns-card');
+        const animElements = panel.querySelectorAll(
+          '.keynote-h1, .keynote-lead, .roster-card, .price-tile, .direction-box, ' +
+          '.stat-cell-cinematic, .market-box-cinematic, .check-hero-card, .thank-you-big, ' +
+          '.links-row, .crash-columns-card, .chart-card-cinematic, .how-to-read-card, ' +
+          '.formula-banner, .walk-forward-timeline, .safeguard-card, .takeaway-item, ' +
+          '.roadmap-phase-card, .data-quality-strip'
+        );
         gsap.fromTo(animElements, 
-          { opacity: 0, y: 24 },
-          { opacity: 1, y: 0, stagger: 0.08, duration: 0.6, ease: 'power2.out', clearProps: 'transform' }
+          { opacity: 0, y: 20 },
+          { opacity: 1, y: 0, stagger: 0.06, duration: 0.55, ease: 'power2.out', clearProps: 'transform' }
         );
       } else {
         panel.classList.remove('active');
@@ -1259,7 +1395,9 @@ class PitchDeckManager {
       '.keynote-h1, .keynote-lead, .roster-card, .price-tile, .direction-box, ' +
       '.stat-cell-cinematic, .market-box-cinematic, .check-hero-card, .thank-you-big, ' +
       '.links-row, .crash-columns-card, .gap-banner-cinematic, .results-table-wrap, ' +
-      '.verdict-banner-cinematic, .roadmap-col-cinematic, .flow-step-node, .check-row-cinematic'
+      '.verdict-banner-cinematic, .roadmap-col-cinematic, .flow-step-node, .check-row-cinematic, ' +
+      '.chart-card-cinematic, .how-to-read-card, .formula-banner, .walk-forward-timeline, ' +
+      '.safeguard-card, .takeaway-item, .roadmap-phase-card, .data-quality-strip'
     );
     animElements.forEach((el) => {
       gsap.killTweensOf(el);
@@ -1267,22 +1405,42 @@ class PitchDeckManager {
       el.style.transform = 'none';
     });
 
-    // 2. Specific slide enforcements
-    if (slideNum === 4) {
-      for (let i = 1; i <= 5; i++) {
-        const node = document.getElementById(`arch-node-${i}`);
-        if (node) node.classList.remove('active-gold');
-      }
-    }
+    // 2. Reset SVG path animations to fully drawn
+    const paths = panel.querySelectorAll('path');
+    paths.forEach(p => {
+      gsap.killTweensOf(p);
+      p.style.strokeDashoffset = '0';
+    });
 
-    if (slideNum === 5) {
+    // 3. Reset SVG bar animations
+    const barsW = panel.querySelectorAll('rect[data-target-width]');
+    barsW.forEach(b => {
+      gsap.killTweensOf(b);
+      b.setAttribute('width', b.dataset.targetWidth);
+    });
+    const barsH = panel.querySelectorAll('rect[data-target-height]');
+    barsH.forEach(b => {
+      gsap.killTweensOf(b);
+      b.setAttribute('y', b.dataset.targetY);
+      b.setAttribute('height', b.dataset.targetHeight);
+    });
+
+    // 4. Reset dots
+    const dots = panel.querySelectorAll('.chart-dot-anim');
+    dots.forEach(d => {
+      gsap.killTweensOf(d);
+      d.style.opacity = '1';
+    });
+
+    // 5. Specific slide enforcements
+    if (slideNum === 7) {
       for (let i = 1; i <= 5; i++) {
         const row = document.getElementById(`check-row-${i}`);
         if (row) row.classList.add('lit');
       }
     }
 
-    if (slideNum === 6) {
+    if (slideNum === 9) {
       const counters = panel.querySelectorAll('.counter-stat');
       counters.forEach((el) => {
         gsap.killTweensOf(el);
@@ -1297,9 +1455,18 @@ class PitchDeckManager {
           el.textContent = '-₹19,056';
         }
       });
+    }
 
+    if (slideNum === 11) {
       if (crashColumnsRenderer) {
         crashColumnsRenderer.forceFinal();
+      }
+    }
+
+    if (slideNum === 14) {
+      for (let i = 1; i <= 5; i++) {
+        const node = document.getElementById(`arch-node-${i}`);
+        if (node) node.classList.remove('active-gold');
       }
     }
   }
@@ -1317,26 +1484,55 @@ class PitchDeckManager {
   }
 
   runSlideSpecificAnimations(slideNum) {
-    // Slide 4: Data Flow Gold Pulse
-    if (slideNum === 4) {
-      const nodes = [
-        document.getElementById('arch-node-1'),
-        document.getElementById('arch-node-2'),
-        document.getElementById('arch-node-3'),
-        document.getElementById('arch-node-4'),
-        document.getElementById('arch-node-5')
-      ];
-      nodes.forEach((node, i) => {
-        if (!node) return;
-        setTimeout(() => {
-          node.classList.add('active-gold');
-          setTimeout(() => node.classList.remove('active-gold'), 800);
-        }, i * 350);
+    const panel = document.getElementById(`slide-${slideNum}`);
+    if (!panel) return;
+
+    // Slide 3: Normalization bars grow
+    if (slideNum === 3) {
+      const bars = panel.querySelectorAll('.chart-bar-anim');
+      bars.forEach((b, i) => {
+        const targetW = parseFloat(b.dataset.targetWidth || b.getAttribute('width'));
+        gsap.fromTo(b, { attr: { width: 0 } }, { attr: { width: targetW }, duration: 0.8, delay: i * 0.1, ease: 'power2.out' });
       });
     }
 
-    // Slide 5: The 5 Checks sequential illumination
+    // Slide 4: 3-Year Gap Line & Dots
+    if (slideNum === 4) {
+      const line = panel.querySelector('.chart-line-anim');
+      if (line) {
+        try {
+          const len = line.getTotalLength();
+          line.style.strokeDasharray = `${len} ${len}`;
+          gsap.fromTo(line, { strokeDashoffset: len }, { strokeDashoffset: 0, duration: 1.2, ease: 'power2.out' });
+        } catch (e) {}
+      }
+      const dots = panel.querySelectorAll('.chart-dot-anim');
+      gsap.fromTo(dots, { opacity: 0, scale: 0 }, { opacity: 1, scale: 1, duration: 0.45, stagger: 0.02, delay: 0.5, ease: 'back.out(2)' });
+    }
+
+    // Slide 5: Bell Curve
     if (slideNum === 5) {
+      const curve = panel.querySelector('.chart-curve-anim');
+      if (curve) {
+        try {
+          const len = curve.getTotalLength();
+          curve.style.strokeDasharray = `${len} ${len}`;
+          gsap.fromTo(curve, { strokeDashoffset: len }, { strokeDashoffset: 0, duration: 1.0, ease: 'power2.out' });
+        } catch (e) {}
+      }
+    }
+
+    // Slide 6: Cost Hurdle Bars
+    if (slideNum === 6) {
+      const bars = panel.querySelectorAll('.hurdle-bar-anim');
+      bars.forEach((b, i) => {
+        const targetW = parseFloat(b.dataset.targetWidth || b.getAttribute('width'));
+        gsap.fromTo(b, { attr: { width: 0 } }, { attr: { width: targetW }, duration: 0.8, delay: i * 0.08, ease: 'power2.out' });
+      });
+    }
+
+    // Slide 7: The 5 Checks sequential illumination
+    if (slideNum === 7) {
       const checkRows = [
         document.getElementById('check-row-1'),
         document.getElementById('check-row-2'),
@@ -1349,17 +1545,13 @@ class PitchDeckManager {
         row.classList.remove('lit');
         setTimeout(() => {
           row.classList.add('lit');
-        }, (i + 1) * 220);
+        }, (i + 1) * 200);
       });
     }
 
-    // Slide 6: Number counters animation & Dedicated 3D Columns animation
-    if (slideNum === 6) {
-      if (crashColumnsRenderer) {
-        crashColumnsRenderer.triggerAnimation();
-      }
-
-      const counters = document.querySelectorAll('.counter-stat');
+    // Slide 9: Number counters animation
+    if (slideNum === 9) {
+      const counters = panel.querySelectorAll('.counter-stat');
       counters.forEach((el) => {
         const target = parseFloat(el.dataset.target);
         const prefix = el.dataset.prefix || '';
@@ -1383,6 +1575,74 @@ class PitchDeckManager {
             el.textContent = formatted;
           }
         });
+      });
+    }
+
+    // Slide 10: Pair breakdown bars
+    if (slideNum === 10) {
+      const bars = panel.querySelectorAll('.pair-bar-anim');
+      bars.forEach((b, i) => {
+        const targetW = parseFloat(b.dataset.targetWidth || b.getAttribute('width'));
+        gsap.fromTo(b, { attr: { width: 0 } }, { attr: { width: targetW }, duration: 0.8, delay: i * 0.08, ease: 'power2.out' });
+      });
+    }
+
+    // Slide 11: 3D Crash Columns & Waterfall bars
+    if (slideNum === 11) {
+      if (crashColumnsRenderer) {
+        crashColumnsRenderer.triggerAnimation();
+      }
+      const bars = panel.querySelectorAll('.waterfall-bar-anim');
+      bars.forEach((b, i) => {
+        const targetY = parseFloat(b.dataset.targetY);
+        const targetH = parseFloat(b.dataset.targetHeight);
+        gsap.fromTo(b, 
+          { attr: { y: targetY + targetH, height: 0 } }, 
+          { attr: { y: targetY, height: targetH }, duration: 0.8, delay: i * 0.1, ease: 'power2.out' }
+        );
+      });
+    }
+
+    // Slide 12: Slippage Sensitivity bars
+    if (slideNum === 12) {
+      const bars = panel.querySelectorAll('.slip-bar-anim');
+      bars.forEach((b, i) => {
+        const targetY = parseFloat(b.dataset.targetY);
+        const targetH = parseFloat(b.dataset.targetHeight);
+        gsap.fromTo(b, 
+          { attr: { y: targetY + targetH, height: 0 } }, 
+          { attr: { y: targetY, height: targetH }, duration: 0.7, delay: i * 0.06, ease: 'power2.out' }
+        );
+      });
+    }
+
+    // Slide 13: Normal Gap Drift line
+    if (slideNum === 13) {
+      const line = panel.querySelector('.drift-line-anim');
+      if (line) {
+        try {
+          const len = line.getTotalLength();
+          line.style.strokeDasharray = `${len} ${len}`;
+          gsap.fromTo(line, { strokeDashoffset: len }, { strokeDashoffset: 0, duration: 1.2, ease: 'power2.out' });
+        } catch (e) {}
+      }
+    }
+
+    // Slide 14: Data Flow Gold Pulse
+    if (slideNum === 14) {
+      const nodes = [
+        document.getElementById('arch-node-1'),
+        document.getElementById('arch-node-2'),
+        document.getElementById('arch-node-3'),
+        document.getElementById('arch-node-4'),
+        document.getElementById('arch-node-5')
+      ];
+      nodes.forEach((node, i) => {
+        if (!node) return;
+        setTimeout(() => {
+          node.classList.add('active-gold');
+          setTimeout(() => node.classList.remove('active-gold'), 800);
+        }, i * 350);
       });
     }
   }
@@ -1457,7 +1717,6 @@ function initFallback2D() {
   if (fallbackLayer) {
     fallbackLayer.style.display = 'block';
   }
-  // Initialize PitchDeckManager so slides, keyboard, buttons, and voice work completely!
   if (!window.pitchDeck) {
     window.pitchDeck = new PitchDeckManager();
   }

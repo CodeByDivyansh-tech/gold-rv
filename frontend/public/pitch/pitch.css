@@ -1264,3 +1264,341 @@ body.mode-2d #goldie-svg-fallback {
   color: var(--gold);
 }
 
+/* ============================================================
+   EXPANDED 17-SLIDE CHART & COMPONENT STYLES
+   ============================================================ */
+
+.chart-card-cinematic {
+  background: var(--panel-bg);
+  border: 1px solid var(--line-subtle);
+  border-radius: 12px;
+  padding: 8px 16px;
+  backdrop-filter: blur(12px);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  width: 100%;
+}
+
+.chart-split-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  align-items: stretch;
+  width: 100%;
+}
+
+.chart-svg-wrap {
+  width: 100%;
+  height: auto;
+  max-height: clamp(140px, 20vh, 190px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.chart-svg-wrap svg {
+  width: 100%;
+  height: 100%;
+  max-height: inherit;
+  display: block;
+}
+
+/* Formula Banner */
+.formula-banner {
+  background: #05080C;
+  border: 1px solid var(--line-gold);
+  border-radius: 8px;
+  padding: 5px 12px;
+  font-size: 12.5px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: fit-content;
+}
+
+.formula-label {
+  font-size: 10.5px;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+/* How to Read This Chart Card */
+.how-to-read-card {
+  background: rgba(10, 15, 22, 0.9);
+  border: 1px solid rgba(242, 169, 59, 0.28);
+  border-radius: 8px;
+  padding: 6px 12px;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
+  max-width: 580px;
+}
+
+.how-to-read-title {
+  font-size: 10px;
+  font-weight: 800;
+  color: var(--gold);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin-bottom: 2px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.how-to-read-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-size: 11px;
+  color: var(--text-muted);
+  line-height: 1.35;
+}
+
+.how-to-read-list li {
+  position: relative;
+  padding-left: 12px;
+}
+
+.how-to-read-list li::before {
+  content: "•";
+  position: absolute;
+  left: 0;
+  color: var(--gold);
+  font-weight: bold;
+}
+
+/* Slide 8: Walk-forward timeline & Safeguards */
+.walk-forward-timeline {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #05080C;
+  border: 1px solid var(--line-gold);
+  border-radius: 10px;
+  padding: 8px 18px;
+  position: relative;
+  gap: 12px;
+}
+
+.timeline-phase {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.timeline-phase.train {
+  border-left: 3px solid #93A3B4;
+  padding-left: 10px;
+}
+
+.timeline-phase.test {
+  border-left: 3px solid var(--green);
+  padding-left: 10px;
+}
+
+.timeline-lock {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--gold-subtle);
+  border: 1px solid var(--gold);
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--gold);
+  white-space: nowrap;
+}
+
+.safeguard-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 8px;
+}
+
+.safeguard-card {
+  background: var(--panel-bg);
+  border: 1px solid var(--line-subtle);
+  border-radius: 8px;
+  padding: 6px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.safeguard-num {
+  font-size: 10.5px;
+  font-weight: 800;
+  color: var(--gold);
+}
+
+.safeguard-card strong {
+  font-size: 11.5px;
+  color: var(--text-primary);
+  line-height: 1.25;
+}
+
+.safeguard-card span {
+  font-size: 10.5px;
+  color: var(--text-muted);
+}
+
+/* Slide 14: Data Quality Strip */
+.data-quality-strip {
+  background: #05080C;
+  border: 1px solid var(--line-gold);
+  border-radius: 8px;
+  padding: 6px 14px;
+  font-size: 11.5px;
+  color: #8CE8C3;
+  font-family: var(--font-mono);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* Slide 16: Key Takeaways & Scope Split */
+.takeaways-roadmap-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  align-items: stretch;
+}
+
+.takeaways-card {
+  background: var(--panel-bg);
+  border: 1px solid var(--line-subtle);
+  border-radius: 10px;
+  padding: 10px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.takeaway-item {
+  display: flex;
+  gap: 8px;
+  font-size: 12px;
+  line-height: 1.35;
+  color: var(--text-primary);
+}
+
+.takeaway-num {
+  color: var(--gold);
+  font-weight: 800;
+  font-family: var(--font-mono);
+}
+
+/* ============================================================
+   OVERVIEW GRID MODAL (G KEY)
+   ============================================================ */
+.overview-grid-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 120;
+  display: none;
+  justify-content: center;
+  align-items: center;
+}
+
+.overview-grid-modal.open {
+  display: flex;
+}
+
+.grid-modal-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.88);
+  backdrop-filter: blur(16px);
+}
+
+.grid-modal-dialog {
+  position: relative;
+  z-index: 10;
+  width: 92%;
+  max-width: 1080px;
+  max-height: 85vh;
+  background: rgba(10, 15, 22, 0.96);
+  border: 1px solid var(--line-gold);
+  border-radius: 16px;
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.95), 0 0 32px var(--gold-glow);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.grid-modal-header {
+  padding: 12px 20px;
+  border-bottom: 1px solid var(--line-subtle);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.grid-cards-container {
+  padding: 16px 20px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 10px;
+  overflow-y: auto;
+  max-height: calc(85vh - 60px);
+}
+
+.grid-slide-card {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--line-subtle);
+  border-radius: 8px;
+  padding: 8px 12px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  text-align: left;
+}
+
+.grid-slide-card:hover {
+  background: rgba(242, 169, 59, 0.08);
+  border-color: var(--gold);
+  transform: translateY(-2px);
+}
+
+.grid-slide-card.active-slide-card {
+  background: var(--gold-subtle);
+  border-color: var(--gold);
+  box-shadow: 0 0 16px var(--gold-glow);
+}
+
+.grid-card-top-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.grid-card-num {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--gold);
+}
+
+.grid-card-tag {
+  font-size: 9px;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  letter-spacing: 0.04em;
+}
+
+.grid-card-title {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-primary);
+  line-height: 1.2;
+}
+
