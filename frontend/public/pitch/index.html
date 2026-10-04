@@ -17,6 +17,11 @@
 
   <!-- GSAP 3.12.5 (Local Offline Vendor) -->
   <script src="./vendor/gsap.min.js"></script>
+  <script>
+    if (window.gsap && window.gsap.ticker) {
+      window.gsap.ticker.lagSmoothing(0);
+    }
+  </script>
 
   <!-- Three.js r160 ES Module Import Map (Local Offline Vendor) -->
   <script type="importmap">
@@ -441,25 +446,30 @@
         <div class="crash-columns-card">
           <div class="crash-card-header">
             <div>
-              <strong style="color: var(--gold); font-size: 17px;">"One Crash Carries The Profit"</strong>
-              <div style="font-size: 13px; color: var(--text-muted); margin-top: 2px;">
+              <strong style="color: var(--gold); font-size: 15px;">"One Crash Carries The Profit"</strong>
+              <span style="font-size: 12px; color: var(--text-muted); margin-left: 10px;">
                 Costs: 24.4 bps per round trip, 82% of it slippage (assumed); training breaks even at ~3.8 bps.
+              </span>
+            </div>
+          </div>
+
+          <div class="crash-columns-layout">
+            <div class="crash-label-top">
+              <div class="crash-legend-item left">
+                <span class="mono" style="color: var(--green); font-size: 14px; font-weight: 800;">+₹1,37,985</span>
+                <span style="font-size: 11.5px; color: var(--text-muted);">8 trades closed in the Jan–Mar 2026 crash</span>
               </div>
             </div>
-          </div>
 
-          <div class="crash-canvas-wrapper">
-            <canvas id="crash-columns-canvas" width="520" height="240"></canvas>
-          </div>
-
-          <div class="crash-legend-row">
-            <div class="crash-legend-item left">
-              <span class="mono" style="color: var(--green); font-size: 16px; font-weight: 800;">+₹1,37,985</span>
-              <span style="font-size: 12px; color: var(--text-muted);">8 trades closed in the Jan–Mar 2026 crash</span>
+            <div class="crash-canvas-wrapper">
+              <canvas id="crash-columns-canvas" width="480" height="190"></canvas>
             </div>
-            <div class="crash-legend-item right">
-              <span class="mono" style="color: var(--red); font-size: 16px; font-weight: 800;">-₹24,387</span>
-              <span style="font-size: 12px; color: var(--text-muted);">12 other trades</span>
+
+            <div class="crash-label-bottom">
+              <div class="crash-legend-item right">
+                <span class="mono" style="color: var(--red); font-size: 14px; font-weight: 800;">-₹24,387</span>
+                <span style="font-size: 11.5px; color: var(--text-muted);">12 other trades</span>
+              </div>
             </div>
           </div>
         </div>

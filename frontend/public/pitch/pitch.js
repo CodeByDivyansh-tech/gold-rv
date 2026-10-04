@@ -14,6 +14,11 @@ import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
 import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
 import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
 
+// Slow-laptop safety: disable lag smoothing so count-ups and animations never freeze halfway
+if (typeof gsap !== 'undefined' && gsap.ticker) {
+  gsap.ticker.lagSmoothing(0);
+}
+
 // ============================================================
 // GLOBAL STATE & DATA
 // ============================================================
@@ -475,12 +480,12 @@ class CrashColumnsRenderer {
   }
 
   init() {
-    const width = this.canvas.clientWidth || 520;
-    const height = this.canvas.clientHeight || 240;
+    const width = this.canvas.clientWidth || 480;
+    const height = this.canvas.clientHeight || 190;
 
     this.scene = new THREE.Scene();
-    this.camera = new THREE.PerspectiveCamera(38, width / height, 0.1, 50);
-    this.camera.position.set(0, 1.2, 5.6);
+    this.camera = new THREE.PerspectiveCamera(36, width / height, 0.1, 50);
+    this.camera.position.set(0, 0.45, 4.6);
 
     this.renderer = new THREE.WebGLRenderer({
       canvas: this.canvas,
@@ -492,62 +497,75 @@ class CrashColumnsRenderer {
     this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
     // Lighting
-    const keyLight = new THREE.DirectionalLight(0xFFF2C2, 2.4);
+    const keyLight = new THREE.DirectionalLight(0xFFF2C2, 2.0);
     keyLight.position.set(3, 4, 3);
     this.scene.add(keyLight);
 
-    const fillLight = new THREE.DirectionalLight(0x93A3B4, 1.2);
+    const fillLight = new THREE.DirectionalLight(0x93A3B4, 1.0);
     fillLight.position.set(-3, 2, 2);
     this.scene.add(fillLight);
 
-    const ambLight = new THREE.AmbientLight(0x18232F, 1.0);
+    const ambLight = new THREE.AmbientLight(0x18232F, 1.2);
     this.scene.add(ambLight);
 
-    // Floor Plane at y = 0
-    const floorGeom = new THREE.BoxGeometry(6.4, 0.04, 3.2);
+    // Dedicated underglow for red column (-₹24,387) below floor
+    const redUnderLight = new THREE.PointLight(0xFF8F85, 3.2, 4.0);
+    redUnderLight.position.set(1.3, -0.6, 0.6);
+    this.scene.add(redUnderLight);
+
+    // Dedicated uplight for green column (+₹1,37,985)
+    const greenUpLight = new THREE.PointLight(0x4FD1A1, 2.2, 5.0);
+    greenUpLight.position.set(-1.3, 1.4, 0.8);
+    this.scene.add(greenUpLight);
+
+    // Semi-transparent floor plane at y = 0
+    const floorGeom = new THREE.BoxGeometry(5.6, 0.02, 1.8);
     const floorMat = new THREE.MeshStandardMaterial({
-      color: 0x0A1017,
-      metalness: 0.5,
-      roughness: 0.5,
+      color: 0x0F1822,
+      metalness: 0.8,
+      roughness: 0.2,
+      transparent: true,
+      opacity: 0.35,
+      depthWrite: false,
     });
     const floor = new THREE.Mesh(floorGeom, floorMat);
     floor.position.set(0, 0, 0);
     this.scene.add(floor);
 
-    // Glowing equator zero-line
-    const lineGeom = new THREE.BoxGeometry(6.4, 0.02, 0.05);
+    // Glowing equator zero-line at y = 0
+    const lineGeom = new THREE.BoxGeometry(5.6, 0.02, 0.04);
     const lineMat = new THREE.MeshBasicMaterial({ color: 0xF2A93B });
     const zeroLine = new THREE.Mesh(lineGeom, lineMat);
-    zeroLine.position.set(0, 0.02, 0);
+    zeroLine.position.set(0, 0.01, 0);
     this.scene.add(zeroLine);
 
     // 1. Gold/Green Rising Column: +₹1,37,985 (8 Crash Trades)
-    // Target height: 2.2 units above floor (y = 0)
-    const crashGeom = new RoundedBoxGeometry(1.0, 1.0, 1.0, 4, 0.06);
+    // Target height: 2.0 units above floor (y = 0)
+    const crashGeom = new RoundedBoxGeometry(0.95, 1.0, 0.95, 4, 0.06);
     const crashMat = new THREE.MeshStandardMaterial({
       color: 0x4FD1A1,
-      metalness: 0.75,
-      roughness: 0.25,
-      emissive: 0x1A4732,
-      emissiveIntensity: 0.35,
+      metalness: 0.4,
+      roughness: 0.2,
+      emissive: 0x228B5E,
+      emissiveIntensity: 0.6,
     });
     this.colCrash = new THREE.Mesh(crashGeom, crashMat);
-    this.colCrash.position.set(-1.4, 0.001, 0);
+    this.colCrash.position.set(-1.3, 0.001, 0);
     this.colCrash.scale.set(1.0, 0.001, 1.0);
     this.scene.add(this.colCrash);
 
-    // 2. Red Dipping Column: -₹24,387 (12 Other Trades)
-    // Height to scale: (24387 / 137985) * 2.2 = ~0.39 units below floor
-    const otherGeom = new RoundedBoxGeometry(1.0, 1.0, 1.0, 4, 0.06);
+    // 2. Bright Red Dipping Column: -₹24,387 (12 Other Trades)
+    // Target height: 0.355 units below floor (17.75%, ~18% of gold/green column to scale)
+    const otherGeom = new RoundedBoxGeometry(0.95, 1.0, 0.95, 4, 0.06);
     const otherMat = new THREE.MeshStandardMaterial({
       color: 0xFF8F85,
-      metalness: 0.75,
-      roughness: 0.25,
-      emissive: 0x5C1F1F,
-      emissiveIntensity: 0.35,
+      metalness: 0.3,
+      roughness: 0.2,
+      emissive: 0xFF4D3D,
+      emissiveIntensity: 0.85,
     });
     this.colOther = new THREE.Mesh(otherGeom, otherMat);
-    this.colOther.position.set(1.4, -0.001, 0);
+    this.colOther.position.set(1.3, -0.001, 0);
     this.colOther.scale.set(1.0, 0.001, 1.0);
     this.scene.add(this.colOther);
 
@@ -557,15 +575,33 @@ class CrashColumnsRenderer {
 
   onResize() {
     if (!this.canvas) return;
-    const width = this.canvas.clientWidth || 520;
-    const height = this.canvas.clientHeight || 240;
+    const width = this.canvas.clientWidth || 480;
+    const height = this.canvas.clientHeight || 190;
     this.camera.aspect = width / height;
     this.camera.updateProjectionMatrix();
     this.renderer.setSize(width, height);
   }
 
+  forceFinal() {
+    if (!this.colCrash || !this.colOther) return;
+    gsap.killTweensOf(this.colCrash.scale);
+    gsap.killTweensOf(this.colOther.scale);
+
+    const targetCrashH = 2.0;
+    const targetOtherH = 0.355;
+
+    this.colCrash.scale.set(1.0, targetCrashH, 1.0);
+    this.colCrash.position.y = targetCrashH * 0.5;
+
+    this.colOther.scale.set(1.0, targetOtherH, 1.0);
+    this.colOther.position.y = -(targetOtherH * 0.5);
+  }
+
   triggerAnimation() {
     if (!this.colCrash || !this.colOther) return;
+
+    gsap.killTweensOf(this.colCrash.scale);
+    gsap.killTweensOf(this.colOther.scale);
 
     // Reset scales
     this.colCrash.scale.set(1.0, 0.001, 1.0);
@@ -575,7 +611,7 @@ class CrashColumnsRenderer {
     this.colOther.position.y = -0.001;
 
     // Animate Gold/Green column rising for +₹1,37,985
-    const targetCrashH = 2.2;
+    const targetCrashH = 2.0;
     gsap.to(this.colCrash.scale, {
       y: targetCrashH,
       duration: 1.4,
@@ -585,8 +621,8 @@ class CrashColumnsRenderer {
       }
     });
 
-    // Animate Red column dipping below floor for -₹24,387 (height to scale)
-    const targetOtherH = 0.39;
+    // Animate Bright Red column dipping below floor for -₹24,387 (height ~18% to scale)
+    const targetOtherH = 0.355;
     gsap.to(this.colOther.scale, {
       y: targetOtherH,
       duration: 1.4,
@@ -600,8 +636,8 @@ class CrashColumnsRenderer {
   update(time) {
     // Gentle camera orbit
     if (this.camera) {
-      this.camera.position.x = Math.sin(time * 0.45) * 0.45;
-      this.camera.lookAt(0, 0.45, 0);
+      this.camera.position.x = Math.sin(time * 0.4) * 0.35;
+      this.camera.lookAt(0, 0.15, 0);
     }
     this.renderer.render(this.scene, this.camera);
   }
@@ -1203,6 +1239,69 @@ class PitchDeckManager {
 
     // 6. Speak slide line
     voiceController.speak(spokenLines[slideNum]);
+
+    // 7. Slow-laptop safety: after 2.5 seconds force every animated element on that slide to its final state
+    if (this.failsafeTimeout) {
+      clearTimeout(this.failsafeTimeout);
+      this.failsafeTimeout = null;
+    }
+    this.failsafeTimeout = setTimeout(() => {
+      this.forceSlideFinalState(slideNum);
+    }, 2500);
+  }
+
+  forceSlideFinalState(slideNum) {
+    const panel = document.getElementById(`slide-${slideNum}`);
+    if (!panel) return;
+
+    // 1. Force all animated elements on this slide to final opacity 1 and transform none
+    const animElements = panel.querySelectorAll(
+      '.keynote-h1, .keynote-lead, .roster-card, .price-tile, .direction-box, ' +
+      '.stat-cell-cinematic, .market-box-cinematic, .check-hero-card, .thank-you-big, ' +
+      '.links-row, .crash-columns-card, .gap-banner-cinematic, .results-table-wrap, ' +
+      '.verdict-banner-cinematic, .roadmap-col-cinematic, .flow-step-node, .check-row-cinematic'
+    );
+    animElements.forEach((el) => {
+      gsap.killTweensOf(el);
+      el.style.opacity = '1';
+      el.style.transform = 'none';
+    });
+
+    // 2. Specific slide enforcements
+    if (slideNum === 4) {
+      for (let i = 1; i <= 5; i++) {
+        const node = document.getElementById(`arch-node-${i}`);
+        if (node) node.classList.remove('active-gold');
+      }
+    }
+
+    if (slideNum === 5) {
+      for (let i = 1; i <= 5; i++) {
+        const row = document.getElementById(`check-row-${i}`);
+        if (row) row.classList.add('lit');
+      }
+    }
+
+    if (slideNum === 6) {
+      const counters = panel.querySelectorAll('.counter-stat');
+      counters.forEach((el) => {
+        gsap.killTweensOf(el);
+        const target = el.dataset.target;
+        if (target === '20') {
+          el.textContent = '20';
+        } else if (target === '113598') {
+          el.textContent = '+₹1,13,598';
+        } else if (target === '1.89') {
+          el.textContent = '1.89';
+        } else if (target === '19056') {
+          el.textContent = '-₹19,056';
+        }
+      });
+
+      if (crashColumnsRenderer) {
+        crashColumnsRenderer.forceFinal();
+      }
+    }
   }
 
   nextSlide() {
