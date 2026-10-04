@@ -1,0 +1,905 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Gold RV Intelligence — Judge Pitch Presentation</title>
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <link rel="alternate icon" href="/favicon.ico" />
+
+  <!-- Fonts: Geist and Geist Mono with system fallbacks -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700;800&family=Geist+Mono:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+  <!-- Pitch CSS -->
+  <link rel="stylesheet" href="pitch.css" />
+
+  <!-- Three.js (r128) with fallback handling -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+</head>
+<body>
+  <div id="app-container">
+
+    <!-- ============================================================
+         STAGE 1: MASCOT INTRO (GOLDIE)
+         ============================================================ -->
+    <section id="stage-intro" class="stage active" aria-label="Mascot Introduction">
+      <header class="intro-topbar">
+        <div class="brand-badge">
+          <img src="/favicon.svg" alt="Gold RV Logo" class="brand-logo-img" width="28" height="28" style="border-radius: 6px;" />
+          <span class="brand-text">Gold RV</span>
+        </div>
+        <button id="btn-skip-intro" class="btn-ghost" title="Skip directly to 3D Interface">Skip intro ➔</button>
+      </header>
+
+      <div class="intro-card">
+        <div class="speech-bubble" id="intro-speech-bubble" title="Click or press Space to continue">
+          <div class="speech-text mono" id="intro-speech-text"></div>
+          <div class="speech-hint" id="intro-speech-hint">Click bubble or press Space to continue ↵</div>
+        </div>
+
+        <div class="intro-goldie-wrap">
+          <div class="mascot-container goldie-bobbing" id="intro-mascot">
+            <svg class="goldie-svg" viewBox="0 0 140 100" width="160" height="114" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <defs>
+                <linearGradient id="introBarTop" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stop-color="#FFE79A"/>
+                  <stop offset="35%" stop-color="#F2A93B"/>
+                  <stop offset="100%" stop-color="#B56E0D"/>
+                </linearGradient>
+                <linearGradient id="introBarBottom" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stop-color="#FFDF7E"/>
+                  <stop offset="45%" stop-color="#E59929"/>
+                  <stop offset="100%" stop-color="#9C5C07"/>
+                </linearGradient>
+              </defs>
+              <ellipse cx="75" cy="94" rx="50" ry="6" fill="#000000" opacity="0.4"/>
+              
+              <!-- Bottom bar shifted right -->
+              <rect x="36" y="48" width="84" height="40" rx="10" fill="url(#introBarBottom)" stroke="#975600" stroke-width="2.2"/>
+              <path d="M42 53 H112" stroke="#FFF0BD" stroke-width="2" stroke-linecap="round" opacity="0.8"/>
+              
+              <!-- Top bar -->
+              <rect x="16" y="14" width="84" height="46" rx="11" fill="url(#introBarTop)" stroke="#975600" stroke-width="2.2"/>
+              <path d="M22 19 H92" stroke="#FFF7D6" stroke-width="2.2" stroke-linecap="round" opacity="0.9"/>
+              
+              <circle cx="28" cy="44" r="5" fill="#FF8F85" opacity="0.45"/>
+              <circle cx="88" cy="44" r="5" fill="#FF8F85" opacity="0.45"/>
+              
+              <path d="M52 45 Q58 51 64 45" stroke="#5A3300" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+
+              <!-- Left eye -->
+              <g class="eye-group left-eye">
+                <ellipse class="eye-ball" cx="42" cy="32" rx="11" ry="13" fill="#FFFFFF" stroke="#5A3300" stroke-width="1.8"/>
+                <g class="pupil pupil-left">
+                  <circle cx="42" cy="32" r="5.5" fill="#070D14"/>
+                  <circle cx="40" cy="30" r="2" fill="#FFFFFF"/>
+                  <circle cx="44" cy="34" r="0.9" fill="#FFFFFF"/>
+                </g>
+              </g>
+
+              <!-- Right eye -->
+              <g class="eye-group right-eye">
+                <ellipse class="eye-ball" cx="74" cy="32" rx="11" ry="13" fill="#FFFFFF" stroke="#5A3300" stroke-width="1.8"/>
+                <g class="pupil pupil-right">
+                  <circle cx="74" cy="32" r="5.5" fill="#070D14"/>
+                  <circle cx="72" cy="30" r="2" fill="#FFFFFF"/>
+                  <circle cx="76" cy="34" r="0.9" fill="#FFFFFF"/>
+                </g>
+              </g>
+            </svg>
+          </div>
+        </div>
+
+        <div class="intro-actions">
+          <button id="btn-intro-next" class="btn-secondary">Next line ↵</button>
+          <button id="btn-enter-3d" class="btn-primary" style="display: none;">Enter the 3D view ➔</button>
+        </div>
+
+        <div class="intro-dots" id="intro-dots">
+          <span class="intro-dot active"></span>
+          <span class="intro-dot"></span>
+          <span class="intro-dot"></span>
+          <span class="intro-dot"></span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================================
+         STAGE 2: 3D INTERFACE (THREE.JS WITH 2D FALLBACK)
+         ============================================================ -->
+    <section id="stage-3d" class="stage" aria-label="3D Gold Bars Contract View">
+      <div id="three-canvas-container">
+        <canvas id="three-canvas"></canvas>
+      </div>
+
+      <!-- Header in 3D scene -->
+      <div class="stage-3d-header">
+        <div class="stage-3d-title-group">
+          <div class="stage-3d-title">
+            <img src="/favicon.svg" alt="Gold RV Logo" class="brand-logo-img" width="28" height="28" style="border-radius: 6px;" />
+            <span>Gold RV Intelligence — 3D Contract Geometry</span>
+          </div>
+          <div class="stage-3d-subtitle">Hover bars to inspect raw quotes vs pure gold equivalent (30-Sep-2026 Bhavcopy)</div>
+        </div>
+        <div class="badge badge-gold">Interactive 3D View</div>
+      </div>
+
+      <!-- Floating 3D Hover Card -->
+      <div id="hover-card-3d">
+        <div class="card-title" id="hover-card-title">GOLDM (100 g)</div>
+        <div class="card-row">
+          <span>Raw Bhavcopy:</span>
+          <span class="card-val mono" id="hover-card-raw">₹1,47,908 / 10 g (995 pure)</span>
+        </div>
+        <div class="card-row">
+          <span>Per 10g Pure Gold:</span>
+          <span class="card-val pure mono" id="hover-card-pure">₹1,48,651</span>
+        </div>
+      </div>
+
+      <!-- Controls in 3D Scene -->
+      <div class="stage-3d-controls">
+        <div class="normalize-banner" id="normalize-banner">
+          Raw prices look ₹1.3 lakh apart. Priced the same way, the real gap is ₹687 per 10 g (0.46%).
+        </div>
+        <div class="stage-3d-btn-row">
+          <button id="btn-normalize-bars" class="btn-secondary">Normalize Sizes ⚖️</button>
+          <button id="btn-open-pitch" class="btn-primary">Open the pitch ➔</button>
+        </div>
+      </div>
+
+      <!-- Companion Goldie in Corner -->
+      <div class="goldie-corner" id="stage2-goldie">
+        <div class="mascot-container goldie-bobbing" id="mascot-stage2">
+          <svg class="goldie-svg" viewBox="0 0 140 100" width="100" height="71" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect x="36" y="48" width="84" height="40" rx="10" fill="#E59929" stroke="#975600" stroke-width="2.2"/>
+            <rect x="16" y="14" width="84" height="46" rx="11" fill="#F2A93B" stroke="#975600" stroke-width="2.2"/>
+            <path d="M52 45 Q58 51 64 45" stroke="#5A3300" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+            <g class="eye-group left-eye">
+              <ellipse class="eye-ball" cx="42" cy="32" rx="11" ry="13" fill="#FFFFFF" stroke="#5A3300" stroke-width="1.8"/>
+              <g class="pupil pupil-left">
+                <circle cx="42" cy="32" r="5.5" fill="#070D14"/>
+                <circle cx="40" cy="30" r="2" fill="#FFFFFF"/>
+              </g>
+            </g>
+            <g class="eye-group right-eye">
+              <ellipse class="eye-ball" cx="74" cy="32" rx="11" ry="13" fill="#FFFFFF" stroke="#5A3300" stroke-width="1.8"/>
+              <g class="pupil pupil-right">
+                <circle cx="74" cy="32" r="5.5" fill="#070D14"/>
+                <circle cx="72" cy="30" r="2" fill="#FFFFFF"/>
+              </g>
+            </g>
+          </svg>
+        </div>
+        <div class="goldie-speech-mini" id="stage2-goldie-text">Same gold. The gap is small. Does it survive costs?</div>
+      </div>
+
+      <!-- 2D Fallback View in case WebGL / CDN fails -->
+      <div id="fallback-2d-view">
+        <h2 style="font-size: 24px; font-weight: 800; color: var(--gold); margin-bottom: 8px;">2D Contract Comparison</h2>
+        <p style="color: var(--muted); font-size: 15px;">MCX Gold Derivative Contracts (Sized by lot size)</p>
+        <div class="fallback-bars-grid" id="fallback-grid">
+          <div class="fallback-bar-col" data-lot="100">
+            <div class="fallback-bar-graphic"></div>
+            <div style="font-weight: 700; color: var(--gold);">GOLDM (100 g)</div>
+            <div style="font-size: 13px; color: var(--muted);">Raw: ₹1,47,908 / 10g (995)</div>
+            <div style="font-size: 14px; font-weight: 700; color: var(--green);">Pure: ₹1,48,651</div>
+          </div>
+          <div class="fallback-bar-col" data-lot="10">
+            <div class="fallback-bar-graphic"></div>
+            <div style="font-weight: 700; color: var(--gold);">GOLDTEN (10 g)</div>
+            <div style="font-size: 13px; color: var(--muted);">Raw: ₹1,48,322 / 10g (999)</div>
+            <div style="font-size: 14px; font-weight: 700; color: var(--green);">Pure: ₹1,48,470</div>
+          </div>
+          <div class="fallback-bar-col" data-lot="8">
+            <div class="fallback-bar-graphic"></div>
+            <div style="font-weight: 700; color: var(--gold);">GOLDGUINEA (8 g)</div>
+            <div style="font-size: 13px; color: var(--muted);">Raw: ₹1,19,207 / 8g (999)</div>
+            <div style="font-size: 14px; font-weight: 700; color: var(--green);">Pure: ₹1,49,158</div>
+          </div>
+          <div class="fallback-bar-col" data-lot="1">
+            <div class="fallback-bar-graphic"></div>
+            <div style="font-weight: 700; color: var(--gold);">GOLDPETAL (1 g)</div>
+            <div style="font-size: 13px; color: var(--muted);">Raw: ₹14,893 / 1g (999)</div>
+            <div style="font-size: 14px; font-weight: 700; color: var(--green);">Pure: ₹1,49,079</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================================
+         STAGE 3: THE PITCH (8 SLIDES)
+         ============================================================ -->
+    <section id="stage-pitch" class="stage" aria-label="Pitch Deck Presentation">
+      <div class="pitch-progress-bar" id="pitch-progress"></div>
+
+      <!-- Pitch Header -->
+      <header class="pitch-header">
+        <div class="pitch-brand">
+          <img src="/favicon.svg" alt="Gold RV Logo" class="brand-logo-img" width="28" height="28" style="border-radius: 6px;" />
+          <span class="brand-text">Gold RV</span>
+          <span class="badge badge-gold" style="font-size: 11px;">Hack in Hills '26</span>
+        </div>
+
+        <div class="pitch-nav-center">
+          <div class="slide-counter mono" id="slide-counter">1 / 8</div>
+          <div class="slide-dots" id="slide-dots">
+            <span class="slide-dot active" data-slide="1"></span>
+            <span class="slide-dot" data-slide="2"></span>
+            <span class="slide-dot" data-slide="3"></span>
+            <span class="slide-dot" data-slide="4"></span>
+            <span class="slide-dot" data-slide="5"></span>
+            <span class="slide-dot" data-slide="6"></span>
+            <span class="slide-dot" data-slide="7"></span>
+            <span class="slide-dot" data-slide="8"></span>
+          </div>
+        </div>
+
+        <div class="pitch-actions-right">
+          <button id="btn-back-3d" class="nav-tool-btn" title="Back to 3D View (Esc)">3D View (Esc)</button>
+          <button id="btn-toggle-notes" class="nav-tool-btn" title="Speaker Notes (N)">Notes (N)</button>
+          <button id="btn-toggle-mascot" class="nav-tool-btn" title="Toggle Goldie Mascot (M)">Goldie (M)</button>
+          <button id="btn-fullscreen" class="nav-tool-btn" title="Toggle Fullscreen (F)">Fullscreen (F)</button>
+        </div>
+      </header>
+
+      <!-- Slides Viewport (16:9 responsive frame) -->
+      <main class="slides-viewport">
+        <!-- Floating Navigation Arrows -->
+        <button class="slide-nav-btn prev-btn" id="btn-prev-slide" title="Previous Slide (← / ↑)">‹</button>
+        <button class="slide-nav-btn next-btn" id="btn-next-slide" title="Next Slide (→ / ↓ / Space)">›</button>
+
+        <div class="slide-wrapper">
+
+          <!-- SLIDE 1: TEAM -->
+          <article class="slide active" id="slide-1" data-index="1">
+            <div class="slide-top">
+              <div class="slide-title-wrap">
+                <span class="slide-tag">Executive Presentation · Team NEXORA</span>
+                <h1 class="slide-h1">Gold RV Intelligence</h1>
+              </div>
+              <div class="badge badge-gold">Problem Statement 03</div>
+            </div>
+
+            <div class="slide-body">
+              <div class="team-slide-grid">
+                <div class="team-headline-box">
+                  <div class="hack-pill">Hack in Hills '26 · Problem Statement 03: Commodity Derivatives Intelligence</div>
+                  <div class="hero-main-title">
+                    Cross-Contract Relative Value & <span class="gold-gradient">Honest Backtesting</span>
+                  </div>
+                  <div class="answer-callout">
+                    "The gaps are real; a proven edge after costs is not."
+                  </div>
+                  <div>
+                    <a href="https://gold-rv.vercel.app" target="_blank" rel="noopener noreferrer" class="btn-primary">
+                      Explore Live Terminal ➔
+                    </a>
+                  </div>
+                </div>
+
+                <div class="team-roster">
+                  <div class="roster-header">Team NEXORA</div>
+                  <div class="member-row">
+                    <span class="member-name">Divyansh</span>
+                    <span class="member-role">Data & Quant Pipeline</span>
+                  </div>
+                  <div class="member-row">
+                    <span class="member-name">Ishant Bhaudhira</span>
+                    <span class="member-role">Frontend & UI</span>
+                  </div>
+                  <div class="member-row">
+                    <span class="member-name">Noni Gopal Das</span>
+                    <span class="member-role">Research & Pitch</span>
+                  </div>
+                  <div style="font-size: 13.5px; color: var(--muted); border-top: 1px solid var(--line); padding-top: 12px; margin-top: 4px;">
+                    Built with Python (pandas, NumPy) and a plain HTML/JS website with no frameworks. Zero runtime backend servers.
+                  </div>
+                </div>
+              </div>
+            </div>
+          </article>
+
+          <!-- SLIDE 2: PROBLEM & THEME -->
+          <article class="slide" id="slide-2" data-index="2">
+            <div class="slide-top">
+              <div class="slide-title-wrap">
+                <span class="slide-tag">Market Structure & Brief Alignment</span>
+                <h1 class="slide-h1">Problem & Theme</h1>
+              </div>
+              <div class="badge badge-gold">30-Sep-2026 Snapshot</div>
+            </div>
+
+            <div class="slide-body">
+              <!-- 4 Price Cards -->
+              <div class="price-cards-row">
+                <div class="price-card">
+                  <div class="price-card-header">
+                    <span class="contract-badge">GOLDM (100 g)</span>
+                    <span class="purity-tag">995 Pure</span>
+                  </div>
+                  <div class="price-val-raw mono">Raw: ₹1,47,908 / 10 g</div>
+                  <div class="price-val-pure mono">₹1,48,651 <span style="font-size: 12px; font-weight: normal; color: var(--muted);">/ 10g pure</span></div>
+                </div>
+                <div class="price-card">
+                  <div class="price-card-header">
+                    <span class="contract-badge">GOLDTEN (10 g)</span>
+                    <span class="purity-tag">999 Pure</span>
+                  </div>
+                  <div class="price-val-raw mono">Raw: ₹1,48,322 / 10 g</div>
+                  <div class="price-val-pure mono">₹1,48,470 <span style="font-size: 12px; font-weight: normal; color: var(--muted);">/ 10g pure</span></div>
+                </div>
+                <div class="price-card">
+                  <div class="price-card-header">
+                    <span class="contract-badge">GOLDGUINEA (8 g)</span>
+                    <span class="purity-tag">999 Pure</span>
+                  </div>
+                  <div class="price-val-raw mono">Raw: ₹1,19,207 / 8 g</div>
+                  <div class="price-val-pure mono">₹1,49,158 <span style="font-size: 12px; font-weight: normal; color: var(--muted);">/ 10g pure</span></div>
+                </div>
+                <div class="price-card">
+                  <div class="price-card-header">
+                    <span class="contract-badge">GOLDPETAL (1 g)</span>
+                    <span class="purity-tag">999 Pure</span>
+                  </div>
+                  <div class="price-val-raw mono">Raw: ₹14,893 / 1 g</div>
+                  <div class="price-val-pure mono">₹1,49,079 <span style="font-size: 12px; font-weight: normal; color: var(--muted);">/ 10g pure</span></div>
+                </div>
+              </div>
+
+              <!-- Gap Callout -->
+              <div class="gap-highlight-bar">
+                <span>Normalized Pure Gold Spread: <strong class="mono" style="color: var(--gold);">₹687 per 10 g (0.46%)</strong></span>
+                <span style="font-size: 14px; color: var(--muted);">Max gap between GOLDGUINEA and GOLDTEN</span>
+              </div>
+
+              <!-- 3 Panels -->
+              <div class="problem-theme-grid">
+                <div class="info-panel">
+                  <div class="info-panel-title">⚠️ The Problem</div>
+                  <div class="info-panel-text">
+                    Contracts differ in lot size (1g to 100g), quote unit, metallurgical purity (995 vs 999) and expiry calendar. A fair comparison must handle carry, thin days, settlement vs real fills, and costs; backtests can cheat with look-ahead bias.
+                  </div>
+                </div>
+                <div class="info-panel">
+                  <div class="info-panel-title">💥 The Impact</div>
+                  <div class="info-panel-text">
+                    Apparent "arbitrage" vanishes after brokerage, taxes (CTT, GST, stamp duty) and slippage. Furthermore, a single historical crash episode can make an otherwise unprofitable rule look deceptively brilliant.
+                  </div>
+                </div>
+                <div class="info-panel">
+                  <div class="info-panel-title">🎯 The Theme</div>
+                  <div class="info-panel-text">
+                    Covers all 5 directions of the hackathon brief using public MCX Bhavcopy only, strictly tracked by expiry date. Under the brief's scientific guidelines, a rigorous "no edge after costs" is a valid and robust outcome.
+                  </div>
+                </div>
+              </div>
+            </div>
+          </article>
+
+          <!-- SLIDE 3: SOLUTION -->
+          <article class="slide" id="slide-3" data-index="3">
+            <div class="slide-top">
+              <div class="slide-title-wrap">
+                <span class="slide-tag">Methodology & Framework</span>
+                <h1 class="slide-h1">The Solution</h1>
+              </div>
+              <div class="badge badge-gold">Hover Cards to Flip</div>
+            </div>
+
+            <div class="slide-body">
+              <div class="solution-layout">
+                <!-- 6 Flip Cards -->
+                <div class="flip-cards-grid">
+                  <!-- Card 1 -->
+                  <div class="flip-card">
+                    <div class="flip-card-inner">
+                      <div class="flip-front">
+                        <div class="card-title">1. Relative Value</div>
+                        <div class="card-preview">Priced per gram of pure gold. Flags unusually cheap or rich contracts.</div>
+                        <div class="flip-hint">Hover to flip ↻</div>
+                      </div>
+                      <div class="flip-back">
+                        Every contract normalized mathematically to pure gold equivalent. Normalization formula: close / quote_grams / purity. Eliminates superficial lot and purity distortions.
+                      </div>
+                    </div>
+                  </div>
+                  <!-- Card 2 -->
+                  <div class="flip-card">
+                    <div class="flip-card-inner">
+                      <div class="flip-front">
+                        <div class="card-title">2. Curve & Carry</div>
+                        <div class="card-preview">GOLDPETAL curve carry (median 8.0% a year). Moves decomposed daily.</div>
+                        <div class="flip-hint">Hover to flip ↻</div>
+                      </div>
+                      <div class="flip-back">
+                        Each day's basis move is split into underlying gold price movement, roll-down (~4 bps) and real curve change (~24 bps). Matches financing and vaulting costs.
+                      </div>
+                    </div>
+                  </div>
+                  <!-- Card 3 -->
+                  <div class="flip-card">
+                    <div class="flip-card-inner">
+                      <div class="flip-front">
+                        <div class="card-title">3. Walk-Forward Test</div>
+                        <div class="card-preview">Day-by-day replay, past data only, next-day fills, full MCX cost structure.</div>
+                        <div class="flip-hint">Hover to flip ↻</div>
+                      </div>
+                      <div class="flip-back">
+                        Frozen parameters on 24-month Train (2023-2025) and tested on 12 months unseen Test (2025-2026). Decides at close t, fills at close t+1. Stress-tested at 0-10 bps slippage.
+                      </div>
+                    </div>
+                  </div>
+                  <!-- Card 4 -->
+                  <div class="flip-card">
+                    <div class="flip-card-inner">
+                      <div class="flip-front">
+                        <div class="card-title">4. Quiet Alerts</div>
+                        <div class="card-preview">Five checks including gap >= 2x trading cost. All 6 pairs quiet on 30-Sep-2026.</div>
+                        <div class="flip-hint">Hover to flip ↻</div>
+                      </div>
+                      <div class="flip-back">
+                        Signals require statistical divergence AND edge > 2x round-trip cost (48.8 bps). On 30-Sep-2026, all pairs stay quiet to avoid losing money to transaction friction.
+                      </div>
+                    </div>
+                  </div>
+                  <!-- Card 5 -->
+                  <div class="flip-card">
+                    <div class="flip-card-inner">
+                      <div class="flip-front">
+                        <div class="card-title">5. Attribution</div>
+                        <div class="card-preview">Profit split into spread, gold, and costs. Gold explains under 1%.</div>
+                        <div class="flip-hint">Hover to flip ↻</div>
+                      </div>
+                      <div class="flip-back">
+                        Net P&L is mathematically reconciled: Spread Gain + Gold Gain - All Costs. Zero beta and near-zero correlation (<0.02) to the gold price confirms true market neutrality.
+                      </div>
+                    </div>
+                  </div>
+                  <!-- Card 6 -->
+                  <div class="flip-card">
+                    <div class="flip-card-inner">
+                      <div class="flip-front">
+                        <div class="card-title">6. Contract Lifecycle</div>
+                        <div class="card-preview">Calendar of 138 contracts. No entry in last 7 days; forced exit at 4 days.</div>
+                        <div class="flip-hint">Hover to flip ↻</div>
+                      </div>
+                      <div class="flip-back">
+                        Tracks 138 contract lifecycles individually. Prohibits new entries in the final 7 trading days and mandates forced liquidation 4 days before expiry to avoid physical tender.
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Side Panel -->
+                <div class="diff-side-panel">
+                  <div class="diff-header">What Makes It Different</div>
+                  <div class="diff-item">
+                    <span class="diff-bullet">✓</span>
+                    <div><strong>One Rule:</strong> Exact same 5 checks for live alerts and backtest engine.</div>
+                  </div>
+                  <div class="diff-item">
+                    <span class="diff-bullet">✓</span>
+                    <div><strong>Zero Look-Ahead:</strong> Validated by 18 automated tests across all dates.</div>
+                  </div>
+                  <div class="diff-item">
+                    <span class="diff-bullet">✓</span>
+                    <div><strong>Self-Checking Data:</strong> 11,954 rows with 0 duplicate keys or date mismatches.</div>
+                  </div>
+                  <div class="diff-item">
+                    <span class="diff-bullet">✓</span>
+                    <div><strong>Honest by Design:</strong> Rejects overfitting and highlights real cost hurdles.</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </article>
+
+          <!-- SLIDE 4: ARCHITECTURE & HOW IT WORKS -->
+          <article class="slide" id="slide-4" data-index="4">
+            <div class="slide-top">
+              <div class="slide-title-wrap">
+                <span class="slide-tag">Data Engine & Implementation</span>
+                <h1 class="slide-h1">Architecture & How It Works</h1>
+              </div>
+              <div class="badge badge-green">Zero Server Cold Starts</div>
+            </div>
+
+            <div class="slide-body">
+              <!-- Animated Flow Bar -->
+              <div class="arch-flow-wrap">
+                <div class="flow-step-node">MCX Bhavcopy<br><span style="font-size: 11px; color: var(--muted);">11,954 Clean Rows</span></div>
+                <div style="flex: 1; text-align: center; color: var(--gold); font-size: 18px;">➔ ⚡ ➔</div>
+                <div class="flow-step-node active-glow">Python Pipeline<br><span style="font-size: 11px; color: var(--gold);">pandas, NumPy, 18 tests</span></div>
+                <div style="flex: 1; text-align: center; color: var(--gold); font-size: 18px;">➔ ⚡ ➔</div>
+                <div class="flow-step-node">site-data.json<br><span style="font-size: 11px; color: var(--muted);">&lt; 5 MB Payload</span></div>
+                <div style="flex: 1; text-align: center; color: var(--gold); font-size: 18px;">➔ ⚡ ➔</div>
+                <div class="flow-step-node">Static 7-Page Site<br><span style="font-size: 11px; color: var(--muted);">Plain HTML/JS · no frameworks</span></div>
+                <div style="flex: 1; text-align: center; color: var(--gold); font-size: 18px;">➔ ⚡ ➔</div>
+                <div class="flow-step-node">Vercel<br><span style="font-size: 11px; color: var(--green);">Instant CDN Deploy</span></div>
+              </div>
+
+              <div class="arch-details-grid">
+                <!-- 6 Processing Steps -->
+                <div>
+                  <div style="font-size: 14px; font-weight: 700; color: var(--gold); text-transform: uppercase; margin-bottom: 8px;">6-Step Data Processing</div>
+                  <div class="steps-list">
+                    <div class="step-pill"><span class="step-num">1</span> Collect & validate 11,954 rows</div>
+                    <div class="step-pill"><span class="step-num">2</span> Normalize price per pure gram</div>
+                    <div class="step-pill"><span class="step-num">3</span> Pair 6 pairs + carry estimation</div>
+                    <div class="step-pill"><span class="step-num">4</span> Rolling z-score from past days only</div>
+                    <div class="step-pill"><span class="step-num">5</span> Five checks -> alert or stay quiet</div>
+                    <div class="step-pill"><span class="step-num">6</span> Walk-forward backtest simulation</div>
+                  </div>
+
+                  <div class="data-checks-box">
+                    <strong style="color: var(--text);">Exchange Data Integrity Safeguards:</strong><br>
+                    Resolved DD/MM requests vs MM/DD exchange replies; handled 04SEP2026 expiries and trimmed padded symbol whitespaces. Every row verified against requested dates: exactly 0 outside. Tracked by contract expiry, avoiding continuous series distortion.
+                  </div>
+                </div>
+
+                <!-- Core Maths Monospace -->
+                <div>
+                  <div style="font-size: 14px; font-weight: 700; color: var(--gold); text-transform: uppercase; margin-bottom: 8px;">Core Mathematical Formulation</div>
+                  <div class="core-math-box">
+                    <div># 1. Pure Gold Normalization</div>
+                    <div>p = close / grams / purity</div>
+                    <div style="margin-top: 6px;"># 2. Rolling Out-of-Sample Z-Score</div>
+                    <div>z = (s - mean[past]) / std[past]</div>
+                    <div style="margin-top: 6px;"># 3. Execution (Zero Look-Ahead)</div>
+                    <div>decide at close t -&gt; fill at close t+1</div>
+                    <div style="margin-top: 6px;"># 4. Hurdle Check</div>
+                    <div>entry allowed iff |gap from normal| &gt;= 2 x round-trip cost (48.8 bps)</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </article>
+
+          <!-- SLIDE 5: LIVE EXAMPLE (THE FIVE CHECKS) -->
+          <article class="slide" id="slide-5" data-index="5">
+            <div class="slide-top">
+              <div class="slide-title-wrap">
+                <span class="slide-tag">Signal Gate Evaluation</span>
+                <h1 class="slide-h1">Live Example: The Five Checks</h1>
+              </div>
+              <div class="badge badge-gold">GOLDM vs GOLDPETAL · 30-Sep-2026</div>
+            </div>
+
+            <div class="slide-body">
+              <div class="checks-slide-container">
+                <!-- Checks List -->
+                <div class="checks-list">
+                  <div class="check-item pass">
+                    <div class="check-label-group">
+                      <span class="check-title">1. Enough History</span>
+                      <span class="check-detail">Full 30-day rolling window available</span>
+                    </div>
+                    <div class="check-status-badge pass">PASS ✓</div>
+                  </div>
+
+                  <div class="check-item pass">
+                    <div class="check-label-group">
+                      <span class="check-title">2. Unusual Gap</span>
+                      <span class="check-detail">|z| = 2.14 &gt;= 2.0 (stop-loss hurdle at 3.5)</span>
+                    </div>
+                    <div class="check-status-badge pass">PASS ✓</div>
+                  </div>
+
+                  <div class="check-item fail">
+                    <div class="check-label-group">
+                      <span class="check-title">3. Beats Cost Hurdle</span>
+                      <span class="check-detail">35.8 bps &lt; 48.8 bps (2 x 24.4 bps round-trip cost)</span>
+                    </div>
+                    <div class="check-status-badge fail">FAIL ✗</div>
+                  </div>
+
+                  <div class="check-item pass">
+                    <div class="check-label-group">
+                      <span class="check-title">4. Liquidity Gate</span>
+                      <span class="check-detail">Volume and open interest above the minimum on both legs</span>
+                    </div>
+                    <div class="check-status-badge pass">PASS ✓</div>
+                  </div>
+
+                  <div class="check-item pass">
+                    <div class="check-label-group">
+                      <span class="check-title">5. Contract Lifecycle</span>
+                      <span class="check-detail">22 trading days left to expiry (minimum 7 required)</span>
+                    </div>
+                    <div class="check-status-badge pass">PASS ✓</div>
+                  </div>
+                </div>
+
+                <!-- Big Verdict Card -->
+                <div class="verdict-hero-card">
+                  <div class="verdict-badge">System Status On 30-Sep-2026</div>
+                  <div class="verdict-title">
+                    NO SIGNAL.<br>
+                    <span style="color: var(--gold);">Staying quiet is a feature.</span>
+                  </div>
+                  <div class="verdict-sub">
+                    Although the statistical z-score flagged a divergence (|z| = 2.14), the 35.8 bps gap fails to clear the 2x trading cost threshold (48.8 bps). Entering here would guarantee friction loss.
+                  </div>
+                  <div class="badge badge-green" style="font-size: 13px; padding: 6px 14px;">
+                    0 Out of 6 Pairs Signaled Today
+                  </div>
+                </div>
+              </div>
+            </div>
+          </article>
+
+          <!-- SLIDE 6: RESULTS (JUDGES' KEY SLIDE) -->
+          <article class="slide" id="slide-6" data-index="6">
+            <div class="slide-top">
+              <div class="slide-title-wrap">
+                <span class="slide-tag">Empirical Backtest & Attribution</span>
+                <h1 class="slide-h1">Results: Key Findings & Attribution</h1>
+              </div>
+              <div class="badge badge-gold">12 Months Unseen Data (Oct 2025 → Sep 2026)</div>
+            </div>
+
+            <div class="slide-body">
+              <!-- 4 Stat Tiles with Counter Animation -->
+              <div class="results-grid-top">
+                <div class="stat-tile">
+                  <div class="stat-tile-label">Unseen Trades (5 bps Slippage)</div>
+                  <div class="stat-tile-num mono counter-target" data-value="20" data-prefix="" data-suffix="">0</div>
+                  <div class="stat-tile-sub">12-month walk-forward test</div>
+                </div>
+                <div class="stat-tile">
+                  <div class="stat-tile-label">Net Strategy P&L</div>
+                  <div class="stat-tile-num green mono counter-target" data-value="113598" data-prefix="+₹" data-format="in">0</div>
+                  <div class="stat-tile-sub">+39.4 bps per trade (₹10L/leg)</div>
+                </div>
+                <div class="stat-tile">
+                  <div class="stat-tile-label">t-Statistic</div>
+                  <div class="stat-tile-num gold mono counter-target" data-value="1.89" data-prefix="" data-decimals="2">0.00</div>
+                  <div class="stat-tile-sub">Below 2: not statistically proven</div>
+                </div>
+                <div class="stat-tile">
+                  <div class="stat-tile-label">Training Period P&L</div>
+                  <div class="stat-tile-num red mono counter-target" data-value="19056" data-prefix="-₹" data-format="in">0</div>
+                  <div class="stat-tile-sub">Over 37 in-sample trades</div>
+                </div>
+              </div>
+
+              <!-- Analysis Row: Chart & Table -->
+              <div class="results-analysis-row">
+                <!-- SVG Bar Chart -->
+                <div class="crash-chart-card">
+                  <div class="card-heading-sm">"One Crash Carries The Profit"</div>
+                  <svg viewBox="0 0 420 150" width="100%" height="150" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <!-- Zero reference line -->
+                    <line x1="40" y1="95" x2="400" y2="95" stroke="#1E2B38" stroke-width="1.5" stroke-dasharray="3 3"/>
+                    <text x="35" y="99" fill="#93A3B4" font-size="11" text-anchor="end" font-family="'Geist Mono'">0</text>
+                    
+                    <!-- Bar 1: Crash Profit (+1,37,985) -->
+                    <rect x="90" y="25" width="85" height="70" rx="4" fill="#4FD1A1" fill-opacity="0.85" stroke="#4FD1A1"/>
+                    <text x="132" y="20" fill="#4FD1A1" font-size="12" font-weight="700" text-anchor="middle" font-family="'Geist Mono'">+₹1,37,985</text>
+                    <text x="132" y="112" fill="#EAF0F6" font-size="11" text-anchor="middle">8 Crash Trades</text>
+                    <text x="132" y="125" fill="#93A3B4" font-size="10" text-anchor="middle">(Jan-Mar 2026)</text>
+
+                    <!-- Bar 2: Other Trades (-24,387) -->
+                    <rect x="250" y="95" width="85" height="22" rx="4" fill="#FF8F85" fill-opacity="0.85" stroke="#FF8F85"/>
+                    <text x="292" y="132" fill="#FF8F85" font-size="12" font-weight="700" text-anchor="middle" font-family="'Geist Mono'">-₹24,387</text>
+                    <text x="292" y="85" fill="#EAF0F6" font-size="11" text-anchor="middle">Other 12 Trades</text>
+                    <text x="292" y="73" fill="#93A3B4" font-size="10" text-anchor="middle">(Normal regimes)</text>
+                  </svg>
+                  <div style="font-size: 12px; color: var(--muted); line-height: 1.35;">
+                    Costs: 24.4 bps per round trip, 82% of it slippage (assumed); training breaks even at ~3.8 bps.
+                  </div>
+                </div>
+
+                <!-- Comparison Table -->
+                <div class="crash-chart-card">
+                  <div class="card-heading-sm">Original vs Fixed Rule (5 bps Slippage)</div>
+                  <table class="results-table">
+                    <thead>
+                      <tr>
+                        <th>Rule Specification</th>
+                        <th>Training (Oct 23 - Sep 25)</th>
+                        <th>Unseen (Oct 25 - Sep 26)</th>
+                        <th>t-Stat</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td><strong>Original</strong> (4 checks, no cost line)</td>
+                        <td class="mono" style="color: var(--red);">59 tr: -₹66,783</td>
+                        <td class="mono" style="color: var(--green);">54 tr: +₹16,387</td>
+                        <td class="mono">-0.08</td>
+                      </tr>
+                      <tr class="highlight-row">
+                        <td><strong>Fixed</strong> (Same 5 checks as alerts)</td>
+                        <td class="mono" style="color: var(--red);">37 tr: -₹19,056</td>
+                        <td class="mono" style="color: var(--green); font-weight: 700;">20 tr: +₹1,13,598</td>
+                        <td class="mono" style="color: var(--gold); font-weight: 700;">1.89</td>
+                      </tr>
+                      <tr>
+                        <td><strong>Fixed + Training Switch</strong> (GOLDM·PETAL)</td>
+                        <td class="mono" style="color: var(--muted);">Qualified</td>
+                        <td class="mono" style="color: var(--green);">4 tr: +₹22,916</td>
+                        <td class="mono">—</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+              <!-- Verdict Banner -->
+              <div class="final-verdict-banner">
+                Honest Scientific Verdict: "No persistent edge is proven after costs."
+              </div>
+            </div>
+          </article>
+
+          <!-- SLIDE 7: MARKET & FUTURE SCOPE -->
+          <article class="slide" id="slide-7" data-index="7">
+            <div class="slide-top">
+              <div class="slide-title-wrap">
+                <span class="slide-tag">Commercial Opportunity & Execution Roadmap</span>
+                <h1 class="slide-h1">Market & Future Scope</h1>
+              </div>
+              <div class="badge badge-gold">Commodity Derivatives Ecosystem</div>
+            </div>
+
+            <div class="slide-body">
+              <div class="market-slide-layout">
+                <!-- Market Stats Grid -->
+                <div class="market-stats-row">
+                  <div class="market-metric-box">
+                    <div class="metric-big mono">3.4x</div>
+                    <div class="metric-desc">Growth in MCX gold futures daily turnover (₹8,449 cr FY25 ➔ ₹28,484 cr FY26)</div>
+                  </div>
+                  <div class="market-metric-box">
+                    <div class="metric-big mono">~98%</div>
+                    <div class="metric-desc">MCX dominant market share of India's commodity futures volume</div>
+                  </div>
+                  <div class="market-metric-box">
+                    <div class="metric-big mono">57%</div>
+                    <div class="metric-desc">Bullion segment share of total MCX turnover (Q2 FY26)</div>
+                  </div>
+                  <div class="market-metric-box">
+                    <div class="metric-big mono">23 t</div>
+                    <div class="metric-desc">Metric tonnes of gold equivalent traded daily across MCX futures (FY26)</div>
+                  </div>
+                </div>
+
+                <div style="font-size: 13.5px; color: var(--text); background: var(--raised); padding: 8px 16px; border-radius: var(--radius-sm); border: 1px solid var(--line); display: flex; justify-content: space-between;">
+                  <span><strong>Target Users:</strong> Prop desks, jewellers hedging physical stock, retail mini-contract traders, broker research teams.</span>
+                  <span><strong>Revenue Model:</strong> Free dashboard, Pro alerts, B2B institutional licence.</span>
+                </div>
+
+                <!-- 3-Column Roadmap -->
+                <div class="roadmap-grid">
+                  <div class="roadmap-col">
+                    <div class="roadmap-tag tag-now">NOW</div>
+                    <ul class="roadmap-items">
+                      <li>• Live audit-ready static website</li>
+                      <li>• Unified 5-gate hurdle rule</li>
+                      <li>• Walk-forward backtest engine</li>
+                      <li>• 18 automated validation tests</li>
+                    </ul>
+                  </div>
+
+                  <div class="roadmap-col">
+                    <div class="roadmap-tag tag-next">NEXT</div>
+                    <ul class="roadmap-items">
+                      <li>• 6-12 month forward test in live market</li>
+                      <li>• Measure real limit-order book slippage</li>
+                      <li>• Licensed real-time exchange data feed</li>
+                      <li>• Automated alert webhooks & notifications</li>
+                    </ul>
+                  </div>
+
+                  <div class="roadmap-col">
+                    <div class="roadmap-tag tag-later">LATER</div>
+                    <ul class="roadmap-items">
+                      <li>• Silver family (SILVER, SILVERM, SILVERMIC)</li>
+                      <li>• High-frequency tick & intraday depth data</li>
+                      <li>• Structural regime-break change detection</li>
+                      <li>• Direct broker execution API integration</li>
+                    </ul>
+                  </div>
+                </div>
+
+                <!-- Limits & Sources -->
+                <div class="limits-footer-box">
+                  <div>
+                    <strong style="color: var(--gold);">Openly Stated Research Limits:</strong>
+                    Settlement price ≠ real fill; volume ≠ market depth; GOLDTEN history only from 2025.
+                  </div>
+                  <div style="font-size: 11px;">
+                    Sources: Business Today (14-Aug-2026); Business Standard (7-Nov-2025).
+                  </div>
+                </div>
+              </div>
+            </div>
+          </article>
+
+          <!-- SLIDE 8: THANK YOU -->
+          <article class="slide" id="slide-8" data-index="8">
+            <div class="slide-body">
+              <div class="thank-you-layout">
+                <div class="brand-badge" style="gap: 16px;">
+                  <img src="/favicon.svg" alt="Gold RV Logo" class="brand-logo-img" width="40" height="40" style="border-radius: 8px;" />
+                  <span class="brand-text" style="font-size: 28px;">Gold RV Intelligence</span>
+                </div>
+
+                <div class="thank-you-title">Thank you!</div>
+
+                <p class="thank-you-sub">
+                  Honest, audit-ready commodity relative value research terminal.<br>
+                  Built by Team NEXORA for Hack in Hills '26.
+                </p>
+
+                <div class="links-row">
+                  <a href="https://gold-rv.vercel.app" target="_blank" rel="noopener noreferrer" class="btn-primary" style="font-size: 18px; padding: 14px 32px;">
+                    Open Live Terminal ➔
+                  </a>
+                  <a href="https://github.com/CodeByDivyansh-tech/gold-rv" target="_blank" rel="noopener noreferrer" class="btn-secondary" style="font-size: 18px; padding: 14px 28px;">
+                    GitHub Repository ↗
+                  </a>
+                </div>
+
+                <div style="margin-top: 10px; font-size: 15px; color: var(--muted);">
+                  Press <strong>Esc</strong> to return to 3D view · <strong>N</strong> for speaker notes · <strong>1-8</strong> to jump slides
+                </div>
+              </div>
+            </div>
+          </article>
+
+        </div>
+      </main>
+
+      <!-- Persistent Mascot in Corner of Stage 3 -->
+      <aside class="pitch-mascot-companion" id="pitch-mascot-companion">
+        <div class="mascot-container goldie-bobbing" id="mascot-stage3">
+          <svg class="goldie-svg" viewBox="0 0 140 100" width="105" height="75" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect x="36" y="48" width="84" height="40" rx="10" fill="#E59929" stroke="#975600" stroke-width="2.2"/>
+            <rect x="16" y="14" width="84" height="46" rx="11" fill="#F2A93B" stroke="#975600" stroke-width="2.2"/>
+            <path d="M52 45 Q58 51 64 45" stroke="#5A3300" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+            <g class="eye-group left-eye">
+              <ellipse class="eye-ball" cx="42" cy="32" rx="11" ry="13" fill="#FFFFFF" stroke="#5A3300" stroke-width="1.8"/>
+              <g class="pupil pupil-left">
+                <circle cx="42" cy="32" r="5.5" fill="#070D14"/>
+                <circle cx="40" cy="30" r="2" fill="#FFFFFF"/>
+              </g>
+            </g>
+            <g class="eye-group right-eye">
+              <ellipse class="eye-ball" cx="74" cy="32" rx="11" ry="13" fill="#FFFFFF" stroke="#5A3300" stroke-width="1.8"/>
+              <g class="pupil pupil-right">
+                <circle cx="74" cy="32" r="5.5" fill="#070D14"/>
+                <circle cx="72" cy="30" r="2" fill="#FFFFFF"/>
+              </g>
+            </g>
+            <!-- Waving arm on slide 8 -->
+            <g class="goldie-wave-arm" id="mascot-wave-arm" style="display: none;">
+              <rect x="94" y="24" width="22" height="12" rx="6" fill="#F2A93B" stroke="#975600" stroke-width="1.8" transform="rotate(-30 94 24)"/>
+            </g>
+          </svg>
+        </div>
+        <div class="mascot-tip-bubble" id="mascot-slide-tip">Meet the team that built me.</div>
+      </aside>
+
+      <!-- Speaker Notes Drawer (Toggled by N) -->
+      <aside id="speaker-notes-panel" role="dialog" aria-label="Speaker Notes">
+        <div class="notes-header">
+          <span class="notes-title">🎙️ Speaker Notes (Press N to close)</span>
+          <button class="notes-close-btn" id="btn-close-notes" title="Close Notes">×</button>
+        </div>
+        <div class="notes-content" id="notes-content">
+          Loading speaker notes...
+        </div>
+      </aside>
+    </section>
+
+  </div>
+
+  <!-- Pitch JavaScript -->
+  <script src="pitch.js"></script>
+</body>
+</html>
