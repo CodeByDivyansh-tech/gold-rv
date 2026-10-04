@@ -3,12 +3,13 @@
  * Team NEXORA (Divyansh, Ishant Bhaudhira, Noni Gopal Das)
  * Hack in Hills '26 · Problem Statement 03
  *
- * Built with Three.js (ES modules), GSAP 3.12.5, Web Speech API.
+ * Built with Three.js r160 (local vendor), GSAP 3.12.5 (local vendor), Web Speech API.
  * Apple Keynote aesthetic: Pure black #000000, Bullion Gold #F2A93B.
  */
 
 import * as THREE from 'three';
 import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
+import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
 import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
 import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
@@ -64,8 +65,8 @@ const contractData = {
     pure: "₹1,48,651",
     lot: 100,
     size: [2.5, 1.1, 1.2],
-    posRaw: [-4.2, 0.4, 0],
-    posNorm: [-4.2, 0, 0],
+    posRaw: [-4.2, 0.9, 0],
+    posNorm: [-4.2, 0.8, 0],
     scaleNorm: [1.4, 0.7, 0.8],
   },
   GOLDTEN: {
@@ -74,8 +75,8 @@ const contractData = {
     pure: "₹1,48,470",
     lot: 10,
     size: [1.6, 0.75, 0.85],
-    posRaw: [-1.4, -0.2, 0.5],
-    posNorm: [-1.4, 0, 0],
+    posRaw: [-1.4, 0.6, 0.4],
+    posNorm: [-1.4, 0.8, 0],
     scaleNorm: [1.4, 0.7, 0.8],
   },
   GOLDGUINEA: {
@@ -84,8 +85,8 @@ const contractData = {
     pure: "₹1,49,158",
     lot: 8,
     size: [1.4, 0.65, 0.75],
-    posRaw: [1.4, 0.3, -0.3],
-    posNorm: [1.4, 0, 0],
+    posRaw: [1.4, 0.9, -0.2],
+    posNorm: [1.4, 0.8, 0],
     scaleNorm: [1.4, 0.7, 0.8],
   },
   GOLDPETAL: {
@@ -94,8 +95,8 @@ const contractData = {
     pure: "₹1,49,079",
     lot: 1,
     size: [0.85, 0.4, 0.45],
-    posRaw: [4.0, -0.4, 0.2],
-    posNorm: [4.0, 0, 0],
+    posRaw: [4.0, 0.5, 0.2],
+    posNorm: [4.0, 0.8, 0],
     scaleNorm: [1.4, 0.7, 0.8],
   },
 };
@@ -154,7 +155,6 @@ class VoiceController {
     }
 
     if (!state.voiceEnabled || !this.synth) {
-      // Calculate estimated duration for reading
       const words = text.split(/\s+/).length;
       const readingDurationMs = Math.max(3000, words * 320);
       this.captionTimeout = setTimeout(() => {
@@ -204,7 +204,7 @@ class VoiceController {
 const voiceController = new VoiceController();
 
 // ============================================================
-// 3D MASCOT "GOLDIE" (ROUNDEDBOX METALLIC 3D CHARACTER)
+// 3D MASCOT "GOLDIE" (BRIGHT SHINY GOLD #F2A93B + ROOMENVIRONMENT)
 // ============================================================
 
 class GoldieMascot {
@@ -238,18 +238,36 @@ class GoldieMascot {
     });
     this.renderer.setSize(width, height);
     this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    this.renderer.toneMappingExposure = 1.25;
 
-    // Warm Key & Rim Lighting
-    const keyLight = new THREE.DirectionalLight(0xFFF0BD, 2.2);
-    keyLight.position.set(2, 3, 4);
+    // RoomEnvironment (PMREMGenerator) for brilliant, realistic reflections
+    try {
+      const pmremGenerator = new THREE.PMREMGenerator(this.renderer);
+      pmremGenerator.compileEquirectangularShader();
+      const roomEnv = new RoomEnvironment();
+      this.scene.environment = pmremGenerator.fromScene(roomEnv, 0.04).texture;
+      roomEnv.dispose();
+      pmremGenerator.dispose();
+    } catch (e) {
+      console.warn("RoomEnvironment PMREM not supported; using standard lights.", e);
+    }
+
+    // Warm Key & Soft Fill Lighting
+    const keyLight = new THREE.DirectionalLight(0xFFF2C2, 2.6);
+    keyLight.position.set(2.5, 3.5, 4);
     this.scene.add(keyLight);
 
-    const rimLight = new THREE.DirectionalLight(0xF2A93B, 1.8);
-    rimLight.position.set(-3, -2, -2);
+    const fillLight = new THREE.DirectionalLight(0xFFD67A, 1.6);
+    fillLight.position.set(-3, 1.5, 2.5);
+    this.scene.add(fillLight);
+
+    const rimLight = new THREE.DirectionalLight(0xF2A93B, 1.5);
+    rimLight.position.set(0, -3, -2);
     this.scene.add(rimLight);
 
-    const fillLight = new THREE.AmbientLight(0x2A1C0A, 1.2);
-    this.scene.add(fillLight);
+    const ambLight = new THREE.AmbientLight(0x5A4018, 0.9);
+    this.scene.add(ambLight);
 
     this.buildCharacter();
     this.scheduleBlink();
@@ -260,11 +278,11 @@ class GoldieMascot {
     this.bodyGroup = new THREE.Group();
     this.scene.add(this.bodyGroup);
 
-    // Gold Bar Metallic Material
+    // Bright, shiny gold: color #F2A93B, metalness 0.6, roughness 0.3
     const goldMat = new THREE.MeshStandardMaterial({
       color: 0xF2A93B,
-      metalness: 0.9,
-      roughness: 0.25,
+      metalness: 0.6,
+      roughness: 0.3,
     });
 
     // 1. Bottom Bar (Shifted Right)
@@ -283,7 +301,7 @@ class GoldieMascot {
     const eyeMat = new THREE.MeshStandardMaterial({
       color: 0xFFFFFF,
       roughness: 0.1,
-      metalness: 0.1,
+      metalness: 0.05,
     });
     const eyeGeom = new THREE.SphereGeometry(0.16, 24, 24);
 
@@ -320,8 +338,8 @@ class GoldieMascot {
     this.mouth.position.set(0, 0.02, 0.32);
     this.bodyGroup.add(this.mouth);
 
-    // 6. Cheeks (Cute subtle pink)
-    const cheekMat = new THREE.MeshBasicMaterial({ color: 0xFF8F85, transparent: true, opacity: 0.45 });
+    // 6. Cheeks (Cute subtle blush)
+    const cheekMat = new THREE.MeshBasicMaterial({ color: 0xFF8F85, transparent: true, opacity: 0.5 });
     const cheekGeom = new THREE.CircleGeometry(0.055, 16);
     const cheekL = new THREE.Mesh(cheekGeom, cheekMat);
     cheekL.position.set(-0.48, 0.08, 0.31);
@@ -388,7 +406,7 @@ class GoldieMascot {
       const dy = state.pointer.y - centerY;
       const dist = Math.hypot(dx, dy);
 
-      // Max eye travel
+      // Max eye travel inside white sphere
       const maxTravel = 0.06;
       const travel = Math.min(dist * 0.0003, maxTravel);
       const angle = Math.atan2(dy, dx);
@@ -438,6 +456,169 @@ class GoldieMascot {
 let goldieMascot = null;
 
 // ============================================================
+// DEDICATED 3D RESULTS COLUMNS (#crash-columns-canvas)
+// ============================================================
+
+class CrashColumnsRenderer {
+  constructor(canvasId) {
+    this.canvas = document.getElementById(canvasId);
+    if (!this.canvas) return;
+
+    this.scene = null;
+    this.camera = null;
+    this.renderer = null;
+    this.colCrash = null;
+    this.colOther = null;
+    this.hasAnimated = false;
+
+    this.init();
+  }
+
+  init() {
+    const width = this.canvas.clientWidth || 520;
+    const height = this.canvas.clientHeight || 240;
+
+    this.scene = new THREE.Scene();
+    this.camera = new THREE.PerspectiveCamera(38, width / height, 0.1, 50);
+    this.camera.position.set(0, 1.2, 5.6);
+
+    this.renderer = new THREE.WebGLRenderer({
+      canvas: this.canvas,
+      alpha: true,
+      antialias: true,
+      powerPreference: 'high-performance'
+    });
+    this.renderer.setSize(width, height);
+    this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+    // Lighting
+    const keyLight = new THREE.DirectionalLight(0xFFF2C2, 2.4);
+    keyLight.position.set(3, 4, 3);
+    this.scene.add(keyLight);
+
+    const fillLight = new THREE.DirectionalLight(0x93A3B4, 1.2);
+    fillLight.position.set(-3, 2, 2);
+    this.scene.add(fillLight);
+
+    const ambLight = new THREE.AmbientLight(0x18232F, 1.0);
+    this.scene.add(ambLight);
+
+    // Floor Plane at y = 0
+    const floorGeom = new THREE.BoxGeometry(6.4, 0.04, 3.2);
+    const floorMat = new THREE.MeshStandardMaterial({
+      color: 0x0A1017,
+      metalness: 0.5,
+      roughness: 0.5,
+    });
+    const floor = new THREE.Mesh(floorGeom, floorMat);
+    floor.position.set(0, 0, 0);
+    this.scene.add(floor);
+
+    // Glowing equator zero-line
+    const lineGeom = new THREE.BoxGeometry(6.4, 0.02, 0.05);
+    const lineMat = new THREE.MeshBasicMaterial({ color: 0xF2A93B });
+    const zeroLine = new THREE.Mesh(lineGeom, lineMat);
+    zeroLine.position.set(0, 0.02, 0);
+    this.scene.add(zeroLine);
+
+    // 1. Gold/Green Rising Column: +₹1,37,985 (8 Crash Trades)
+    // Target height: 2.2 units above floor (y = 0)
+    const crashGeom = new RoundedBoxGeometry(1.0, 1.0, 1.0, 4, 0.06);
+    const crashMat = new THREE.MeshStandardMaterial({
+      color: 0x4FD1A1,
+      metalness: 0.75,
+      roughness: 0.25,
+      emissive: 0x1A4732,
+      emissiveIntensity: 0.35,
+    });
+    this.colCrash = new THREE.Mesh(crashGeom, crashMat);
+    this.colCrash.position.set(-1.4, 0.001, 0);
+    this.colCrash.scale.set(1.0, 0.001, 1.0);
+    this.scene.add(this.colCrash);
+
+    // 2. Red Dipping Column: -₹24,387 (12 Other Trades)
+    // Height to scale: (24387 / 137985) * 2.2 = ~0.39 units below floor
+    const otherGeom = new RoundedBoxGeometry(1.0, 1.0, 1.0, 4, 0.06);
+    const otherMat = new THREE.MeshStandardMaterial({
+      color: 0xFF8F85,
+      metalness: 0.75,
+      roughness: 0.25,
+      emissive: 0x5C1F1F,
+      emissiveIntensity: 0.35,
+    });
+    this.colOther = new THREE.Mesh(otherGeom, otherMat);
+    this.colOther.position.set(1.4, -0.001, 0);
+    this.colOther.scale.set(1.0, 0.001, 1.0);
+    this.scene.add(this.colOther);
+
+    window.addEventListener('resize', () => this.onResize());
+    this.animateLoop();
+  }
+
+  onResize() {
+    if (!this.canvas) return;
+    const width = this.canvas.clientWidth || 520;
+    const height = this.canvas.clientHeight || 240;
+    this.camera.aspect = width / height;
+    this.camera.updateProjectionMatrix();
+    this.renderer.setSize(width, height);
+  }
+
+  triggerAnimation() {
+    if (!this.colCrash || !this.colOther) return;
+
+    // Reset scales
+    this.colCrash.scale.set(1.0, 0.001, 1.0);
+    this.colCrash.position.y = 0.001;
+
+    this.colOther.scale.set(1.0, 0.001, 1.0);
+    this.colOther.position.y = -0.001;
+
+    // Animate Gold/Green column rising for +₹1,37,985
+    const targetCrashH = 2.2;
+    gsap.to(this.colCrash.scale, {
+      y: targetCrashH,
+      duration: 1.4,
+      ease: 'power2.out',
+      onUpdate: () => {
+        this.colCrash.position.y = this.colCrash.scale.y * 0.5;
+      }
+    });
+
+    // Animate Red column dipping below floor for -₹24,387 (height to scale)
+    const targetOtherH = 0.39;
+    gsap.to(this.colOther.scale, {
+      y: targetOtherH,
+      duration: 1.4,
+      ease: 'power2.out',
+      onUpdate: () => {
+        this.colOther.position.y = -(this.colOther.scale.y * 0.5);
+      }
+    });
+  }
+
+  update(time) {
+    // Gentle camera orbit
+    if (this.camera) {
+      this.camera.position.x = Math.sin(time * 0.45) * 0.45;
+      this.camera.lookAt(0, 0.45, 0);
+    }
+    this.renderer.render(this.scene, this.camera);
+  }
+
+  animateLoop() {
+    const clock = new THREE.Clock();
+    const renderLoop = () => {
+      requestAnimationFrame(renderLoop);
+      this.update(clock.getElapsedTime());
+    };
+    renderLoop();
+  }
+}
+
+let crashColumnsRenderer = null;
+
+// ============================================================
 // MAIN WEBGL 3D WORLD (#bg-canvas)
 // ============================================================
 
@@ -452,7 +633,6 @@ class Main3DWorld {
     this.composer = null;
     this.particleSystem = null;
     this.contractBars = {};
-    this.slide6Columns = null;
     this.slide8Logo = null;
     this.raycaster = new THREE.Raycaster();
     this.hoveredBar = null;
@@ -468,7 +648,7 @@ class Main3DWorld {
     this.scene.fog = new THREE.FogExp2(0x000000, 0.015);
 
     this.camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 100);
-    this.camera.position.set(0, 0, 14);
+    this.camera.position.set(0, 0.2, 12.5);
 
     this.renderer = new THREE.WebGLRenderer({
       canvas: this.canvas,
@@ -481,7 +661,7 @@ class Main3DWorld {
     this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
     this.renderer.toneMappingExposure = 1.1;
 
-    // Set up UnrealBloomPass post-processing
+    // Post-processing UnrealBloomPass
     try {
       this.composer = new EffectComposer(this.renderer);
       const renderPass = new RenderPass(this.scene, this.camera);
@@ -489,20 +669,19 @@ class Main3DWorld {
 
       const bloomPass = new UnrealBloomPass(
         new THREE.Vector2(width, height),
-        0.55,  // bloom strength
-        0.4,   // radius
-        0.82   // threshold
+        0.5,   // bloom strength
+        0.35,  // radius
+        0.85   // threshold
       );
       this.composer.addPass(bloomPass);
     } catch (e) {
-      console.warn("EffectComposer/Bloom disabled; falling back to direct render.", e);
+      console.warn("EffectComposer bloom disabled; direct render used.", e);
       this.composer = null;
     }
 
     this.setupLighting();
     this.setupParticles();
     this.setupContractBars();
-    this.setupSlide6Visuals();
     this.setupSlide8Visuals();
 
     window.addEventListener('resize', () => this.onResize());
@@ -523,14 +702,13 @@ class Main3DWorld {
     this.rimLight.position.set(-6, -4, -6);
     this.scene.add(this.rimLight);
 
-    // Subtle moving warm pointlight
-    this.pointLight = new THREE.PointLight(0xF2A93B, 1.5, 30);
+    this.pointLight = new THREE.PointLight(0xF2A93B, 1.2, 30);
     this.pointLight.position.set(0, 2, 6);
     this.scene.add(this.pointLight);
   }
 
   setupParticles() {
-    // 1200 gold particles: Gather into logo in Opening stage, then drift
+    // 1200 gold particles: smaller (size 0.8px, sizeAttenuation: false) and dimmer (opacity 0.35)
     const count = 1200;
     const geometry = new THREE.BufferGeometry();
     const positions = new Float32Array(count * 3);
@@ -539,19 +717,17 @@ class Main3DWorld {
 
     for (let i = 0; i < count; i++) {
       const i3 = i * 3;
-      // Initial random floating distribution
       positions[i3] = (Math.random() - 0.5) * 28;
       positions[i3 + 1] = (Math.random() - 0.5) * 18;
       positions[i3 + 2] = (Math.random() - 0.5) * 20;
 
-      // Half the particles form top bar, half form bottom bar (nudged right)
       if (i < count / 2) {
-        // Top bar: center (0, 0.8, 0), width 4, height 1.4
+        // Top bar
         targetPositions[i3] = (Math.random() - 0.5) * 4.2;
         targetPositions[i3 + 1] = 0.8 + (Math.random() - 0.5) * 1.3;
         targetPositions[i3 + 2] = (Math.random() - 0.5) * 0.8;
       } else {
-        // Bottom bar: center (0.9, -0.8, 0), width 4, height 1.4 (nudged right!)
+        // Bottom bar (nudged right)
         targetPositions[i3] = 0.9 + (Math.random() - 0.5) * 4.2;
         targetPositions[i3 + 1] = -0.8 + (Math.random() - 0.5) * 1.3;
         targetPositions[i3 + 2] = (Math.random() - 0.5) * 0.8;
@@ -564,11 +740,13 @@ class Main3DWorld {
     this.particleTargets = targetPositions;
     this.particleSpeeds = speeds;
 
+    // Fixed 0.8px particle size, opacity 0.35
     const pMaterial = new THREE.PointsMaterial({
       color: 0xF2A93B,
-      size: 0.08,
+      size: 0.8,
+      sizeAttenuation: false,
       transparent: true,
-      opacity: 0.85,
+      opacity: 0.35,
       blending: THREE.AdditiveBlending,
     });
 
@@ -583,8 +761,8 @@ class Main3DWorld {
 
     const goldMat = new THREE.MeshStandardMaterial({
       color: 0xF2A93B,
-      metalness: 0.92,
-      roughness: 0.22,
+      metalness: 0.7,
+      roughness: 0.28,
     });
 
     Object.keys(contractData).forEach((key) => {
@@ -599,53 +777,6 @@ class Main3DWorld {
     });
   }
 
-  setupSlide6Visuals() {
-    this.slide6Columns = new THREE.Group();
-    this.scene.add(this.slide6Columns);
-    this.slide6Columns.visible = false;
-
-    // Thin glowing reference floor at y = -1.2
-    const floorGeom = new THREE.PlaneGeometry(16, 8);
-    const floorMat = new THREE.MeshBasicMaterial({
-      color: 0x070D14,
-      transparent: true,
-      opacity: 0.7,
-      wireframe: true,
-    });
-    const floor = new THREE.Mesh(floorGeom, floorMat);
-    floor.rotation.x = -Math.PI / 2;
-    floor.position.y = -1.2;
-    this.slide6Columns.add(floor);
-
-    // Green/Gold Column: +₹1,37,985 (8 Crash Trades)
-    const colCrashGeom = new RoundedBoxGeometry(1.6, 1.0, 1.2, 4, 0.08);
-    const colCrashMat = new THREE.MeshStandardMaterial({
-      color: 0x4FD1A1,
-      metalness: 0.85,
-      roughness: 0.25,
-      emissive: 0x1F5C45,
-      emissiveIntensity: 0.4,
-    });
-    this.colCrash = new THREE.Mesh(colCrashGeom, colCrashMat);
-    this.colCrash.position.set(-2.4, -1.2, 0);
-    this.colCrash.scale.set(1, 0.01, 1);
-    this.slide6Columns.add(this.colCrash);
-
-    // Red/Gray Column: -₹24,387 (Other 12 Trades)
-    const colOtherGeom = new RoundedBoxGeometry(1.6, 1.0, 1.2, 4, 0.08);
-    const colOtherMat = new THREE.MeshStandardMaterial({
-      color: 0xFF8F85,
-      metalness: 0.85,
-      roughness: 0.25,
-      emissive: 0x6B2D26,
-      emissiveIntensity: 0.4,
-    });
-    this.colOther = new THREE.Mesh(colOtherGeom, colOtherMat);
-    this.colOther.position.set(2.4, -1.2, 0);
-    this.colOther.scale.set(1, 0.01, 1);
-    this.slide6Columns.add(this.colOther);
-  }
-
   setupSlide8Visuals() {
     this.slide8Logo = new THREE.Group();
     this.scene.add(this.slide8Logo);
@@ -654,8 +785,8 @@ class Main3DWorld {
 
     const goldMat = new THREE.MeshStandardMaterial({
       color: 0xF2A93B,
-      metalness: 0.92,
-      roughness: 0.22,
+      metalness: 0.7,
+      roughness: 0.28,
     });
 
     const barGeom = new RoundedBoxGeometry(3.2, 1.2, 0.9, 4, 0.14);
@@ -684,7 +815,7 @@ class Main3DWorld {
     state.pointer.ndcY = -(e.clientY / window.innerHeight) * 2 + 1;
 
     // Raycast on Stage 2 contract bars
-    if (state.currentStage === '3d-bars' && this.barsGroup.visible) {
+    if (state.currentStage === '3d-bars' && this.barsGroup && this.barsGroup.visible) {
       this.raycaster.setFromCamera(
         new THREE.Vector2(state.pointer.ndcX, state.pointer.ndcY),
         this.camera
@@ -754,52 +885,22 @@ class Main3DWorld {
 
     if (stage === 'opening') {
       this.barsGroup.visible = false;
-      this.slide6Columns.visible = false;
       this.slide8Logo.visible = false;
-      gsap.to(this.camera.position, { x: 0, y: 0, z: 14, duration: 1.2 });
+      document.body.classList.remove('stage-3d-active');
+      gsap.to(this.camera.position, { x: 0, y: 0.2, z: 12.5, duration: 1.2 });
     } else if (stage === '3d-bars') {
       this.barsGroup.visible = true;
-      this.slide6Columns.visible = false;
       this.slide8Logo.visible = false;
-      gsap.to(this.camera.position, { x: 0, y: 0.5, z: 12, duration: 1.2, ease: 'power3.out' });
+      document.body.classList.add('stage-3d-active');
+      gsap.to(this.camera.position, { x: 0, y: 0.6, z: 12.0, duration: 1.2, ease: 'power3.out' });
       voiceController.speak(spokenLines.stage2);
     } else if (stage === 'slides') {
       this.barsGroup.visible = false;
+      document.body.classList.remove('stage-3d-active');
     }
   }
 
   animateSlideVisuals(slideNum) {
-    if (this.slide6Columns) {
-      if (slideNum === 6) {
-        this.slide6Columns.visible = true;
-        // Rising +1,37,985 green column
-        this.colCrash.scale.set(1, 0.01, 1);
-        this.colCrash.position.y = -1.2;
-        gsap.to(this.colCrash.scale, {
-          y: 3.4,
-          duration: 1.2,
-          ease: 'power2.out',
-          onUpdate: () => {
-            this.colCrash.position.y = -1.2 + (this.colCrash.scale.y * 0.5);
-          }
-        });
-
-        // Dipping -24,387 red column below floor
-        this.colOther.scale.set(1, 0.01, 1);
-        this.colOther.position.y = -1.2;
-        gsap.to(this.colOther.scale, {
-          y: 0.8,
-          duration: 1.2,
-          ease: 'power2.out',
-          onUpdate: () => {
-            this.colOther.position.y = -1.2 - (this.colOther.scale.y * 0.5);
-          }
-        });
-      } else {
-        this.slide6Columns.visible = false;
-      }
-    }
-
     if (this.slide8Logo) {
       this.slide8Logo.visible = (slideNum === 8);
       if (goldieMascot) goldieMascot.setWaving(slideNum === 8);
@@ -813,7 +914,6 @@ class Main3DWorld {
       const count = positions.length / 3;
 
       if (state.currentStage === 'opening') {
-        // Morph particles towards two-bar logo
         for (let i = 0; i < count; i++) {
           const i3 = i * 3;
           positions[i3] += (this.particleTargets[i3] - positions[i3]) * 0.04;
@@ -821,7 +921,6 @@ class Main3DWorld {
           positions[i3 + 2] += (this.particleTargets[i3 + 2] - positions[i3 + 2]) * 0.04;
         }
       } else {
-        // Drifting ambient starfield
         for (let i = 0; i < count; i++) {
           const i3 = i * 3;
           positions[i3 + 1] -= this.particleSpeeds[i] * 0.015;
@@ -834,10 +933,10 @@ class Main3DWorld {
     // 2. Parallax camera drift
     if (this.camera) {
       const targetCamX = state.pointer.ndcX * 0.8;
-      const targetCamY = state.pointer.ndcY * 0.5;
+      const targetCamY = 0.2 + state.pointer.ndcY * 0.4;
       this.camera.position.x += (targetCamX - this.camera.position.x) * 0.05;
       this.camera.position.y += (targetCamY - this.camera.position.y) * 0.05;
-      this.camera.lookAt(0, 0, 0);
+      this.camera.lookAt(0, 0.4, 0);
     }
 
     // 3. Contract Bars rotation
@@ -904,7 +1003,6 @@ class PitchDeckManager {
     const btnBegin = document.getElementById('btn-begin');
     if (btnBegin) {
       btnBegin.addEventListener('click', () => {
-        // User interaction unlocks audio/speech
         this.goTo3DScene();
       });
     }
@@ -1082,7 +1180,7 @@ class PitchDeckManager {
       const idx = parseInt(panel.dataset.slide, 10);
       if (idx === slideNum) {
         panel.classList.add('active');
-        const animElements = panel.querySelectorAll('.keynote-h1, .keynote-lead, .roster-card, .price-tile, .direction-box, .stat-cell-cinematic, .market-box-cinematic, .check-hero-card, .thank-you-big, .links-row');
+        const animElements = panel.querySelectorAll('.keynote-h1, .keynote-lead, .roster-card, .price-tile, .direction-box, .stat-cell-cinematic, .market-box-cinematic, .check-hero-card, .thank-you-big, .links-row, .crash-columns-card');
         gsap.fromTo(animElements, 
           { opacity: 0, y: 24 },
           { opacity: 1, y: 0, stagger: 0.08, duration: 0.6, ease: 'power2.out', clearProps: 'transform' }
@@ -1156,8 +1254,12 @@ class PitchDeckManager {
       });
     }
 
-    // Slide 6: Number counters animation
+    // Slide 6: Number counters animation & Dedicated 3D Columns animation
     if (slideNum === 6) {
+      if (crashColumnsRenderer) {
+        crashColumnsRenderer.triggerAnimation();
+      }
+
       const counters = document.querySelectorAll('.counter-stat');
       counters.forEach((el) => {
         const target = parseFloat(el.dataset.target);
@@ -1251,9 +1353,14 @@ function checkWebGLSupport() {
 
 function initFallback2D() {
   console.warn("WebGL not available. Initializing high-fidelity 2D fallback.");
+  document.body.classList.add('mode-2d');
   const fallbackLayer = document.getElementById('fallback-2d-layer');
   if (fallbackLayer) {
     fallbackLayer.style.display = 'block';
+  }
+  // Initialize PitchDeckManager so slides, keyboard, buttons, and voice work completely!
+  if (!window.pitchDeck) {
+    window.pitchDeck = new PitchDeckManager();
   }
 }
 
@@ -1269,6 +1376,7 @@ window.addEventListener('DOMContentLoaded', () => {
 
   try {
     goldieMascot = new GoldieMascot('goldie-canvas');
+    crashColumnsRenderer = new CrashColumnsRenderer('crash-columns-canvas');
     main3DWorld = new Main3DWorld();
     window.pitchDeck = new PitchDeckManager();
 

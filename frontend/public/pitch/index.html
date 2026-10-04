@@ -15,15 +15,15 @@
   <!-- Pitch CSS -->
   <link rel="stylesheet" href="pitch.css" />
 
-  <!-- GSAP 3.12.5 -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <!-- GSAP 3.12.5 (Local Offline Vendor) -->
+  <script src="./vendor/gsap.min.js"></script>
 
-  <!-- Three.js ES Module Import Map -->
+  <!-- Three.js r160 ES Module Import Map (Local Offline Vendor) -->
   <script type="importmap">
   {
     "imports": {
-      "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
-      "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+      "three": "./vendor/three.module.js",
+      "three/addons/": "./vendor/addons/"
     }
   }
   </script>
@@ -265,7 +265,7 @@
           </div>
           <div class="direction-box">
             <h3>5. Attribution</h3>
-            <p>Net P&amp;L reconciled: Spread Gain + Gold Gain - All Costs. Zero beta and near-zero correlation (&lt;0.02) to gold confirms true market neutrality.</p>
+            <p>Net P&amp;L reconciled: Spread Gain + Gold Gain - All Costs. Gold price moves explain under 1% of the profit; correlation of trade returns with gold is -0.10.</p>
           </div>
           <div class="direction-box">
             <h3>6. Contract Lifecycle</h3>
@@ -437,16 +437,30 @@
           </div>
         </div>
 
-        <!-- 3D Columns Info Callout & Results Table -->
-        <div class="chart-columns-info">
-          <div>
-            <strong style="color: var(--gold); font-size: 16px;">"One Crash Carries The Profit"</strong> (Interactive 3D Columns in WebGL Background)
-            <div style="font-size: 13.5px; color: var(--text-muted); margin-top: 4px;">
-              <span style="color: var(--green); font-weight: 700;">+₹1,37,985</span> (8 crash trades, Jan-Mar 2026) vs <span style="color: var(--red); font-weight: 700;">-₹24,387</span> (other 12 trades in normal regimes).
+        <!-- Dedicated 3D Columns Card (One Crash Carries The Profit) -->
+        <div class="crash-columns-card">
+          <div class="crash-card-header">
+            <div>
+              <strong style="color: var(--gold); font-size: 17px;">"One Crash Carries The Profit"</strong>
+              <div style="font-size: 13px; color: var(--text-muted); margin-top: 2px;">
+                Costs: 24.4 bps per round trip, 82% of it slippage (assumed); training breaks even at ~3.8 bps.
+              </div>
             </div>
           </div>
-          <div style="font-size: 13px; color: var(--text-muted); text-align: right;">
-            Costs: 24.4 bps round trip (82% assumed slippage); training breaks even at ~3.8 bps.
+
+          <div class="crash-canvas-wrapper">
+            <canvas id="crash-columns-canvas" width="520" height="240"></canvas>
+          </div>
+
+          <div class="crash-legend-row">
+            <div class="crash-legend-item left">
+              <span class="mono" style="color: var(--green); font-size: 16px; font-weight: 800;">+₹1,37,985</span>
+              <span style="font-size: 12px; color: var(--text-muted);">8 trades closed in the Jan–Mar 2026 crash</span>
+            </div>
+            <div class="crash-legend-item right">
+              <span class="mono" style="color: var(--red); font-size: 16px; font-weight: 800;">-₹24,387</span>
+              <span style="font-size: 12px; color: var(--text-muted);">12 other trades</span>
+            </div>
           </div>
         </div>
 
