@@ -658,8 +658,12 @@ let crashColumnsRenderer = null;
 
 class Main3DWorld {
   constructor() {
-    this.canvas = document.getElementById('webgl-canvas');
-    if (!this.canvas) return;
+    this.canvas = document.getElementById('bg-canvas');
+    if (!this.canvas) {
+      console.error('bg-canvas not found');
+      initFallback2D();
+      return;
+    }
 
     this.scene = null;
     this.camera = null;
@@ -814,7 +818,8 @@ class Main3DWorld {
     const pTexture = new THREE.CanvasTexture(pCanvas);
 
     const mat = new THREE.PointsMaterial({
-      size: 0.9,
+      size: 1.5,
+      sizeAttenuation: false,
       vertexColors: true,
       map: pTexture,
       transparent: true,
