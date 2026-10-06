@@ -74,45 +74,20 @@
     '<circle cx="18" cy="10" r="3.2" fill="#fff"/><circle cx="26" cy="10" r="3.2" fill="#fff"/><circle cx="18.8" cy="10.4" r="1.5" fill="#070D14"/><circle cx="26.8" cy="10.4" r="1.5" fill="#070D14"/></svg>';
 
   var css = '' +
-    '.xp-btn{position:fixed;left:20px;bottom:74px;z-index:40;min-height:44px;padding:0 16px 0 8px;border-radius:999px;border:1px solid rgba(242,169,59,.55);' +
-    'background:#0F1822;color:#EAF0F6;font:600 14px Geist,system-ui,sans-serif;display:flex;align-items:center;gap:6px;cursor:pointer;box-shadow:0 10px 30px rgba(7,13,20,.35)}' +
-    '.xp-btn[aria-pressed="true"]{background:#F2A93B;color:#1A1204;border-color:#F2A93B}' +
-    '.xp-btn:focus-visible,.xp-x:focus-visible{outline:2px solid #F2A93B;outline-offset:2px}' +
-    '@media (max-width:899px){.xp-btn{left:auto;right:14px;bottom:calc(138px + env(safe-area-inset-bottom,0px));padding:0 8px}.xp-btn span{display:none}}' +
-    'body.xp-on #app main{cursor:help}' +
+    '.xp-x:focus-visible{outline:2px solid #F2A93B;outline-offset:2px}' +
+    '#app main{touch-action:manipulation}' +
     '.xp-ring{position:fixed;z-index:45;pointer-events:none;border:2px solid #F2A93B;border-radius:18px;box-shadow:0 0 0 4px rgba(242,169,59,.18);transition:all .15s ease}' +
-    '.xp-tip{position:fixed;z-index:50;width:min(330px,calc(100vw - 32px));box-sizing:border-box;background:#0F1822;color:#EAF0F6;border:1px solid #F2A93B;border-radius:16px;' +
+    '.xp-tip{cursor:pointer;position:fixed;z-index:50;width:min(330px,calc(100vw - 32px));box-sizing:border-box;background:#0F1822;color:#EAF0F6;border:1px solid #F2A93B;border-radius:16px;' +
     'padding:12px 14px 14px;box-shadow:0 18px 50px rgba(7,13,20,.45);font-family:Geist,system-ui,sans-serif;display:flex;gap:10px;align-items:flex-start}' +
     '.xp-tip .xp-body{flex:1;min-width:0}.xp-tip .xp-t{font-weight:600;font-size:15px;color:#F2A93B;margin:2px 0 4px}' +
     '.xp-tip .xp-d{font-size:14px;line-height:1.55;color:#DCE4EC}' +
     '.xp-x{flex:none;min-width:36px;min-height:36px;border-radius:10px;border:1px solid #1E2B38;background:#18232F;color:#EAF0F6;font-size:18px;cursor:pointer}' +
-    '.xp-hint{position:fixed;z-index:44;left:50%;transform:translateX(-50%);top:14px;background:#F2A93B;color:#1A1204;font:600 13px Geist,system-ui,sans-serif;' +
-    'padding:8px 14px;border-radius:999px;box-shadow:0 8px 24px rgba(7,13,20,.3);max-width:calc(100vw - 32px);text-align:center}' +
     '@media (prefers-reduced-motion:reduce){.xp-ring{transition:none}}';
   var st = document.createElement('style'); st.textContent = css; document.head.appendChild(st);
 
-  var on = false, ring = null, tip = null, hint = null;
-  var btn = document.createElement('button');
-  btn.type = 'button'; btn.className = 'xp-btn'; btn.setAttribute('aria-pressed', 'false');
-  btn.innerHTML = GOLDIE.replace('width="40" height="34"', 'width="30" height="26"') + '<span>Explain like I\'m new</span>';
-  btn.setAttribute('aria-label', 'Explain mode: tap any box to have it explained');
-  document.body.appendChild(btn);
-
-  function clearTip() { if (tip) { tip.remove(); tip = null; } if (ring) { ring.remove(); ring = null; } }
-  function setOn(v) {
-    on = v; btn.setAttribute('aria-pressed', v ? 'true' : 'false');
-    document.body.classList.toggle('xp-on', v);
-    clearTip();
-    if (hint) { hint.remove(); hint = null; }
-    if (v) {
-      hint = document.createElement('div'); hint.className = 'xp-hint'; hint.setAttribute('role', 'status');
-      hint.textContent = innerWidth < 600 ? 'Explain mode on: tap any box.' : 'Explain mode is on: tap any box or chart. Tap Goldie again to turn it off.';
-      document.body.appendChild(hint);
-      setTimeout(function () { if (hint) { hint.remove(); hint = null; } }, 4500);
-    }
-    try { sessionStorage.setItem('grv-explain', v ? '1' : '0'); } catch (e) {}
-  }
-  btn.addEventListener('click', function () { setOn(!on); });
+  // Goldie explains a box when someone double-clicks it (double-taps on a phone). No mode to switch on.
+  var ring = null, tip = null, shownEl = null, closedAt = 0, shownAt = 0;
+  function clearTip() { if (tip) { tip.remove(); tip = null; } if (ring) { ring.remove(); ring = null; } shownEl = null; }
 
   function find(el) {
     var main = document.querySelector('#app main');
@@ -128,6 +103,7 @@
 
   function show(hit, x, y) {
     clearTip();
+    shownEl = hit.el; shownAt = Date.now();
     var r = hit.el.getBoundingClientRect();
     ring = document.createElement('div'); ring.className = 'xp-ring';
     ring.style.left = (r.left - 4) + 'px'; ring.style.top = (r.top - 4) + 'px';
@@ -135,10 +111,9 @@
     document.body.appendChild(ring);
     tip = document.createElement('div'); tip.className = 'xp-tip'; tip.setAttribute('role', 'dialog'); tip.setAttribute('aria-live', 'polite');
     tip.setAttribute('aria-label', hit.title);
-    tip.innerHTML = GOLDIE + '<div class="xp-body"><div class="xp-t"></div><div class="xp-d"></div></div><button type="button" class="xp-x" aria-label="Close">×</button>';
+    tip.innerHTML = GOLDIE + '<div class="xp-body"><div class="xp-t"></div><div class="xp-d"></div></div><button type="button" class="xp-x" aria-label="Close (or tap anywhere on this bubble)">×</button>';
     tip.querySelector('.xp-t').textContent = hit.title;
     tip.querySelector('.xp-d').textContent = hit.text;
-    tip.querySelector('.xp-x').addEventListener('click', function (e) { e.stopPropagation(); clearTip(); });
     document.body.appendChild(tip);
     var w = tip.offsetWidth, h = tip.offsetHeight, vw = innerWidth, vh = innerHeight;
     var left = Math.min(Math.max(16, x + 14), vw - w - 16);
@@ -147,20 +122,44 @@
     tip.style.left = left + 'px'; tip.style.top = top + 'px';
   }
 
-  document.addEventListener('click', function (e) {
-    if (!on) return;
-    if (tip && tip.contains(e.target)) return;
-    if (e.target.closest('.xp-btn, .gl-btn, .gl-back')) return;
-    // Links, buttons and form fields keep working as normal
-    if (e.target.closest('a, button, input, select, textarea, label, [role="slider"]')) { clearTip(); return; }
-    var hit = find(e.target);
-    if (!hit) { clearTip(); return; }
-    e.preventDefault(); e.stopPropagation();
-    show(hit, e.clientX, e.clientY);
+  var SKIP = 'a, button, input, select, textarea, label, [role="slider"], [data-grv], .gl-back, .km-back, .km-tip';
+  function explainAt(target, x, y) {
+    if (!target || !target.closest || target.closest(SKIP)) return false;
+    if (Date.now() - closedAt < 600) return false;       // 2nd click of a double-click on the bubble
+    if (Date.now() - shownAt < 250) return true;         // phone: our double-tap and the browser's dblclick
+    var hit = find(target);
+    if (!hit) return false;
+    try { var sel = getSelection(); if (sel) sel.removeAllRanges(); } catch (err) {}
+    show(hit, x, y);
+    return true;
+  }
+
+  // Stop the browser selecting a word when someone double-clicks a box
+  document.addEventListener('mousedown', function (e) {
+    if (e.detail > 1 && !e.target.closest(SKIP) && find(e.target)) e.preventDefault();
   }, true);
-  document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && (tip || on)) { if (tip) clearTip(); else setOn(false); } });
+  document.addEventListener('dblclick', function (e) {
+    if (explainAt(e.target, e.clientX, e.clientY)) { e.preventDefault(); e.stopPropagation(); }
+  }, true);
+  // Double-tap on touch screens (not every phone browser sends dblclick)
+  var lastTap = { t: 0, x: 0, y: 0 };
+  document.addEventListener('pointerup', function (e) {
+    if (e.pointerType !== 'touch') return;
+    var now = Date.now();
+    if (now - lastTap.t < 350 && Math.abs(e.clientX - lastTap.x) < 30 && Math.abs(e.clientY - lastTap.y) < 30) {
+      lastTap.t = 0;
+      if (explainAt(e.target, e.clientX, e.clientY)) e.preventDefault();
+    } else lastTap = { t: now, x: e.clientX, y: e.clientY };
+  }, true);
+
+  // One click on the bubble closes it; a click anywhere else also closes it but still does its normal job
+  document.addEventListener('click', function (e) {
+    if (!tip) return;
+    if (tip.contains(e.target)) { e.preventDefault(); e.stopPropagation(); clearTip(); closedAt = Date.now(); return; }
+    if (Date.now() - shownAt > 250) clearTip();
+  }, true);
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && tip) clearTip(); });
   window.addEventListener('scroll', clearTip, { passive: true });
   window.addEventListener('hashchange', clearTip);
-  try { if (sessionStorage.getItem('grv-explain') === '1') setOn(true); } catch (e) {}
-  window.GRVExplain = { setOn: setOn, notes: NOTES, find: find };
+  window.GRVExplain = { show: show, clear: clearTip, notes: NOTES, find: find };
 })();

@@ -31,11 +31,7 @@
   ];
 
   var css = '' +
-    '.gl-btn{position:fixed;left:20px;bottom:20px;z-index:40;min-height:44px;padding:0 16px;border-radius:999px;border:1px solid rgba(242,169,59,.55);' +
-    'background:#0F1822;color:#EAF0F6;font:600 14px Geist,system-ui,sans-serif;display:flex;align-items:center;gap:8px;cursor:pointer;box-shadow:0 10px 30px rgba(7,13,20,.35)}' +
-    '.gl-btn:hover{border-color:#F2A93B}.gl-btn:focus-visible,.gl-x:focus-visible,.gl-q:focus-visible{outline:2px solid #F2A93B;outline-offset:2px}' +
-    '.gl-btn b{display:inline-grid;place-items:center;width:20px;height:20px;border-radius:50%;background:#F2A93B;color:#1A1204;font-size:13px}' +
-    '@media (max-width:899px){.gl-btn{bottom:calc(84px + env(safe-area-inset-bottom,0px));left:auto;right:14px}.gl-btn span{display:none}}' +
+    '.gl-x:focus-visible,.gl-q:focus-visible{outline:2px solid #F2A93B;outline-offset:2px}' +
     '.gl-back{position:fixed;inset:0;z-index:60;background:rgba(7,13,20,.5);display:flex;justify-content:flex-end}' +
     '.gl-panel{width:min(440px,100%);height:100%;box-sizing:border-box;background:#0F1822;color:#EAF0F6;border-left:1px solid #1E2B38;display:flex;flex-direction:column;' +
     'font-family:Geist,system-ui,sans-serif;padding:max(20px,env(safe-area-inset-top,0px)) 20px 20px}' +
@@ -54,13 +50,6 @@
   st.textContent = css;
   document.head.appendChild(st);
 
-  var btn = document.createElement('button');
-  btn.type = 'button';
-  btn.className = 'gl-btn';
-  btn.setAttribute('aria-haspopup', 'dialog');
-  btn.innerHTML = '<b aria-hidden="true">?</b><span>Words explained</span>';
-  btn.setAttribute('aria-label', 'Words explained');
-  document.body.appendChild(btn);
 
   var back = null, lastFocus = null;
 
@@ -123,7 +112,6 @@
     q.focus();
   }
 
-  btn.addEventListener('click', function () { open(''); });
   // Any element with data-term="z-score" opens the list filtered to that word.
   document.addEventListener('click', function (e) {
     var t = e.target.closest && e.target.closest('[data-term]');
