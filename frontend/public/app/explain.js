@@ -1,6 +1,6 @@
 /*
- * explain.js — "Explain mode" for first-time visitors.
- * Turn it on, then tap any box or chart: Goldie explains it in one or two plain sentences.
+ * explain.js — Goldie explains the page for first-time visitors.
+ * Double-click (double-tap) any row, number, card or chart: Goldie explains that exact item, using its own numbers.
  * It only reads the page (never changes #app), so page re-renders cannot break it.
  * Links, buttons and inputs keep working normally while it is on.
  */
@@ -70,6 +70,165 @@
     [/^Check it yourself/, 'Check it yourself', 'All our code and data are public on GitHub, so anyone can run it again.']
   ];
 
+  // ---- Item notes: explain the exact row, card or number that was double-clicked, using its own numbers.
+  // Each pattern is matched against the item's whole text (spaces collapsed). Checked before the section notes.
+  var CON = {
+    GOLDM: 'Gold Mini: one lot is 100 g of 995-purity gold, priced per 10 g. It is the most traded of the four.',
+    GOLDTEN: 'Gold Ten: one lot is 10 g of 999-purity gold, priced per 10 g. It only started trading in March 2025.',
+    GOLDGUINEA: 'Gold Guinea: one lot is an 8 g coin of 999-purity gold, priced per 8 g.',
+    GOLDPETAL: 'Gold Petal: one lot is just 1 g of 999-purity gold, priced per 1 g. The smallest and cheapest way in.'
+  };
+  var WHY = {
+    'Back to normal': 'the gap went back near its normal level, which is what we bet on',
+    'Time limit': 'it reached the 10-day limit',
+    'Stop-loss': 'the gap kept growing, so the stop-loss closed it to limit the loss',
+    'Contract roll': 'one contract was close to expiry, so the trade was closed before switching to the next month'
+  };
+  var CHECK = {
+    'Enough history': 'We need enough past days to know what "normal" looks like for this pair.',
+    'Extreme gap': 'The gap must be unusual (z of about 2 or more), but not so extreme that it is already at the stop-loss.',
+    'Beats costs': 'The gap must be bigger than the cost line, so a trade could pay for all its fees.',
+    'Liquidity': 'Both contracts must be traded enough that we could really buy and sell them.',
+    'Timing': 'Not too close to expiry or a contract switch, so a trade does not get stuck in the delivery period.'
+  };
+  var FEE = {
+    'Slippage': 'the small amount you lose because you rarely trade at exactly the listed price',
+    'Commodity transaction tax': 'a government tax on commodity futures, charged when you sell',
+    'Exchange fees': 'what MCX charges for using the exchange',
+    'Brokerage': 'what your broker charges for each order',
+    'Stamp duty': 'a state tax, charged when you buy',
+    'GST': 'Goods and Services Tax on the brokerage and fees',
+    'SEBI fee': 'a tiny fee paid to SEBI, the market regulator'
+  };
+  var STEP = {
+    '1': 'Read the MCX files and check every row: dates, prices, no duplicates.',
+    '2': 'Turn every price into the price of pure gold, so the four contracts can be compared.',
+    '3': 'Adjust for different expiry dates: a later contract normally costs a little more.',
+    '4': 'Build the six pairs and the price gap (spread) of each one.',
+    '5': 'Measure how unusual each gap is (the z-score), using only earlier days.',
+    '6': 'Apply the five checks that decide both the alerts and the backtest trades.',
+    '7': 'Tune on two years, freeze the settings, then test on the next year the model never saw.',
+    '8': 'Subtract every MCX cost, then split the result into spread moves, gold price moves and costs.'
+  };
+  var GROUP = {
+    'Alerts, unseen year': 'Days in the test year when all five checks passed (an alert).',
+    'Alerts, training years': 'Alert days in the two training years.',
+    'Unusual gap, no alert': 'Days with an unusual gap that still failed another check, so no alert.',
+    'Ordinary days': 'Normal days with nothing unusual, for comparison.'
+  };
+  var MONEY = {
+    'Spread moves (what we bet on)': 'Money made or lost because the gap between the two contracts changed. This is the part the strategy is betting on.',
+    'Gold price moves (leftover exposure)': 'Money from gold\'s own price moving. The two legs almost cancel out, so this should be close to zero.',
+    'Costs and slippage': 'Everything paid in fees and slippage on these trades.',
+    'Result after costs': 'What was left after adding everything up.'
+  };
+  function n(s) { return parseFloat(String(s).replace(/[₹,+L%]/g, '').replace('−', '-')); }
+  function pc(bps) { return (Math.abs(n(bps)) / 100).toFixed(2) + '%'; }
+  function money(s) { return n(s) >= 0 ? 'made ' + s.replace(/^[+]/, '') : 'lost ' + s.replace(/^[−-]/, ''); }
+  function costLine() { var m = (document.querySelector('#app main') || document.body).innerText.match(/(\d+\.\d) bps(?:\s*\n?\s*2 × | \(cost line\)|\)\.?\s*$)/m) || document.body.innerText.match(/cost line \((\d+\.\d) bps\)/); return m ? m[1] : '48.8'; }
+  function near(el) { for (var i = 0; el && i < 4; i++, el = el.parentElement) { var m = (el.innerText || '').match(/\b(GOLDM|GOLDTEN|GOLDGUINEA|GOLDPETAL)\b/); if (m) return m[1]; } return 'This contract'; }
+  function pairOnPage() { var m = ((document.querySelector('#app main') || {}).innerText || '').match(/(GOLD\w+ · GOLD\w+)(?=: \w+ \d{4} to| at \d+ bps| · contracts)/); return m ? m[1] : 'this pair'; }
+  var P = '(GOLD\\w+) · (GOLD\\w+)';
+  var ITEMS = [
+    // Home: contract cards
+    [/^(GOLDM|GOLDTEN|GOLDGUINEA|GOLDPETAL) Gold \w+ · (\d+ g) lot$/, function (m) { return [m[1], CON[m[1]]]; }],
+    [/^₹([\d,]+) per (\d+) g$/, function (m, el) { return ['Today\'s price', near(el) + '\'s official closing price today: ₹' + m[1] + ' for ' + m[2] + ' g. Each contract is quoted for a different weight, so these raw prices cannot be compared directly.']; }],
+    [/^([▲▼]) ₹([\d,]+) \(([−+-]?[\d.]+)%\) Prev\. ₹([\d,]+)$/, function (m, el) { return ['Change since yesterday', near(el) + ' went ' + (m[1] === '▲' ? 'up' : 'down') + ' by ₹' + m[2] + ' (' + m[3].replace(/^[−-]/, '') + '%) from yesterday\'s closing price of ₹' + m[4] + '.']; }],
+    [/^Per 10 g pure gold ₹([\d,]+)$/, function (m, el) { return ['Price of 10 g of pure gold', 'We turn ' + near(el) + '\'s price into the price of 10 g of 100% pure gold: ₹' + m[1] + '. Now all four contracts can be compared fairly.']; }],
+    [new RegExp('^' + P + ' ([\\d.]+) bps$'), function (m) { var c = costLine(), g = n(m[3]); return [m[1] + ' vs ' + m[2], 'The price gap between ' + m[1] + ' and ' + m[2] + ' is ' + m[3] + ' bps (' + pc(m[3]) + ') away from its normal level. To be worth trading it must pass the cost line of ' + c + ' bps' + (g < n(c) ? ', so it is ' + (n(c) - g).toFixed(1) + ' bps short.' : '. It does.')]; }],
+    [/^([\d,]+) daily settlements checked$/, function (m) { return ['Prices checked', 'We checked ' + m[1] + ' official end-of-day prices: one per contract for every trading day.']; }],
+    [/^(\d+) years (.+)$/, function (m) { return ['How long', 'Our data covers about ' + m[1] + ' years of trading: ' + m[2] + '.']; }],
+    [/^(\d+) trades in 12 months the model never saw$/, function (m) { return ['The test year', 'We kept the last 12 months hidden while building the model. In that unseen year the rules made ' + m[1] + ' trades.']; }],
+    [/^([−+-]₹[\d,]+) that year after costs, leaving out the (.+) crash$/, function (m) { return ['Without the crash', 'If you leave out the unusual gold crash of ' + m[2] + ', the test-year trades ' + money(m[1]) + ' after costs. That is why we do not claim a reliable edge.']; }],
+    // Today
+    [/^Pairs above the cost line (\d+) of (\d+) (.+)$/, function (m) { return ['Pairs above the line', m[1] + ' of the ' + m[2] + ' pairs have a gap bigger than the cost line today. ' + (m[1] === '0' ? 'So nothing is worth trading; we wait.' : 'Those are worth a closer look on the Signals page.')]; }],
+    [new RegExp('^Biggest gap from normal ([\\d.]+) bps ' + P + '$'), function (m) { var c = costLine(); return ['Biggest gap', 'The largest gap today is ' + m[1] + ' bps, between ' + m[2] + ' and ' + m[3] + '. The cost line is ' + c + ' bps, so even the biggest gap is ' + (n(m[1]) < n(c) ? (n(c) - n(m[1])).toFixed(1) + ' bps short.' : 'above it.')]; }],
+    [/^Cost line ([\d.]+) bps 2 × ([\d.]+) bps round trip$/, function (m) { return ['The cost line', 'Buying and selling both contracts once costs about ' + m[2] + ' bps. To be safe we ask for twice that: ' + m[1] + ' bps. A gap smaller than this is not worth trading.']; }],
+    [new RegExp('^' + P + ' Contracts (\\S+) / (\\S+) · z ([−+-]?[\\d.]+), needs ±([\\d.]+) Gap Cost line Short by ([\\d.]+) ([\\d.]+) ([\\d.]+) (\\w+)$'), function (m) {
+      return [m[1] + ' vs ' + m[2], 'Today their gap is ' + m[7] + ' bps from normal. It must reach the cost line of ' + m[8] + ' bps, so it is ' + m[9] + ' bps short. Its z-score (how unusual the gap is) is ' + m[5].replace('−', '-') + '; it needs ±' + m[6] + '. Status: ' + m[10] + (m[10] === 'Quiet' ? ', so no trade.' : '.')]; }],
+    [/^(\d+ \w+ \d{4}) Weeks so far with a gap above the line: (\d+) of (\d+) Weeks the model actually traded: (\d+) of (\d+)$/, function (m) { return ['Up to ' + m[1], m[2] + ' of ' + m[3] + ' weeks had at least one gap above the cost line, but the model traded in only ' + m[4] + ' weeks, because the other four checks must pass too.']; }],
+    [new RegExp('^' + P + ' ([\\d.]+)$'), function (m) { return [m[1] + ' vs ' + m[2], 'In the week picked on the slider, the biggest gap from normal for this pair was ' + m[3] + ' bps. The gold line is the cost line it must pass.']; }],
+    [/^Drag to any week (.+)$/, function () { return ['The slider', 'Drag it to any week since October 2023, or press Replay. The bars above change to that week.']; }],
+    [new RegExp('^' + P + ' ([−+-]?[\\d.]+) bps ([−+-]?₹[\\d,]+) ([−+-]?[\\d.]+) bps ([\\d.]+) bps ([−+-]?[\\d.]+) \\(([\\d.]+)\\) ?(.*)$'), function (m) {
+      return [m[1] + ' vs ' + m[2], 'Spread now: ' + m[1] + ' is ' + m[3].replace(/^[+−-]/, '') + ' bps ' + (n(m[3]) < 0 ? 'cheaper' : 'dearer') + ' than ' + m[2] + ' (about ' + m[4].replace(/^[+−-]/, '') + ' per 10 g). Its normal level is ' + m[5] + ' bps, so the gap from normal is ' + m[6] + ' bps. z = ' + m[7].replace('−', '-') + ', needs ' + m[8] + '.' + (m[9] ? ' Checks failed: ' + m[9] + '.' : ' All checks passed.')]; }],
+    [/^Pair Spread now In ₹ per 10 g Normal level Gap from normal z \(needed\) Checks failed$/, function () { return ['The columns', 'Spread now: today\'s price difference. Normal level: its usual value. Gap from normal: how far today is from usual. z: how unusual that is. Checks failed: what stopped a trade.']; }],
+    // Market
+    [/^GOLDM ₹([\d,]+) GOLDTEN ₹([\d,]+) GOLDGUINEA ₹([\d,]+) GOLDPETAL ₹([\d,]+)$/, function (m) { var v = [m[1], m[2], m[3], m[4]].map(n); return ['Today, per 10 g of pure gold', 'All four contracts priced the same way. The dearest and the cheapest are only ₹' + (Math.max.apply(0, v) - Math.min.apply(0, v)).toLocaleString('en-IN') + ' apart, because it is the same gold.']; }],
+    [/^(GOLD\w+) ₹([\d,]+) per 10 g pure ([−+-]₹[\d,]+) ([−+-][\d.]+) bps$/, function (m) { return [m[1] + ' vs GOLDTEN', m[1] + ' costs ₹' + m[2] + ' for 10 g of pure gold, ' + m[3].replace(/^[+−-]/, '') + ' ' + (n(m[3]) >= 0 ? 'more' : 'less') + ' than GOLDTEN (' + m[4].replace(/^[+−-]/, '') + ' bps). This is before adjusting for their different expiry dates.']; }],
+    [/^GOLDTEN ₹([\d,]+) per 10 g pure Reference$/, function (m) { return ['GOLDTEN, the reference', 'GOLDTEN costs ₹' + m[1] + ' for 10 g of pure gold. The other three are compared with it.']; }],
+    [/^GOLDTEN now ([−+-][\d.]+) bps GOLDGUINEA now ([−+-][\d.]+) bps GOLDPETAL now ([−+-][\d.]+) bps$/, function (m) { return ['Compared with GOLDM today', 'After adjusting for expiry: GOLDTEN is ' + m[1] + ', GOLDGUINEA ' + m[2] + ' and GOLDPETAL ' + m[3] + ' bps compared with GOLDM. Above zero means dearer than GOLDM.']; }],
+    [new RegExp('^' + P + ' (not listed|[−+-]?[\\d.]+ bps) ([−+-]?[\\d.]+ bps) ([−+-]?[\\d.]+ bps) (.+)$'), function (m) { return [m[1] + ' vs ' + m[2], 'Its usual spread: ' + (m[3] === 'not listed' ? 'no data in Oct 2023 – Dec 2024' : m[3] + ' in Oct 2023 – Dec 2024') + ', ' + m[4] + ' in Apr 2025 – Sep 2026, and ' + m[5] + ' during the Jan–Mar 2026 crash. ' + m[6]]; }],
+    [/^(GOLD\w+) Gold \w+ (\d+ g) (\d+ g) (\d+) (.+?) · now (\d+ \w+ \d{4}) ([\d,]+) ([\d,]+)$/, function (m) { return [m[1], 'One lot is ' + m[2] + ', priced per ' + m[3] + ', purity ' + m[4] + ' out of 1000. It expires on the ' + m[5].charAt(0).toLowerCase() + m[5].slice(1) + '; the current contract ends ' + m[6] + '. On the last day ' + m[7] + ' lots traded and ' + m[8] + ' were still open.']; }],
+    [/^Contract Lot Priced per Purity Expires Volume \(lots\) Open interest$/, function () { return ['The columns', 'Lot: how much gold one contract is. Purity 999: 99.9% pure. Volume: lots traded that day. Open interest: contracts still open at the end of the day.']; }],
+    [/^price ÷ grams quoted ÷ purity × 10 = ₹ per 10 g of pure gold$/, function () { return ['The formula', 'Divide by the grams the price is for (to get 1 g), divide by purity (to get pure gold), then multiply by 10. Every contract ends up as "₹ per 10 g of pure gold".']; }],
+    [/^(GOLD\w+), (.+?) ₹([\d,]+) ÷ (\d+) ÷ ([\d.]+) × 10 = ₹([\d,]+)$/, function (m) { return [m[1] + ' worked example', 'Price ₹' + m[3] + ' is for ' + m[4] + ' g, so divide by ' + m[4] + ' for 1 g, divide by ' + m[5] + ' for pure gold, then × 10: ₹' + m[6] + ' per 10 g of pure gold.']; }],
+    // Pair Explorer
+    [/^Contracts now (\S+) \/ (\S+)$/, function (m) { return ['Contracts now', pairOnPage() + ' uses the ' + m[1] + ' and ' + m[2] + ' contracts right now. We always use the month with the most open interest.']; }],
+    [/^Spread today ([−+-]?[\d.]+) bps$/, function (m) { var p = pairOnPage().split(' · '); return ['Spread today', (p[1] ? p[0] + ' is ' + m[1].replace(/^[+−-]/, '') + ' bps (' + pc(m[1]) + ') ' + (n(m[1]) < 0 ? 'cheaper' : 'dearer') + ' than ' + p[1] : 'The spread is ' + m[1] + ' bps') + ', after adjusting for expiry.']; }],
+    [/^Normal level ([−+-]?[\d.]+) bps$/, function (m) { return ['Normal level', 'The usual spread for ' + pairOnPage() + ' over the last 30 trading days: ' + m[1] + ' bps. A trade bets on the spread coming back to this.']; }],
+    [/^History since (.+)$/, function (m) { return ['History', 'We have prices for this pair from ' + m[1] + ' to today.']; }],
+    [/^Model settings \(tuned on training data\) (\d+)-day window · enter at \|z\| ≥ ([\d.]+) · exit at \|z\| ≤ ([\d.]+) · hold ≤ (\d+) days$/, function (m) { return ['The rules', '"Normal" is measured over the last ' + m[1] + ' trading days. A trade starts when the gap is unusual (z ' + m[2] + ' or more), ends when it is back near normal (z ' + m[3] + ' or less), and never lasts more than ' + m[4] + ' days.']; }],
+    [/^(\d+ \w+ \d{4}) (Buy|Sell) (GOLD\w+), (buy|sell) (GOLD\w+) ([−+-][\d.]+) (\d+) (.+?) ([−+-]₹[\d,]+) ([−+-][\d.]+) bps (Unseen test|Training)$/, function (m) {
+      return ['Trade on ' + m[1], 'The model ' + (m[2] === 'Buy' ? 'bought ' : 'sold ') + m[3] + ' and ' + (m[4] === 'buy' ? 'bought ' : 'sold ') + m[5] + ' because the gap was unusual (z = ' + m[6].replace('−', '-') + '). It held ' + m[7] + (m[7] === '1' ? ' day' : ' days') + ' and closed because ' + (WHY[m[8]] || m[8].toLowerCase()) + '. After costs it ' + money(m[9]) + ' (' + m[10] + ' bps). ' + (m[11] === 'Training' ? 'This was in the training years.' : 'This was in the unseen test year.')]; }],
+    [/^Entered Trade z Days Why it closed Result Period$/, function () { return ['The columns', 'Entered: start date. Trade: what was bought and sold. z: how unusual the gap was. Days: how long it was held. Result: profit or loss after costs.']; }],
+    // Score cards (Pair Explorer and Backtesting)
+    [/^Trades (\d+)$|^Trades in the unseen year (\d+)(.*)$/, function (m) { var k = m[1] || m[2]; return ['Number of trades', k + ' trades in the year the model never saw. With fewer than about 30, results are shaky and can easily be luck.']; }],
+    [/^Won (\d+)%( after costs)?$/, function (m) { return ['Won', m[1] + '% of the trades made money after costs.']; }],
+    [/^Average per trade ([−+-][\d.]+) bps(?: every trade counts equally · before costs ([−+-][\d.]+) bps)?$/, function (m) { return ['Average per trade', 'Each trade made ' + m[1] + ' bps on average (' + pc(m[1]) + ' of one leg) after costs' + (m[2] ? '; before costs it was ' + m[2] + ' bps.' : '.')]; }],
+    [/^Total after costs ([−+-]?₹[\d,]+)(?: bigger trades count more · costs paid ₹([\d,]+))?$/, function (m) { return ['Total after costs', 'All the trades together ' + money(m[1]) + ' after paying every fee' + (m[2] ? ' (₹' + m[2] + ' in costs).' : '.')]; }],
+    [/^t-statistic ([−+-]?[\d.]+)(.*)$/, function (m) { return ['t-statistic', 'This says whether a result is more than luck. Ours is ' + m[1].replace('−', '-') + '. You usually need about 2 or more, so this result is ' + (Math.abs(n(m[1])) >= 2 ? 'strong.' : 'not proven.')]; }],
+    [/^Not statistically significant t-statistic ([−+-]?[\d.]+)/, function (m) { return ['Could it be luck?', 'The t-statistic is ' + m[1].replace('−', '-') + ', below the usual bar of about 2. With so few trades, this result could easily be luck.']; }],
+    [/^Training period, for comparison (.+)$/, function (m) { return ['Training years', 'How the same pair did in the two years used to tune the model: ' + m[1]]; }],
+    // Signals
+    [new RegExp('^' + P + ' · contracts (\\S+) / (\\S+) Quiet: (\\d) of 5 checks failed'), function (m) { return [m[1] + ' vs ' + m[2], m[5] + ' of the 5 checks failed today. All 5 must pass on the same day for a signal, so this pair stays quiet.']; }],
+    [/^Check (\d) (Pass|Fail) (Enough history|Extreme gap|Beats costs|Liquidity|Timing) (.+)$/, function (m) { return ['Check ' + m[1] + ': ' + m[3] + ' (' + m[2] + ')', CHECK[m[3]] + ' Today: ' + m[4].split(/\. (?=[A-Z])/)[0].replace(/\.$/, '') + '.']; }],
+    [/^Gap from normal ([\d.]+) bps about ₹([\d,]+) per 10 g of pure gold Needed to trade ([\d.]+) bps 2 × ([\d.]+) bps round trip$/, function (m) { var d = n(m[3]) - n(m[1]); return ['Gap vs cost', 'The gap is ' + m[1] + ' bps (about ₹' + m[2] + ' per 10 g). It needs ' + m[3] + ' bps, so it is ' + (d > 0 ? d.toFixed(1) + ' bps short. No trade.' : 'enough.')]; }],
+    [/^(Slippage|Commodity transaction tax|Exchange fees|Brokerage|Stamp duty|GST|SEBI fee) (.+) ([\d.]+)$/, function (m) { return [m[1], FEE[m[1]].charAt(0).toUpperCase() + FEE[m[1]].slice(1) + '. Here: ' + m[2] + '. It adds ' + m[3] + ' bps to one round trip.']; }],
+    [/^Total round trip ([\d.]+) bps$/, function (m) { return ['Total cost', 'All the fees for buying and selling both legs once: ' + m[1] + ' bps, about ₹' + Math.round(n(m[1]) * 100).toLocaleString('en-IN') + ' on ₹10 lakh.']; }],
+    [/^Slippage per order, bps Brokerage per order, ₹ Size of each leg, ₹ lakh$/, function () { return ['Your numbers', 'Type your own slippage, brokerage and trade size. Everything below updates.']; }],
+    [/^Our assumption: (.+)$/, function () { return ['Quick presets', 'Shortcuts: our own assumption, perfect fills, a busy market or a thin market. Try them to see how much costs matter.']; }],
+    [/^Your round trip ([\d.]+) bps about ₹([\d,]+) on ₹([\d.]+) lakh a leg$/, function (m) { return ['Your round trip', 'With your numbers, buying and selling both legs once costs ' + m[1] + ' bps, about ₹' + m[2] + ' on ₹' + m[3] + ' lakh a leg.']; }],
+    [/^Your cost line ([\d.]+) bps (.+)$/, function (m) { return ['Your cost line', 'Twice your round-trip cost, as a safety margin: ' + m[1] + ' bps. A gap must be bigger than this to be worth trading.']; }],
+    [/^Pairs above your line today (\d+) of 6 with our ([\d.]+) bps line: (\d+) of 6$/, function (m) { return ['Pairs above your line', 'With your costs, ' + m[1] + ' of 6 pairs would be worth trading today. With our ' + m[2] + ' bps line it is ' + m[3] + ' of 6.']; }],
+    [new RegExp('^' + P + ' ([\\d.]+) bps · (short by|above by|over by) ([\\d.]+)$'), function (m) { return [m[1] + ' vs ' + m[2], 'Today\'s gap is ' + m[3] + ' bps. Compared with your cost line it is ' + m[4] + ' ' + m[5] + ' bps' + (m[4] === 'short by' ? ', so not worth trading.' : ', so it would be worth a look.')]; }],
+    [/^(Alerts, unseen year|Alerts, training years|Unusual gap, no alert|Ordinary days) (.+?) · median gap ([\d.]+) bps (shrank|grew) ([\d.]+) bps (\d+)% closed at least halfway$/, function (m) { return [m[1], GROUP[m[1]] + ' ' + m[2] + '. The typical gap was ' + m[3] + ' bps; 10 trading days later it had ' + (m[4] === 'shrank' ? 'shrunk' : 'grown') + ' by ' + m[5] + ' bps (one round trip costs 24.4 bps). ' + m[6] + '% closed at least halfway.']; }],
+    [/^Signal Held Trade z Outcome Result Period$/, function () { return ['The columns', 'Signal: the day it fired. Held: days in the trade. z: how unusual the gap was. Result: profit or loss after costs.']; }],
+    // Backtesting
+    [/^Closed during the Jan–Mar 2026 crash Every other trade$/, function () { return ['The two colours', 'Gold bars: trades that closed during the Jan–Mar 2026 gold crash. Grey bars: all the other trades.']; }],
+    [/^at (\d+) bps( \(ours\))? ([−+-]₹[\d.]+L) ([−+-]₹[\d.]+L)$/, function (m) { return ['At ' + m[1] + ' bps slippage' + (m[2] ? ' (ours)' : ''), 'Trades that closed during the crash ' + money(m[3]) + '; all other trades ' + money(m[4]) + '. L means lakh (₹1,00,000).']; }],
+    [/^(Unseen year, all trades|Unseen year, without the crash|Training years) (.+?) ([−+-]₹[\d,]+) 95% range ([−+-]₹[\d,]+) to ([−+-]₹[\d,]+) (\d+)% of resamples above ₹0$/, function (m) { return [m[1], m[2] + ': the result was ' + m[3] + '. Reshuffling these trades 10,000 times, 95% of results fell between ' + m[4] + ' and ' + m[5] + '. ' + m[6] + '% were above zero, so ' + (n(m[6]) >= 95 ? 'it is fairly solid.' : 'we cannot rule out luck.')]; }],
+    [/^95% range of resampled results/, function () { return ['How to read the bars', 'Each bar is the range where 95% of the reshuffled results fell. The dot is the real result. A bar crossing ₹0 means it could be a loss.']; }],
+    [/^(Five checks: what this site shows|Original study: four checks, no cost line|Five checks \+ training switch \(.+?\)) (\S+) (\S+) (\S+) (\S+) (\S+) (\S+)$/, function (m) { function v(x) { return x === '–' ? 'not tested' : x; } return [m[1].replace(/:.*/, ''), 'Training: ' + v(m[2]) + ' trades, ' + v(m[3]) + '. Unseen year: ' + v(m[4]) + ' trades, ' + v(m[5]) + '. Outside the crash: ' + v(m[6]) + '. t-statistic: ' + v(m[7]) + ' (needs about 2).']; }],
+    [/^Rule Training trades Training result Unseen trades Unseen result Outside the crash t-statistic$/, function () { return ['The columns', 'Each row is one version of the rule, scored on the training years and on the unseen year. "Outside the crash" leaves out Jan–Mar 2026.']; }],
+    [new RegExp('^' + P + ' · (On|Off) (.+)$'), function (m) { return [m[1] + ' vs ' + m[2] + ': ' + m[3], 'Training switch ' + m[3].toLowerCase() + ': ' + m[4].charAt(0).toLowerCase() + m[4].slice(1) + '. A pair is only traded in the test year if it had at least 10 training trades and made money in training.']; }],
+    [/^Slippage per order 0 bps/, function () { return ['Slippage', 'Pick how much you lose per order to slippage. Everything below is recalculated.']; }],
+    [/^(\d+) bps( \(our assumption\))? (\d+) ([−+-][\d.]+) bps ([−+-][\d.]+) bps ([−+-]₹[\d,]+) (\d+)%$/, function (m) { return ['At ' + m[1] + ' bps slippage', m[3] + ' trades. Average ' + m[4] + ' bps before costs and ' + m[5] + ' bps after. In total they ' + money(m[6]) + '; ' + m[7] + '% won.']; }],
+    [/^Slippage per order Trades Before costs After costs Total ₹ Won$/, function () { return ['The columns', 'Each row is the same trades with a different slippage. The more you lose per order, the smaller the profit.']; }],
+    [/^(Spread moves \(what we bet on\)|Gold price moves \(leftover exposure\)|Costs and slippage|Result after costs) ([−+-]₹[\d,]+)$/, function (m) { return [m[1].replace(/ \(.*\)/, ''), MONEY[m[1]] + ' Here: ' + m[2] + '.']; }],
+    [/^Pair Oct 2023 – Dec 2024 Apr 2025 – Sep 2026 Jan–Mar 2026 crash What happened$/, function () { return ['The columns', 'The usual spread for each pair in three periods. If "normal" moves this much, a fixed average would mislead, so we use a rolling one.']; }],
+    [/^Download Last settlement (.+?) Search(?: Ctrl O| ⌘ O)? \?$/, function (m) { return ['The top bar', 'Download the data, see the date of the latest prices (' + m[1] + '), Search to jump to any page (Ctrl O), switch dark or light, and ? for the meaning of words.']; }],
+    // Data
+    [/^([\d,]+) daily settlements (.+)$/, function (m) { return [m[1] + ' prices', 'One official closing price per contract for every trading day: ' + m[1] + ' rows in all.']; }],
+    [/^(\d+) contracts (.+)$/, function (m) { return [m[1] + ' contracts', 'Each month has its own contract for each symbol. We have every one in the period: ' + m[1] + ' in total.']; }],
+    [/^(\d+) trading days (.+)$/, function (m) { return [m[1] + ' trading days', 'Days when MCX was open: ' + m[2]]; }],
+    [/^0 mismatches (.+)$/, function () { return ['0 mismatches', 'We compared our cleaned data with the raw MCX file, row by row. Not a single number differs.']; }],
+    [/^(\d+) days with no trades removed/, function (m) { return [m[1] + ' days removed', 'On these days a contract had zero trades, so its "price" was not real. We left them out.']; }],
+    [/^(\d+) thin days flagged/, function (m) { return [m[1] + ' thin days', 'Very little trading on these days. We take no new signals then, and assume 3× slippage if a trade is already open.']; }],
+    [/^(\d+) special weekend sessions kept (.+)$/, function (m) { return [m[1] + ' weekend sessions', 'MCX opened on special weekend days (Diwali Muhurat and Union Budget days). Those were real trading days, so we kept them: ' + m[2]]; }],
+    [/^([1-8]) (Load & Validate|Normalize|Implied Carry|Pair Construction|Point-in-Time z-scores|One rule: five checks|Walk-Forward Test|Costs & Attribution)( .*)?$/, function (m) { return ['Step ' + m[1] + ': ' + m[2], STEP[m[1]]]; }],
+    [/^(GOLD\w+) (\d+ \w+ \d{4}) (\d+ \w+ \d{4}) to (\d+ \w+ \d{4}) (\d+) (\d+ \w+ \d{4}) to (\d+ \w+ \d{4})$/, function (m) { return ['One download', 'The ' + m[1] + ' contract that expired on ' + m[2] + '. We asked MCX for ' + m[3] + ' to ' + m[4] + ' and got ' + m[5] + ' daily prices, from ' + m[6] + ' to ' + m[7] + '.']; }],
+    [/^Contract Expiry Requested range Rows First to last trading day$/, function () { return ['The columns', 'One row per file we downloaded from MCX: which contract, what dates we asked for, and how many daily prices came back.']; }]
+  ];
+  function findItem(el) {
+    var t = (el.innerText || '').replace(/\s+/g, ' ').trim();
+    if (!t || t.length > 700) return null;
+    for (var i = 0; i < ITEMS.length; i++) {
+      var m = t.match(ITEMS[i][0]);
+      if (m) { try { var r = ITEMS[i][1](m, el); if (r && r[1]) return { el: el, title: r[0], text: r[1] }; } catch (err) { return null; } }
+    }
+    return null;
+  }
+
   var GOLDIE = '<svg viewBox="0 0 48 40" width="40" height="34" aria-hidden="true"><path d="M6 14L9 5H35L38 14Z" fill="#F2A93B"/><path d="M12 33L15 24H41L44 33Z" fill="#C9821F"/>' +
     '<circle cx="18" cy="10" r="3.2" fill="#fff"/><circle cx="26" cy="10" r="3.2" fill="#fff"/><circle cx="18.8" cy="10.4" r="1.5" fill="#070D14"/><circle cx="26.8" cy="10.4" r="1.5" fill="#070D14"/></svg>';
 
@@ -91,6 +250,10 @@
 
   function find(el) {
     var main = document.querySelector('#app main');
+    if (!main || !el || !main.contains(el)) return null;
+    // 1) The exact item (row, card, number) under the pointer, with its own numbers
+    for (var e = el; e && e !== main; e = e.parentElement) { var item = findItem(e); if (item) return item; }
+    // 2) Otherwise the note for the section it sits in
     for (; el && el !== document.body; el = el.parentElement) {
       if (main && !main.contains(el)) return null;
       var txt = (el.innerText || '').trim().slice(0, 200);
@@ -161,5 +324,5 @@
   document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && tip) clearTip(); });
   window.addEventListener('scroll', clearTip, { passive: true });
   window.addEventListener('hashchange', clearTip);
-  window.GRVExplain = { show: show, clear: clearTip, notes: NOTES, find: find };
+  window.GRVExplain = { show: show, clear: clearTip, notes: NOTES, items: ITEMS, find: find };
 })();
