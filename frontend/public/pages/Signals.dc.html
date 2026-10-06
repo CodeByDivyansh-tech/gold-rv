@@ -156,6 +156,75 @@ button:focus-visible,a:focus-visible,input:focus-visible{outline:2px solid #F2A9
           </section>
         </div>
 
+        <section aria-labelledby="calc-h" style="background: var(--panel); border: 1px solid var(--line); border-radius: 20px; padding: clamp(18px, 2.5vw, 26px); display: flex; flex-direction: column; gap: 16px">
+          <div style="display: flex; flex-direction: column; gap: 4px">
+            <h2 id="calc-h" style="margin: 0; font-size: 18px; font-weight: 600">Work out your own cost</h2>
+            <span style="font-size: 13px; color: var(--muted); line-height: 1.6; max-width: 82ch">Put in your own broker's numbers. Taxes and exchange fees are fixed by MCX and the government, so only slippage, brokerage and trade size change. The cost line moves, and so does the number of pairs that clear it on {{calc.asOf}}.</span>
+          </div>
+          <div style="display: flex; flex-wrap: wrap; gap: 12px">
+            <label style="flex: 1 1 180px; min-width: 0; display: flex; flex-direction: column; gap: 6px; font-size: 13px; color: var(--muted)" for="calc-slip">Slippage per order, bps
+              <input id="calc-slip" type="number" inputmode="decimal" min="0" max="100" step="0.5" value="{{calc.slip}}" onChange="{{calc.setSlip}}" style="min-height: 44px; padding: 0 12px; border-radius: 12px; border: 1px solid var(--line); background: var(--raised); color: var(--fg); font: 500 16px 'Geist Mono', ui-monospace, monospace; width: 100%; box-sizing: border-box">
+            </label>
+            <label style="flex: 1 1 180px; min-width: 0; display: flex; flex-direction: column; gap: 6px; font-size: 13px; color: var(--muted)" for="calc-brok">Brokerage per order, ₹
+              <input id="calc-brok" type="number" inputmode="decimal" min="0" max="10000" step="1" value="{{calc.brok}}" onChange="{{calc.setBrok}}" style="min-height: 44px; padding: 0 12px; border-radius: 12px; border: 1px solid var(--line); background: var(--raised); color: var(--fg); font: 500 16px 'Geist Mono', ui-monospace, monospace; width: 100%; box-sizing: border-box">
+            </label>
+            <label style="flex: 1 1 180px; min-width: 0; display: flex; flex-direction: column; gap: 6px; font-size: 13px; color: var(--muted)" for="calc-size">Size of each leg, ₹ lakh
+              <input id="calc-size" type="number" inputmode="decimal" min="0.1" max="10000" step="1" value="{{calc.size}}" onChange="{{calc.setSize}}" style="min-height: 44px; padding: 0 12px; border-radius: 12px; border: 1px solid var(--line); background: var(--raised); color: var(--fg); font: 500 16px 'Geist Mono', ui-monospace, monospace; width: 100%; box-sizing: border-box">
+            </label>
+          </div>
+          <div style="display: flex; flex-wrap: wrap; gap: 8px">
+            <sc-for list="{{calc.presets}}" as="q" hint-placeholder-count="4">
+              <button type="button" onClick="{{q.go}}" aria-pressed="{{q.on}}" style="min-height: 40px; padding: 0 14px; border-radius: 999px; border: 1px solid {{q.border}}; background: {{q.bg}}; color: {{q.color}}; font: 500 13px 'Geist', system-ui, sans-serif; cursor: pointer">{{q.label}}</button>
+            </sc-for>
+          </div>
+          <div role="status" aria-live="polite" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(170px, 100%), 1fr)); gap: 12px">
+            <div style="background: var(--raised); border-radius: 14px; padding: 14px 16px; display: flex; flex-direction: column; gap: 4px"><span style="font-size: 12px; color: var(--muted)">Your round trip</span><span style="font-family: 'Geist Mono', ui-monospace, monospace; font-size: 24px; font-weight: 600">{{calc.rt}} bps</span><span style="font-size: 12px; color: var(--muted)">{{calc.rtRs}}</span></div>
+            <div style="background: var(--raised); border-radius: 14px; padding: 14px 16px; display: flex; flex-direction: column; gap: 4px"><span style="font-size: 12px; color: var(--muted)">Your cost line</span><span style="font-family: 'Geist Mono', ui-monospace, monospace; font-size: 24px; font-weight: 600; color: var(--gold)">{{calc.line}} bps</span><span style="font-size: 12px; color: var(--muted)">2 × round trip, our safety margin</span></div>
+            <div style="background: var(--raised); border-radius: 14px; padding: 14px 16px; display: flex; flex-direction: column; gap: 4px"><span style="font-size: 12px; color: var(--muted)">Pairs above your line today</span><span style="font-family: 'Geist Mono', ui-monospace, monospace; font-size: 24px; font-weight: 600">{{calc.count}}</span><span style="font-size: 12px; color: var(--muted)">{{calc.vsOurs}}</span></div>
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 0">
+            <sc-for list="{{calc.rows}}" as="r" hint-placeholder-count="6">
+              <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 6px 14px; padding: 9px 0; border-top: 1px solid var(--line); font-size: 14px">
+                <span style="flex: 1 1 180px; min-width: 0; font-weight: 600">{{r.label}}</span>
+                <div aria-hidden="true" style="flex: 3 1 200px; position: relative; height: 14px; background: var(--raised); border-radius: 7px">
+                  <div style="position: absolute; left: 0; top: 0; bottom: 0; width: {{r.w}}; border-radius: 7px; background: {{r.bar}}"></div>
+                  <div style="position: absolute; left: {{r.lineX}}; top: -3px; bottom: -3px; width: 2px; background: var(--gold)"></div>
+                </div>
+                <span style="flex: 0 0 auto; margin-left: auto; font-family: 'Geist Mono', ui-monospace, monospace; font-size: 13px; color: {{r.color}}">{{r.text}}</span>
+              </div>
+            </sc-for>
+          </div>
+          <p style="margin: 0; font-size: 13px; line-height: 1.6; color: var(--muted)">{{calc.note}}</p>
+        </section>
+
+        <sc-if value="{{ft.show}}" hint-placeholder-val="{{ true }}">
+        <section aria-labelledby="ft-h" style="background: var(--panel); border: 1px solid var(--line); border-radius: 20px; padding: clamp(18px, 2.5vw, 26px); display: flex; flex-direction: column; gap: 16px">
+          <div style="display: flex; flex-direction: column; gap: 4px">
+            <h2 id="ft-h" style="margin: 0; font-size: 18px; font-weight: 600">After an alert, does the gap close?</h2>
+            <span style="font-size: 13px; color: var(--muted); line-height: 1.6; max-width: 82ch">{{ft.intro}}</span>
+          </div>
+          <div style="display: flex; flex-wrap: wrap; gap: 8px 18px; font-size: 13px; color: var(--muted)">
+            <span style="display: inline-flex; align-items: center; gap: 6px"><span style="width: 22px; height: 10px; border-radius: 3px; background: var(--muted)"></span>How much the gap shrank in 10 trading days (median)</span>
+            <span style="display: inline-flex; align-items: center; gap: 6px"><span style="width: 2px; height: 14px; background: var(--gold)"></span>Round-trip cost, {{ft.cost}} bps</span>
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 0">
+            <sc-for list="{{ft.rows}}" as="r" hint-placeholder-count="4">
+              <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 8px 18px; padding: 12px 0; border-top: 1px solid var(--line)">
+                <span style="flex: 1 1 210px; min-width: 0; display: flex; flex-direction: column; gap: 2px"><span style="font-weight: 600; font-size: 14px">{{r.name}}</span><span style="font-size: 12px; color: var(--muted)">{{r.sub}}</span></span>
+                <div role="img" aria-label="{{r.aria}}" style="flex: 3 1 240px; position: relative; height: 26px">
+                  <div style="position: absolute; left: 0; right: 0; top: 12px; height: 2px; background: var(--raised)"></div>
+                  <div style="position: absolute; left: {{r.left}}; width: {{r.width}}; top: 5px; height: 16px; border-radius: 4px; background: {{r.bar}}"></div>
+                  <div style="position: absolute; left: {{r.zero}}; top: 0; bottom: 0; width: 1px; background: var(--muted)"></div>
+                  <div style="position: absolute; left: {{r.cost}}; top: -2px; bottom: -2px; width: 2px; background: var(--gold)"></div>
+                </div>
+                <span style="flex: 0 0 auto; margin-left: auto; min-width: 150px; display: flex; flex-direction: column; align-items: flex-end; gap: 1px"><span style="font-family: 'Geist Mono', ui-monospace, monospace; font-weight: 600; color: {{r.color}}">{{r.closed}}</span><span style="font-size: 12px; color: var(--muted)">{{r.half}}</span></span>
+              </div>
+            </sc-for>
+          </div>
+          <p style="margin: 0; font-size: 14px; line-height: 1.6">{{ft.note}}</p>
+        </section>
+        </sc-if>
+
         <section aria-labelledby="past-h" style="display: flex; flex-direction: column; gap: 12px">
           <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 8px">
             <h2 id="past-h" style="margin: 0; font-size: 18px; font-weight: 600">Every trade the backtest took for this pair</h2>
@@ -249,6 +318,10 @@ class Component extends DCLogic {
       .then((r) => r.json())
       .then((d) => this.setState({ D: d }))
       .catch(() => this.setState({ failed: true }));
+    fetch('data/robustness.json')
+      .then((r) => r.json())
+      .then((r) => this.setState({ R: r }))
+      .catch(() => {});
   }
 
   tokens(dark) {
@@ -362,7 +435,78 @@ class Component extends DCLogic {
       (hist.length ? '' : 'This pair never met all five at once. ') +
       'Training switch: ' + (sw.on ? 'on' : 'off') + ' (' + sw.reason + ').';
 
-    return { ...shell, loading: false, ready: true, chips, status, gates, meter, costs, costTotal, costNote, past, pastCount, pastNote, morePast };
+    // ---- your-own-cost calculator (same formula as the pipeline's cost model)
+    const num = (v, d) => { const x = parseFloat(v); return isFinite(x) && x >= 0 ? x : d; };
+    const cs = st.cs ?? '5', cb = st.cb ?? '20', cz = st.cz ?? '10';
+    const sl = num(cs, 5), br = num(cb, 20), sz = Math.max(0.1, num(cz, 10));
+    const NL = sz * 1e5;
+    const part = { slip: 4 * sl, ctt: 2.0, exch: 0.84, brok: 4 * br / NL * 1e4, stamp: 0.4, sebi: 4 * 10 / 1e7 * 1e4 };
+    part.gst = 0.18 * (part.brok + part.exch + part.sebi);
+    const rtC = part.slip + part.ctt + part.exch + part.brok + part.stamp + part.sebi + part.gst;
+    const lineC = 2 * rtC;
+    const devMax = Math.max(lineC, ...D.today.map((t) => t.dev)) * 1.08;
+    const calcRows = D.today.map((t) => {
+      const ok = t.dev >= lineC;
+      return { label: t.label, w: (t.dev / devMax * 100).toFixed(2) + '%', lineX: (lineC / devMax * 100).toFixed(2) + '%',
+        bar: ok ? 'var(--up)' : 'var(--muted)', color: ok ? 'var(--up)' : 'var(--muted)',
+        text: t.dev.toFixed(1) + ' bps · ' + (ok ? 'clears it' : 'short by ' + (lineC - t.dev).toFixed(1)) };
+    });
+    const nOk = D.today.filter((t) => t.dev >= lineC).length;
+    const nOurs = D.today.filter((t) => t.dev >= 2 * D.rt).length;
+    const presetDefs = [
+      { label: 'Our assumption: 5 bps, ₹20', v: ['5', '20', '10'] },
+      { label: 'Perfect fills: 0 bps', v: ['0', '20', '10'] },
+      { label: 'Busy market: 2 bps', v: ['2', '20', '10'] },
+      { label: 'Thin market: 10 bps', v: ['10', '20', '10'] }
+    ];
+    const calc = {
+      slip: cs, brok: cb, size: cz, asOf: this.fd(D.asOf),
+      setSlip: (e) => this.setState({ cs: e.target.value }),
+      setBrok: (e) => this.setState({ cb: e.target.value }),
+      setSize: (e) => this.setState({ cz: e.target.value }),
+      presets: presetDefs.map((q) => {
+        const on = q.v[0] === cs && q.v[1] === cb && q.v[2] === cz;
+        return { label: q.label, on: on ? 'true' : 'false', border: on ? 'var(--gold)' : 'var(--line)', bg: on ? 'var(--glow)' : 'var(--panel)', color: on ? 'var(--gold)' : 'var(--fg)',
+          go: () => this.setState({ cs: q.v[0], cb: q.v[1], cz: q.v[2] }) };
+      }),
+      rt: rtC.toFixed(2), rtRs: 'about ₹' + Math.round(rtC / 1e4 * NL).toLocaleString('en-IN') + ' on ₹' + sz.toLocaleString('en-IN') + ' lakh a leg',
+      line: lineC.toFixed(1), count: nOk + ' of ' + D.today.length,
+      vsOurs: 'with our ' + (2 * D.rt).toFixed(1) + ' bps line: ' + nOurs + ' of ' + D.today.length,
+      rows: calcRows,
+      note: 'Only the cost check is recalculated here. A real alert also needs the other four checks: an unusual gap, enough history, liquid contracts and time left to expiry. Slippage is ' + (part.slip / rtC * 100).toFixed(0) + '% of your cost, so it decides most of the answer.'
+    };
+
+    const R = (this.state || {}).R;
+    let ft = { show: false, rows: [], intro: '', note: '', cost: '' };
+    if (R && R.alerts && R.alerts.alert_test) {
+      const A = R.alerts, cost = R.round_trip_cost_bps;
+      const items = [
+        { name: 'Alerts, unseen year', sub: A.alert_test.n + ' alerts · median gap ' + A.alert_test.median_gap_bps.toFixed(0) + ' bps', x: A.alert_test },
+        { name: 'Alerts, training years', sub: A.alert_train.n + ' alerts · median gap ' + A.alert_train.median_gap_bps.toFixed(0) + ' bps', x: A.alert_train },
+        { name: 'Unusual gap, no alert', sub: A.unusual_small.n.toLocaleString('en-IN') + ' days that failed another check · median gap ' + A.unusual_small.median_gap_bps.toFixed(0) + ' bps', x: A.unusual_small },
+        { name: 'Ordinary days', sub: A.ordinary.n.toLocaleString('en-IN') + ' days with |z| below 1 · median gap ' + A.ordinary.median_gap_bps.toFixed(0) + ' bps', x: A.ordinary }
+      ];
+      const vals = items.map((i) => i.x.median_closed_bps).concat([0, cost]);
+      const lo = Math.min(...vals) - 6, hi = Math.max(...vals) + 6;
+      const X = (v) => (v - lo) / (hi - lo) * 100;
+      ft = {
+        show: true, cost: cost.toFixed(1),
+        intro: 'For every day we measured how much the gap from normal shrank over the next ' + R.horizon_days + ' trading days, while the same two contracts were still held. A trade only pays if the gap shrinks by more than the ' + cost.toFixed(1) + ' bps round-trip cost. All six pairs, ' + this.fd(D.split.train_start) + ' to ' + this.fd(D.asOf) + '.',
+        rows: items.map((i) => {
+          const v = i.x.median_closed_bps, l = Math.min(X(0), X(v)), w = Math.abs(X(v) - X(0));
+          return {
+            name: i.name, sub: i.sub, left: l.toFixed(2) + '%', width: w.toFixed(2) + '%', zero: X(0).toFixed(2) + '%', cost: X(cost).toFixed(2) + '%',
+            bar: v >= cost ? 'var(--up)' : (v >= 0 ? 'var(--muted)' : 'var(--down)'),
+            closed: (v < 0 ? 'grew ' : 'shrank ') + Math.abs(v).toFixed(1) + ' bps', color: v >= cost ? 'var(--up)' : (v < 0 ? 'var(--down)' : 'var(--fg)'),
+            half: i.x.halfway_pct + '% closed at least halfway',
+            aria: i.name + ': gap ' + (v < 0 ? 'grew ' : 'shrank ') + Math.abs(v).toFixed(1) + ' bps in ' + R.horizon_days + ' days, cost ' + cost.toFixed(1) + ' bps'
+          };
+        }),
+        note: 'In the unseen year the gap after an alert shrank a median ' + A.alert_test.median_closed_bps.toFixed(1) + ' bps, more than the cost. In training it shrank only ' + A.alert_train.median_closed_bps.toFixed(1) + ' bps, less than the cost, which matches the training loss. Unusual gaps that did not pass every check shrank ' + A.unusual_small.median_closed_bps.toFixed(1) + ' bps, not enough to pay for a trade; that is what the cost line filters out. On ordinary days the gap does not close at all. So alerts point at real moves, but whether those moves pay depends on the period.'
+      };
+    }
+
+    return { ...shell, loading: false, ready: true, chips, status, gates, meter, costs, costTotal, costNote, past, pastCount, pastNote, morePast, ft, calc };
   }
 }
 </script>

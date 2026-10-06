@@ -119,6 +119,36 @@ button:focus-visible,a:focus-visible,input:focus-visible{outline:2px solid #F2A9
           </section>
         </div>
 
+        <sc-if value="{{rob.show}}" hint-placeholder-val="{{ true }}">
+        <section aria-labelledby="sure-h" style="background: var(--panel); border: 1px solid var(--line); border-radius: 20px; padding: clamp(18px, 2.5vw, 26px); display: flex; flex-direction: column; gap: 16px">
+          <div style="display: flex; flex-direction: column; gap: 4px">
+            <h2 id="sure-h" style="margin: 0; font-size: 18px; font-weight: 600">How sure can we be?</h2>
+            <span style="font-size: 13px; color: var(--muted); line-height: 1.6; max-width: 82ch">{{rob.intro}}</span>
+          </div>
+          <div style="display: flex; flex-wrap: wrap; gap: 8px 18px; font-size: 13px; color: var(--muted)">
+            <span style="display: inline-flex; align-items: center; gap: 6px"><span style="width: 22px; height: 10px; border-radius: 5px; background: var(--glow); outline: 1px solid var(--gold)"></span>95% range of resampled results</span>
+            <span style="display: inline-flex; align-items: center; gap: 6px"><span style="width: 12px; height: 12px; border-radius: 50%; background: var(--fg)"></span>Actual result</span>
+            <span style="display: inline-flex; align-items: center; gap: 6px"><span style="width: 1px; height: 14px; background: var(--muted)"></span>₹0</span>
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 14px">
+            <sc-for list="{{rob.rows}}" as="r" hint-placeholder-count="3">
+              <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 8px 18px; padding-top: 12px; border-top: 1px solid var(--line)">
+                <span style="flex: 1 1 200px; min-width: 0; display: flex; flex-direction: column; gap: 2px"><span style="font-weight: 600; font-size: 14px">{{r.name}}</span><span style="font-size: 12px; color: var(--muted)">{{r.sub}}</span></span>
+                <div role="img" aria-label="{{r.aria}}" style="flex: 3 1 260px; position: relative; height: 30px">
+                  <div style="position: absolute; left: 0; right: 0; top: 14px; height: 2px; background: var(--raised)"></div>
+                  <div style="position: absolute; left: {{r.lo}}; width: {{r.w}}; top: 8px; height: 14px; border-radius: 7px; background: var(--glow); outline: 1px solid var(--gold)"></div>
+                  <div style="position: absolute; left: {{r.zero}}; top: 0; bottom: 0; width: 1px; background: var(--muted)"></div>
+                  <div style="position: absolute; left: {{r.pt}}; top: 8px; width: 14px; height: 14px; margin-left: -7px; border-radius: 50%; background: var(--fg); border: 2px solid var(--panel)"></div>
+                </div>
+                <span style="flex: 0 0 auto; margin-left: auto; min-width: 190px; display: flex; flex-direction: column; align-items: flex-end; gap: 1px"><span style="font-family: 'Geist Mono', ui-monospace, monospace; font-weight: 600; color: {{r.color}}">{{r.total}}</span><span style="font-family: 'Geist Mono', ui-monospace, monospace; font-size: 12px; color: var(--muted)">{{r.range}}</span><span style="font-size: 12px; color: var(--muted)">{{r.share}}</span></span>
+              </div>
+            </sc-for>
+          </div>
+          <div style="display: flex; justify-content: space-between; font-family: 'Geist Mono', ui-monospace, monospace; font-size: 12px; color: var(--muted)"><span>{{rob.axisLo}}</span><span>{{rob.axisHi}}</span></div>
+          <p style="margin: 0; font-size: 14px; line-height: 1.6">{{rob.note}}</p>
+        </section>
+        </sc-if>
+
         <section aria-labelledby="rule-h" style="background: var(--panel); border: 1px solid var(--line); border-radius: 20px; padding: clamp(18px, 2.5vw, 26px); display: flex; flex-direction: column; gap: 14px">
           <div style="display: flex; flex-direction: column; gap: 4px">
             <h2 id="rule-h" style="margin: 0; font-size: 18px; font-weight: 600">One rule for alerts and backtest</h2>
@@ -340,6 +370,10 @@ class Component extends DCLogic {
       .then((r) => r.json())
       .then((d) => this.setState({ D: d }))
       .catch(() => this.setState({ failed: true }));
+    fetch('data/robustness.json')
+      .then((r) => r.json())
+      .then((r) => this.setState({ R: r }))
+      .catch(() => {});
   }
 
   tokens(dark) {
@@ -541,10 +575,38 @@ class Component extends DCLogic {
     const pr = B.params;
     const settings = 'Settings for ' + D.pairs[pid].label + ', chosen on ' + this.fd(D.split.train_start) + ' to ' + this.fd(D.split.train_end) + ' and then frozen: ' + pr.W + '-day window, enter at |z| ≥ ' + pr.ze + ', exit at |z| ≤ ' + pr.zx + ', hold at most ' + pr.mh + ' days, ₹10 lakh per leg, stop-loss at |z| ≥ ' + pr.stop_z + '. A trade needs all five checks: an unusual gap below the stop-loss, a gap of at least ' + pr.hurdle_bps + ' bps (the cost line), liquid contracts and at least ' + D.minTd + ' trading days to expiry. Signals are decided at one day\'s close and filled at the next day\'s close, never on a day either contract moved ' + pr.max_fill_move_pct.toFixed(0) + '% or more.';
 
+    const R = st.R;
+    let rob = { show: false, rows: [], intro: '', note: '', axisLo: '', axisHi: '' };
+    if (R && R.bootstrap && R.bootstrap['5']) {
+      const b5 = R.bootstrap['5'], bt = R.bootstrap.train_5;
+      const items = [
+        { name: 'Unseen year, all trades', sub: b5.all.n + ' trades, 1 Oct 2025 – 30 Sep 2026', x: b5.all },
+        { name: 'Unseen year, without the crash', sub: b5.without_crash.n + ' trades that closed outside ' + D.events.crashShort, x: b5.without_crash },
+        { name: 'Training years', sub: bt.n + ' trades, 10 Oct 2023 – 30 Sep 2025', x: bt }
+      ];
+      const lo = Math.min(0, ...items.map((i) => i.x.lo)), hi = Math.max(0, ...items.map((i) => i.x.hi));
+      const pad = (hi - lo) * 0.04, a = lo - pad, z = hi + pad;
+      const X = (v) => ((v - a) / (z - a) * 100).toFixed(2) + '%';
+      const lakh = (v) => (v < 0 ? '−' : '') + '₹' + (Math.abs(v) / 1e5).toFixed(2) + 'L';
+      rob = {
+        show: true,
+        intro: 'Twenty trades is a small sample, so we resampled them ' + R.draws.toLocaleString('en-IN') + ' times (drawing trades at random, with repeats) to see how much the total could have swung by luck. All at our 5 bps slippage assumption.',
+        rows: items.map((i) => ({
+          name: i.name, sub: i.sub, lo: X(i.x.lo), w: ((i.x.hi - i.x.lo) / (z - a) * 100).toFixed(2) + '%', zero: X(0), pt: X(i.x.total),
+          total: this.srs(i.x.total), color: i.x.total >= 0 ? 'var(--up)' : 'var(--down)',
+          range: '95% range ' + this.srs(i.x.lo) + ' to ' + this.srs(i.x.hi),
+          share: i.x.above_zero_pct + '% of resamples above ₹0',
+          aria: i.name + ': ' + this.srs(i.x.total) + ', 95% range ' + this.srs(i.x.lo) + ' to ' + this.srs(i.x.hi)
+        })),
+        axisLo: lakh(a), axisHi: lakh(z),
+        note: 'The full unseen year looks safely positive (' + b5.all.above_zero_pct + '% of resamples above zero), but that comes from ' + b5.crash.n + ' crash trades. Without them only ' + b5.without_crash.above_zero_pct + '% of resamples stay above zero, and in training ' + bt.above_zero_pct + '%. Same verdict as above: no persistent edge.'
+      };
+    }
+
     return {
       ...shell, loading: false, ready: true, conclusion: D.conclusion, pooledN: D.pooled['5'].n, slipBars, zeroY, splitText,
       crashShort: D.events.crashShort, ruleRows, ruleIntro, switchIntro, switchChips, chips, slips, kpis, mismatch, eq, hover, stress, stressNote, attr, attrNote, settings,
-      slipText: slip + ' bps'
+      slipText: slip + ' bps', rob
     };
   }
 }

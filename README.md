@@ -74,6 +74,7 @@ gold-rv/
 │   ├── build_site_data.py            # Master builder writing frontend/public/data/*.json
 │   └── tests/                        # Comprehensive Section 12 test suite
 │   ├── build_web_data.py             # Writes frontend/public/data/site-data.json for the website
+│   ├── robustness.py                 # Alert follow-through and resampled 95% ranges (robustness.json)
 └── frontend/                         # The website: static HTML + JS, no runtime dependencies
     ├── index.html                    # Shell: meta tags, favicon, theme before first paint
     ├── build.mjs                     # `npm run build` → dist/ (copies index.html + public/)
@@ -100,7 +101,7 @@ Run the pipeline to process all Bhavcopy records, simulate the walk-forward back
 python -m pipeline.build_site_data
 ```
 
-All generated files land in `frontend/public/data/`; the last step writes `site-data.json`, the one file the website reads.
+All generated files land in `frontend/public/data/`. Step 8 writes `site-data.json`, the main file the website reads; step 9 writes `robustness.json` (does the gap close after an alert, and a resampled 95% range for each result).
 
 ### Step 2: Run Acceptance Tests
 Verify mathematical equivalence, zero look-ahead, and test fixtures:

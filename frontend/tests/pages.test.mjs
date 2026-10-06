@@ -4,6 +4,7 @@ import { readFileSync } from 'node:fs'
 import assert from 'node:assert/strict'
 
 const D = JSON.parse(readFileSync('public/data/site-data.json', 'utf8'))
+const R = JSON.parse(readFileSync('public/data/robustness.json', 'utf8'))
 const PAIRS = ['M_TEN', 'M_PETAL', 'M_GUINEA', 'TEN_PETAL', 'GUINEA_TEN', 'GUINEA_PETAL']
 const SLIPS = ['0', '2', '5', '10']
 
@@ -21,8 +22,8 @@ const states = {
   Today: [{}, { ri: 0 }, { ri: 60 }, { ri: 120, speed: 2 }],
   Market: [{}, { range: '3M', hover: 10 }, { range: '3Y', hover: 150 }],
   Pairs: PAIRS.flatMap((pair) => [{ pair }, { pair, hover: 20, allTrades: true }]),
-  Signals: PAIRS.map((pair) => ({ pair, allPast: true })),
-  Backtesting: PAIRS.flatMap((pair) => SLIPS.map((slip) => ({ pair, slip, hover: 0 }))),
+  Signals: PAIRS.map((pair) => ({ pair, allPast: true })).concat([{ R }, { R, cs: '0', cb: '0', cz: '1' }, { R, cs: '', cb: 'abc', cz: '0' }, { cs: '10', cb: '50', cz: '25' }]),
+  Backtesting: PAIRS.flatMap((pair) => SLIPS.map((slip) => ({ pair, slip, hover: 0 }))).concat([{ R }]),
   Data: [{}, { all: true }],
   DownloadPanel: ['today', 'prices', 'trades', 'backtest', 'report'].flatMap((what) =>
     ['3m', 'all'].map((period) => ({ what, period, pair: 'ALL' }))),
@@ -51,5 +52,13 @@ for (const [name, list] of Object.entries(states)) {
   const C = load('Home'); const c = new C(); c.props = {}; c.state = { D }
   const signals = D.today.filter((p) => p.status === 'SIGNAL').length
   assert.equal(c.renderVals().answer.word === 'No.', signals === 0)
+}
+// The cost calculator reproduces the site's own round trip at our defaults
+{
+  const C = load('Signals'); const c = new C(); c.props = {}; c.state = { D, R }
+  const v = c.renderVals()
+  assert.equal(v.calc.rt, D.costTotal.toFixed(2))
+  assert.equal(v.calc.count, D.today.filter((p) => p.dev >= 2 * D.rt).length + ' of ' + D.today.length)
+  assert.ok(v.ft.show && v.ft.rows.length === 4)
 }
 console.log(`pages ok: ${runs} page states rendered against site-data.json`)

@@ -779,6 +779,10 @@ def build_all_site_data(output_dir: str = 'frontend/public/data'):
     print("--- 8. Writing site-data.json for the website ---")
     from pipeline.build_web_data import build_web_data
     build_web_data(output_dir)
+
+    print("--- 9. Extra checks: alert follow-through and 95% ranges ---")
+    from pipeline.robustness import build as build_robustness
+    build_robustness(output_dir)
     
     print("--- Build complete! All JSON files written successfully. ---")
 
