@@ -38,3 +38,15 @@ def test_history_totals_add_up():
     assert sum(p['n'] for p in r['pairs'].values()) == s['n']
     assert abs(sum(y['net_rs'] for y in r['years']) - s['net_rs']) < 1
     assert r['by_slip']['0']['net_rs'] > s['net_rs'] > r['by_slip']['10']['net_rs']   # more slippage, less profit
+
+
+def test_long_chart_series_is_weekly_and_stops_before_our_data():
+    h = json.load(open(os.path.join(DATA, 'history.json'), encoding='utf-8'))
+    L = h['long']
+    ours_start = pd.read_csv('data/raw/gold_bhavcopy_clean.csv', usecols=['date'])['date'].min()
+    assert L['d'] == sorted(L['d']) and L['d'][-1] < ours_start
+    assert L['d'][0].startswith('2003')
+    for sym in ['GOLDM', 'GOLDTEN', 'GOLDGUINEA', 'GOLDPETAL']:
+        assert len(L[sym]) == len(L['d'])
+    gaps = pd.to_datetime(pd.Series(L['d'])).diff().dt.days.dropna()
+    assert gaps.max() <= 14                                   # one point a week (a holiday week can stretch it)
