@@ -47,6 +47,26 @@ def load_book(path: str = BOOK_PATH) -> pd.DataFrame:
     return b
 
 
+QUOTE = {'GOLDM': (10, 0.995), 'GOLDTEN': (10, 0.999), 'GOLDGUINEA': (8, 0.999), 'GOLDPETAL': (1, 0.999)}
+
+
+def long_series(book: pd.DataFrame, end: pd.Timestamp) -> Dict[str, Any]:
+    """Weekly price of 10 g of pure gold per contract, before our own data starts (for the long charts).
+    Each day uses the contract with the most open interest that traded; each week keeps its last trading day."""
+    b = book[(book['date'] <= end) & (book['traded'] == 'yes')].copy()
+    b['p10'] = [c / QUOTE[s][0] / QUOTE[s][1] * 10 for c, s in zip(b['close'], b['symbol'])]
+    best = b.sort_values('oi').groupby(['symbol', 'date']).tail(1)
+    best['week'] = best['date'].dt.to_period('W-FRI')
+    last = best.sort_values('date').groupby(['symbol', 'week']).tail(1)
+    wide = last.pivot_table(index='week', columns='symbol', values='p10', aggfunc='last')
+    days = last.groupby('week')['date'].max()
+    out: Dict[str, Any] = {'d': [days[w].strftime('%Y-%m-%d') for w in wide.index]}
+    for sym in ['GOLDM', 'GOLDTEN', 'GOLDGUINEA', 'GOLDPETAL']:
+        col = wide[sym] if sym in wide else pd.Series(index=wide.index, dtype=float)
+        out[sym] = [None if pd.isna(v) else int(round(v)) for v in col]
+    return out
+
+
 def tstat(x) -> Optional[float]:
     x = pd.Series(x, dtype=float)
     if len(x) < 3 or x.std(ddof=1) == 0:
@@ -162,6 +182,7 @@ def build(output_dir: str = 'frontend/public/data', book_path: str = BOOK_PATH, 
         'window': {'from': HISTORY_START, 'to': end.strftime('%Y-%m-%d'), 'pairs': HISTORY_PAIRS, 'params': params,
                    'slip': BASE_SLIPPAGE},
         'result': summarise(T) if len(T) else None,
+        'long': long_series(book, end),
     }
     os.makedirs(output_dir, exist_ok=True)
     with open(os.path.join(output_dir, 'history.json'), 'w', encoding='utf-8') as f:

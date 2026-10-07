@@ -103,7 +103,7 @@ Run the pipeline to process all Bhavcopy records, simulate the walk-forward back
 python -m pipeline.build_site_data
 ```
 
-All generated files land in `frontend/public/data/`. Step 8 writes `site-data.json`, the main file the website reads; step 9 writes `robustness.json` (does the gap close after an alert, and a resampled 95% range for each result); step 10 writes `history.json` (the same frozen rule on 2011–2023, years the model never saw, using `data/raw/parity_data_book.csv`, official MCX Bhavcopy rows shared with us by the Parity team with their permission).
+All generated files land in `frontend/public/data/`. Step 8 writes `site-data.json`, the main file the website reads; step 9 writes `robustness.json` (does the gap close after an alert, and a resampled 95% range for each result); step 10 writes `history.json` (the same frozen rule on 2011–2023, years the model never saw, using `data/raw/parity_data_book.csv`, official MCX Bhavcopy rows shared with us by the Parity team with their permission; it also holds a weekly price series back to 2003 for the 10Y and All chart ranges on Home and Market).
 
 ### Step 2: Run Acceptance Tests
 Verify mathematical equivalence, zero look-ahead, and test fixtures:
@@ -162,7 +162,7 @@ Because the site requires zero backend at runtime, it deploys to Render as a **S
 | No fills on 6%+ move days; exits never fill at the signal's own close | `test_rule_fixes.py` | Verified Pass |
 | Max drawdown counts an opening loss | `test_rule_fixes.py` | Verified Pass |
 | Training switch uses Train data only | `test_rule_fixes.py` | Verified Pass |
-| Data book matches our MCX download on every shared row; history check uses the frozen settings and only days before our data | `test_history.py` | Verified Pass |
+| Data book matches our MCX download on every shared row; history check uses the frozen settings and only days before our data; long chart series is weekly and stops before our data | `test_history.py` | Verified Pass |
 | All 6 pairs Quiet on latest date (2026-09-30) | `test_alerts_lifecycle.py` | Verified Pass |
 | Prohibited strings grep (`COMEX`, `USD/INR`, `Confidence`, etc.) | `test_frontend_acceptance.py` | 0 Hits (Verified) |
 

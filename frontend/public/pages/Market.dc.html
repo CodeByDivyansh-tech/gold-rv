@@ -96,8 +96,8 @@ button:focus-visible,a:focus-visible,input:focus-visible{outline:2px solid #F2A9
                 <h2 id="four-h" style="margin: 0; font-size: 18px; font-weight: 600">Price of 10 g of pure gold, by contract</h2>
                 <span style="font-size: 13px; color: var(--muted)">The four lines sit almost on top of each other. That's the point: it's the same gold.</span>
               </div>
-              <div role="group" aria-label="Chart range" style="display: flex; gap: 4px">
-                <sc-for list="{{ranges}}" as="r" hint-placeholder-count="3">
+              <div role="group" aria-label="Chart range" style="display: flex; flex-wrap: wrap; gap: 4px">
+                <sc-for list="{{ranges}}" as="r" hint-placeholder-count="5">
                   <button type="button" onClick="{{r.pick}}" aria-pressed="{{r.pressed}}" style="{{r.style}}">{{r.label}}</button>
                 </sc-for>
               </div>
@@ -129,6 +129,9 @@ button:focus-visible,a:focus-visible,input:focus-visible{outline:2px solid #F2A9
             <div style="display: flex; justify-content: space-between; gap: 8px; font-size: 12px; color: var(--muted); font-family: 'Geist Mono', ui-monospace, monospace">
               <span>{{four.start}}</span><span>Low {{four.low}} · High {{four.high}}</span><span>{{four.end}}</span>
             </div>
+            <sc-if value="{{four.hasNote}}" hint-placeholder-val="{{ false }}">
+              <p style="margin: 0; font-size: 12px; line-height: 1.5; color: var(--muted)">{{four.note}}</p>
+            </sc-if>
           </section>
 
           <aside aria-labelledby="gapten-h" style="flex: 1 1 280px; background: var(--panel); border: 1px solid var(--line); border-radius: 20px; padding: 22px; display: flex; flex-direction: column; gap: 14px">
@@ -323,6 +326,10 @@ class Component extends DCLogic {
       .then((r) => r.json())
       .then((d) => this.setState({ D: d }))
       .catch(() => this.setState({ failed: true }));
+    fetch('data/history.json')
+      .then((r) => r.json())
+      .then((h) => this.setState({ H: h }))
+      .catch(() => {});
   }
 
   tokens(dark) {
@@ -381,35 +388,47 @@ class Component extends DCLogic {
     const COL = { GOLDM: 'var(--c1)', GOLDTEN: 'var(--c2)', GOLDGUINEA: 'var(--c3)', GOLDPETAL: 'var(--c4)' };
     const P = D.pure4;
 
-    // chart 1: four contracts per 10 g pure
-    const range = st.range || '1Y';
+    // chart 1: four contracts per 10 g pure (10Y and All add weekly prices from the shared data book before our own data)
+    const LG = st.H && st.H.long && st.H.long.d && st.H.long.d.length ? st.H.long : null;
+    const RANGES = LG ? ['3M', '1Y', '3Y', '10Y', 'All'] : ['3M', '1Y', '3Y'];
+    const range = RANGES.indexOf(st.range) >= 0 ? st.range : '1Y';
     const n = P.d.length;
     let idx;
     if (range === '3M') idx = Array.from({ length: 63 }, (_, k) => n - 63 + k);
     else if (range === '1Y') idx = Array.from({ length: 252 }, (_, k) => n - 252 + k).filter((i) => (n - 1 - i) % 2 === 0);
     else idx = Array.from({ length: n }, (_, k) => k).filter((i) => (n - 1 - i) % 5 === 0);
-    const cols = SYMS.map((s) => idx.map((i) => P[s][i]));
+    let dts = idx.map((i) => P.d[i]);
+    let cols = SYMS.map((s) => idx.map((i) => P[s][i]));
+    let longNote = '';
+    if (range === '10Y' || range === 'All') {
+      const cut = range === '10Y' ? (+D.asOf.slice(0, 4) - 10) + D.asOf.slice(4) : '0000';
+      const keep = LG.d.map((d, i) => i).filter((i) => LG.d[i] >= cut);
+      dts = keep.map((i) => LG.d[i]).concat(dts);
+      cols = SYMS.map((s, k) => keep.map((i) => LG[s][i]).concat(cols[k]));
+      longNote = 'Weekly prices before ' + this.fd(D.start) + ' come from the Parity team\'s data book (official MCX Bhavcopy); from ' + this.fd(D.start) + ' on, our own MCX download.';
+    }
     const flat = cols.flat().filter((v) => v != null);
     const lo = Math.min(...flat), hi = Math.max(...flat);
     const paths = this.multi(cols, 1000, 300, 16, lo, hi);
     const hv = st.hover;
-    const hover = (hv != null && hv < idx.length) ? {
-      on: true, x: (hv / (idx.length - 1) * 100).toFixed(2) + '%',
-      shift: hv / (idx.length - 1) > 0.7 ? 'translateX(calc(-100% - 10px))' : 'translateX(10px)',
-      date: this.fd(P.d[idx[hv]]),
+    const hover = (hv != null && hv < dts.length) ? {
+      on: true, x: (hv / (dts.length - 1) * 100).toFixed(2) + '%',
+      shift: hv / (dts.length - 1) > 0.7 ? 'translateX(calc(-100% - 10px))' : 'translateX(10px)',
+      date: this.fd(dts[hv]),
       items: SYMS.map((s, k) => ({ sym: s, color: COL[s], value: cols[k][hv] == null ? 'not listed' : this.inr(cols[k][hv]) })),
-      say: this.fd(P.d[idx[hv]]) + ': ' + SYMS.map((s, k) => s + ' ' + (cols[k][hv] == null ? 'not listed' : this.inr(cols[k][hv]))).join(', ')
+      say: this.fd(dts[hv]) + ': ' + SYMS.map((s, k) => s + ' ' + (cols[k][hv] == null ? 'not listed' : this.inr(cols[k][hv]))).join(', ')
     } : { on: false, items: [], say: '' };
     const four = {
       l1: paths[0], l2: paths[1], l3: paths[2], l4: paths[3],
-      start: this.fd(P.d[idx[0]]), end: this.fd(P.d[idx[idx.length - 1]]), low: this.inr(lo), high: this.inr(hi),
-      aria: 'Price of 10 g of pure gold for GOLDM, GOLDTEN, GOLDGUINEA and GOLDPETAL from ' + this.fd(P.d[idx[0]]) + ' to ' + this.fd(P.d[idx[idx.length - 1]]),
-      move: (e) => { const r = e.currentTarget.getBoundingClientRect(); const f = Math.min(1, Math.max(0, (e.clientX - r.left) / r.width)); this.setState({ hover: Math.round(f * (idx.length - 1)) }); },
+      start: this.fd(dts[0]), end: this.fd(dts[dts.length - 1]), low: this.inr(lo), high: this.inr(hi),
+      note: longNote, hasNote: !!longNote,
+      aria: 'Price of 10 g of pure gold for GOLDM, GOLDTEN, GOLDGUINEA and GOLDPETAL from ' + this.fd(dts[0]) + ' to ' + this.fd(dts[dts.length - 1]),
+      move: (e) => { const r = e.currentTarget.getBoundingClientRect(); const f = Math.min(1, Math.max(0, (e.clientX - r.left) / r.width)); this.setState({ hover: Math.round(f * (dts.length - 1)) }); },
       leave: (e) => { if (e && e.pointerType === 'touch') return; this.setState({ hover: null }); },
-      key: (e) => this.stepHover(e, idx.length, 10),
+      key: (e) => this.stepHover(e, dts.length, 10),
       scrubLabel: 'Chart of the four contracts. Tap or drag on it, or use the left and right arrow keys, to read all four prices on any day.'
     };
-    const ranges = ['3M', '1Y', '3Y'].map((r) => {
+    const ranges = RANGES.map((r) => {
       const on = r === range;
       return {
         label: r, pressed: on ? 'true' : 'false', pick: () => this.setState({ range: r, hover: null }),

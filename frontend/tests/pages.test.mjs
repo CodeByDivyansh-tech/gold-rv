@@ -19,9 +19,9 @@ function load(name) {
 }
 
 const states = {
-  Home: [{}, { range: '1M', hover: 5 }, { range: '3Y', hover: 100 }, { dark: false }],
+  Home: [{}, { range: '1M', hover: 5 }, { range: '3Y', hover: 100 }, { dark: false }, { H, range: '10Y', hover: 200 }, { H, range: 'All', hover: 900 }, { range: 'All' }],
   Today: [{}, { ri: 0 }, { ri: 60 }, { ri: 120, speed: 2 }],
-  Market: [{}, { range: '3M', hover: 10 }, { range: '3Y', hover: 150 }],
+  Market: [{}, { range: '3M', hover: 10 }, { range: '3Y', hover: 150 }, { H, range: '10Y', hover: 100 }, { H, range: 'All', hover: 1000 }, { range: '10Y' }],
   Pairs: PAIRS.flatMap((pair) => [{ pair }, { pair, hover: 20, allTrades: true }]),
   Signals: PAIRS.map((pair) => ({ pair, allPast: true })).concat([{ R }, { R, cs: '0', cb: '0', cz: '1' }, { R, cs: '', cb: 'abc', cz: '0' }, { cs: '10', cb: '50', cz: '25' }]),
   Backtesting: PAIRS.flatMap((pair) => SLIPS.map((slip) => ({ pair, slip, hover: 0 }))).concat([{ R }, { R, H }, { H, pair: 'GUINEA_TEN', slip: '10' }]),
@@ -77,4 +77,18 @@ console.log(`pages ok: ${runs} page states rendered against site-data.json`)
   assert.equal(w.hx.show, true)
   assert.equal(w.hx.facts[2].value, String(H.check.mismatches))
   assert.match(w.hx.intro, /Parity team/)
+}
+
+// Long charts: All starts at the first week of the shared book, 10Y about ten years back, and both end on our last day
+{
+  const first = (s) => { const [y, m, d] = s.split('-'); return +d + ' ' + ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][+m - 1] + ' ' + y }
+  const Hm = new (load('Home'))(); Hm.props = {}; Hm.state = { D, H, range: 'All' }
+  const a = Hm.renderVals().chart
+  assert.equal(a.start, first(H.long.d[0])); assert.equal(a.end, first(D.asOf)); assert.equal(a.hasNote, true)
+  const Mk = new (load('Market'))(); Mk.props = {}; Mk.state = { D, H, range: '10Y' }
+  const f = Mk.renderVals().four
+  assert.ok(+f.start.slice(-4) === +D.asOf.slice(0, 4) - 10, '10Y starts ten years back: ' + f.start)
+  assert.equal(f.end, first(D.asOf))
+  const M0 = new (load('Market'))(); M0.props = {}; M0.state = { D, range: 'All' }
+  assert.equal(M0.renderVals().ranges.length, 3)   // without the history file the long ranges are hidden
 }
