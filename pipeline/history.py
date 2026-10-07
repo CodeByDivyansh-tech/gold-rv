@@ -1,0 +1,176 @@
+"""Long-history check: the frozen rule on 2011-2023, years the model never saw.
+
+Source: the Parity team's MCX Gold Futures Data Book (official MCX Bhavcopy rows,
+shared with us with their permission), saved as data/raw/parity_data_book.csv.
+
+What it does
+  1. Compares the book with our own MCX download on every day both cover (Oct 2023 - Sep 2026).
+  2. Takes the settings the main build chose on our training years (read from site-data.json,
+     so nothing is re-tuned) and runs the same five-check rule, with the same costs,
+     on 18 Apr 2011 (first GOLDPETAL day) to the day before our own data starts.
+  3. Writes frontend/public/data/history.json for the website.
+
+Only the three pairs that existed back then can be tested: GOLDTEN started in March 2025.
+"""
+import json
+import os
+import tempfile
+from typing import Any, Dict, Optional
+
+import numpy as np
+import pandas as pd
+
+from pipeline.config import ALERT_RULE, BASE_SLIPPAGE, SLIPPAGE_SCENARIOS
+from pipeline.load import load_clean_bhavcopy
+from pipeline.carry import compute_reference_carry
+from pipeline.pairs import build_pair_series
+from pipeline.backtest import prepare_contract_lookup, run_pair_backtest
+
+BOOK_PATH = 'data/raw/parity_data_book.csv'
+OURS_PATH = 'data/raw/gold_bhavcopy_clean.csv'
+HISTORY_START = '2011-04-18'          # first trading day of GOLDPETAL, so all three contracts exist
+HISTORY_PAIRS = ['M_PETAL', 'M_GUINEA', 'GUINEA_PETAL']
+SOURCE = {
+    'name': 'Parity MCX Gold Futures Data Book',
+    'by': 'the Parity team',
+    'note': 'Official MCX Bhavcopy rows, shared with us with their permission. Thank you!',
+}
+CHECK_FIELDS = [('open', 'open'), ('high', 'high'), ('low', 'low'), ('close', 'close'),
+                ('prev_close', 'prev_close'), ('volume', 'volume_lots'), ('oi', 'open_interest_lots'),
+                ('value_lakh', 'value_lakhs')]
+
+
+def load_book(path: str = BOOK_PATH) -> pd.DataFrame:
+    b = pd.read_csv(path, parse_dates=['date', 'expiry'])
+    for c in ['open', 'high', 'low', 'close', 'prev_close', 'volume', 'oi', 'value_lakh']:
+        b[c] = pd.to_numeric(b[c], errors='coerce')
+    return b
+
+
+def tstat(x) -> Optional[float]:
+    x = pd.Series(x, dtype=float)
+    if len(x) < 3 or x.std(ddof=1) == 0:
+        return None
+    return round(float(x.mean() / (x.std(ddof=1) / np.sqrt(len(x)))), 2)
+
+
+def cross_check(book: pd.DataFrame, ours: pd.DataFrame) -> Dict[str, Any]:
+    """Every row both sources share, compared field by field."""
+    o = ours.rename(columns={'expiry_date': 'expiry'})
+    lo, hi = o['date'].min(), o['date'].max()
+    b = book[(book['date'] >= lo) & (book['date'] <= hi)]
+    m = o.merge(b, on=['symbol', 'expiry', 'date'], how='outer', suffixes=('_o', '_b'), indicator=True)
+    both = m[m['_merge'] == 'both']
+    traded = both[both['traded'] == 'yes']
+    mism = 0
+    for bf, of in CHECK_FIELDS:
+        a = both if bf not in ('open', 'high', 'low') else traded   # no-trade days have no open/high/low in the book
+        ca = a[bf + '_b'] if bf + '_b' in a else a[bf]
+        cb = a[of + '_o'] if of + '_o' in a else a[of]
+        mism += int(((ca - cb).abs() > 0.011).sum())
+    only_book = m[m['_merge'] == 'right_only']
+    return {
+        'from': lo.strftime('%Y-%m-%d'), 'to': hi.strftime('%Y-%m-%d'),
+        'shared_rows': int(len(both)), 'mismatches': mism,
+        'fields': [f for f, _ in CHECK_FIELDS],
+        'only_in_book': int(len(only_book)),
+        'only_in_book_contracts': int(only_book.groupby(['symbol', 'expiry']).ngroups),
+        'only_in_ours': int((m['_merge'] == 'left_only').sum()),
+    }
+
+
+def frozen_params(site_data_path: str) -> Dict[str, Dict[str, float]]:
+    d = json.load(open(site_data_path, encoding='utf-8'))
+    return {pid: {k: d['pairs'][pid]['params'][k] for k in ('W', 'ze', 'mh')} for pid in HISTORY_PAIRS}
+
+
+def run_history(book: pd.DataFrame, end: pd.Timestamp, params: Dict[str, Dict[str, float]]) -> pd.DataFrame:
+    """Same rule, same costs, frozen settings, on the book's rows before our own data starts."""
+    h = book[(book['date'] >= '2011-01-01') & (book['date'] <= end) & (book['symbol'] != 'GOLDTEN')]
+    clean = pd.DataFrame({
+        'date': h['date'].dt.strftime('%Y-%m-%d'), 'symbol': h['symbol'], 'expiry_date': h['expiry'].dt.strftime('%Y-%m-%d'),
+        'open': h['open'].fillna(0), 'high': h['high'].fillna(0), 'low': h['low'].fillna(0),
+        'close': h['close'], 'prev_close': h['prev_close'], 'volume_lots': h['volume'],
+        'value_lakhs': h['value_lakh'], 'open_interest_lots': h['oi'],
+    })
+    with tempfile.TemporaryDirectory() as tmp:
+        path = os.path.join(tmp, 'history_clean.csv')
+        clean.to_csv(path, index=False)
+        df, dates, tdi = load_clean_bhavcopy(path)
+    P = prepare_contract_lookup(df)
+    carry, _ = compute_reference_carry(df, dates)
+    start = pd.Timestamp(HISTORY_START)
+    out = []
+    for pid in HISTORY_PAIRS:
+        W, ze, mh = int(params[pid]['W']), float(params[pid]['ze']), int(params[pid]['mh'])
+        ps = build_pair_series(df, pid, carry)
+        for slip in SLIPPAGE_SCENARIOS:
+            t = run_pair_backtest(pid, ps, P, dates, tdi, W, ze, mh, slip_bps=slip, rule=ALERT_RULE)
+            if len(t):
+                t = t[t['entry'] >= start].copy()
+                t['pair'], t['slip'] = pid, slip
+                out.append(t)
+    return pd.concat(out, ignore_index=True) if out else pd.DataFrame()
+
+
+def summarise(T: pd.DataFrame) -> Dict[str, Any]:
+    by_slip = {}
+    for slip in SLIPPAGE_SCENARIOS:
+        a = T[T['slip'] == slip]
+        by_slip[str(slip)] = {
+            'n': int(len(a)), 'net_rs': round(float(a['net'].sum()), 1),
+            'avg_bps': round(float(a['net_bps'].mean()), 1) if len(a) else None,
+            'gross_bps': round(float(a['gross_bps'].mean()), 1) if len(a) else None,
+            'hit': round(float((a['net'] > 0).mean()), 3) if len(a) else None,
+            't': tstat(a['net_bps']),
+        }
+    a = T[T['slip'] == BASE_SLIPPAGE].copy()
+    a['year'] = pd.to_datetime(a['entry']).dt.year
+    years = [{'year': int(y), 'n': int(len(g)), 'net_rs': round(float(g['net'].sum()), 1),
+              'avg_bps': round(float(g['net_bps'].mean()), 1)} for y, g in a.groupby('year')]
+    pairs = {pid: {'n': int(len(g)), 'net_rs': round(float(g['net'].sum()), 1),
+                   'avg_bps': round(float(g['net_bps'].mean()), 1), 'gross_bps': round(float(g['gross_bps'].mean()), 1),
+                   'hit': round(float((g['net'] > 0).mean()), 3), 't': tstat(g['net_bps'])}
+             for pid, g in a.groupby('pair')}
+    ranked = a.sort_values('net', ascending=False)
+    worst = a.sort_values('net').iloc[0] if len(a) else None
+    return {
+        'by_slip': by_slip, 'years': years, 'pairs': pairs,
+        'years_positive': int(sum(1 for y in years if y['net_rs'] > 0)), 'years_count': len(years),
+        'without_best5_rs': round(float(ranked['net'].iloc[5:].sum()), 1) if len(a) > 5 else None,
+        'reverted_share': round(float((a['reason'] == 'revert').mean()), 3) if len(a) else None,
+        'worst': None if worst is None else {
+            'pair': worst['pair'], 'entry': pd.Timestamp(worst['entry']).strftime('%Y-%m-%d'),
+            'exit': pd.Timestamp(worst['exit']).strftime('%Y-%m-%d'), 'net_rs': round(float(worst['net']), 1),
+            'reason': worst['reason']},
+    }
+
+
+def build(output_dir: str = 'frontend/public/data', book_path: str = BOOK_PATH, ours_path: str = OURS_PATH) -> Dict[str, Any]:
+    book = load_book(book_path)
+    ours = pd.read_csv(ours_path, parse_dates=['date', 'expiry_date'])
+    end = ours['date'].min() - pd.Timedelta(days=1)
+    params = frozen_params(os.path.join(output_dir, 'site-data.json'))
+    T = run_history(book, end, params)
+    cov = {s: {'first': g['date'].min().strftime('%Y-%m-%d'), 'last': g['date'].max().strftime('%Y-%m-%d'),
+               'rows': int(len(g)), 'contracts': int(g['expiry'].nunique())} for s, g in book.groupby('symbol')}
+    res = {
+        'source': dict(SOURCE, rows=int(len(book)), contracts=int(book.groupby(['symbol', 'expiry']).ngroups),
+                       first=book['date'].min().strftime('%Y-%m-%d'), last=book['date'].max().strftime('%Y-%m-%d'),
+                       coverage=cov),
+        'check': cross_check(book, ours),
+        'window': {'from': HISTORY_START, 'to': end.strftime('%Y-%m-%d'), 'pairs': HISTORY_PAIRS, 'params': params,
+                   'slip': BASE_SLIPPAGE},
+        'result': summarise(T) if len(T) else None,
+    }
+    os.makedirs(output_dir, exist_ok=True)
+    with open(os.path.join(output_dir, 'history.json'), 'w', encoding='utf-8') as f:
+        json.dump(res, f, indent=2)
+    return res
+
+
+if __name__ == '__main__':
+    r = build()
+    s = r['result']['by_slip'][str(BASE_SLIPPAGE)]
+    print('check:', r['check'])
+    print(f"history {r['window']['from']}..{r['window']['to']}: {s['n']} trades, net Rs {s['net_rs']:,.0f}, t {s['t']}")

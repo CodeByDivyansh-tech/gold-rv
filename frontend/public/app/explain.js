@@ -58,6 +58,7 @@
     [/^GOLD\S+ · GOLD\S+ at \d+ bps slippage/, 'Money over time', 'The running total, trade after trade. The shaded part is the year the model had never seen.'],
     [/^Same trades, different costs/, 'Cheaper or dearer trading', 'The same trades with cheaper or dearer trading. More slippage means less profit.'],
     [/^Where the result came from/, 'Where the money came from', 'Did it come from the gap closing (what we bet on) or from gold\'s price moving? Almost all of it came from the gap.'],
+    [/^13 more years: does the rule hold up\?/, 'Long history', 'The same frozen rule tested on 2011–2023, years it never saw. 151 trades instead of 20: it loses money after costs, so the test-year profit was not a lasting edge.'],
     [/^Settings for /, 'The frozen settings', 'The exact rules this pair used, fixed before the test year started.'],
     // Data
     [/^Where the numbers come from/, 'Our data', 'Every number on this site comes from MCX\'s official end-of-day price files.'],
@@ -66,6 +67,7 @@
     [/^From raw files to this website/, 'Eight steps', 'The eight steps our Python code follows, from MCX files to the charts you see.'],
     [/^How we avoid peeking at the future/, 'A fair exam', 'The model only uses past days, never tomorrow\'s answers, like an exam without the answer key.'],
     [/^What this data cannot tell you/, 'Honest limits', 'What our data cannot show. Good research says what it does not know.'],
+    [/^More history, shared by the Parity team/, 'Shared history', 'Another team shared their book of official MCX prices back to 2003. It matches our own data exactly, and we use it only for the long-history check.'],
     [/^Download log/, 'Receipts', 'A record of every file we downloaded, so anyone can check our work.'],
     [/^Check it yourself/, 'Check it yourself', 'All our code and data are public on GitHub, so anyone can run it again.']
   ];
@@ -130,6 +132,16 @@
   function pairOnPage() { var m = ((document.querySelector('#app main') || {}).innerText || '').match(/(GOLD\w+ · GOLD\w+)(?=: \w+ \d{4} to| at \d+ bps| · contracts)/); return m ? m[1] : 'this pair'; }
   var P = '(GOLD\\w+) · (GOLD\\w+)';
   var ITEMS = [
+    // Long history (Backtesting) and the shared data book (Data)
+    [/^Trades (\d+) (\d+ \w+ \d{4}) – (\d+ \w+ \d{4})$/, function (m) { return ['13 more years', 'The same frozen rule made ' + m[1] + ' trades between ' + m[2] + ' and ' + m[3] + ', years the model never saw. That is far more than the 20 in our test year, so the answer is much more certain.']; }],
+    [/^After costs ([−+-]₹[\d,]+) at (\d+) bps slippage, (\d+)% won$/, function (m) { return ['After costs, 13 years', 'Added up over all those trades, the rule ' + money(m[1]) + ' after paying every cost, at ' + m[2] + ' bps slippage. Only ' + m[3] + '% of trades made money.']; }],
+    [/^Losing years (\d+) of (\d+) (.+)$/, function (m) { return ['Losing years', 'The rule lost money in ' + m[1] + ' of ' + m[2] + ' years; it ' + m[3] + '. A real edge would win in most years.']; }],
+    [/^(\d{4}): ([−+-]₹[\d,]+), (\d+) trades$/, function (m) { return ['The year ' + m[1], 'In ' + m[1] + ' the rule made ' + m[3] + ' trades and ' + money(m[2]) + ' after costs. Green bars are years that made money; red bars lost.']; }],
+    [new RegExp('^' + P + ' (\\d+) trades before costs ([−+-][\\d.]+) bps a trade ([−+-]₹[\\d,]+) after costs$'), function (m) { return [m[1] + ' vs ' + m[2] + ', 2011–2023', m[3] + ' trades. Before costs the average trade made ' + m[4] + ' bps, which is about zero: the gap does come back, but not by more than the cost of trading. After costs it ' + money(m[5]) + '.']; }],
+    [/^([\d,]+) extra daily settlements (.+)$/, function (m) { return ['Extra history', 'The Parity team\'s data book adds ' + m[1] + ' official MCX daily prices: ' + m[2]]; }],
+    [/^(\d+) contracts in the book (.+)$/, function (m) { return [m[1] + ' contracts', 'Every monthly contract in the shared data book, each with its own expiry date, as MCX published it.']; }],
+    [/^(\d+) mismatches with our data ([\d,]+) rows (.+)$/, function (m) { return ['Does it match our data?', 'On the ' + m[2] + ' rows both sources cover, we compared every number: ' + m[1] + ' differences. So the book and our own MCX download are the same official prices.']; }],
+    [/^(\d+) contracts our download missed (.+)$/, function (m) { return ['What we had missed', 'The book showed ' + m[1] + ' near-month contracts from Oct–Dec 2023 that our own download left out. They only touch the first weeks of training, not the test year.']; }],
     // Home: contract cards
     [/^(GOLDM|GOLDTEN|GOLDGUINEA|GOLDPETAL) Gold \w+ · (\d+ g) lot$/, function (m) { return [m[1], CON[m[1]]]; }],
     [/^₹([\d,]+) per (\d+) g$/, function (m, el) { return ['Today\'s price', near(el) + '\'s official closing price today: ₹' + m[1] + ' for ' + m[2] + ' g. Each contract is quoted for a different weight, so these raw prices cannot be compared directly.']; }],
@@ -176,7 +188,7 @@
     [/^Won (\d+)%( after costs)?$/, function (m) { return ['Won', m[1] + '% of the trades made money after costs.']; }],
     [/^Average per trade ([−+-][\d.]+) bps(?: every trade counts equally · before costs ([−+-][\d.]+) bps)?$/, function (m) { return ['Average per trade', 'Each trade made ' + m[1] + ' bps on average (' + pc(m[1]) + ' of one leg) after costs' + (m[2] ? '; before costs it was ' + m[2] + ' bps.' : '.')]; }],
     [/^Total after costs ([−+-]?₹[\d,]+)(?: bigger trades count more · costs paid ₹([\d,]+))?$/, function (m) { return ['Total after costs', 'All the trades together ' + money(m[1]) + ' after paying every fee' + (m[2] ? ' (₹' + m[2] + ' in costs).' : '.')]; }],
-    [/^t-statistic ([−+-]?[\d.]+)(.*)$/, function (m) { return ['t-statistic', 'This says whether a result is more than luck. Ours is ' + m[1].replace('−', '-') + '. You usually need about 2 or more, so this result is ' + (Math.abs(n(m[1])) >= 2 ? 'strong.' : 'not proven.')]; }],
+    [/^t-statistic ([−+-]?[\d.]+)(.*)$/, function (m) { return ['t-statistic', 'This says whether a result is more than luck. Ours is ' + m[1].replace('−', '-') + '. You usually need beyond ±2, so ' + (n(m[1]) >= 2 ? 'this profit is strong evidence.' : n(m[1]) <= -2 ? 'this loss is strong evidence, not bad luck.' : 'this result is not proven.')]; }],
     [/^Not statistically significant t-statistic ([−+-]?[\d.]+)/, function (m) { return ['Could it be luck?', 'The t-statistic is ' + m[1].replace('−', '-') + ', below the usual bar of about 2. With so few trades, this result could easily be luck.']; }],
     [/^Training period, for comparison (.+)$/, function (m) { return ['Training years', 'How the same pair did in the two years used to tune the model: ' + m[1]]; }],
     // Signals
@@ -221,6 +233,7 @@
   ];
   function findItem(el) {
     var t = (el.innerText || '').replace(/\s+/g, ' ').trim();
+    if (!t && el.getAttribute && el.getAttribute('role') === 'img') t = el.getAttribute('aria-label') || '';
     if (!t || t.length > 700) return null;
     for (var i = 0; i < ITEMS.length; i++) {
       var m = t.match(ITEMS[i][0]);

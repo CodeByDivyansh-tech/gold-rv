@@ -783,6 +783,10 @@ def build_all_site_data(output_dir: str = 'frontend/public/data'):
     print("--- 9. Extra checks: alert follow-through and 95% ranges ---")
     from pipeline.robustness import build as build_robustness
     build_robustness(output_dir)
+
+    print("--- 10. Long-history check: frozen rule on 2011-2023 (Parity data book) ---")
+    from pipeline.history import build as build_history
+    build_history(output_dir)
     
     print("--- Build complete! All JSON files written successfully. ---")
 

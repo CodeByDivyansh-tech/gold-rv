@@ -111,6 +111,24 @@ button:focus-visible,a:focus-visible,input:focus-visible{outline:2px solid #F2A9
           </div>
         </section>
 
+        <sc-if value="{{hx.show}}" hint-placeholder-val="{{ true }}">
+        <section aria-labelledby="hx-h" style="background: var(--panel); border: 1px solid var(--line); border-radius: 20px; padding: clamp(18px, 2.5vw, 26px); display: flex; flex-direction: column; gap: 14px">
+          <div style="display: flex; flex-direction: column; gap: 4px">
+            <h2 id="hx-h" style="margin: 0; font-size: 18px; font-weight: 600">More history, shared by the Parity team</h2>
+            <span style="font-size: 13px; color: var(--muted); line-height: 1.6; max-width: 82ch">{{hx.intro}}</span>
+          </div>
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(240px, 100%), 1fr)); gap: 12px">
+            <sc-for list="{{hx.facts}}" as="q" hint-placeholder-count="4">
+              <div style="border: 1px solid var(--line); border-radius: 16px; padding: 16px 18px; display: flex; gap: 14px; align-items: baseline">
+                <span style="font-family: 'Geist Mono', ui-monospace, monospace; font-size: 22px; font-weight: 600; flex: none; min-width: 56px; color: {{q.color}}">{{q.value}}</span>
+                <span style="display: flex; flex-direction: column; gap: 3px"><span style="font-weight: 600; font-size: 14px">{{q.label}}</span><span style="font-size: 13px; color: var(--muted); line-height: 1.5">{{q.note}}</span></span>
+              </div>
+            </sc-for>
+          </div>
+          <p style="margin: 0; font-size: 14px; line-height: 1.6">{{hx.note}}</p>
+        </section>
+        </sc-if>
+
         <section aria-labelledby="pipe-h" style="background: var(--panel); border: 1px solid var(--line); border-radius: 20px; padding: clamp(18px, 2.5vw, 26px); display: flex; flex-direction: column; gap: 16px">
           <div style="display: flex; flex-direction: column; gap: 4px">
             <h2 id="pipe-h" style="margin: 0; font-size: 18px; font-weight: 600">From raw files to this website, in eight steps</h2>
@@ -240,6 +258,10 @@ class Component extends DCLogic {
       .then((r) => r.json())
       .then((d) => this.setState({ D: d }))
       .catch(() => this.setState({ failed: true }));
+    fetch('data/history.json')
+      .then((r) => r.json())
+      .then((h) => this.setState({ H: h }))
+      .catch(() => {});
   }
 
   tokens(dark) {
@@ -294,8 +316,25 @@ class Component extends DCLogic {
     const showAll = !!st.all;
     const rows = showAll ? D.retrieval : D.retrieval.slice(0, 8);
     const log = rows.map((r) => ({ sym: r[0], exp: this.fd(r[1]), req: this.fdm(r[2]) + ' to ' + this.fdm(r[3]), rows: r[4], span: this.fd(r[5]) + ' to ' + this.fd(r[6]) }));
+    const HX = st.H;
+    let hx = { show: false, facts: [], intro: '', note: '' };
+    if (HX && HX.source && HX.check) {
+      const cv = HX.source.coverage || {}, k = HX.check;
+      const since = ['GOLDM', 'GOLDGUINEA', 'GOLDPETAL', 'GOLDTEN'].filter((x) => cv[x]).map((x) => x + ' from ' + this.fd(cv[x].first).replace(/^\d+ /, '')).join(', ');
+      hx = {
+        show: true,
+        intro: 'The Parity team shared their MCX Gold Futures Data Book with us: official MCX Bhavcopy rows from ' + this.fd(HX.source.first) + ' to ' + this.fd(HX.source.last) + '. Thank you!',
+        facts: [
+          { value: n(HX.source.rows), label: 'extra daily settlements', note: since + '.', color: 'var(--fg)' },
+          { value: n(HX.source.contracts), label: 'contracts in the book', note: 'Each contract listed under its own expiry, exactly as MCX published it.', color: 'var(--fg)' },
+          { value: String(k.mismatches), label: 'mismatches with our data', note: n(k.shared_rows) + ' rows both sources cover, compared on open, high, low, close, volume, open interest and value.', color: k.mismatches === 0 ? 'var(--up)' : 'var(--down)' },
+          { value: String(k.only_in_book_contracts), label: 'contracts our download missed', note: 'Near-month contracts trading in Oct–Dec 2023 (' + n(k.only_in_book) + ' rows). Our main results do not use them yet.', color: 'var(--fg)' }
+        ],
+        note: 'We use the book only for the long-history check on the Backtesting page (' + this.fd(HX.window.from) + ' to ' + this.fd(HX.window.to) + '). Everything else on this site comes from our own MCX download, listed below.'
+      };
+    }
     return {
-      ...shell, loading: false, ready: true, big, quality, stages, rules, limits, log,
+      ...shell, loading: false, ready: true, big, quality, stages, rules, limits, log, hx,
       logCount: D.retrieval.length, logExpanded: showAll ? 'true' : 'false',
       logButton: showAll ? 'Show the first 8' : 'Show all ' + D.retrieval.length,
       toggleLog: () => this.setState({ all: !showAll })

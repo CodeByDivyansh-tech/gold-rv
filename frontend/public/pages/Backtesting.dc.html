@@ -153,6 +153,52 @@ button:focus-visible,a:focus-visible,input:focus-visible{outline:2px solid #F2A9
         </section>
         </sc-if>
 
+        <sc-if value="{{hist.show}}" hint-placeholder-val="{{ true }}">
+        <section aria-labelledby="hist-h" style="background: var(--panel); border: 1px solid var(--line); border-radius: 20px; padding: clamp(18px, 2.5vw, 26px); display: flex; flex-direction: column; gap: 18px">
+          <div style="display: flex; flex-direction: column; gap: 4px">
+            <h2 id="hist-h" style="margin: 0; font-size: 18px; font-weight: 600">13 more years: does the rule hold up?</h2>
+            <span style="font-size: 13px; color: var(--muted); line-height: 1.6; max-width: 82ch">{{hist.intro}}</span>
+          </div>
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(140px, 100%), 1fr)); gap: 12px">
+            <sc-for list="{{hist.kpis}}" as="k" hint-placeholder-count="4">
+              <div style="border: 1px solid var(--line); border-radius: 14px; padding: 14px 16px; display: flex; flex-direction: column; gap: 4px">
+                <span style="font-size: 12px; color: var(--muted)">{{k.label}}</span>
+                <span style="font-family: 'Geist Mono', ui-monospace, monospace; font-size: clamp(19px, 5vw, 24px); white-space: nowrap; font-weight: 600; letter-spacing: -0.02em; color: {{k.color}}">{{k.value}}</span>
+                <span style="font-size: 12px; color: var(--muted); line-height: 1.45">{{k.note}}</span>
+              </div>
+            </sc-for>
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 8px">
+            <span style="font-size: 13px; font-weight: 600">Result after costs, year by year ({{hist.slipText}} slippage)</span>
+            <div style="position: relative; height: 160px; display: grid; grid-template-columns: repeat({{hist.nYears}}, minmax(0, 1fr)); gap: 4px">
+              <div style="position: absolute; left: 0; right: 0; top: {{hist.zeroY}}; height: 1px; background: var(--muted); opacity: 0.6"></div>
+              <sc-for list="{{hist.years}}" as="y" hint-placeholder-count="13">
+                <div role="img" aria-label="{{y.aria}}" title="{{y.aria}}" style="position: relative; height: 100%">
+                  <div style="position: absolute; left: 14%; right: 14%; top: {{y.top}}; height: {{y.h}}; background: {{y.color}}; border-radius: 4px"></div>
+                </div>
+              </sc-for>
+            </div>
+            <div style="display: grid; grid-template-columns: repeat({{hist.nYears}}, minmax(0, 1fr)); gap: 4px; text-align: center">
+              <sc-for list="{{hist.years}}" as="y" hint-placeholder-count="13">
+                <span style="font-family: 'Geist Mono', ui-monospace, monospace; font-size: 11px; color: var(--muted)">{{y.label}}</span>
+              </sc-for>
+            </div>
+          </div>
+          <div style="display: flex; flex-direction: column">
+            <sc-for list="{{hist.pairs}}" as="q" hint-placeholder-count="3">
+              <div style="display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 18px; padding: 10px 0; border-top: 1px solid var(--line)">
+                <span style="flex: 1 1 190px; font-weight: 600; font-size: 14px">{{q.name}}</span>
+                <span style="font-size: 13px; color: var(--muted); min-width: 80px">{{q.n}}</span>
+                <span style="font-size: 13px; color: var(--muted); min-width: 190px">{{q.gross}}</span>
+                <span style="font-family: 'Geist Mono', ui-monospace, monospace; font-size: 13px; font-weight: 600; color: {{q.color}}; min-width: 150px; text-align: right">{{q.net}}</span>
+              </div>
+            </sc-for>
+          </div>
+          <p style="margin: 0; font-size: 14px; line-height: 1.6">{{hist.note}}</p>
+          <p style="margin: 0; font-size: 12px; line-height: 1.6; color: var(--muted)">{{hist.source}}</p>
+        </section>
+        </sc-if>
+
         <section aria-labelledby="rule-h" style="background: var(--panel); border: 1px solid var(--line); border-radius: 20px; padding: clamp(18px, 2.5vw, 26px); display: flex; flex-direction: column; gap: 14px">
           <div style="display: flex; flex-direction: column; gap: 4px">
             <h2 id="rule-h" style="margin: 0; font-size: 18px; font-weight: 600">One rule for alerts and backtest</h2>
@@ -377,6 +423,10 @@ class Component extends DCLogic {
     fetch('data/robustness.json')
       .then((r) => r.json())
       .then((r) => this.setState({ R: r }))
+      .catch(() => {});
+    fetch('data/history.json')
+      .then((r) => r.json())
+      .then((h) => this.setState({ H: h }))
       .catch(() => {});
   }
 
@@ -607,10 +657,44 @@ class Component extends DCLogic {
       };
     }
 
+    const HX = st.H;
+    let hist = { show: false, kpis: [], years: [], pairs: [], nYears: 1, zeroY: '50%', intro: '', note: '', source: '', slipText: '' };
+    if (HX && HX.result && HX.result.by_slip && HX.result.by_slip['5']) {
+      const r = HX.result, s = r.by_slip['5'], s0 = r.by_slip['0'], w = HX.window;
+      const vals = r.years.map((y) => y.net_rs);
+      const top = Math.max(0, ...vals), bot = Math.min(0, ...vals), span = (top - bot) || 1;
+      const pc = (v) => (v / span * 100).toFixed(2) + '%';
+      const good = r.years.filter((y) => y.net_rs > 0).map((y) => y.year);
+      const label = (pid) => (D.pairs[pid] ? D.pairs[pid].label : pid);
+      hist = {
+        show: true, slipText: w.slip + ' bps', nYears: r.years.length, zeroY: pc(top),
+        intro: 'We ran the exact rule from this page, with the same frozen settings, the same five checks and the same costs, on ' + this.fd(w.from) + ' to ' + this.fd(w.to) + ': years the model never saw. Only the three pairs that existed then can be tested; GOLDTEN started in March 2025.',
+        kpis: [
+          { label: 'Trades', value: String(s.n), note: this.fd(w.from) + ' – ' + this.fd(w.to), color: 'var(--fg)' },
+          { label: 'After costs', value: this.srs(s.net_rs), note: 'at ' + w.slip + ' bps slippage, ' + Math.round(s.hit * 100) + '% won', color: s.net_rs >= 0 ? 'var(--up)' : 'var(--down)' },
+          { label: 'Losing years', value: (r.years_count - r.years_positive) + ' of ' + r.years_count, note: good.length ? 'made money only in ' + good.join(' and ') : 'no year made money', color: 'var(--fg)' },
+          { label: 't-statistic', value: this.sgn(s.t, 2), note: s.t <= -2 ? 'beyond −2: the loss is not luck' : (s.t >= 2 ? 'beyond +2: the profit is not luck' : 'between −2 and +2: could be luck'), color: 'var(--fg)' }
+        ],
+        years: r.years.map((y) => ({
+          label: '’' + String(y.year).slice(2),
+          top: y.net_rs >= 0 ? pc(top - y.net_rs) : pc(top), h: pc(Math.abs(y.net_rs)),
+          color: y.net_rs >= 0 ? 'var(--up)' : 'var(--down)',
+          aria: y.year + ': ' + this.srs(y.net_rs) + ', ' + y.n + ' trades'
+        })),
+        pairs: w.pairs.filter((pid) => r.pairs[pid]).map((pid) => ({
+          name: label(pid), n: r.pairs[pid].n + ' trades',
+          gross: 'before costs ' + this.sgn(r.pairs[pid].gross_bps, 1) + ' bps a trade',
+          net: this.srs(r.pairs[pid].net_rs) + ' after costs', color: r.pairs[pid].net_rs >= 0 ? 'var(--up)' : 'var(--down)'
+        })),
+        note: 'Before costs, the average trade made ' + this.sgn(s.gross_bps, 1) + ' bps: the gaps do come back, but not by enough to pay for trading. Even with zero slippage the rule ' + (s0.net_rs < 0 ? 'loses ' : 'makes ') + this.srs(Math.abs(s0.net_rs)).slice(1) + '. This backs the verdict above: no persistent edge after costs. Past years are charged today\'s MCX fee rates.',
+        source: 'Prices: official MCX Bhavcopy rows from the Parity team\'s data book, shared with us with their permission. It matches our own MCX download on all ' + HX.check.shared_rows.toLocaleString('en-IN') + ' rows both cover (' + HX.check.mismatches + ' mismatches).'
+      };
+    }
+
     return {
       ...shell, loading: false, ready: true, conclusion: D.conclusion, pooledN: D.pooled['5'].n, slipBars, zeroY, splitText,
       crashShort: D.events.crashShort, ruleRows, ruleIntro, switchIntro, switchChips, chips, slips, kpis, mismatch, eq, hover, stress, stressNote, attr, attrNote, settings,
-      slipText: slip + ' bps', rob
+      slipText: slip + ' bps', rob, hist
     };
   }
 }

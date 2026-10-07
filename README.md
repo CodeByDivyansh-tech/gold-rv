@@ -56,7 +56,8 @@ gold-rv/
 ├── data/
 │   └── raw/
 │       ├── gold_bhavcopy_clean.csv   # 11,954 verified EOD rows (10-Oct-2023 → 30-Sep-2026)
-│       └── contract_calendar.csv     # Contract lifecycles (liquid-from, peak OI, expiry)
+│       ├── contract_calendar.csv     # Contract lifecycles (liquid-from, peak OI, expiry)
+│       └── parity_data_book.csv      # 55,457 MCX rows, Nov-2003 → Oct-2026, shared by the Parity team (used for the 2011–2023 history check)
 ├── reference/                        # Mathematical reference scripts & benchmarks
 │   ├── reference_check.py            # Verification reference
 │   ├── reference_summary.csv         # Target benchmark table reproduced by pipeline
@@ -75,6 +76,7 @@ gold-rv/
 │   └── tests/                        # Comprehensive Section 12 test suite
 │   ├── build_web_data.py             # Writes frontend/public/data/site-data.json for the website
 │   ├── robustness.py                 # Alert follow-through and resampled 95% ranges (robustness.json)
+│   ├── history.py                    # Frozen rule on 2011–2023 from the Parity data book (history.json)
 └── frontend/                         # The website: static HTML + JS, no runtime dependencies
     ├── index.html                    # Shell: meta tags, favicon, theme before first paint
     ├── build.mjs                     # `npm run build` → dist/ (copies index.html + public/)
@@ -101,7 +103,7 @@ Run the pipeline to process all Bhavcopy records, simulate the walk-forward back
 python -m pipeline.build_site_data
 ```
 
-All generated files land in `frontend/public/data/`. Step 8 writes `site-data.json`, the main file the website reads; step 9 writes `robustness.json` (does the gap close after an alert, and a resampled 95% range for each result).
+All generated files land in `frontend/public/data/`. Step 8 writes `site-data.json`, the main file the website reads; step 9 writes `robustness.json` (does the gap close after an alert, and a resampled 95% range for each result); step 10 writes `history.json` (the same frozen rule on 2011–2023, years the model never saw, using `data/raw/parity_data_book.csv`, official MCX Bhavcopy rows shared with us by the Parity team with their permission).
 
 ### Step 2: Run Acceptance Tests
 Verify mathematical equivalence, zero look-ahead, and test fixtures:
@@ -160,6 +162,7 @@ Because the site requires zero backend at runtime, it deploys to Render as a **S
 | No fills on 6%+ move days; exits never fill at the signal's own close | `test_rule_fixes.py` | Verified Pass |
 | Max drawdown counts an opening loss | `test_rule_fixes.py` | Verified Pass |
 | Training switch uses Train data only | `test_rule_fixes.py` | Verified Pass |
+| Data book matches our MCX download on every shared row; history check uses the frozen settings and only days before our data | `test_history.py` | Verified Pass |
 | All 6 pairs Quiet on latest date (2026-09-30) | `test_alerts_lifecycle.py` | Verified Pass |
 | Prohibited strings grep (`COMEX`, `USD/INR`, `Confidence`, etc.) | `test_frontend_acceptance.py` | 0 Hits (Verified) |
 
@@ -170,7 +173,7 @@ Because the site requires zero backend at runtime, it deploys to Render as a **S
 1. **Settlement Closes vs Order-Book Fills**: EOD Bhavcopy settlement prices reflect official settlement determinations rather than executable limit-order book fills.
 2. **Volume vs Liquidity Depth**: Traded lots indicate activity but do not capture instantaneous book depth or market impact for sizes exceeding typical retail flow.
 3. **GOLDTEN History**: `GOLDTEN` commenced trading on 31-Mar-2025, providing only 6 months of in-sample training data.
-4. **Sample Size Constraints**: The 12-month unseen test period yielded 2 to 5 trades per pair (20 in total) under the five-check rule, precluding high statistical significance.
+4. **Sample Size Constraints**: The 12-month unseen test period yielded 2 to 5 trades per pair (20 in total) under the five-check rule, precluding high statistical significance. The long-history check (step 10) adds 151 trades on 2011–2023 for the three pairs that existed then; at 5 bps slippage the same frozen rule lost money after costs (see `history.json`). It applies today's MCX fee rates to past years.
 5. **Structural Break Causality**: The 250 bps structural flip in `GOLDPETAL` basis between Dec-2024 and Mar-2025 warrants ongoing investigation into physical delivery logistics and contract settlement circulars.
 6. **One Crash Dominates**: Trades that closed during the Jan–Mar 2026 crash made more than the whole unseen-year profit; outside it the rule lost money.
 7. **Assumed Slippage**: Slippage (82% of round-trip cost) is assumed at 5 bps per order, not measured. In training the five-check rule breaks even at about 3.8 bps per order, close to that assumption.

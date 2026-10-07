@@ -1,0 +1,236 @@
+{
+  "source": {
+    "name": "Parity MCX Gold Futures Data Book",
+    "by": "the Parity team",
+    "note": "Official MCX Bhavcopy rows, shared with us with their permission. Thank you!",
+    "rows": 55457,
+    "contracts": 710,
+    "first": "2003-11-20",
+    "last": "2026-10-01",
+    "coverage": {
+      "GOLDGUINEA": {
+        "first": "2008-05-08",
+        "last": "2026-10-01",
+        "rows": 18509,
+        "contracts": 225
+      },
+      "GOLDM": {
+        "first": "2003-11-20",
+        "last": "2026-10-01",
+        "rows": 18977,
+        "contracts": 270
+      },
+      "GOLDPETAL": {
+        "first": "2011-04-18",
+        "last": "2026-10-01",
+        "rows": 16007,
+        "contracts": 191
+      },
+      "GOLDTEN": {
+        "first": "2025-03-31",
+        "last": "2026-10-01",
+        "rows": 1964,
+        "contracts": 24
+      }
+    }
+  },
+  "check": {
+    "from": "2023-10-10",
+    "to": "2026-09-30",
+    "shared_rows": 11708,
+    "mismatches": 0,
+    "fields": [
+      "open",
+      "high",
+      "low",
+      "close",
+      "prev_close",
+      "volume",
+      "oi",
+      "value_lakh"
+    ],
+    "only_in_book": 289,
+    "only_in_book_contracts": 8,
+    "only_in_ours": 246
+  },
+  "window": {
+    "from": "2011-04-18",
+    "to": "2023-10-09",
+    "pairs": [
+      "M_PETAL",
+      "M_GUINEA",
+      "GUINEA_PETAL"
+    ],
+    "params": {
+      "M_PETAL": {
+        "W": 30,
+        "ze": 2.0,
+        "mh": 10
+      },
+      "M_GUINEA": {
+        "W": 20,
+        "ze": 2.5,
+        "mh": 5
+      },
+      "GUINEA_PETAL": {
+        "W": 20,
+        "ze": 2.5,
+        "mh": 10
+      }
+    },
+    "slip": 5
+  },
+  "result": {
+    "by_slip": {
+      "0": {
+        "n": 151,
+        "net_rs": -235391.1,
+        "avg_bps": -15.8,
+        "gross_bps": -11.4,
+        "hit": 0.517,
+        "t": -1.6
+      },
+      "2": {
+        "n": 151,
+        "net_rs": -360862.6,
+        "avg_bps": -23.8,
+        "gross_bps": -11.4,
+        "hit": 0.411,
+        "t": -2.42
+      },
+      "5": {
+        "n": 151,
+        "net_rs": -549069.8,
+        "avg_bps": -35.8,
+        "gross_bps": -11.4,
+        "hit": 0.311,
+        "t": -3.63
+      },
+      "10": {
+        "n": 151,
+        "net_rs": -862748.6,
+        "avg_bps": -55.8,
+        "gross_bps": -11.4,
+        "hit": 0.179,
+        "t": -5.67
+      }
+    },
+    "years": [
+      {
+        "year": 2011,
+        "n": 2,
+        "net_rs": -721.9,
+        "avg_bps": -5.1
+      },
+      {
+        "year": 2012,
+        "n": 10,
+        "net_rs": -20157.2,
+        "avg_bps": -20.5
+      },
+      {
+        "year": 2013,
+        "n": 12,
+        "net_rs": 19844.5,
+        "avg_bps": 19.2
+      },
+      {
+        "year": 2014,
+        "n": 14,
+        "net_rs": -65816.2,
+        "avg_bps": -43.9
+      },
+      {
+        "year": 2015,
+        "n": 13,
+        "net_rs": -54164.9,
+        "avg_bps": -40.9
+      },
+      {
+        "year": 2016,
+        "n": 19,
+        "net_rs": -25863.5,
+        "avg_bps": -13.0
+      },
+      {
+        "year": 2017,
+        "n": 12,
+        "net_rs": -201604.9,
+        "avg_bps": -167.5
+      },
+      {
+        "year": 2018,
+        "n": 10,
+        "net_rs": -29530.1,
+        "avg_bps": -30.2
+      },
+      {
+        "year": 2019,
+        "n": 9,
+        "net_rs": -29581.6,
+        "avg_bps": -34.2
+      },
+      {
+        "year": 2020,
+        "n": 12,
+        "net_rs": -77503.8,
+        "avg_bps": -69.1
+      },
+      {
+        "year": 2021,
+        "n": 10,
+        "net_rs": 18091.2,
+        "avg_bps": 18.7
+      },
+      {
+        "year": 2022,
+        "n": 11,
+        "net_rs": -15750.8,
+        "avg_bps": -14.4
+      },
+      {
+        "year": 2023,
+        "n": 17,
+        "net_rs": -66310.5,
+        "avg_bps": -35.7
+      }
+    ],
+    "pairs": {
+      "GUINEA_PETAL": {
+        "n": 41,
+        "net_rs": -251618.3,
+        "avg_bps": -61.6,
+        "gross_bps": -37.3,
+        "hit": 0.244,
+        "t": -2.34
+      },
+      "M_GUINEA": {
+        "n": 50,
+        "net_rs": -134282.7,
+        "avg_bps": -25.1,
+        "gross_bps": -0.7,
+        "hit": 0.32,
+        "t": -3.13
+      },
+      "M_PETAL": {
+        "n": 60,
+        "net_rs": -163168.9,
+        "avg_bps": -27.1,
+        "gross_bps": -2.7,
+        "hit": 0.35,
+        "t": -1.74
+      }
+    },
+    "years_positive": 2,
+    "years_count": 13,
+    "without_best5_rs": -647008.7,
+    "reverted_share": 0.344,
+    "worst": {
+      "pair": "GUINEA_PETAL",
+      "entry": "2017-01-17",
+      "exit": "2017-01-25",
+      "net_rs": -100759.9,
+      "reason": "expiry"
+    }
+  }
+}

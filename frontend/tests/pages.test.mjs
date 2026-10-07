@@ -5,6 +5,7 @@ import assert from 'node:assert/strict'
 
 const D = JSON.parse(readFileSync('public/data/site-data.json', 'utf8'))
 const R = JSON.parse(readFileSync('public/data/robustness.json', 'utf8'))
+const H = JSON.parse(readFileSync('public/data/history.json', 'utf8'))
 const PAIRS = ['M_TEN', 'M_PETAL', 'M_GUINEA', 'TEN_PETAL', 'GUINEA_TEN', 'GUINEA_PETAL']
 const SLIPS = ['0', '2', '5', '10']
 
@@ -23,8 +24,8 @@ const states = {
   Market: [{}, { range: '3M', hover: 10 }, { range: '3Y', hover: 150 }],
   Pairs: PAIRS.flatMap((pair) => [{ pair }, { pair, hover: 20, allTrades: true }]),
   Signals: PAIRS.map((pair) => ({ pair, allPast: true })).concat([{ R }, { R, cs: '0', cb: '0', cz: '1' }, { R, cs: '', cb: 'abc', cz: '0' }, { cs: '10', cb: '50', cz: '25' }]),
-  Backtesting: PAIRS.flatMap((pair) => SLIPS.map((slip) => ({ pair, slip, hover: 0 }))).concat([{ R }]),
-  Data: [{}, { all: true }],
+  Backtesting: PAIRS.flatMap((pair) => SLIPS.map((slip) => ({ pair, slip, hover: 0 }))).concat([{ R }, { R, H }, { H, pair: 'GUINEA_TEN', slip: '10' }]),
+  Data: [{}, { all: true }, { H }, { H, all: true }],
   DownloadPanel: ['today', 'prices', 'trades', 'backtest', 'report'].flatMap((what) =>
     ['3m', 'all'].map((period) => ({ what, period, pair: 'ALL' }))),
 }
@@ -62,3 +63,18 @@ for (const [name, list] of Object.entries(states)) {
   assert.ok(v.ft.show && v.ft.rows.length === 4)
 }
 console.log(`pages ok: ${runs} page states rendered against site-data.json`)
+
+// The long-history section shows the history file's own numbers, and the Data page credits the source
+{
+  const C = load('Backtesting'); const c = new C(); c.props = {}; c.state = { D, H }
+  const v = c.renderVals(), s5 = H.result.by_slip['5']
+  assert.equal(v.hist.show, true)
+  assert.equal(v.hist.kpis[0].value, String(s5.n))
+  assert.equal(v.hist.years.length, H.result.years.length)
+  assert.equal(v.hist.pairs.length, 3)
+  const D2 = new (load('Data'))(); D2.props = {}; D2.state = { D, H }
+  const w = D2.renderVals()
+  assert.equal(w.hx.show, true)
+  assert.equal(w.hx.facts[2].value, String(H.check.mismatches))
+  assert.match(w.hx.intro, /Parity team/)
+}
