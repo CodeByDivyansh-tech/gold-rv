@@ -113,5 +113,27 @@
    }
   },
   "note": "GOLDM · GOLDPETAL: training made +₹1,280 over 17 trades (t = 0.06; 52% of resamples above zero), close to a coin flip, so the switch is a weak filter, not proof."
+ },
+ "petal_break": {
+  "start": "2024-11-04",
+  "end": "2024-11-11",
+  "gap_start_bps": 203.1,
+  "gap_end_bps": 18.6,
+  "same_contract": true,
+  "contract_expiry": "2024-11-29",
+  "m_guinea_change_bps": -65.8,
+  "m_petal_change_bps": -249.0,
+  "before": {
+   "from": "2024-05-16",
+   "to": "2024-11-01",
+   "median_bps": 255.4
+  },
+  "after": {
+   "from": "2025-02-03",
+   "to": "2025-07-21",
+   "median_bps": -29.4
+  },
+  "cause_confirmed": false,
+  "summary": "GOLDGUINEA − GOLDPETAL fell from +203 to +19 bps between 04 Nov 2024 and 11 Nov 2024, inside one contract (expiry Nov 2024). Against GOLDM over the same days, GOLDPETAL rose about 249 bps and GOLDGUINEA about 66 bps, so most of the move was GOLDPETAL repricing. The gap swung back part-way for a few weeks, then settled: median +255 bps from May 2024 to Nov 2024, −29 bps from Feb 2025 to Jul 2025. We found no MCX notice explaining it, so the cause is not confirmed."
  }
 }
