@@ -211,13 +211,11 @@ class Component extends DCLogic {
   renderVals() {
     const st = this.state || {};
     const dark = this.props.dark ?? true;
-    const t = dark
-      ? { bg: '#070D14', panel: '#0F1822', raised: '#18232F', line: '#1E2B38', fg: '#EAF0F6', muted: '#93A3B4', gold: '#F2A93B', glow: 'rgba(242,169,59,0.12)', ongold: '#1A1204', up: '#4FD1A1', down: '#FF8F85' }
-      : { bg: '#F3F5F8', panel: '#FFFFFF', raised: '#E9EDF2', line: '#DCE2E9', fg: '#0C1622', muted: '#55636F', gold: '#975600', glow: 'rgba(151,86,0,0.10)', ongold: '#FFFFFF', up: '#0B7A55', down: '#B42318' };
+    const t = typeof GRVTheme === 'undefined' ? {} : GRVTheme.tokens(dark);   // shared gold-tinted themes
     const vars = Object.keys(t).map((k) => '--' + k + ': ' + t[k]).join('; ');
     const overlay = typeof this.props.onClose === 'function';
     const rootStyle = vars + '; font-family: \'Geist\', system-ui, sans-serif; ' + (overlay
-      ? 'position: fixed; inset: 0; z-index: 50; background: rgba(3,8,14,0.6); display: flex; align-items: center; justify-content: center; padding: 16px; box-sizing: border-box'
+      ? 'position: fixed; inset: 0; z-index: 50; background: rgba(18,12,4,0.62); display: flex; align-items: center; justify-content: center; padding: 16px; box-sizing: border-box'
       : 'min-height: 100vh; background: var(--bg); display: flex; align-items: center; justify-content: center; padding: 24px; box-sizing: border-box');
     const close = () => { if (overlay) this.props.onClose(); };
     const base = { rootStyle, close, onKey: (e) => { if (e.key === 'Escape') close(); } };

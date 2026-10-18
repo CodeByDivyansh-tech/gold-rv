@@ -32,20 +32,20 @@
   ];
 
   var css = '' +
-    '.gl-x:focus-visible,.gl-q:focus-visible{outline:2px solid #F2A93B;outline-offset:2px}' +
-    '.gl-back{position:fixed;inset:0;z-index:60;background:rgba(7,13,20,.5);display:flex;justify-content:flex-end}' +
-    '.gl-panel{width:min(440px,100%);height:100%;box-sizing:border-box;background:#0F1822;color:#EAF0F6;border-left:1px solid #1E2B38;display:flex;flex-direction:column;' +
+    '.gl-x:focus-visible,.gl-q:focus-visible{outline:2px solid var(--grv-gold,#E5B04A);outline-offset:2px}' +
+    '.gl-back{position:fixed;inset:0;z-index:60;background:rgba(18,12,4,.5);display:flex;justify-content:flex-end}' +
+    '.gl-panel{width:min(440px,100%);height:100%;box-sizing:border-box;background:var(--grv-panel,#1B150C);color:var(--grv-fg,#F6ECD8);border-left:1px solid var(--grv-line,#3A2D1A);display:flex;flex-direction:column;' +
     'font-family:Geist,system-ui,sans-serif;padding:max(20px,env(safe-area-inset-top,0px)) 20px 20px}' +
     '.gl-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px}' +
     '.gl-head h2{margin:0;font-size:20px;font-weight:600;letter-spacing:-.01em}' +
-    '.gl-x{min-width:44px;min-height:44px;border-radius:12px;border:1px solid #1E2B38;background:#18232F;color:#EAF0F6;font-size:20px;cursor:pointer}' +
-    '.gl-q{min-height:44px;padding:0 14px;border-radius:12px;border:1px solid #1E2B38;background:#18232F;color:#EAF0F6;font:500 16px Geist,system-ui,sans-serif;margin-bottom:8px}' +
+    '.gl-x{min-width:44px;min-height:44px;border-radius:12px;border:1px solid var(--grv-line,#3A2D1A);background:var(--grv-raised,#261D11);color:var(--grv-fg,#F6ECD8);font-size:20px;cursor:pointer}' +
+    '.gl-q{min-height:44px;padding:0 14px;border-radius:12px;border:1px solid var(--grv-line,#3A2D1A);background:var(--grv-raised,#261D11);color:var(--grv-fg,#F6ECD8);font:500 16px Geist,system-ui,sans-serif;margin-bottom:8px}' +
     '.gl-list{list-style:none;margin:0;padding:0;overflow-y:auto;flex:1}' +
-    '.gl-list li{padding:12px 2px;border-bottom:1px solid #1E2B38}' +
-    '.gl-list dt,.gl-t{font-weight:600;font-size:15px;color:#F2A93B;margin-bottom:3px}' +
+    '.gl-list li{padding:12px 2px;border-bottom:1px solid var(--grv-line,#3A2D1A)}' +
+    '.gl-list dt,.gl-t{font-weight:600;font-size:15px;color:var(--grv-gold,#E5B04A);margin-bottom:3px}' +
     '.gl-d{font-size:14px;line-height:1.55;color:#C9D3DD}' +
-    '.gl-none{padding:16px 2px;color:#93A3B4;font-size:14px}' +
-    '.gl-foot{margin-top:10px;font-size:12px;color:#93A3B4}';
+    '.gl-none{padding:16px 2px;color:var(--grv-muted,#BBA987);font-size:14px}' +
+    '.gl-foot{margin-top:10px;font-size:12px;color:var(--grv-muted,#BBA987)}';
 
   var st = document.createElement('style');
   st.textContent = css;

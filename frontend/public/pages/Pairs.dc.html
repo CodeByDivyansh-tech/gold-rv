@@ -13,14 +13,14 @@
 <style>
 body{margin:0}
 a{color:inherit}a:hover{color:inherit}
-button:focus-visible,a:focus-visible,input:focus-visible{outline:2px solid #F2A93B;outline-offset:2px}
+button:focus-visible,a:focus-visible,input:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
 .rail{display:flex}.phonebar{display:none}.tabbar{display:none}.headmeta{display:flex}.wide{display:block}.cards{display:none}
 .scrub{position:absolute;inset:0;width:100%;height:100%;background:transparent;border:0;padding:0;margin:0;cursor:crosshair;touch-action:pan-y;border-radius:8px}
 .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 @media (max-width: 899px){.rail{display:none}.phonebar{display:flex}.tabbar{display:flex}.headmeta{display:none}.wide{display:none}.cards{display:flex}.pagepad{padding-bottom:104px !important}}
 </style>
 </helmet>
-<div style="--bg: {{t.bg}}; --panel: {{t.panel}}; --raised: {{t.raised}}; --line: {{t.line}}; --fg: {{t.fg}}; --muted: {{t.muted}}; --gold: {{t.gold}}; --glow: {{t.glow}}; --ongold: {{t.ongold}}; --up: {{t.up}}; --down: {{t.down}}; background: var(--bg); color: var(--fg); font-family: 'Geist', 'Segoe UI', system-ui, sans-serif; min-height: 100vh; display: flex; align-items: stretch">
+<div style="--bg: {{t.bg}}; --panel: {{t.panel}}; --raised: {{t.raised}}; --line: {{t.line}}; --fg: {{t.fg}}; --muted: {{t.muted}}; --gold: {{t.gold}}; --glow: {{t.glow}}; --ongold: {{t.ongold}}; --up: {{t.up}}; --down: {{t.down}}; --c1: {{t.c1}}; --c2: {{t.c2}}; --c3: {{t.c3}}; --c4: {{t.c4}}; --area: {{t.area}}; --hover: {{t.hover}}; background: var(--bg); color: var(--fg); font-family: 'Geist', 'Segoe UI', system-ui, sans-serif; min-height: 100vh; display: flex; align-items: stretch">
 
   <dc-import name="Rail" current="Pairs"></dc-import>
 
@@ -36,14 +36,14 @@ button:focus-visible,a:focus-visible,input:focus-visible{outline:2px solid #F2A9
         <sc-if value="{{dark}}" hint-placeholder-val="{{ true }}"><svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true" style="fill: none; stroke: currentColor; stroke-width: 1.8px; stroke-linecap: round"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"></path></svg></sc-if>
         <sc-if value="{{light}}" hint-placeholder-val="{{ false }}"><svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true" style="fill: none; stroke: currentColor; stroke-width: 1.8px; stroke-linejoin: round"><path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"></path></svg></sc-if>
       </button>
-      <button type="button" class="grv-tool pbtn" data-grv="words" aria-haspopup="dialog" aria-label="Words explained" data-label="Words explained (?)" style="width: 44px; height: 44px; flex: none; border-radius: 12px; border: 1px solid var(--line); background: var(--raised); color: var(--fg); display: grid; place-items: center; cursor: pointer; padding: 0"><span aria-hidden="true" style="display: grid; place-items: center; width: 22px; height: 22px; border-radius: 50%; background: #F2A93B; color: #1A1204; font: 700 14px 'Geist', system-ui, sans-serif">?</span></button>
+      <button type="button" class="grv-tool pbtn" data-grv="words" aria-haspopup="dialog" aria-label="Words explained" data-label="Words explained (?)" style="width: 44px; height: 44px; flex: none; border-radius: 12px; border: 1px solid var(--line); background: var(--raised); color: var(--fg); display: grid; place-items: center; cursor: pointer; padding: 0"><span aria-hidden="true" style="display: grid; place-items: center; width: 22px; height: 22px; border-radius: 50%; background: var(--gold); color: var(--ongold); font: 700 14px 'Geist', system-ui, sans-serif">?</span></button>
     </div>
 
     <main class="pagepad" style="flex: 1 1 auto; box-sizing: border-box; width: 100%; max-width: 1240px; margin: 0 auto; padding: 32px clamp(16px, 4vw, 48px) 48px; display: flex; flex-direction: column; gap: 24px">
 
       <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-start; gap: 20px">
         <div style="display: flex; flex-direction: column; gap: 12px; max-width: 720px">
-          <h1 style="margin: 0; font-size: clamp(30px, 4vw, 44px); font-weight: 600; letter-spacing: -0.03em; line-height: 1.05">Pair Explorer</h1>
+          <h1 class="grv-foil" style="margin: 0; font-size: clamp(30px, 4vw, 44px); font-weight: 600; letter-spacing: -0.03em; line-height: 1.05">Pair Explorer</h1>
           <p style="margin: 0; font-size: 16px; line-height: 1.6; color: var(--muted); max-width: 62ch">Pick a pair to see its whole history: the gap between the two contracts, its normal range, and every trade the model took, with the result after costs.</p>
         </div>
         <div class="headmeta" style="align-items: center; gap: 12px">
@@ -54,7 +54,7 @@ button:focus-visible,a:focus-visible,input:focus-visible{outline:2px solid #F2A9
             <sc-if value="{{dark}}" hint-placeholder-val="{{ true }}"><svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true" style="fill: none; stroke: currentColor; stroke-width: 1.8px; stroke-linecap: round"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"></path></svg></sc-if>
             <sc-if value="{{light}}" hint-placeholder-val="{{ false }}"><svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true" style="fill: none; stroke: currentColor; stroke-width: 1.8px; stroke-linejoin: round"><path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"></path></svg></sc-if>
           </button>
-          <button type="button" class="grv-tool" data-grv="words" aria-haspopup="dialog" aria-label="Words explained" data-label="Words explained (?)" style="width: 44px; height: 44px; border-radius: 12px; border: 1px solid var(--line); background: var(--panel); color: var(--fg); display: grid; place-items: center; cursor: pointer; padding: 0"><span aria-hidden="true" style="display: grid; place-items: center; width: 22px; height: 22px; border-radius: 50%; background: #F2A93B; color: #1A1204; font: 700 14px 'Geist', system-ui, sans-serif">?</span></button>
+          <button type="button" class="grv-tool" data-grv="words" aria-haspopup="dialog" aria-label="Words explained" data-label="Words explained (?)" style="width: 44px; height: 44px; border-radius: 12px; border: 1px solid var(--line); background: var(--panel); color: var(--fg); display: grid; place-items: center; cursor: pointer; padding: 0"><span aria-hidden="true" style="display: grid; place-items: center; width: 22px; height: 22px; border-radius: 50%; background: var(--gold); color: var(--ongold); font: 700 14px 'Geist', system-ui, sans-serif">?</span></button>
         </div>
       </div>
 
@@ -63,7 +63,7 @@ button:focus-visible,a:focus-visible,input:focus-visible{outline:2px solid #F2A9
       </sc-if>
 
       <sc-if value="{{failed}}" hint-placeholder-val="{{ false }}">
-        <div role="alert" style="background: var(--panel); border: 1px solid var(--down); border-radius: 16px; padding: 18px 20px; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px"><span style="display: flex; flex-direction: column; gap: 4px"><span style="font-weight: 600; font-size: 16px">The data didn't load</span><span style="font-size: 14px; color: var(--muted)">Check your internet connection, then try again.</span></span><button type="button" onClick="{{retry}}" style="min-height: 44px; padding: 0 16px; border-radius: 12px; border: 0; background: var(--gold); color: var(--ongold); font: 600 14px 'Geist', system-ui, sans-serif; cursor: pointer">Try again</button></div>
+        <div role="alert" style="background: var(--panel); border: 1px solid var(--down); border-radius: 16px; padding: 18px 20px; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px"><span style="display: flex; flex-direction: column; gap: 4px"><span style="font-weight: 600; font-size: 16px">The data didn't load</span><span style="font-size: 14px; color: var(--muted)">Check your internet connection, then try again.</span></span><button class="grv-goldbtn" type="button" onClick="{{retry}}" style="min-height: 44px; padding: 0 16px; border-radius: 12px; border: 0; background: var(--gold); color: var(--ongold); font: 600 14px 'Geist', system-ui, sans-serif; cursor: pointer">Try again</button></div>
       </sc-if>
       <sc-if value="{{ready}}" hint-placeholder-val="{{ true }}">
         <div role="group" aria-label="Choose a pair" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(180px, 100%), 1fr)); gap: 8px">
@@ -81,46 +81,19 @@ button:focus-visible,a:focus-visible,input:focus-visible{outline:2px solid #F2A9
           </sc-for>
         </div>
 
-        <section aria-labelledby="hist-h" style="background: var(--panel); border: 1px solid var(--line); border-radius: 20px; padding: clamp(18px, 2.5vw, 26px); display: flex; flex-direction: column; gap: 14px">
+        <section class="grv-card" aria-labelledby="hist-h" style="background: var(--panel); border: 1px solid var(--line); border-radius: 20px; padding: clamp(18px, 2.5vw, 26px); display: flex; flex-direction: column; gap: 14px">
           <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-start; gap: 12px">
             <div style="display: flex; flex-direction: column; gap: 4px">
               <h2 id="hist-h" style="margin: 0; font-size: 18px; font-weight: 600">{{chart.title}}</h2>
               <span style="font-size: 13px; color: var(--muted)">Spread in bps, after adjusting for expiry. Each dot is a trade, placed on the day its signal fired (it was entered the next day).</span>
             </div>
             <div style="display: flex; flex-wrap: wrap; gap: 8px 16px; font-size: 12px; color: var(--muted); align-items: center">
-              <span style="display: flex; align-items: center; gap: 6px"><span style="width: 16px; height: 2px; background: var(--gold)"></span>Spread</span>
-              <span style="display: flex; align-items: center; gap: 6px"><span style="width: 16px; height: 0; border-top: 2px dotted var(--fg)"></span>Normal level</span>
-              <span style="display: flex; align-items: center; gap: 6px"><span style="width: 16px; height: 10px; background: var(--fg); opacity: 0.12; border-radius: 2px"></span>Entry band</span>
+              <span style="display: flex; align-items: center; gap: 6px"><span style="width: 16px; height: 10px; background: var(--glow); outline: 1px solid var(--gold); border-radius: 2px"></span>Entry band</span>
               <span style="display: flex; align-items: center; gap: 6px"><span style="width: 10px; height: 10px; border-radius: 50%; background: var(--up)"></span>Made money</span>
               <span style="display: flex; align-items: center; gap: 6px"><span style="width: 10px; height: 10px; border-radius: 50%; border: 2px solid var(--down); box-sizing: border-box"></span>Lost money</span>
             </div>
           </div>
-          <div style="position: relative; height: 340px">
-            <div style="position: absolute; top: 0; bottom: 0; left: {{chart.testX}}; right: 0; background: var(--glow); border-left: 1px dashed var(--gold); pointer-events: none"></div>
-            <span style="position: absolute; top: 6px; left: {{chart.testX}}; padding-left: 8px; font-size: 12px; color: var(--gold); pointer-events: none">Test year</span>
-            <svg viewBox="0 0 1000 340" preserveAspectRatio="none" role="img" aria-label="{{chart.aria}}" style="position: absolute; inset: 0; width: 100%; height: 100%; display: block; overflow: visible">
-              <path d="{{chart.band}}" style="fill: var(--fg); opacity: 0.08"></path>
-              <path d="{{chart.zero}}" style="fill: none; stroke: var(--muted); stroke-width: 1px; stroke-dasharray: 2 6; vector-effect: non-scaling-stroke; opacity: 0.6"></path>
-              <path d="{{chart.mu}}" style="fill: none; stroke: var(--fg); stroke-width: 1.25px; stroke-dasharray: 2 3; vector-effect: non-scaling-stroke; opacity: 0.75"></path>
-              <path d="{{chart.line}}" style="fill: none; stroke: var(--gold); stroke-width: 1.5px; vector-effect: non-scaling-stroke; stroke-linejoin: round"></path>
-            </svg>
-            <sc-for list="{{chart.marks}}" as="m" hint-placeholder-count="8">
-              <span title="{{m.tip}}" style="{{m.style}}"></span>
-            </sc-for>
-            <sc-if value="{{hover.on}}" hint-placeholder-val="{{ false }}">
-              <div style="position: absolute; top: 0; bottom: 0; left: {{hover.x}}; width: 1px; background: var(--muted); opacity: 0.6; pointer-events: none"></div>
-              <div style="position: absolute; top: 30px; left: {{hover.x}}; transform: {{hover.shift}}; background: var(--raised); border: 1px solid var(--line); border-radius: 10px; padding: 8px 10px; font-size: 12px; white-space: nowrap; pointer-events: none; display: flex; flex-direction: column; gap: 3px">
-                <span style="color: var(--muted)">{{hover.date}}</span>
-                <span>Spread <span style="font-family: 'Geist Mono', ui-monospace, monospace; font-weight: 600">{{hover.s}}</span></span>
-                <span>Normal <span style="font-family: 'Geist Mono', ui-monospace, monospace">{{hover.mu}}</span></span>
-              </div>
-            </sc-if>
-            <button type="button" class="scrub" aria-label="{{chart.scrubLabel}}" onPointerMove="{{chart.move}}" onPointerDown="{{chart.move}}" onPointerLeave="{{chart.leave}}" onKeyDown="{{chart.key}}"></button>
-            <span class="sr" aria-live="polite">{{hover.say}}</span>
-          </div>
-          <div style="display: flex; justify-content: space-between; gap: 8px; font-size: 12px; color: var(--muted); font-family: 'Geist Mono', ui-monospace, monospace">
-            <span>{{chart.start}}</span><span>{{chart.scale}}</span><span>{{chart.end}}</span>
-          </div>
+          <dc-import name="LineChart" dates="{{chart.dates}}" series="{{chart.series}}" envelope="{{chart.envelope}}" markers="{{chart.markers}}" bands="{{chart.bands}}" fmt="bps" height="340" zero="{{ true }}" clamp-lo="{{chart.vlo}}" clamp-hi="{{chart.vhi}}" label="{{chart.aria}}" hint-size="100%,460px"></dc-import>
           <sc-if value="{{chart.clipped}}" hint-placeholder-val="{{ false }}">
             <p style="margin: 0; font-size: 13px; color: var(--muted); line-height: 1.6">{{chart.clipNote}}</p>
           </sc-if>
@@ -177,7 +150,7 @@ button:focus-visible,a:focus-visible,input:focus-visible{outline:2px solid #F2A9
           </section>
 
           <aside aria-labelledby="verdict-h" style="flex: 1 1 300px; display: flex; flex-direction: column; gap: 14px">
-            <section style="background: var(--panel); border: 1px solid var(--line); border-radius: 20px; padding: 22px; display: flex; flex-direction: column; gap: 14px">
+            <section class="grv-card" style="background: var(--panel); border: 1px solid var(--line); border-radius: 20px; padding: 22px; display: flex; flex-direction: column; gap: 14px">
               <div style="display: flex; flex-direction: column; gap: 4px">
                 <h2 id="verdict-h" style="margin: 0; font-size: 16px; font-weight: 600">On the 12-month test year</h2>
                 <span style="font-size: 13px; color: var(--muted)">{{split}}</span>
@@ -201,7 +174,7 @@ button:focus-visible,a:focus-visible,input:focus-visible{outline:2px solid #F2A9
                 <span style="font-size: 13px; line-height: 1.6; background: var(--raised); border-radius: 10px; padding: 10px 12px">{{verdict.mismatch}}</span>
               </sc-if>
             </section>
-            <section style="background: var(--panel); border: 1px solid var(--line); border-radius: 20px; padding: 18px 22px; display: flex; flex-direction: column; gap: 8px">
+            <section class="grv-card" style="background: var(--panel); border: 1px solid var(--line); border-radius: 20px; padding: 18px 22px; display: flex; flex-direction: column; gap: 8px">
               <span style="font-weight: 600; font-size: 14px">Training period, for comparison</span>
               <span style="font-size: 13px; color: var(--muted); line-height: 1.6">{{trainText}}</span>
             </section>
@@ -236,9 +209,10 @@ class Component extends DCLogic {
   }
 
   tokens(dark) {
-    return dark
-      ? { bg: '#070D14', panel: '#0F1822', raised: '#18232F', line: '#1E2B38', fg: '#EAF0F6', muted: '#93A3B4', gold: '#F2A93B', glow: 'rgba(242,169,59,0.12)', ongold: '#1A1204', up: '#4FD1A1', down: '#FF8F85' }
-      : { bg: '#F3F5F8', panel: '#FFFFFF', raised: '#E9EDF2', line: '#DCE2E9', fg: '#0C1622', muted: '#55636F', gold: '#975600', glow: 'rgba(151,86,0,0.10)', ongold: '#FFFFFF', up: '#0B7A55', down: '#B42318' };
+    // shared gold-tinted themes (app/theme.js); also puts the tokens on <html> for the overlays
+    if (typeof GRVTheme === 'undefined') return {};
+    GRVTheme.apply(dark);
+    return GRVTheme.tokens(dark);
   }
 
   stepHover(e, n, big) {
@@ -347,7 +321,17 @@ class Component extends DCLogic {
       };
       hover.say = hover.date + ': spread ' + hover.s + ', normal ' + hover.mu;
     } else hover.say = '';
+    const WHYS = { revert: 'back to normal', stop: 'stop-loss', time: 'time limit', roll: 'contract roll', expiry: 'near expiry' };
     const chart = {
+      dates: P.d, vlo, vhi,
+      series: [
+        { key: 's', label: 'Spread', color: 'var(--gold)', values: P.s, width: 1.75 },
+        { key: 'mu', label: 'Normal level', color: 'var(--fg)', values: P.mu, width: 1.25, dash: '2 3' }
+      ],
+      envelope: { label: 'Entry band', lo: P.mu.map((m, i) => (m == null || P.sd[i] == null ? null : m - pr.ze * P.sd[i])), hi: P.mu.map((m, i) => (m == null || P.sd[i] == null ? null : m + pr.ze * P.sd[i])) },
+      markers: P.trades.map((tr) => ({ date: tr.sig, value: sAt[tr.sig] ?? sAt[tr.e] ?? 0, fill: tr.net > 0 ? 'var(--up)' : 'var(--panel)', ring: tr.net > 0 ? '' : 'var(--down)',
+        label: 'Trade signal (entered ' + this.fd(tr.e) + '): ' + this.srs(tr.net) + ' after costs, closed at ' + (WHYS[tr.why] || tr.why) })),
+      bands: [{ from: D.split.test_start, to: D.asOf, label: 'Test year', fill: 'var(--glow)', ink: 'var(--gold)' }],
       title: P.label + ': ' + this.fd(P.d[0]).replace(/^\d+ /, '') + ' to ' + this.fd(D.asOf).replace(/^\d+ /, ''),
       line, mu, band, zero: 'M0 ' + Y(0).toFixed(1) + ' L' + W + ' ' + Y(0).toFixed(1), marks,
       testX: (X(Date.parse(D.split.test_start)) / W * 100).toFixed(2) + '%',

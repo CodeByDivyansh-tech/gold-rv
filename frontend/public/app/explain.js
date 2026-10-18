@@ -14,7 +14,7 @@
     [/^Is any gap between them worth trading today\?/, 'Today\'s answer', 'Each bar is how far apart two contracts are. The gold line is the cost of trading. No bar crosses it, so the answer today is "No".'],
     [/^Gold price, per 10 g of pure gold/, 'Gold\'s price', 'This is simply the price of gold over time. Use 1M, 3M, 1Y or 3Y to look at a shorter or longer stretch.'],
     [/^Want to go deeper\?/, 'Where to go next', 'Shortcuts to the other pages. Pick whichever you are curious about.'],
-    [/^11,954\s*\n\s*daily settlements checked/, 'The project in four numbers', 'How many prices we checked, over how long, and how the test went, in one line.'],
+    [/^[\d,]+\s*\n\s*daily settlements checked/, 'The project in four numbers', 'How many prices we checked, over how long, and how the test went, in one line.'],
     // Today
     [/^Is any gap worth trading today\?/, 'Today', 'This page answers one question every day: is any price gap big enough to be worth trading?'],
     [/^Pairs above the cost line/, 'Pairs above the line', 'How many of the six pairs have a gap bigger than the cost of trading. When it is 0, we wait.'],
@@ -65,7 +65,7 @@
     [/^Settings for /, 'The frozen settings', 'The exact rules this pair used, fixed before the test year started.'],
     // Data
     [/^Where the numbers come from/, 'Our data', 'Every number on this site comes from MCX\'s official end-of-day price files.'],
-    [/^(11,954|138|768|0)\s*\n\s*(daily settlements|contracts|trading days|mismatches)/, 'Data in numbers', 'Quick facts about our data. "0 mismatches" means our copy matches MCX\'s files exactly.'],
+    [/^([\d,]+)\s*\n\s*(daily settlements|contracts|trading days|mismatches)/, 'Data in numbers', 'Quick facts about our data. "0 mismatches" means our copy matches MCX\'s files exactly.'],
     [/^How we cleaned it/, 'Cleaning', 'Days with no trading were removed, thin days were flagged, and special weekend sessions were kept.'],
     [/^From raw files to this website/, 'Eight steps', 'The eight steps our Python code follows, from MCX files to the charts you see.'],
     [/^How we avoid peeking at the future/, 'A fair exam', 'The model only uses past days, never tomorrow\'s answers, like an exam without the answer key.'],
@@ -245,18 +245,18 @@
     return null;
   }
 
-  var GOLDIE = '<svg viewBox="0 0 48 40" width="40" height="34" aria-hidden="true"><path d="M6 14L9 5H35L38 14Z" fill="#F2A93B"/><path d="M12 33L15 24H41L44 33Z" fill="#C9821F"/>' +
-    '<circle cx="18" cy="10" r="3.2" fill="#fff"/><circle cx="26" cy="10" r="3.2" fill="#fff"/><circle cx="18.8" cy="10.4" r="1.5" fill="#070D14"/><circle cx="26.8" cy="10.4" r="1.5" fill="#070D14"/></svg>';
+  var GOLDIE = '<svg viewBox="0 0 48 40" width="40" height="34" aria-hidden="true"><path d="M6 14L9 5H35L38 14Z" fill="#E5B04A"/><path d="M12 33L15 24H41L44 33Z" fill="#B98428"/>' +
+    '<circle cx="18" cy="10" r="3.2" fill="#fff"/><circle cx="26" cy="10" r="3.2" fill="#fff"/><circle cx="18.8" cy="10.4" r="1.5" fill="#1B1305"/><circle cx="26.8" cy="10.4" r="1.5" fill="#1B1305"/></svg>';
 
   var css = '' +
-    '.xp-x:focus-visible{outline:2px solid #F2A93B;outline-offset:2px}' +
+    '.xp-x:focus-visible{outline:2px solid var(--grv-gold,#E5B04A);outline-offset:2px}' +
     '#app main{touch-action:manipulation}' +
-    '.xp-ring{position:fixed;z-index:45;pointer-events:none;border:2px solid #F2A93B;border-radius:18px;box-shadow:0 0 0 4px rgba(242,169,59,.18);transition:all .15s ease}' +
-    '.xp-tip{cursor:pointer;position:fixed;z-index:50;width:min(330px,calc(100vw - 32px));box-sizing:border-box;background:#0F1822;color:#EAF0F6;border:1px solid #F2A93B;border-radius:16px;' +
-    'padding:12px 14px 14px;box-shadow:0 18px 50px rgba(7,13,20,.45);font-family:Geist,system-ui,sans-serif;display:flex;gap:10px;align-items:flex-start}' +
-    '.xp-tip .xp-body{flex:1;min-width:0}.xp-tip .xp-t{font-weight:600;font-size:15px;color:#F2A93B;margin:2px 0 4px}' +
+    '.xp-ring{position:fixed;z-index:45;pointer-events:none;border:2px solid var(--grv-gold,#E5B04A);border-radius:18px;box-shadow:0 0 0 4px rgba(229,176,74,.18);transition:all .15s ease}' +
+    '.xp-tip{cursor:pointer;position:fixed;z-index:50;width:min(330px,calc(100vw - 32px));box-sizing:border-box;background:var(--grv-panel,#1B150C);color:var(--grv-fg,#F6ECD8);border:1px solid var(--grv-gold,#E5B04A);border-radius:16px;' +
+    'padding:12px 14px 14px;box-shadow:0 18px 50px rgba(18,12,4,.45);font-family:Geist,system-ui,sans-serif;display:flex;gap:10px;align-items:flex-start}' +
+    '.xp-tip .xp-body{flex:1;min-width:0}.xp-tip .xp-t{font-weight:600;font-size:15px;color:var(--grv-gold,#E5B04A);margin:2px 0 4px}' +
     '.xp-tip .xp-d{font-size:14px;line-height:1.55;color:#DCE4EC}' +
-    '.xp-x{flex:none;min-width:36px;min-height:36px;border-radius:10px;border:1px solid #1E2B38;background:#18232F;color:#EAF0F6;font-size:18px;cursor:pointer}' +
+    '.xp-x{flex:none;min-width:36px;min-height:36px;border-radius:10px;border:1px solid var(--grv-line,#3A2D1A);background:var(--grv-raised,#261D11);color:var(--grv-fg,#F6ECD8);font-size:18px;cursor:pointer}' +
     '@media (prefers-reduced-motion:reduce){.xp-ring{transition:none}}';
   var st = document.createElement('style'); st.textContent = css; document.head.appendChild(st);
 

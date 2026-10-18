@@ -122,7 +122,7 @@ def build_web_data(data_dir: str = 'frontend/public/data', out_path: str = None)
         sel = [c for c, d in zip(cross, fdates) if lo <= d <= hi]
         return sum(sel), len(sel)
     periods = {
-        'Oct 2023 – Mar 2025 (thin, before GOLDTEN listed)': count('2023-10-01', '2025-03-31'),
+        'Oct 2023 – Mar 2025 (quieter, before GOLDTEN listed)': count('2023-10-01', '2025-03-31'),
         'Apr 2025 – Dec 2025': count('2025-04-01', '2025-12-31'),
         'Jan 2026 – Mar 2026 (crash)': count('2026-01-01', '2026-03-31'),
         'Apr 2026 – Sep 2026': count('2026-04-01', '2026-09-30'),
@@ -192,7 +192,7 @@ def build_web_data(data_dir: str = 'frontend/public/data', out_path: str = None)
         meta=dict(rows=meta['rows_count'], contracts=meta['contracts_count'], days=meta['trading_dates_count'],
                   noTrade=meta['no_trade_rows_count'], thin=meta['thin_rows_count'], weekend=meta['weekend_sessions'],
                   checkRows=meta['raw_cross_check']['matched_rows'], mismatches=meta['raw_cross_check']['mismatches'],
-                  checkText=meta['raw_cross_check']['status']),
+                  checkText=meta['raw_cross_check']['status'], supplement=meta.get('supplement', {})),
         rule=dict(hurdle=rule_cmp['hurdle_bps'], stopBuffer=rule_cmp['stop_buffer_z'], maxMove=rule_cmp['max_fill_move_pct'],
                   minTrain=rule_cmp['min_train_trades'], switch=switch,
                   current=rule_cmp['current_rule']['by_slip'], original=rule_cmp['original_rule']['by_slip'],

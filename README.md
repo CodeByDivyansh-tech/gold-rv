@@ -21,7 +21,7 @@ Every number below is computed by the pipeline (`frontend/public/data/`), not ty
 
 The rule and its settings were frozen before this data was used, and nothing was changed afterwards
 (data: the data-book team's MCX Bhavcopy data book, shared with permission; it matches our own MCX download on
-all 11,708 shared rows). Only the three pairs that existed then can be tested.
+all 12,021 shared rows). Only the three pairs that existed then can be tested.
 
 | At 5 bps slippage | Trades | Net after costs | t-stat | Losing years |
 |---|---|---|---|---|
@@ -39,16 +39,16 @@ Settings were tuned on Train (10-Oct-2023 → 30-Sep-2025) and frozen for Test (
 
 | Rule (5 bps slippage) | Train trades | Train net | Test trades | Test net | t-stat | Closed in Jan–Mar 2026 crash | Test outside crash |
 |---|---|---|---|---|---|---|---|
-| Five checks (what the site shows) | 37 | −₹19,056 | 20 | +₹1,13,598 | 1.89 | +₹1,37,985 | −₹24,387 |
-| Original study (4 checks, no cost line) | 59 | −₹66,783 | 54 | +₹16,387 | −0.08 | +₹1,70,806 | −₹1,54,419 |
+| Five checks (what the site shows) | 38 | −₹16,514 | 20 | +₹1,13,598 | 1.89 | +₹1,37,985 | −₹24,387 |
+| Original study (4 checks, no cost line) | 60 | −₹63,801 | 54 | +₹16,387 | −0.08 | +₹1,70,806 | −₹1,54,419 |
 | Five checks + training switch | — | — | 4 | +₹22,916 | — | — | — |
 
 - **Significance**: t = 1.89 on 20 trades gives p = 0.07; allowing for the 3 rule versions scored on the test year,
   p = 0.22. 108 settings (18 per pair) were tried on training only, which is tuning, not testing.
 - **One crash**: trades that closed in Jan–Mar 2026 made more than the whole test-year profit. That window was named
   after the results were seen, so the split is a check, not a test.
-- **Resampling** (10,000 draws): 94% of test-year totals stay above ₹0, 14% without the crash, 26% in training.
-- **Training switch**: only GOLDM − GOLDPETAL qualifies, on +₹1,280 over 17 training trades (t = 0.06): close to a coin flip.
+- **Resampling** (10,000 draws): 94% of test-year totals stay above ₹0, 14% without the crash, 30% in training.
+- **Training switch**: only GOLDM − GOLDPETAL qualifies, on +₹6,633 over 17 training trades (t = 0.19): close to a coin flip.
 
 ### 1.3 Slippage: the number that decides it, and daily data cannot measure it
 
@@ -58,7 +58,7 @@ spread on most contracts and months (it is smaller than a day's price noise); wi
 they give 26–31 bps for every contract alike, which is volatility, not a spread. The hard floor is half a tick,
 at most 0.34 bps. Our trades were a median 0.06% of the day's volume.
 
-Break-even slippage per order: **training 3.8 bps · test year 14.3 bps · 2011–2023 never (loses at 0)**.
+Break-even slippage per order: **training 4.0 bps · test year 14.3 bps · 2011–2023 never (loses at 0)**.
 Only real broker fills (a forward test) can settle it.
 
 ### 1.4 Market structure
@@ -75,6 +75,17 @@ Only real broker fills (a forward test) can settle it.
 - **Carry**: GOLDPETAL calendar spreads imply a median 8.03% a year (IQR 6.18–10.86%).
 - **Gold exposure**: equal grams on both legs; gold-price P&L is ~1.4% of gross; correlation of trade returns
   with gold moves −0.10.
+
+### 1.5 The data: what we have, what was missing, what we still need
+
+| | |
+|---|---|
+| **Coverage** | 10 Oct 2023 → 1 Oct 2026: 769 trading days, 149 contracts, 12,267 daily settlements; every day the MCX history book has in that window is present (a test checks this) |
+| **Fixed in Oct 2026** | Our MCX download had skipped 8 contracts: the Oct, Nov and Dec 2023 expiries of GOLDM, GOLDGUINEA and GOLDPETAL (289 traded rows, the busiest contracts in those months). They are now added from the MCX history book, with 1 Oct 2026, in `data/raw/mcx_bhavcopy_supplement.csv`. Effect: training 37 → 38 trades, −₹19,056 → −₹16,514; settings, test year, 2011–2023 check and alerts unchanged |
+| **Checked and fine** | No missing days inside any contract's life; no broken high/low/close; the 6%+ days (Jan–Mar 2026, 19 Mar, 13 May 2026) moved all four contracts together, so they are real; GOLDM's Nov-2024 contract expired early, on 31 Oct 2024 |
+| **Exchange quirk** | 169 rows where MCX's "previous close" differs from the prior day's close, mostly thin contracts and no-trade days; the pipeline never uses that field for signals |
+| **Still missing** | 2 Oct 2026 onward. Run `python -m pipeline.download` on a computer that can reach mcxindia.com (MCX blocks most cloud servers) |
+| **Would help most** | Real broker fills or intraday bid/ask, to measure slippage (82% of the cost, and the number that decides the verdict); MCX circulars for Nov 2024 (the GOLDPETAL repricing); MCX's official contract spec sheets (purities, delivery centres) |
 
 ---
 
@@ -93,7 +104,8 @@ gold-rv/
 │   └── refresh-data.yml        # manual: download new MCX rows, rebuild, test, commit
 ├── data/raw/
 │   ├── mcx_bhavcopy_raw_api.csv   # rows exactly as the MCX endpoint returns them (source of truth)
-│   ├── gold_bhavcopy_clean.csv    # 11,954 rows, derived from the raw file (pipeline/download.py)
+│   ├── mcx_bhavcopy_supplement.csv # 313 official MCX rows our download missed, from the MCX history book
+│   ├── gold_bhavcopy_clean.csv    # 12,267 rows, derived from the raw file + supplement (pipeline/download.py)
 │   ├── contract_calendar.csv      # contract lifecycles, derived from the clean file
 │   ├── retrieval_log.csv          # one line per MCX request
 │   └── mcx_history_book.csv       # 55,457 MCX rows, Nov-2003 → Oct-2026 (data-book team, with permission)
@@ -108,7 +120,7 @@ gold-rv/
 │   ├── robustness.py           # alert follow-through and resampled 95% ranges (robustness.json)
 │   ├── build_site_data.py      # runs everything, writes frontend/public/data/*.json
 │   ├── build_web_data.py       # site-data.json, the one file the pages read
-│   └── tests/                  # 41 pytest tests
+│   └── tests/                  # 42 pytest tests
 └── frontend/
     ├── index.html · build.mjs · tests/pages.test.mjs
     └── public/
@@ -128,7 +140,7 @@ Prerequisites: Python 3.11+, Node.js 18+ (no npm packages needed to build or tes
 ```bash
 pip install -r requirements.txt
 python -m pipeline.build_site_data      # writes frontend/public/data/ (about 20 s)
-python -m pytest pipeline/tests/        # 41 tests
+python -m pytest pipeline/tests/        # 42 tests
 cd frontend
 npm test                                # page logic against the real data
 npm run build                           # writes dist/
@@ -169,7 +181,7 @@ does not match what the pipeline produces from the committed code.
 
 ---
 
-## 5. Verification (pytest, 41 tests)
+## 5. Verification (pytest, 42 tests)
 
 | Requirement | Test module |
 |---|---|
