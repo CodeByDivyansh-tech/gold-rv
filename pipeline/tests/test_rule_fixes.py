@@ -3,6 +3,7 @@ import pytest
 import numpy as np
 import pandas as pd
 from pipeline.load import load_clean_bhavcopy
+from pipeline.config import TEST_END   # research snapshot: a data refresh must not change these checks
 from pipeline.carry import compute_reference_carry
 from pipeline.pairs import build_all_pairs
 from pipeline.backtest import (prepare_contract_lookup, run_grid_search, run_all_scenarios,
@@ -16,7 +17,7 @@ _CACHE = {}
 
 def _run():
     if not _CACHE:
-        df, dates, tdi = load_clean_bhavcopy('data/raw/gold_bhavcopy_clean.csv')
+        df, dates, tdi = load_clean_bhavcopy('data/raw/gold_bhavcopy_clean.csv', end=TEST_END)
         carry, _ = compute_reference_carry(df, dates)
         pairs = build_all_pairs(df, carry)
         P = prepare_contract_lookup(df)

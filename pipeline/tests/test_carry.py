@@ -3,11 +3,12 @@ import pytest
 import numpy as np
 import pandas as pd
 from pipeline.load import load_clean_bhavcopy
+from pipeline.config import TEST_END   # research snapshot: a data refresh must not change these checks
 from pipeline.carry import compute_reference_carry, compute_carry_decomposition
 
 def test_goldpetal_carry_sanity():
     """GOLDPETAL median implied carry between 3% and 12% (reference: 8.0%)."""
-    df, dates, tdi = load_clean_bhavcopy('data/raw/gold_bhavcopy_clean.csv')
+    df, dates, tdi = load_clean_bhavcopy('data/raw/gold_bhavcopy_clean.csv', end=TEST_END)
     carry_series, chosen = compute_reference_carry(df, dates)
     
     med = chosen['c'].median() * 100.0
@@ -19,7 +20,7 @@ def test_goldpetal_carry_sanity():
 
 def test_carry_decomposition_identity():
     """Verify that Δln F_i = gold_move + rolldown + curve_change + residual."""
-    df, dates, tdi = load_clean_bhavcopy('data/raw/gold_bhavcopy_clean.csv')
+    df, dates, tdi = load_clean_bhavcopy('data/raw/gold_bhavcopy_clean.csv', end=TEST_END)
     carry_series, chosen = compute_reference_carry(df, dates)
     decomp = compute_carry_decomposition(df, carry_series, chosen)
     

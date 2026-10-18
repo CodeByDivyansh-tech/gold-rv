@@ -3,6 +3,7 @@
 import { readFileSync } from 'node:fs'
 import assert from 'node:assert/strict'
 
+globalThis.window = globalThis; new Function(readFileSync('public/app/theme.js', 'utf8'))()   // shared themes, as in the browser
 const D = JSON.parse(readFileSync('public/data/site-data.json', 'utf8'))
 const R = JSON.parse(readFileSync('public/data/robustness.json', 'utf8'))
 const H = JSON.parse(readFileSync('public/data/history.json', 'utf8'))
@@ -61,6 +62,22 @@ for (const [name, list] of Object.entries(states)) {
   assert.equal(v.calc.rt, D.costTotal.toFixed(2))
   assert.equal(v.calc.count, D.today.filter((p) => p.dev >= 2 * D.rt).length + ' of ' + D.today.length)
   assert.ok(v.ft.show && v.ft.rows.length === 4)
+}
+// Shared menus: exactly one item is marked as the current page, on every page
+for (const name of ['Rail', 'TabBar']) {
+  const C = load(name)
+  for (const cur of ['Home', 'Today', 'Market', 'Pairs', 'Signals', 'Backtesting', 'Data']) {
+    const c = new C(); c.props = { current: cur }; c.state = {}
+    const v = c.renderVals()
+    assert.deepEqual(Object.keys(v.nav).filter((k) => v.nav[k].cur === 'page'), [cur], `${name} highlights ${cur}`)
+    runs++
+  }
+}
+// Every page uses the shared menus instead of its own copy
+for (const name of ['Home', 'Today', 'Market', 'Pairs', 'Signals', 'Backtesting', 'Data']) {
+  const src = readFileSync(`public/pages/${name}.dc.html`, 'utf8')
+  assert.ok(src.includes(`<dc-import name="Rail" current="${name}">`) && src.includes(`<dc-import name="TabBar" current="${name}">`), `${name} uses the shared menus`)
+  assert.ok(!src.includes('<aside class="rail"') && !src.includes('<nav class="tabbar"'), `${name} still has its own menu copy`)
 }
 console.log(`pages ok: ${runs} page states rendered against site-data.json`)
 

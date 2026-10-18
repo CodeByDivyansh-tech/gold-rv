@@ -2,15 +2,15 @@
   {
     "pair_id": "GUINEA_PETAL",
     "pair": "GOLDGUINEA \u2212 GOLDPETAL",
-    "pre_break_mean": 211.3,
-    "pre_break_text": "+211.3 bps",
+    "pre_break_mean": 210.9,
+    "pre_break_text": "+210.9 bps",
     "post_break_mean": -16.5,
     "post_break_text": "-16.5 bps",
     "q1_mean": -23.6,
     "q1_min": -82.8,
     "q1_max": 47.8,
     "q1_text": "Mean -23.6 bps [min -82.8, max +47.8]",
-    "comment": "Level shift around Dec-24 \u2192 Mar-25: GOLDPETAL moved from cheap to slightly rich. Cause not yet confirmed; a move this size usually means a change in contract terms, so check MCX circulars for that period."
+    "comment": "Level shift: GOLDPETAL repriced from cheap to slightly rich, sharpest 04 Nov\u201311 Nov 2024. Cause not confirmed; no MCX notice found."
   },
   {
     "pair_id": "TEN_PETAL",
@@ -41,15 +41,15 @@
   {
     "pair_id": "M_PETAL",
     "pair": "GOLDM \u2212 GOLDPETAL",
-    "pre_break_mean": 143.1,
-    "pre_break_text": "+143.1 bps",
+    "pre_break_mean": 143.5,
+    "pre_break_text": "+143.5 bps",
     "post_break_mean": -90.8,
     "post_break_text": "-90.8 bps",
     "q1_mean": -261.2,
     "q1_min": -741.6,
     "q1_max": -0.8,
     "q1_text": "Mean -261.2 bps [min -741.6, max -0.8]",
-    "comment": "Level shift around Dec-24 \u2192 Mar-25: GOLDPETAL moved from cheap to slightly rich. Cause not yet confirmed; a move this size usually means a change in contract terms, so check MCX circulars for that period."
+    "comment": "Level shift: GOLDPETAL repriced from cheap to slightly rich, sharpest 04 Nov\u201311 Nov 2024. Cause not confirmed; no MCX notice found."
   },
   {
     "pair_id": "M_TEN",
@@ -67,14 +67,14 @@
   {
     "pair_id": "M_GUINEA",
     "pair": "GOLDM \u2212 GOLDGUINEA",
-    "pre_break_mean": -69.1,
-    "pre_break_text": "-69.1 bps",
+    "pre_break_mean": -66.7,
+    "pre_break_text": "-66.7 bps",
     "post_break_mean": -76.5,
     "post_break_text": "-76.5 bps",
     "q1_mean": -237.3,
     "q1_min": -555.6,
     "q1_max": -6.6,
     "q1_text": "Mean -237.3 bps [min -555.6, max -6.6]",
-    "comment": "Fairly stable: GOLDM averaged -73.3 bps vs GOLDGUINEA (carry-adjusted) over the whole period."
+    "comment": "Fairly stable: GOLDM averaged -72.1 bps vs GOLDGUINEA (carry-adjusted) over the whole period."
   }
 ]

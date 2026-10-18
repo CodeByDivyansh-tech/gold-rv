@@ -15,6 +15,7 @@ from pipeline.config import (
     TRAIN_END,
     TEST_START,
     TEST_END,
+    segment_of,
     BASE_SLIPPAGE,
     SLIPPAGE_SCENARIOS,
     NOTIONAL_PER_LEG,
@@ -74,6 +75,12 @@ def cross_check_raw_vs_clean(df: pd.DataFrame, raw_path: str = 'data/raw/mcx_bha
         return {'raw_rows': 0, 'matched_rows': 0, 'mismatches': None,
                 'status': 'Raw file not present in this build; cross-check not run.'}
     raw = pd.read_csv(raw_path)
+    sup_path = os.path.join(os.path.dirname(raw_path), 'mcx_bhavcopy_supplement.csv')
+    n_sup = 0
+    if os.path.exists(sup_path):                     # rows our download missed, from the MCX history book
+        sup = pd.read_csv(sup_path)
+        n_sup = len(sup)
+        raw = pd.concat([raw, sup[[c for c in raw.columns]]], ignore_index=True)
     raw['date'] = pd.to_datetime(raw['Date'], format='%m/%d/%Y')
     raw['expiry'] = pd.to_datetime(raw['ExpiryDate'], format='%d%b%Y')
     raw['symbol'] = raw['Symbol'].astype(str).str.strip()
@@ -86,15 +93,30 @@ def cross_check_raw_vs_clean(df: pd.DataFrame, raw_path: str = 'data/raw/mcx_bha
     only_clean = int((m['_merge'] == 'right_only').sum())
     n_bad = int(bad.sum()) + only_raw + only_clean
     return {
-        'raw_rows': int(len(raw)),
+        'raw_rows': int(len(raw)), 'supplement_rows': int(n_sup),
         'matched_rows': int(len(both)),
         'value_mismatches': int(bad.sum()),
         'rows_only_in_raw': only_raw,
         'rows_only_in_clean': only_clean,
         'mismatches': n_bad,
         'fields_compared': ['open', 'close', 'volume_lots', 'open_interest_lots'],
-        'status': (f"Raw MCX file vs cleaned data: {len(both):,} rows compared on open, close, volume and OI, "
+        'status': (f"Raw MCX rows vs cleaned data: {len(both):,} rows compared on open, close, volume and OI "
+                   f"({n_sup} of them from the MCX history book, filling gaps in our download), "
                    f"{n_bad} mismatch{'es' if n_bad != 1 else ''}. Runs on every build."),
+    }
+
+def supplement_summary(path: str = 'data/raw/mcx_bhavcopy_supplement.csv') -> Dict[str, Any]:
+    """What the history-book supplement adds to our MCX download (see pipeline/download.py)."""
+    if not os.path.exists(path):
+        return {'rows': 0, 'missing_contracts': [], 'extra_days': []}
+    s = pd.read_csv(path)
+    miss = s[s['Source'].str.contains('missing', case=False)]
+    later = s[s['Source'].str.contains('after', case=False)]
+    keys = miss.groupby(['Symbol', 'ExpiryDate']).size().reset_index()
+    return {
+        'rows': int(len(s)), 'missing_rows': int(len(miss)), 'extra_day_rows': int(len(later)),
+        'missing_contracts': [f"{r.Symbol} {pd.to_datetime(r.ExpiryDate, format='%d%b%Y').strftime('%b %Y')}" for r in keys.itertuples()],
+        'extra_days': sorted(pd.to_datetime(later['Date'], format='%m/%d/%Y').dt.strftime('%Y-%m-%d').unique().tolist()),
     }
 
 CRASH_START, CRASH_END, CRASH_LABEL = '2026-01-01', '2026-03-31', 'Jan–Mar 2026 crash'
@@ -114,6 +136,7 @@ def summarize_rule(trades: pd.DataFrame, switch: Optional[Dict[str, Dict[str, An
         te = a[a['seg'] == 'test'] if len(a) else a
         crash = te[(te['exit'] >= CRASH_START) & (te['exit'] <= CRASH_END)] if len(te) else te
         rest = te.drop(crash.index) if len(te) else te
+        fw = a[a['seg'] == 'forward'] if len(a) else a
         row = {
             'train_n': int(len(tr)), 'train_net_rs': round(float(tr['net'].sum()), 1) if len(tr) else 0.0,
             'train_avg_bps': round(float(tr['net_bps'].mean()), 1) if len(tr) else None,
@@ -124,6 +147,8 @@ def summarize_rule(trades: pd.DataFrame, switch: Optional[Dict[str, Dict[str, An
             'crash_n': int(len(crash)), 'crash_net_rs': round(float(crash['net'].sum()), 1) if len(crash) else 0.0,
             'ex_crash_n': int(len(rest)), 'ex_crash_net_rs': round(float(rest['net'].sum()), 1) if len(rest) else 0.0,
             'ex_crash_t': _tstat(rest['net_bps']) if len(rest) else None,
+            'forward_n': int(len(fw)), 'forward_net_rs': round(float(fw['net'].sum()), 1) if len(fw) else 0.0,
+            'forward_t': _tstat(fw['net_bps']) if len(fw) else None,
         }
         if switch is not None:
             on = [k for k, v in switch.items() if v['on']]
@@ -205,6 +230,7 @@ def build_all_site_data(output_dir: str = 'frontend/public/data'):
         'thin_rows_count': int(df['thin'].sum()),
         'weekend_sessions': weekend_dates,
         'raw_cross_check': raw_check,
+        'supplement': supplement_summary(),
         'num_contracts': len(CONTRACT_SPECS),
         'num_pairs': len(PAIRS),
         'unseen_test_months': 12,
@@ -325,7 +351,7 @@ def build_all_site_data(output_dir: str = 'frontend/public/data'):
         
         # Point-in-time rolling stats
         p_calc = compute_rolling_z(p_df, W=W)
-        p_calc['segment'] = np.where(p_calc['date'] <= pd.Timestamp(TRAIN_END), 'train', 'test')
+        p_calc['segment'] = segment_of(p_calc['date'].values)
         
         last_row = p_calc.iloc[-1]
         valid_z = p_calc['z'].dropna()
@@ -463,7 +489,7 @@ def build_all_site_data(output_dir: str = 'frontend/public/data'):
         for slip in SLIPPAGE_SCENARIOS:
             t_df = run_pair_backtest(pair_id, p_df, P, dates, tdi, W, ze, mh, slip_bps=slip, rule=ALERT_RULE)
             if not t_df.empty:
-                t_df['seg'] = np.where(t_df['entry'] <= t_end, 'train', 'test')
+                t_df['seg'] = segment_of(t_df['entry'].values)
                 t_train = t_df[t_df['seg'] == 'train']
                 t_test = t_df[t_df['seg'] == 'test']
             else:
@@ -680,6 +706,22 @@ def build_all_site_data(output_dir: str = 'frontend/public/data'):
     }
     save_json(os.path.join(output_dir, 'backtest/rule_comparison.json'), rule_comparison)
 
+    # The verdict needs the cleanest out-of-sample test (2011-2023) and the evidence checks,
+    # so both run here, before methodology.json and site-data.json are written.
+    print("--- 7b. Long-history check: frozen rule on 2011-2023 (MCX history book) ---")
+    from pipeline.history import build as build_history
+    hist = build_history(output_dir)
+    print("--- 7c. Evidence checks: test-year status, slippage, multiple testing, switch ---")
+    from pipeline.evidence import build as build_evidence
+    ev = build_evidence(output_dir)
+    pb = ev['petal_break']
+    for r in regime_records:      # the break is located from the data (evidence.py), not typed in
+        if r['pair_id'] in ('GUINEA_PETAL', 'M_PETAL'):
+            r['comment'] = (f"Level shift: GOLDPETAL repriced from cheap to slightly rich, sharpest "
+                            f"{pd.Timestamp(pb['start']).strftime('%d %b')}–{pd.Timestamp(pb['end']).strftime('%d %b %Y')}. "
+                            f"Cause not confirmed; no MCX notice found.")
+    save_json(os.path.join(output_dir, 'regimes.json'), regime_records)
+
     b = new_sum[str(BASE_SLIPPAGE)]
     o = old_sum[str(BASE_SLIPPAGE)]
     def rs(v: float) -> str:
@@ -704,12 +746,26 @@ def build_all_site_data(output_dir: str = 'frontend/public/data'):
                      f"outside it the rule {'lost ' + rs(-b['ex_crash_net_rs']) if b['ex_crash_net_rs'] < 0 else 'made ' + rs(b['ex_crash_net_rs'])}")
     else:
         crash_txt = f"trades that closed during the {CRASH_LABEL} made {rs(b['crash_net_rs'])}"
+    mt = ev['multiple_testing']
+    p_txt = (f", p = {mt['p_two_sided']:.2f}, or {mt['p_bonferroni']:.2f} allowing for the {mt['rule_versions_scored_on_test']} "
+             f"rule versions scored on that year" if mt['p_two_sided'] is not None else '')
+    hr = hist.get('result') or {}
+    hs, h0 = hr.get('by_slip', {}).get(str(BASE_SLIPPAGE)), hr.get('by_slip', {}).get('0')
+    def made(v: float) -> str:
+        return ('made ' if v > 0 else 'lost ') + rs(abs(v))
+    if hs:
+        hist_txt = (f"The cleanest test is {hist['window']['from'][:4]}–{hist['window']['to'][:4]}: the rule and its settings were "
+                    f"frozen before that data was used. There it {made(hs['net_rs'])} over {hs['n']} trades at {BASE_SLIPPAGE} bps "
+                    f"slippage (t = {str(hs['t']).replace('-', '−')})"
+                    + (f", and {made(h0['net_rs'])} even with zero slippage. " if h0 and h0['net_rs'] < 0 else ". "))
+    else:
+        hist_txt = ''
     honest = (
-        f"Cross-contract gold gaps are real and measurable. With the same five checks the site shows, "
-        f"the rule {'made' if b['train_net_rs'] > 0 else 'lost'} {rs(abs(b['train_net_rs']))} over {b['train_n']} training trades, "
-        f"then {'made' if b['test_net_rs'] > 0 else 'lost'} {rs(abs(b['test_net_rs']))} over {b['test_n']} unseen-year trades "
-        f"at {BASE_SLIPPAGE} bps slippage. But {crash_txt}. The result is not proven ({t_txt}, {sig_txt}), and training "
-        f"would have switched on only {len(on_pairs)} of 6 pairs. No persistent edge is proven after costs."
+        f"Cross-contract gold gaps are real and measurable, but no persistent edge is proven after costs. {hist_txt}"
+        f"The {TEST_START[:4]}–{TEST_END[2:4]} test year {made(b['test_net_rs'])} over {b['test_n']} trades, but it is not a clean "
+        f"test: the five-check rule was written after that year's first results were seen. Its profit also rests on one "
+        f"episode ({crash_txt}), and it is not significant ({t_txt}{p_txt}). In training the same rule "
+        f"{made(b['train_net_rs'])} over {b['train_n']} trades, and training would have switched on only {len(on_pairs)} of 6 pairs."
     )
     methodology_data = {
         'stages': [
@@ -738,17 +794,23 @@ def build_all_site_data(output_dir: str = 'frontend/public/data'):
         ],
         'limitations': [
             'EOD settlement close is an official reference, not an executable book fill.',
-            'Bhavcopy volume indicates activity but does not measure order-book depth; slippage is assumed, not measured.',
+            'Bhavcopy volume indicates activity but does not measure order-book depth. Slippage is assumed at '
+            f'{BASE_SLIPPAGE} bps per order: daily data cannot measure it (see the slippage check), only real broker fills can.',
+            f"The {TEST_START[:4]}–{TEST_END[2:4]} test year is not a clean out-of-sample test: the five-check rule was written "
+            f"on {ev['test_year']['rule_frozen']}, after the original study's test-year results were known. The "
+            f"{hist['window']['from'][:4]}–{hist['window']['to'][:4]} check is the clean one.",
             'GOLDTEN contracts listed only on 31-Mar-2025, offering limited historical depth.',
             f'Test period contains only {int(per_pair_n.min()) if len(per_pair_n) else 0} to {int(per_pair_n.max()) if len(per_pair_n) else 0} trades per pair ({b["test_n"]} in total); small samples preclude high certainty.',
-            'GOLDPETAL\'s level shifted around Dec-24 / Mar-25; the cause is not yet confirmed against MCX circulars.',
-            f'Trades closed during the {CRASH_LABEL} made {rs(b["crash_net_rs"])} of the unseen-year result ({rs(b["test_net_rs"])} in total).',
+            'GOLDPETAL repriced against the other contracts: ' + pb['summary'],
+            f'Trades closed during the {CRASH_LABEL} made {rs(b["crash_net_rs"])} of the test-year result ({rs(b["test_net_rs"])} in total). '
+            'The crash window was named after the results were seen, so this split is a check, not a test.',
+            'The training switch rests on thin evidence: ' + ev['switch']['note'],
             'When the pair series switches to new contracts, open trades are closed; this adds cost.',
             'Exchange transaction charges and statutory rates should be regularly verified against MCX circulars.',
         ],
         'honest_conclusion': honest,
         'original_rule_note': (
-            f"The original study used only four of the five checks (no cost line). Under it: {o['test_n']} unseen-year trades, "
+            f"The original study used only four of the five checks (no cost line). Under it: {o['test_n']} test-year trades, "
             f"{rs(o['test_net_rs'])} at {BASE_SLIPPAGE} bps. It is kept on the site for comparison only."
         ),
     }
@@ -784,10 +846,6 @@ def build_all_site_data(output_dir: str = 'frontend/public/data'):
     from pipeline.robustness import build as build_robustness
     build_robustness(output_dir)
 
-    print("--- 10. Long-history check: frozen rule on 2011-2023 (MCX history book) ---")
-    from pipeline.history import build as build_history
-    build_history(output_dir)
-    
     print("--- Build complete! All JSON files written successfully. ---")
 
 if __name__ == '__main__':

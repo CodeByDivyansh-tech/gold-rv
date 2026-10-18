@@ -25,7 +25,8 @@
   var EVENTS = {
     onclick: ['click'], onchange: ['input', 'change'], oninput: ['input'], onkeydown: ['keydown'],
     onpointerdown: ['pointerdown'], onpointermove: ['pointermove'], onpointerleave: ['pointerleave'],
-    onpointerup: ['pointerup'], onfocus: ['focus'], onblur: ['blur'], onsubmit: ['submit']
+    onpointerup: ['pointerup'], onfocus: ['focus'], onblur: ['blur'], onsubmit: ['submit'],
+    ondblclick: ['dblclick'], onpointercancel: ['pointercancel']
   };
 
   // ------------------------------------------------------------------ values
@@ -211,12 +212,12 @@
         var s = Object.create(scope);
         s[as] = list[i];
         s.$index = i;
-        renderNodes(node.content.childNodes, s, parent, ctx);
+        renderNodes(kidsOf(node), s, parent, ctx);
       }
       return;
     }
     if (kind === 'if') {
-      if (holeValue(node.getAttribute('value'), scope)) renderNodes(node.content.childNodes, scope, parent, ctx);
+      if (holeValue(node.getAttribute('value'), scope)) renderNodes(kidsOf(node), scope, parent, ctx);
       return;
     }
     if (kind === 'import') {
@@ -245,11 +246,14 @@
       if (name === 'href') v = options.href(String(v));
       el.setAttribute(name, String(v));
     }
-    var kids = node.localName === 'template' ? node.content.childNodes : node.childNodes;
+    var kids = node.localName === 'template' ? kidsOf(node) : node.childNodes;
     renderNodes(kids, scope, el, ctx);
     bind(el);
     parent.appendChild(el);
   }
+
+  // <template> inside <svg> is parsed as an SVG element with ordinary children, not a content fragment
+  function kidsOf(node) { return node.content ? node.content.childNodes : node.childNodes; }
 
   function holeValue(raw, scope) {
     if (raw === null) return undefined;

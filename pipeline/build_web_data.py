@@ -122,7 +122,7 @@ def build_web_data(data_dir: str = 'frontend/public/data', out_path: str = None)
         sel = [c for c, d in zip(cross, fdates) if lo <= d <= hi]
         return sum(sel), len(sel)
     periods = {
-        'Oct 2023 – Mar 2025 (thin, before GOLDTEN listed)': count('2023-10-01', '2025-03-31'),
+        'Oct 2023 – Mar 2025 (quieter, before GOLDTEN listed)': count('2023-10-01', '2025-03-31'),
         'Apr 2025 – Dec 2025': count('2025-04-01', '2025-12-31'),
         'Jan 2026 – Mar 2026 (crash)': count('2026-01-01', '2026-03-31'),
         'Apr 2026 – Sep 2026': count('2026-04-01', '2026-09-30'),
@@ -168,19 +168,31 @@ def build_web_data(data_dir: str = 'frontend/public/data', out_path: str = None)
     assert abs(cost_total - calculate_round_trip_cost_bps(SL)) < 1e-9, (cost_total, calculate_round_trip_cost_bps(SL))
     assert abs(round(cost_total, 1) - today['round_trip_cost_bps']) < 0.051
 
+    evidence_pb = J('evidence.json')['petal_break']
     events = dict(asOf=meta['coverage_end'], crashStart=rule_cmp['crash']['start'], crashEnd=rule_cmp['crash']['end'],
                   crashLabel='January–March 2026 crash', crashShort='Jan–Mar 2026 crash',
-                  petalStart='2024-12-01', petalEnd='2025-03-31',
+                  petalStart=evidence_pb['start'], petalEnd=evidence_pb['end'],
                   goldtenListed=next(d for d, v in zip(pure4['d'], pure4['GOLDTEN']) if v is not None),
                   regimeLabels=['Oct 2023 – Dec 2024', 'Apr 2025 – Sep 2026', 'Jan–Mar 2026 crash'])
 
+    # evidence checks (pipeline/evidence.py): test-year status, slippage, multiple testing, switch
+    evidence = J('evidence.json')
+    slip_bps = next(c['bps'] for c in costs if c['name'] == 'Slippage')
+    evidence['slippage']['assumed_share_of_cost_pct'] = round(100 * slip_bps / cost_total)
+    hist = J('history.json')
+    hr = hist['result']
+    longrun = dict(start=hist['window']['from'], end=hist['window']['to'], pairs=hist['window']['pairs'],
+                   n=hr['by_slip'][str(SL)]['n'], net=hr['by_slip'][str(SL)]['net_rs'], t=hr['by_slip'][str(SL)]['t'],
+                   net0=hr['by_slip']['0']['net_rs'], losingYears=hr['years_count'] - hr['years_positive'], years=hr['years_count'])
+
     data = dict(costs=costs, costTotal=round(cost_total, 2), slip=SL, notional=N, events=events,
+        evidence=evidence, longrun=longrun,
                 minVol=C.MIN_VOLUME_LOTS, minOi=C.MIN_OI_LOTS, minTd=C.MIN_ENTRY_TD,
         asOf=meta['coverage_end'], start=meta['coverage_start'], split=meth['split_dates'],
         meta=dict(rows=meta['rows_count'], contracts=meta['contracts_count'], days=meta['trading_dates_count'],
                   noTrade=meta['no_trade_rows_count'], thin=meta['thin_rows_count'], weekend=meta['weekend_sessions'],
                   checkRows=meta['raw_cross_check']['matched_rows'], mismatches=meta['raw_cross_check']['mismatches'],
-                  checkText=meta['raw_cross_check']['status']),
+                  checkText=meta['raw_cross_check']['status'], supplement=meta.get('supplement', {})),
         rule=dict(hurdle=rule_cmp['hurdle_bps'], stopBuffer=rule_cmp['stop_buffer_z'], maxMove=rule_cmp['max_fill_move_pct'],
                   minTrain=rule_cmp['min_train_trades'], switch=switch,
                   current=rule_cmp['current_rule']['by_slip'], original=rule_cmp['original_rule']['by_slip'],

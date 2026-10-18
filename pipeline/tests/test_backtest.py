@@ -4,6 +4,7 @@ import os
 import numpy as np
 import pandas as pd
 from pipeline.load import load_clean_bhavcopy
+from pipeline.config import TEST_END   # research snapshot: a data refresh must not change these checks
 from pipeline.carry import compute_reference_carry
 from pipeline.pairs import build_all_pairs
 from pipeline.backtest import prepare_contract_lookup, run_grid_search, run_all_scenarios
@@ -16,8 +17,8 @@ def test_backtest_reproduces_reference_summary():
     assert os.path.exists(ref_summary_path), f"Reference summary not found at {ref_summary_path}"
     ref_df = pd.read_csv(ref_summary_path).set_index(['pair', 'slip', 'seg'])
     
-    # Load and run pipeline backtest
-    df, dates, tdi = load_clean_bhavcopy('data/raw/gold_bhavcopy_clean.csv')
+    # Load and run pipeline backtest on the rows the original study used (no history-book supplement)
+    df, dates, tdi = load_clean_bhavcopy('data/raw/gold_bhavcopy_clean.csv', end=TEST_END, original_only=True)
     carry_series, _ = compute_reference_carry(df, dates)
     pairs = build_all_pairs(df, carry_series)
     P = prepare_contract_lookup(df)
@@ -41,7 +42,7 @@ def test_backtest_reproduces_reference_summary():
 
 def test_trade_attribution_and_timing():
     """Verify fill dates strictly after signal dates, and attribution identity holds."""
-    df, dates, tdi = load_clean_bhavcopy('data/raw/gold_bhavcopy_clean.csv')
+    df, dates, tdi = load_clean_bhavcopy('data/raw/gold_bhavcopy_clean.csv', end=TEST_END)
     carry_series, _ = compute_reference_carry(df, dates)
     pairs = build_all_pairs(df, carry_series)
     P = prepare_contract_lookup(df)

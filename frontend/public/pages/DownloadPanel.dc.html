@@ -132,7 +132,7 @@ class Component extends DCLogic {
       let run = 0;
       const rows = list.map(({ id, t }) => {
         run += t.net; const P = D.pairs[id];
-        return [t.e, t.x, P.label, t.side < 0 ? 'Sell ' + P.a + ', buy ' + P.b : 'Buy ' + P.a + ', sell ' + P.b, t.z, t.days, WHY[t.why] || t.why, t.net, t.bps, Math.round(run), t.seg === 'test' ? 'Unseen test' : 'Training'];
+        return [t.e, t.x, P.label, t.side < 0 ? 'Sell ' + P.a + ', buy ' + P.b : 'Buy ' + P.a + ', sell ' + P.b, t.z, t.days, WHY[t.why] || t.why, t.net, t.bps, Math.round(run), t.seg === 'test' ? 'Test year' : (t.seg === 'forward' ? 'Forward' : 'Training')];
       });
       return { title: 'Trade statement', head: ['Entered', 'Closed', 'Pair', 'Trade', 'z', 'Days', 'Why it closed', 'Result after costs (Rs)', 'Result (bps)', 'Running total (Rs)', 'Period'], rows };
     }
@@ -142,9 +142,9 @@ class Component extends DCLogic {
         const T = D.backtest[id][s].test;
         rows.push([D.pairs[id].label, s, T.n_trades, Math.round(T.hit_rate * 100), T.gross_bps, T.net_bps, Math.round(T.net_rs), T.t_stat]);
       }));
-      return { title: 'Backtest on the unseen year', head: ['Pair', 'Slippage (bps)', 'Trades', 'Won (%)', 'Before costs (bps)', 'After costs (bps)', 'Total after costs (Rs)', 't-statistic'], rows };
+      return { title: 'Backtest on the test year', head: ['Pair', 'Slippage (bps)', 'Trades', 'Won (%)', 'Before costs (bps)', 'After costs (bps)', 'Total after costs (Rs)', 't-statistic'], rows };
     }
-    return { title: 'Research report', head: ['Section', 'Contents'], rows: [['Verdict', 'No persistent edge proven after costs'], ['Today', 'Six pairs against the cost line'], ['Backtest', 'Unseen year, all pairs at 5 bps'], ['Costs', 'Round trip ' + D.costTotal.toFixed(1) + ' bps'], ['Data', D.meta.rows + ' daily settlements, ' + D.meta.mismatches + ' mismatches']] };
+    return { title: 'Research report', head: ['Section', 'Contents'], rows: [['Verdict', 'No persistent edge proven after costs'], ['Today', 'Six pairs against the cost line'], ['Backtest', 'Test year, all pairs at 5 bps'], ['Costs', 'Round trip ' + D.costTotal.toFixed(1) + ' bps'], ['Data', D.meta.rows + ' daily settlements, ' + D.meta.mismatches + ' mismatches']] };
   }
 
   // The leading byte-order mark makes Excel read the file as UTF-8 (so "·" and "–" display correctly).
@@ -175,10 +175,14 @@ class Component extends DCLogic {
     return head + top +
       '<div class="box"><p><b>Verdict: no persistent edge proven after costs.</b></p><p>' + this.html(D.conclusion) + '</p></div>' +
       '<h2>Today (' + this.fd(D.asOf) + '): gap from normal vs cost line, in bps</h2>' + tbl(['Pair', 'Gap from normal', 'Cost line', 'Status', 'Checks failed'], today) +
-      '<h2>Unseen year (' + this.fd(D.split.test_start) + ' to ' + this.fd(D.split.test_end) + '), 5 bps slippage</h2>' + tbl(['Pair', 'Trades', 'Won', 'Average (bps)', 'Total after costs', 't-statistic'], bt) +
-      '<h2>All pairs together, by slippage (unseen year)</h2>' + tbl(['Slippage per order', 'Trades', 'Total after costs', 'Closed during the ' + D.events.crashShort, 'All other trades', 't-statistic'], slip) +
+      '<h2>Clean test: ' + this.fd(D.longrun.start) + ' to ' + this.fd(D.longrun.end) + ' (rule frozen before this data was used)</h2>' +
+      tbl(['Trades', 'After costs at 5 bps', 'After costs at 0 bps', 't-statistic', 'Losing years'], [[D.longrun.n, this.rs(D.longrun.net), this.rs(D.longrun.net0), String(D.longrun.t), (D.longrun.losingYears + ' of ' + D.longrun.years)]]) +
+      '<h2>Slippage check</h2><p>' + this.html(D.evidence.slippage.summary) + '</p>' +
+      '<p>' + this.html(D.evidence.multiple_testing.note) + '</p>' +
+      '<h2>Test year (' + this.fd(D.split.test_start) + ' to ' + this.fd(D.split.test_end) + '), 5 bps slippage: not a clean test</h2><p>' + this.html(D.evidence.test_year.reason) + '</p>' + tbl(['Pair', 'Trades', 'Won', 'Average (bps)', 'Total after costs', 't-statistic'], bt) +
+      '<h2>All pairs together, by slippage (test year)</h2>' + tbl(['Slippage per order', 'Trades', 'Total after costs', 'Closed during the ' + D.events.crashShort, 'All other trades', 't-statistic'], slip) +
       '<p>Pooled at our 5 bps assumption: ' + pooled.n + ' trades, ' + pooled.bps.toFixed(1) + ' bps average after costs.</p>' +
-      '<h2>One rule for alerts and backtest, at 5 bps</h2>' + tbl(['Rule', 'Training trades', 'Training result', 'Unseen trades', 'Unseen result', 'Outside the crash'], rules) +
+      '<h2>One rule for alerts and backtest, at 5 bps</h2>' + tbl(['Rule', 'Training trades', 'Training result', 'Test-year trades', 'Test-year result', 'Outside the crash'], rules) +
       '<h2>Cost of one round trip (bps of one ₹10 lakh leg)</h2>' + tbl(['Item', 'How', 'bps'], D.costs.map((c) => [c.name, c.how, c.bps.toFixed(2)])) +
       '<h2>Data</h2><p>' + D.meta.rows.toLocaleString('en-IN') + ' daily settlements, ' + D.meta.contracts + ' contracts, ' + D.meta.days + ' trading days (' + this.fd(D.start) + ' to ' + this.fd(D.asOf) + '). ' + this.html(D.meta.checkText) + '</p>' +
       '<h2>Limits</h2><ul>' + D.limits.map((l) => '<li>' + this.html(l) + '</li>').join('') + '</ul>' + foot;
@@ -207,13 +211,11 @@ class Component extends DCLogic {
   renderVals() {
     const st = this.state || {};
     const dark = this.props.dark ?? true;
-    const t = dark
-      ? { bg: '#070D14', panel: '#0F1822', raised: '#18232F', line: '#1E2B38', fg: '#EAF0F6', muted: '#93A3B4', gold: '#F2A93B', glow: 'rgba(242,169,59,0.12)', ongold: '#1A1204', up: '#4FD1A1', down: '#FF8F85' }
-      : { bg: '#F3F5F8', panel: '#FFFFFF', raised: '#E9EDF2', line: '#DCE2E9', fg: '#0C1622', muted: '#55636F', gold: '#975600', glow: 'rgba(151,86,0,0.10)', ongold: '#FFFFFF', up: '#0B7A55', down: '#B42318' };
+    const t = typeof GRVTheme === 'undefined' ? {} : GRVTheme.tokens(dark);   // shared gold-tinted themes
     const vars = Object.keys(t).map((k) => '--' + k + ': ' + t[k]).join('; ');
     const overlay = typeof this.props.onClose === 'function';
     const rootStyle = vars + '; font-family: \'Geist\', system-ui, sans-serif; ' + (overlay
-      ? 'position: fixed; inset: 0; z-index: 50; background: rgba(3,8,14,0.6); display: flex; align-items: center; justify-content: center; padding: 16px; box-sizing: border-box'
+      ? 'position: fixed; inset: 0; z-index: 50; background: rgba(18,12,4,0.62); display: flex; align-items: center; justify-content: center; padding: 16px; box-sizing: border-box'
       : 'min-height: 100vh; background: var(--bg); display: flex; align-items: center; justify-content: center; padding: 24px; box-sizing: border-box');
     const close = () => { if (overlay) this.props.onClose(); };
     const base = { rootStyle, close, onKey: (e) => { if (e.key === 'Escape') close(); } };
@@ -227,7 +229,7 @@ class Component extends DCLogic {
       ['today', 'Today\'s pairs', 'All six pairs: gap, cost line, checks'],
       ['prices', 'Gold prices', 'Daily price of 10 g pure gold, all four contracts'],
       ['trades', 'Trade statement', 'Every trade with result and running total'],
-      ['backtest', 'Backtest results', 'Unseen year, every pair at 0, 2, 5, 10 bps'],
+      ['backtest', 'Backtest results', 'Test year, every pair at 0, 2, 5, 10 bps'],
       ['report', 'Full research report', 'Verdict, today, backtest, costs and data limits']
     ];
     const opt = (on) => 'min-height: 44px; border-radius: 12px; cursor: pointer; font-family: \'Geist\', system-ui, sans-serif; color: var(--fg); ' + (on ? 'background: var(--glow); border: 1px solid var(--gold)' : 'background: transparent; border: 1px solid var(--line)');
@@ -239,7 +241,7 @@ class Component extends DCLogic {
     const showPair = what === 'trades', showPeriod = what === 'trades' || what === 'prices';
     const pairs = [{ id: 'ALL', label: 'All six pairs' }].concat(Object.keys(D.pairs).map((id) => ({ id, label: D.pairs[id].label })))
       .map((p) => ({ label: p.label, pressed: p.id === pair ? 'true' : 'false', pick: () => this.setState({ pair: p.id, status: '' }), style: opt(p.id === pair) + '; font-size: 13px; font-weight: 500; padding: 0 10px' }));
-    const PER = [['3m', 'Last 3 months'], ['1y', 'Last year'], ['test', 'Unseen test year'], ['all', 'Everything']];
+    const PER = [['3m', 'Last 3 months'], ['1y', 'Last year'], ['test', 'Test year'], ['all', 'Everything']];
     const periodLabel = (PER.find((p) => p[0] === period) || PER[3])[1];
     const periods = PER.map(([id, label]) => ({ label, pressed: id === period ? 'true' : 'false', pick: () => this.setState({ period: id, status: '' }), style: opt(id === period) + '; font-size: 13px; font-weight: 500; padding: 0 10px' }));
     const canPrint = what === 'trades' || what === 'report';
