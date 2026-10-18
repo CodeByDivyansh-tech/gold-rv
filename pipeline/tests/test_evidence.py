@@ -100,3 +100,16 @@ def test_petal_break_is_located_from_the_data():
     assert pb['cause_confirmed'] is False
     site = _j('site-data.json')
     assert site['events']['petalStart'] == pb['start'] and site['events']['petalEnd'] == pb['end']
+
+
+def test_home_counts_add_up_from_the_data():
+    """Home's one-line summary: prices used and trades are the sum of the book part and our own part."""
+    site, h = _j('site-data.json'), _j('history.json')
+    book = pd.read_csv('data/raw/mcx_history_book.csv', parse_dates=['date'])
+    win = (book['date'] >= h['window']['from']) & (book['date'] <= h['window']['to'])
+    assert site['longrun']['rows'] == int(win.sum()) == h['window']['rows']
+    assert site['meta']['rows'] == len(pd.read_csv('data/raw/gold_bhavcopy_clean.csv'))
+    cur = site['rule']['current']['5']
+    assert site['longrun']['n'] == h['result']['by_slip']['5']['n']
+    assert cur['test_n'] == site['pooled']['5']['n']
+    assert site['longrun']['checked'] == h['check']['shared_rows'] and site['longrun']['checkMismatches'] == 0
