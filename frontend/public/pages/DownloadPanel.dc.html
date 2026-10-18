@@ -144,7 +144,7 @@ class Component extends DCLogic {
       }));
       return { title: 'Backtest on the test year', head: ['Pair', 'Slippage (bps)', 'Trades', 'Won (%)', 'Before costs (bps)', 'After costs (bps)', 'Total after costs (Rs)', 't-statistic'], rows };
     }
-    return { title: 'Research report', head: ['Section', 'Contents'], rows: [['Verdict', 'No persistent edge proven after costs'], ['Today', 'Six pairs against the cost line'], ['Backtest', 'Test year, all pairs at 5 bps'], ['Costs', 'Round trip ' + D.costTotal.toFixed(1) + ' bps'], ['Data', D.meta.rows + ' daily settlements, ' + D.meta.mismatches + ' mismatches']] };
+    return { title: 'Research report', head: ['Section', 'Contents'], rows: [['Verdict', 'No persistent edge proven after costs'], ['Today', 'Six pairs against the cost line'], ['Backtest', 'Test year, all pairs at 5 bps'], ['Costs', 'Round trip ' + D.costTotal.toFixed(1) + ' bps'], ['Data', (D.longrun.rows + D.meta.rows) + ' daily settlements (' + D.longrun.rows + ' Parity book 2011–2023, ' + D.meta.rows + ' our MCX download), ' + D.meta.mismatches + ' mismatches']] };
   }
 
   // The leading byte-order mark makes Excel read the file as UTF-8 (so "·" and "–" display correctly).
@@ -184,7 +184,7 @@ class Component extends DCLogic {
       '<p>Pooled at our 5 bps assumption: ' + pooled.n + ' trades, ' + pooled.bps.toFixed(1) + ' bps average after costs.</p>' +
       '<h2>One rule for alerts and backtest, at 5 bps</h2>' + tbl(['Rule', 'Training trades', 'Training result', 'Test-year trades', 'Test-year result', 'Outside the crash'], rules) +
       '<h2>Cost of one round trip (bps of one ₹10 lakh leg)</h2>' + tbl(['Item', 'How', 'bps'], D.costs.map((c) => [c.name, c.how, c.bps.toFixed(2)])) +
-      '<h2>Data</h2><p>' + D.meta.rows.toLocaleString('en-IN') + ' daily settlements, ' + D.meta.contracts + ' contracts, ' + D.meta.days + ' trading days (' + this.fd(D.start) + ' to ' + this.fd(D.asOf) + '). ' + this.html(D.meta.checkText) + '</p>' +
+      '<h2>Data</h2><p>' + (D.longrun.rows + D.meta.rows).toLocaleString('en-IN') + ' official MCX daily settlements in all: ' + D.longrun.rows.toLocaleString('en-IN') + ' from the Parity data book for the clean test (' + this.fd(D.longrun.start) + ' to ' + this.fd(D.longrun.end) + '), and our own MCX download: ' + D.meta.rows.toLocaleString('en-IN') + ' daily settlements, ' + D.meta.contracts + ' contracts, ' + D.meta.days + ' trading days (' + this.fd(D.start) + ' to ' + this.fd(D.asOf) + '). ' + this.html(D.meta.checkText) + '</p>' +
       '<h2>Limits</h2><ul>' + D.limits.map((l) => '<li>' + this.html(l) + '</li>').join('') + '</ul>' + foot;
   }
 

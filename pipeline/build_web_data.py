@@ -183,7 +183,8 @@ def build_web_data(data_dir: str = 'frontend/public/data', out_path: str = None)
     hr = hist['result']
     longrun = dict(start=hist['window']['from'], end=hist['window']['to'], pairs=hist['window']['pairs'],
                    n=hr['by_slip'][str(SL)]['n'], net=hr['by_slip'][str(SL)]['net_rs'], t=hr['by_slip'][str(SL)]['t'],
-                   net0=hr['by_slip']['0']['net_rs'], losingYears=hr['years_count'] - hr['years_positive'], years=hr['years_count'])
+                   net0=hr['by_slip']['0']['net_rs'], losingYears=hr['years_count'] - hr['years_positive'], years=hr['years_count'],
+                   rows=hist['window']['rows'], checked=hist['check']['shared_rows'], checkMismatches=hist['check']['mismatches'])
 
     data = dict(costs=costs, costTotal=round(cost_total, 2), slip=SL, notional=N, events=events,
         evidence=evidence, longrun=longrun,
