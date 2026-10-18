@@ -62,6 +62,22 @@ for (const [name, list] of Object.entries(states)) {
   assert.equal(v.calc.count, D.today.filter((p) => p.dev >= 2 * D.rt).length + ' of ' + D.today.length)
   assert.ok(v.ft.show && v.ft.rows.length === 4)
 }
+// Shared menus: exactly one item is marked as the current page, on every page
+for (const name of ['Rail', 'TabBar']) {
+  const C = load(name)
+  for (const cur of ['Home', 'Today', 'Market', 'Pairs', 'Signals', 'Backtesting', 'Data']) {
+    const c = new C(); c.props = { current: cur }; c.state = {}
+    const v = c.renderVals()
+    assert.deepEqual(Object.keys(v.nav).filter((k) => v.nav[k].cur === 'page'), [cur], `${name} highlights ${cur}`)
+    runs++
+  }
+}
+// Every page uses the shared menus instead of its own copy
+for (const name of ['Home', 'Today', 'Market', 'Pairs', 'Signals', 'Backtesting', 'Data']) {
+  const src = readFileSync(`public/pages/${name}.dc.html`, 'utf8')
+  assert.ok(src.includes(`<dc-import name="Rail" current="${name}">`) && src.includes(`<dc-import name="TabBar" current="${name}">`), `${name} uses the shared menus`)
+  assert.ok(!src.includes('<aside class="rail"') && !src.includes('<nav class="tabbar"'), `${name} still has its own menu copy`)
+}
 console.log(`pages ok: ${runs} page states rendered against site-data.json`)
 
 // The long-history section shows the history file's own numbers, and the Data page credits the source

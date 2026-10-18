@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Gold RV Intelligence: phone menu</title>
+</head>
+<body>
+<!-- Shared phone tab bar and "More" sheet. Each page imports it as a dc-import named TabBar with current set to its own name. Edit here once. -->
+<x-dc>
+  <nav class="tabbar" aria-label="Main" style="position: fixed; left: 0; right: 0; bottom: 0; z-index: 20; background: var(--panel); border-top: 1px solid var(--line); padding: 6px 8px 10px; justify-content: space-around">
+    <a href="Home.dc.html" aria-current="{{nav.Home.cur}}" style="flex: 1; min-height: 52px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; text-decoration: none; font-size: 11px; {{nav.Home.tab}}"><svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true" style="fill: none; stroke: currentColor; stroke-width: 1.8px; stroke-linecap: round; stroke-linejoin: round"><path d="M3 11.5 12 4l9 7.5"></path><path d="M5.5 10v10h13V10"></path></svg>Home</a>
+    <a href="Today.dc.html" aria-current="{{nav.Today.cur}}" style="flex: 1; min-height: 52px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; text-decoration: none; font-size: 11px; {{nav.Today.tab}}"><svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true" style="fill: none; stroke: currentColor; stroke-width: 1.8px; stroke-linecap: round; stroke-linejoin: round"><rect x="3.5" y="5" width="17" height="15" rx="2"></rect><path d="M3.5 10h17M8 3v4M16 3v4"></path></svg>Today</a>
+    <a href="Market.dc.html" aria-current="{{nav.Market.cur}}" style="flex: 1; min-height: 52px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; text-decoration: none; font-size: 11px; {{nav.Market.tab}}"><svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true" style="fill: none; stroke: currentColor; stroke-width: 1.8px; stroke-linecap: round; stroke-linejoin: round"><path d="M4 19.5h16"></path><path d="M5 15l4-5 4 3 6-7"></path></svg>Market</a>
+    <a href="Pairs.dc.html" aria-current="{{nav.Pairs.cur}}" style="flex: 1; min-height: 52px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; text-decoration: none; font-size: 11px; {{nav.Pairs.tab}}"><svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true" style="fill: none; stroke: currentColor; stroke-width: 1.8px; stroke-linecap: round; stroke-linejoin: round"><path d="M6 7.5h12l-3-3M18 16.5H6l3 3"></path></svg>Pairs</a>
+    <button type="button" onClick="{{openMore}}" aria-expanded="{{moreExpanded}}" style="flex: 1; min-height: 52px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; border: 0; background: transparent; font: {{moreBtn.weight}} 11px 'Geist', system-ui, sans-serif; color: {{moreBtn.color}}; cursor: pointer"><svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true" style="fill: currentColor"><circle cx="5" cy="12" r="1.7"></circle><circle cx="12" cy="12" r="1.7"></circle><circle cx="19" cy="12" r="1.7"></circle></svg>More</button>
+  </nav>
+  <sc-if value="{{more}}" hint-placeholder-val="{{ false }}">
+    <div style="position: fixed; inset: 0; z-index: 30; background: rgba(0,0,0,0.45); display: flex; flex-direction: column; justify-content: flex-end">
+      <div role="dialog" aria-label="More pages" style="background: var(--panel); border-top: 1px solid var(--line); border-radius: 20px 20px 0 0; padding: 18px 16px 28px; display: flex; flex-direction: column; gap: 6px">
+        <div style="display: flex; justify-content: space-between; align-items: center; padding: 0 4px 8px">
+          <span style="font-weight: 600; font-size: 16px">Deep dive</span>
+          <button type="button" onClick="{{closeMore}}" style="min-height: 44px; padding: 0 14px; border-radius: 12px; border: 1px solid var(--line); background: var(--raised); color: var(--fg); font: 500 14px 'Geist', system-ui, sans-serif; cursor: pointer">Close</button>
+        </div>
+        <a href="Signals.dc.html" aria-current="{{nav.Signals.cur}}" style="text-decoration: none; padding: 14px 12px; border-radius: 12px; {{nav.Signals.sheet}}; font-size: 15px">Signals: why it's quiet</a>
+        <a href="Backtesting.dc.html" aria-current="{{nav.Backtesting.cur}}" style="text-decoration: none; padding: 14px 12px; border-radius: 12px; {{nav.Backtesting.sheet}}; font-size: 15px">Backtesting: did it make money?</a>
+        <a href="Data.dc.html" aria-current="{{nav.Data.cur}}" style="text-decoration: none; padding: 14px 12px; border-radius: 12px; {{nav.Data.sheet}}; font-size: 15px">Data: where the numbers come from</a>
+      </div>
+    </div>
+  </sc-if>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"current":{"editor":"enum","options":["Home","Today","Market","Pairs","Signals","Backtesting","Data"],"default":"Home"}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const cur = this.props.current || 'Home';
+    const nav = {};
+    ['Home', 'Today', 'Market', 'Pairs', 'Signals', 'Backtesting', 'Data'].forEach((p) => {
+      const on = p === cur;
+      nav[p] = {
+        cur: on ? 'page' : null,
+        hl: on ? '; background: var(--glow); color: var(--gold); font-weight: 600' : '',
+        tab: on ? 'color: var(--gold); font-weight: 600' : 'color: var(--muted)',
+        sheet: on ? 'background: var(--glow); color: var(--gold); font-weight: 600' : 'background: var(--raised)'
+      };
+    });
+    const deep = ['Signals', 'Backtesting', 'Data'].indexOf(cur) >= 0;
+    const st = this.state || {};
+    return {
+      nav, more: !!st.more, moreExpanded: st.more ? 'true' : 'false',
+      moreBtn: { weight: deep ? '600' : '400', color: deep ? 'var(--gold)' : 'var(--muted)' },
+      openMore: () => this.setState({ more: true }), closeMore: () => this.setState({ more: false })
+    };
+  }
+}
+</script>
+</body>
+</html>
