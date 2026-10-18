@@ -1,0 +1,117 @@
+{
+ "test_year": {
+  "first_results_seen": "2026-10-02",
+  "rule_frozen": "2026-10-04",
+  "clean": false,
+  "reason": "The original study's test-year results were known by 2026-10-02; the five-check rule was written on 2026-10-04, after that. So the test year helped shape the rule and is not a clean out-of-sample test.",
+  "clean_check": {
+   "from": "2011-04-18",
+   "to": "2023-10-09",
+   "reason": "The rule and its settings were frozen before this data was used, and were not changed after."
+  }
+ },
+ "slippage": {
+  "assumed_bps": 5,
+  "assumed_share_of_cost_pct": null,
+  "by_symbol": {
+   "GOLDM": {
+    "half_tick_bps": 0.034,
+    "roll_contracts": 38,
+    "roll_zero_share_pct": 63,
+    "roll_median_bps": 0.0,
+    "cs_days": 2872,
+    "cs_negative_share_pct": 52,
+    "cs_monthly_median_bps": 0.0,
+    "cs_clipped_mean_bps": 26.5
+   },
+   "GOLDTEN": {
+    "half_tick_bps": 0.034,
+    "roll_contracts": 21,
+    "roll_zero_share_pct": 76,
+    "roll_median_bps": 0.0,
+    "cs_days": 1887,
+    "cs_negative_share_pct": 52,
+    "cs_monthly_median_bps": 0.0,
+    "cs_clipped_mean_bps": 31.0
+   },
+   "GOLDGUINEA": {
+    "half_tick_bps": 0.042,
+    "roll_contracts": 37,
+    "roll_zero_share_pct": 86,
+    "roll_median_bps": 0.0,
+    "cs_days": 2842,
+    "cs_negative_share_pct": 48,
+    "cs_monthly_median_bps": 0.0,
+    "cs_clipped_mean_bps": 26.4
+   },
+   "GOLDPETAL": {
+    "half_tick_bps": 0.336,
+    "roll_contracts": 37,
+    "roll_zero_share_pct": 86,
+    "roll_median_bps": 0.0,
+    "cs_days": 3336,
+    "cs_negative_share_pct": 47,
+    "cs_monthly_median_bps": 0.0,
+    "cs_clipped_mean_bps": 26.3
+   }
+  },
+  "floor_max_bps": 0.336,
+  "cs_clipped_range_bps": [
+   26.3,
+   31.0
+  ],
+  "participation": {
+   "fills": 228,
+   "median_pct": 0.06,
+   "p90_pct": 1.08,
+   "max_pct": 52.9,
+   "over_5pct": 2
+  },
+  "breakeven": {
+   "train": {
+    "net_at_0": 60591.2,
+    "per_bps": -15929.5,
+    "breakeven_bps": 3.8,
+    "loses_even_at_0": false
+   },
+   "test": {
+    "net_at_0": 174771.1,
+    "per_bps": -12234.6,
+    "breakeven_bps": 14.3,
+    "loses_even_at_0": false
+   },
+   "history": {
+    "net_at_0": -235391.1,
+    "per_bps": -62735.7,
+    "breakeven_bps": null,
+    "loses_even_at_0": true
+   }
+  },
+  "measurable_from_eod": false,
+  "summary": "Daily data cannot measure slippage. Both standard estimators find no spread on most contracts and months (it is smaller than a normal day's price noise), and with negative readings set to zero they give 26–31 bps for every contract alike, which is the day's volatility, not a spread. The hard floor is half a tick: at most 0.34 bps. Our trades were a median 0.06% of the day's volume. Training breaks even at 3.8 bps per order, the test year at 14.3 bps, and 2011–2023 loses money even with zero slippage. Only real broker fills (a forward test) can settle the number."
+ },
+ "multiple_testing": {
+  "rule_versions_scored_on_test": 3,
+  "settings_tried_on_training": 108,
+  "grid_per_pair": 18,
+  "t": 1.89,
+  "n": 20,
+  "p_two_sided": 0.074,
+  "p_bonferroni": 0.222,
+  "note": "18 settings × 6 pairs = 108 were tried on training only (that is tuning, not testing). On the test year, 3 rule versions were scored (original study, five checks, five checks + switch). t = 1.89 on 20 trades gives p = 0.074 (two-sided); allowing for 3 looks, p = 0.22. Not significant either way."
+ },
+ "switch": {
+  "on_pairs": [
+   "M_PETAL"
+  ],
+  "detail": {
+   "M_PETAL": {
+    "train_n": 17,
+    "train_net_rs": 1280.0,
+    "train_t": 0.06,
+    "boot_above_zero_pct": 52
+   }
+  },
+  "note": "GOLDM · GOLDPETAL: training made +₹1,280 over 17 trades (t = 0.06; 52% of resamples above zero), close to a coin flip, so the switch is a weak filter, not proof."
+ }
+}

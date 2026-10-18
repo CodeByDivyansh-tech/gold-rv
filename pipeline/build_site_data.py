@@ -680,6 +680,15 @@ def build_all_site_data(output_dir: str = 'frontend/public/data'):
     }
     save_json(os.path.join(output_dir, 'backtest/rule_comparison.json'), rule_comparison)
 
+    # The verdict needs the cleanest out-of-sample test (2011-2023) and the evidence checks,
+    # so both run here, before methodology.json and site-data.json are written.
+    print("--- 7b. Long-history check: frozen rule on 2011-2023 (MCX history book) ---")
+    from pipeline.history import build as build_history
+    hist = build_history(output_dir)
+    print("--- 7c. Evidence checks: test-year status, slippage, multiple testing, switch ---")
+    from pipeline.evidence import build as build_evidence
+    ev = build_evidence(output_dir)
+
     b = new_sum[str(BASE_SLIPPAGE)]
     o = old_sum[str(BASE_SLIPPAGE)]
     def rs(v: float) -> str:
@@ -704,12 +713,26 @@ def build_all_site_data(output_dir: str = 'frontend/public/data'):
                      f"outside it the rule {'lost ' + rs(-b['ex_crash_net_rs']) if b['ex_crash_net_rs'] < 0 else 'made ' + rs(b['ex_crash_net_rs'])}")
     else:
         crash_txt = f"trades that closed during the {CRASH_LABEL} made {rs(b['crash_net_rs'])}"
+    mt = ev['multiple_testing']
+    p_txt = (f", p = {mt['p_two_sided']:.2f}, or {mt['p_bonferroni']:.2f} allowing for the {mt['rule_versions_scored_on_test']} "
+             f"rule versions scored on that year" if mt['p_two_sided'] is not None else '')
+    hr = hist.get('result') or {}
+    hs, h0 = hr.get('by_slip', {}).get(str(BASE_SLIPPAGE)), hr.get('by_slip', {}).get('0')
+    def made(v: float) -> str:
+        return ('made ' if v > 0 else 'lost ') + rs(abs(v))
+    if hs:
+        hist_txt = (f"The cleanest test is {hist['window']['from'][:4]}–{hist['window']['to'][:4]}: the rule and its settings were "
+                    f"frozen before that data was used. There it {made(hs['net_rs'])} over {hs['n']} trades at {BASE_SLIPPAGE} bps "
+                    f"slippage (t = {str(hs['t']).replace('-', '−')})"
+                    + (f", and {made(h0['net_rs'])} even with zero slippage. " if h0 and h0['net_rs'] < 0 else ". "))
+    else:
+        hist_txt = ''
     honest = (
-        f"Cross-contract gold gaps are real and measurable. With the same five checks the site shows, "
-        f"the rule {'made' if b['train_net_rs'] > 0 else 'lost'} {rs(abs(b['train_net_rs']))} over {b['train_n']} training trades, "
-        f"then {'made' if b['test_net_rs'] > 0 else 'lost'} {rs(abs(b['test_net_rs']))} over {b['test_n']} unseen-year trades "
-        f"at {BASE_SLIPPAGE} bps slippage. But {crash_txt}. The result is not proven ({t_txt}, {sig_txt}), and training "
-        f"would have switched on only {len(on_pairs)} of 6 pairs. No persistent edge is proven after costs."
+        f"Cross-contract gold gaps are real and measurable, but no persistent edge is proven after costs. {hist_txt}"
+        f"The {TEST_START[:4]}–{TEST_END[2:4]} test year {made(b['test_net_rs'])} over {b['test_n']} trades, but it is not a clean "
+        f"test: the five-check rule was written after that year's first results were seen. Its profit also rests on one "
+        f"episode ({crash_txt}), and it is not significant ({t_txt}{p_txt}). In training the same rule "
+        f"{made(b['train_net_rs'])} over {b['train_n']} trades, and training would have switched on only {len(on_pairs)} of 6 pairs."
     )
     methodology_data = {
         'stages': [
@@ -738,17 +761,23 @@ def build_all_site_data(output_dir: str = 'frontend/public/data'):
         ],
         'limitations': [
             'EOD settlement close is an official reference, not an executable book fill.',
-            'Bhavcopy volume indicates activity but does not measure order-book depth; slippage is assumed, not measured.',
+            'Bhavcopy volume indicates activity but does not measure order-book depth. Slippage is assumed at '
+            f'{BASE_SLIPPAGE} bps per order: daily data cannot measure it (see the slippage check), only real broker fills can.',
+            f"The {TEST_START[:4]}–{TEST_END[2:4]} test year is not a clean out-of-sample test: the five-check rule was written "
+            f"on {ev['test_year']['rule_frozen']}, after the original study's test-year results were known. The "
+            f"{hist['window']['from'][:4]}–{hist['window']['to'][:4]} check is the clean one.",
             'GOLDTEN contracts listed only on 31-Mar-2025, offering limited historical depth.',
             f'Test period contains only {int(per_pair_n.min()) if len(per_pair_n) else 0} to {int(per_pair_n.max()) if len(per_pair_n) else 0} trades per pair ({b["test_n"]} in total); small samples preclude high certainty.',
             'GOLDPETAL\'s level shifted around Dec-24 / Mar-25; the cause is not yet confirmed against MCX circulars.',
-            f'Trades closed during the {CRASH_LABEL} made {rs(b["crash_net_rs"])} of the unseen-year result ({rs(b["test_net_rs"])} in total).',
+            f'Trades closed during the {CRASH_LABEL} made {rs(b["crash_net_rs"])} of the test-year result ({rs(b["test_net_rs"])} in total). '
+            'The crash window was named after the results were seen, so this split is a check, not a test.',
+            'The training switch rests on thin evidence: ' + ev['switch']['note'],
             'When the pair series switches to new contracts, open trades are closed; this adds cost.',
             'Exchange transaction charges and statutory rates should be regularly verified against MCX circulars.',
         ],
         'honest_conclusion': honest,
         'original_rule_note': (
-            f"The original study used only four of the five checks (no cost line). Under it: {o['test_n']} unseen-year trades, "
+            f"The original study used only four of the five checks (no cost line). Under it: {o['test_n']} test-year trades, "
             f"{rs(o['test_net_rs'])} at {BASE_SLIPPAGE} bps. It is kept on the site for comparison only."
         ),
     }
@@ -784,10 +813,6 @@ def build_all_site_data(output_dir: str = 'frontend/public/data'):
     from pipeline.robustness import build as build_robustness
     build_robustness(output_dir)
 
-    print("--- 10. Long-history check: frozen rule on 2011-2023 (MCX history book) ---")
-    from pipeline.history import build as build_history
-    build_history(output_dir)
-    
     print("--- Build complete! All JSON files written successfully. ---")
 
 if __name__ == '__main__':
