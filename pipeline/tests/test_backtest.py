@@ -17,8 +17,8 @@ def test_backtest_reproduces_reference_summary():
     assert os.path.exists(ref_summary_path), f"Reference summary not found at {ref_summary_path}"
     ref_df = pd.read_csv(ref_summary_path).set_index(['pair', 'slip', 'seg'])
     
-    # Load and run pipeline backtest
-    df, dates, tdi = load_clean_bhavcopy('data/raw/gold_bhavcopy_clean.csv', end=TEST_END)
+    # Load and run pipeline backtest on the rows the original study used (no Parity-book supplement)
+    df, dates, tdi = load_clean_bhavcopy('data/raw/gold_bhavcopy_clean.csv', end=TEST_END, original_only=True)
     carry_series, _ = compute_reference_carry(df, dates)
     pairs = build_all_pairs(df, carry_series)
     P = prepare_contract_lookup(df)

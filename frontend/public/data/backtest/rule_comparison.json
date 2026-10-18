@@ -11,9 +11,9 @@
   "switch": {
     "GUINEA_PETAL": {
       "on": false,
-      "train_trades": 9,
-      "train_net_rs": -11529.2,
-      "reason": "only 9 training trades, needs 10"
+      "train_trades": 10,
+      "train_net_rs": -13251.9,
+      "reason": "lost money in training"
     },
     "TEN_PETAL": {
       "on": false,
@@ -30,7 +30,7 @@
     "M_PETAL": {
       "on": true,
       "train_trades": 17,
-      "train_net_rs": 1279.9,
+      "train_net_rs": 6633.2,
       "reason": "made money in training"
     },
     "M_TEN": {
@@ -42,7 +42,7 @@
     "M_GUINEA": {
       "on": false,
       "train_trades": 9,
-      "train_net_rs": -10024.2,
+      "train_net_rs": -11112.7,
       "reason": "only 9 training trades, needs 10"
     }
   },
@@ -88,9 +88,9 @@
     ],
     "by_slip": {
       "0": {
-        "train_n": 37,
-        "train_net_rs": 60591.2,
-        "train_avg_bps": 15.5,
+        "train_n": 38,
+        "train_net_rs": 65047.7,
+        "train_avg_bps": 16.1,
         "test_n": 20,
         "test_net_rs": 174771.1,
         "test_avg_bps": 59.5,
@@ -111,9 +111,9 @@
         "switched_on_net_rs": 33510.9
       },
       "2": {
-        "train_n": 37,
-        "train_net_rs": 28732.1,
-        "train_avg_bps": 7.5,
+        "train_n": 38,
+        "train_net_rs": 32422.8,
+        "train_avg_bps": 8.1,
         "test_n": 20,
         "test_net_rs": 150301.8,
         "test_avg_bps": 51.5,
@@ -134,9 +134,9 @@
         "switched_on_net_rs": 29272.9
       },
       "5": {
-        "train_n": 37,
-        "train_net_rs": -19056.4,
-        "train_avg_bps": -4.4,
+        "train_n": 38,
+        "train_net_rs": -16514.4,
+        "train_avg_bps": -3.9,
         "test_n": 20,
         "test_net_rs": 113597.9,
         "test_avg_bps": 39.4,
@@ -157,9 +157,9 @@
         "switched_on_net_rs": 22915.9
       },
       "10": {
-        "train_n": 37,
-        "train_net_rs": -98704.0,
-        "train_avg_bps": -24.4,
+        "train_n": 38,
+        "train_net_rs": -98076.4,
+        "train_avg_bps": -23.9,
         "test_n": 20,
         "test_net_rs": 52424.8,
         "test_avg_bps": 19.4,
@@ -223,9 +223,9 @@
     ],
     "by_slip": {
       "0": {
-        "train_n": 59,
-        "train_net_rs": 64185.3,
-        "train_avg_bps": 10.2,
+        "train_n": 60,
+        "train_net_rs": 69069.0,
+        "train_avg_bps": 10.7,
         "test_n": 54,
         "test_net_rs": 163549.3,
         "test_avg_bps": 19.1,
@@ -236,14 +236,14 @@
         "ex_crash_n": 39,
         "ex_crash_net_rs": -45124.4,
         "ex_crash_t": -1.45,
-        "forward_n": 0,
-        "forward_net_rs": 0.0,
+        "forward_n": 1,
+        "forward_net_rs": -608.6,
         "forward_t": null
       },
       "2": {
-        "train_n": 59,
-        "train_net_rs": 11798.0,
-        "train_avg_bps": 2.2,
+        "train_n": 60,
+        "train_net_rs": 15921.2,
+        "train_avg_bps": 2.7,
         "test_n": 54,
         "test_net_rs": 104684.4,
         "test_avg_bps": 11.1,
@@ -254,14 +254,14 @@
         "ex_crash_n": 39,
         "ex_crash_net_rs": -88842.1,
         "ex_crash_t": -2.99,
-        "forward_n": 0,
-        "forward_net_rs": 0.0,
+        "forward_n": 1,
+        "forward_net_rs": -1804.9,
         "forward_t": null
       },
       "5": {
-        "train_n": 59,
-        "train_net_rs": -66783.1,
-        "train_avg_bps": -9.8,
+        "train_n": 60,
+        "train_net_rs": -63800.6,
+        "train_avg_bps": -9.3,
         "test_n": 54,
         "test_net_rs": 16387.1,
         "test_avg_bps": -1.0,
@@ -272,14 +272,14 @@
         "ex_crash_n": 39,
         "ex_crash_net_rs": -154418.5,
         "ex_crash_t": -5.29,
-        "forward_n": 0,
-        "forward_net_rs": 0.0,
+        "forward_n": 1,
+        "forward_net_rs": -3599.3,
         "forward_t": null
       },
       "10": {
-        "train_n": 59,
-        "train_net_rs": -197751.4,
-        "train_avg_bps": -29.8,
+        "train_n": 60,
+        "train_net_rs": -196670.3,
+        "train_avg_bps": -29.3,
         "test_n": 54,
         "test_net_rs": -130775.2,
         "test_avg_bps": -21.1,
@@ -290,8 +290,8 @@
         "ex_crash_n": 39,
         "ex_crash_net_rs": -263712.6,
         "ex_crash_t": -9.14,
-        "forward_n": 0,
-        "forward_net_rs": 0.0,
+        "forward_n": 1,
+        "forward_net_rs": -6590.1,
         "forward_t": null
       }
     }
