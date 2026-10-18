@@ -318,7 +318,8 @@ class Component extends DCLogic {
     const pooled = D.pooled['5'];
     const facts = [
       { value: D.meta.rows.toLocaleString('en-IN'), label: 'daily settlements checked' },
-      { value: '3 years', label: this.fd(D.start) + ' to ' + this.fd(D.asOf) },
+      // full span tested: the Parity data book (clean test) plus our own MCX download, computed from the data
+      { value: Math.round((Date.parse(D.asOf) - Date.parse(D.longrun.start)) / 3.15576e10) + ' years', label: this.fd(D.longrun.start) + ' to ' + this.fd(D.asOf) + ': the Parity data book until ' + this.fd(D.longrun.end).replace(/^\d+ /, '') + ', our own MCX download after' },
       { value: pooled.n + ' trades', label: 'in the 12-month test year' },
       { value: this.inr(D.rule.current['5'].ex_crash_net_rs), label: 'that year after costs, leaving out the ' + D.events.crashShort },
       { value: this.inr(D.longrun.net), label: 'the clean test: ' + D.longrun.n + ' trades on ' + D.longrun.start.slice(0, 4) + '–' + D.longrun.end.slice(0, 4) + ', years the rule never saw' }
