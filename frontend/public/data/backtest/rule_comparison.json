@@ -101,6 +101,9 @@
         "ex_crash_n": 12,
         "ex_crash_net_rs": 15406.9,
         "ex_crash_t": 1.24,
+        "forward_n": 0,
+        "forward_net_rs": 0.0,
+        "forward_t": null,
         "switched_on_pairs": [
           "M_PETAL"
         ],
@@ -121,6 +124,9 @@
         "ex_crash_n": 12,
         "ex_crash_net_rs": -510.5,
         "ex_crash_t": 0.51,
+        "forward_n": 0,
+        "forward_net_rs": 0.0,
+        "forward_t": null,
         "switched_on_pairs": [
           "M_PETAL"
         ],
@@ -141,6 +147,9 @@
         "ex_crash_n": 12,
         "ex_crash_net_rs": -24386.6,
         "ex_crash_t": -0.59,
+        "forward_n": 0,
+        "forward_net_rs": 0.0,
+        "forward_t": null,
         "switched_on_pairs": [
           "M_PETAL"
         ],
@@ -161,6 +170,9 @@
         "ex_crash_n": 12,
         "ex_crash_net_rs": -64180.1,
         "ex_crash_t": -2.41,
+        "forward_n": 0,
+        "forward_net_rs": 0.0,
+        "forward_t": null,
         "switched_on_pairs": [
           "M_PETAL"
         ],
@@ -223,7 +235,10 @@
         "crash_net_rs": 208673.7,
         "ex_crash_n": 39,
         "ex_crash_net_rs": -45124.4,
-        "ex_crash_t": -1.45
+        "ex_crash_t": -1.45,
+        "forward_n": 0,
+        "forward_net_rs": 0.0,
+        "forward_t": null
       },
       "2": {
         "train_n": 59,
@@ -238,7 +253,10 @@
         "crash_net_rs": 193526.4,
         "ex_crash_n": 39,
         "ex_crash_net_rs": -88842.1,
-        "ex_crash_t": -2.99
+        "ex_crash_t": -2.99,
+        "forward_n": 0,
+        "forward_net_rs": 0.0,
+        "forward_t": null
       },
       "5": {
         "train_n": 59,
@@ -253,7 +271,10 @@
         "crash_net_rs": 170805.6,
         "ex_crash_n": 39,
         "ex_crash_net_rs": -154418.5,
-        "ex_crash_t": -5.29
+        "ex_crash_t": -5.29,
+        "forward_n": 0,
+        "forward_net_rs": 0.0,
+        "forward_t": null
       },
       "10": {
         "train_n": 59,
@@ -268,7 +289,10 @@
         "crash_net_rs": 132937.4,
         "ex_crash_n": 39,
         "ex_crash_net_rs": -263712.6,
-        "ex_crash_t": -9.14
+        "ex_crash_t": -9.14,
+        "forward_n": 0,
+        "forward_net_rs": 0.0,
+        "forward_t": null
       }
     }
   }

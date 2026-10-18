@@ -15,6 +15,7 @@ from pipeline.config import (
     TRAIN_END,
     TEST_START,
     TEST_END,
+    segment_of,
     BASE_SLIPPAGE,
     SLIPPAGE_SCENARIOS,
     NOTIONAL_PER_LEG,
@@ -114,6 +115,7 @@ def summarize_rule(trades: pd.DataFrame, switch: Optional[Dict[str, Dict[str, An
         te = a[a['seg'] == 'test'] if len(a) else a
         crash = te[(te['exit'] >= CRASH_START) & (te['exit'] <= CRASH_END)] if len(te) else te
         rest = te.drop(crash.index) if len(te) else te
+        fw = a[a['seg'] == 'forward'] if len(a) else a
         row = {
             'train_n': int(len(tr)), 'train_net_rs': round(float(tr['net'].sum()), 1) if len(tr) else 0.0,
             'train_avg_bps': round(float(tr['net_bps'].mean()), 1) if len(tr) else None,
@@ -124,6 +126,8 @@ def summarize_rule(trades: pd.DataFrame, switch: Optional[Dict[str, Dict[str, An
             'crash_n': int(len(crash)), 'crash_net_rs': round(float(crash['net'].sum()), 1) if len(crash) else 0.0,
             'ex_crash_n': int(len(rest)), 'ex_crash_net_rs': round(float(rest['net'].sum()), 1) if len(rest) else 0.0,
             'ex_crash_t': _tstat(rest['net_bps']) if len(rest) else None,
+            'forward_n': int(len(fw)), 'forward_net_rs': round(float(fw['net'].sum()), 1) if len(fw) else 0.0,
+            'forward_t': _tstat(fw['net_bps']) if len(fw) else None,
         }
         if switch is not None:
             on = [k for k, v in switch.items() if v['on']]
@@ -325,7 +329,7 @@ def build_all_site_data(output_dir: str = 'frontend/public/data'):
         
         # Point-in-time rolling stats
         p_calc = compute_rolling_z(p_df, W=W)
-        p_calc['segment'] = np.where(p_calc['date'] <= pd.Timestamp(TRAIN_END), 'train', 'test')
+        p_calc['segment'] = segment_of(p_calc['date'].values)
         
         last_row = p_calc.iloc[-1]
         valid_z = p_calc['z'].dropna()
@@ -463,7 +467,7 @@ def build_all_site_data(output_dir: str = 'frontend/public/data'):
         for slip in SLIPPAGE_SCENARIOS:
             t_df = run_pair_backtest(pair_id, p_df, P, dates, tdi, W, ze, mh, slip_bps=slip, rule=ALERT_RULE)
             if not t_df.empty:
-                t_df['seg'] = np.where(t_df['entry'] <= t_end, 'train', 'test')
+                t_df['seg'] = segment_of(t_df['entry'].values)
                 t_train = t_df[t_df['seg'] == 'train']
                 t_test = t_df[t_df['seg'] == 'test']
             else:

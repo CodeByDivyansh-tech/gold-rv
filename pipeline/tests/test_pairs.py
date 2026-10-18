@@ -3,12 +3,13 @@ import pytest
 import numpy as np
 import pandas as pd
 from pipeline.load import load_clean_bhavcopy
+from pipeline.config import TEST_END   # research snapshot: a data refresh must not change these checks
 from pipeline.carry import compute_reference_carry
 from pipeline.pairs import build_pair_series, compute_rolling_z, build_all_pairs
 
 def test_pair_counts_and_spreads():
     """Verify pair counts and last spreads match reference."""
-    df, dates, tdi = load_clean_bhavcopy('data/raw/gold_bhavcopy_clean.csv')
+    df, dates, tdi = load_clean_bhavcopy('data/raw/gold_bhavcopy_clean.csv', end=TEST_END)
     carry_series, _ = compute_reference_carry(df, dates)
     pairs = build_all_pairs(df, carry_series)
     
@@ -29,7 +30,7 @@ def test_pair_counts_and_spreads():
 
 def test_lookahead_pair_selection():
     """Pair selection at date t must be strictly identical if future data is truncated."""
-    df, dates, tdi = load_clean_bhavcopy('data/raw/gold_bhavcopy_clean.csv')
+    df, dates, tdi = load_clean_bhavcopy('data/raw/gold_bhavcopy_clean.csv', end=TEST_END)
     carry_series, _ = compute_reference_carry(df, dates)
     
     # Pick a test trading date in the middle of the series
@@ -50,7 +51,7 @@ def test_lookahead_pair_selection():
 
 def test_lookahead_rolling_z():
     """z at date t must be strictly identical if future data is truncated."""
-    df, dates, tdi = load_clean_bhavcopy('data/raw/gold_bhavcopy_clean.csv')
+    df, dates, tdi = load_clean_bhavcopy('data/raw/gold_bhavcopy_clean.csv', end=TEST_END)
     carry_series, _ = compute_reference_carry(df, dates)
     
     cutoff_date = pd.Timestamp('2025-11-20')

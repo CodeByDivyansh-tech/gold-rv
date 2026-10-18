@@ -495,7 +495,8 @@ class Component extends DCLogic {
     });
     const spRsA = (n) => '₹' + Math.abs(Math.round(n)).toLocaleString('en-IN');
     const spB5 = spRC['5'];
-    const splitText = 'At our 5 bps assumption, the ' + spB5.crash_n + ' trades that closed during the crash made ' + spRsA(spB5.crash_net_rs) + '. The other ' + spB5.ex_crash_n + ' ' + (spB5.ex_crash_net_rs < 0 ? 'lost ' : 'made ') + spRsA(spB5.ex_crash_net_rs) + '. In training the same rule ' + (spB5.train_net_rs < 0 ? 'lost ' : 'made ') + spRsA(spB5.train_net_rs) + ' over ' + spB5.train_n + ' trades.';
+    const fwText = spB5.forward_n > 0 ? ' Since the test year ended (' + this.fd(D.split.test_end) + '), the frozen rule has ' + (spB5.forward_net_rs < 0 ? 'lost ' : 'made ') + spRsA(spB5.forward_net_rs) + ' over ' + spB5.forward_n + ' trades: data nobody had when the rule was written.' : '';
+    const splitText = 'At our 5 bps assumption, the ' + spB5.crash_n + ' trades that closed during the crash made ' + spRsA(spB5.crash_net_rs) + '. The other ' + spB5.ex_crash_n + ' ' + (spB5.ex_crash_net_rs < 0 ? 'lost ' : 'made ') + spRsA(spB5.ex_crash_net_rs) + '. In training the same rule ' + (spB5.train_net_rs < 0 ? 'lost ' : 'made ') + spRsA(spB5.train_net_rs) + ' over ' + spB5.train_n + ' trades.' + fwText;
 
     const spTTxt = (v) => (v == null ? '–' : this.sgn(v, 2));
     const spCol = (v) => (v >= 0 ? 'var(--up)' : 'var(--down)');
@@ -577,7 +578,7 @@ class Component extends DCLogic {
       const c = cur[hv], f = X(c[1]) / W;
       hover = {
         on: true, x: (f * 100).toFixed(2) + '%', y: (Y(c[3]) / H * 100).toFixed(2) + '%', shift: f > 0.7 ? 'translateX(calc(-100% - 10px))' : 'translateX(10px)',
-        date: this.fd(c[1]), seg: c[5] === 'test' ? 'test year' : 'training', net: this.srs(c[2]), cum: this.srs(c[3]), color: c[2] > 0 ? 'var(--up)' : 'var(--down)'
+        date: this.fd(c[1]), seg: c[5] === 'test' ? 'test year' : (c[5] === 'forward' ? 'forward (after the test year)' : 'training'), net: this.srs(c[2]), cum: this.srs(c[3]), color: c[2] > 0 ? 'var(--up)' : 'var(--down)'
       };
     }
     const xs = cur.map((c) => X(c[1]) / W);

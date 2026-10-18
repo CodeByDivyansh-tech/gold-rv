@@ -1,0 +1,53 @@
+# Downloads new MCX Bhavcopy rows, rebuilds the website data, runs every test, and commits the result.
+# Vercel then redeploys from main.
+#
+# Start it by hand first (Actions tab > Refresh MCX data > Run workflow). MCX may block requests from
+# GitHub's servers; if so the download step fails, nothing is committed, and you can run
+# `python -m pipeline.download` on your own computer instead. Once a manual run succeeds, remove the
+# '#' in front of the two schedule lines below to run it every weekday evening.
+name: Refresh MCX data
+
+on:
+  workflow_dispatch:
+  # schedule:
+  #   - cron: '0 15 * * 1-5'   # 20:30 IST, after MCX publishes the day's Bhavcopy
+
+permissions:
+  contents: write
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - run: pip install -r requirements.txt
+
+      - name: Download new rows from MCX
+        run: python -m pipeline.download
+
+      - name: Rebuild website data
+        run: python -m pipeline.build_site_data
+
+      - name: Tests
+        run: |
+          python -m pytest pipeline/tests/ -q
+          cd frontend && npm test && npm run build
+
+      - name: Commit if anything changed
+        run: |
+          if git diff --quiet -- data/raw/; then echo "No new MCX rows."; exit 0; fi
+          git config user.name "gold-rv data bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add data/raw/ frontend/public/data/
+          git commit -m "Data: MCX Bhavcopy to $(python -c "import pandas as p; print(p.read_csv('data/raw/gold_bhavcopy_clean.csv')['date'].max())")"
+          git push

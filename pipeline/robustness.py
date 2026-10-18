@@ -79,7 +79,7 @@ def build(data_dir='frontend/public/data'):
     rt_cost = round(_load(data_dir, 'site-data.json')['rt'], 2) if os.path.exists(os.path.join(data_dir, 'site-data.json')) else 24.38
     sig_days = {(h['pair'], h['date']): h for h in history}
 
-    groups = {'alert': [], 'alert_test': [], 'alert_train': [], 'unusual_small': [], 'ordinary': []}
+    groups = {'alert': [], 'alert_test': [], 'alert_train': [], 'alert_forward': [], 'unusual_small': [], 'ordinary': []}
     per_alert = []
     for p in PAIRS:
         ze = _load(data_dir, f'backtest/{p}_5.json')['params']['ze']
