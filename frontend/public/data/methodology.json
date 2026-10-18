@@ -61,7 +61,7 @@
     "The 2025\u201326 test year is not a clean out-of-sample test: the five-check rule was written on 2026-10-04, after the original study's test-year results were known. The 2011\u20132023 check is the clean one.",
     "GOLDTEN contracts listed only on 31-Mar-2025, offering limited historical depth.",
     "Test period contains only 2 to 5 trades per pair (20 in total); small samples preclude high certainty.",
-    "GOLDPETAL's level shifted around Dec-24 / Mar-25; the cause is not yet confirmed against MCX circulars.",
+    "GOLDPETAL repriced against the other contracts: GOLDGUINEA \u2212 GOLDPETAL fell from +203 to +19 bps between 04 Nov 2024 and 11 Nov 2024, inside one contract (expiry Nov 2024). Against GOLDM over the same days, GOLDPETAL rose about 249 bps and GOLDGUINEA about 66 bps, so most of the move was GOLDPETAL repricing. The gap swung back part-way for a few weeks, then settled: median +255 bps from May 2024 to Nov 2024, \u221229 bps from Feb 2025 to Jul 2025. We found no MCX notice explaining it, so the cause is not confirmed.",
     "Trades closed during the Jan\u2013Mar 2026 crash made \u20b91,37,985 of the test-year result (\u20b91,13,598 in total). The crash window was named after the results were seen, so this split is a check, not a test.",
     "The training switch rests on thin evidence: GOLDM \u00b7 GOLDPETAL: training made +\u20b91,280 over 17 trades (t = 0.06; 52% of resamples above zero), close to a coin flip, so the switch is a weak filter, not proof.",
     "When the pair series switches to new contracts, open trades are closed; this adds cost.",

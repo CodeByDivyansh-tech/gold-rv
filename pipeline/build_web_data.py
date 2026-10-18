@@ -168,9 +168,10 @@ def build_web_data(data_dir: str = 'frontend/public/data', out_path: str = None)
     assert abs(cost_total - calculate_round_trip_cost_bps(SL)) < 1e-9, (cost_total, calculate_round_trip_cost_bps(SL))
     assert abs(round(cost_total, 1) - today['round_trip_cost_bps']) < 0.051
 
+    evidence_pb = J('evidence.json')['petal_break']
     events = dict(asOf=meta['coverage_end'], crashStart=rule_cmp['crash']['start'], crashEnd=rule_cmp['crash']['end'],
                   crashLabel='January–March 2026 crash', crashShort='Jan–Mar 2026 crash',
-                  petalStart='2024-12-01', petalEnd='2025-03-31',
+                  petalStart=evidence_pb['start'], petalEnd=evidence_pb['end'],
                   goldtenListed=next(d for d, v in zip(pure4['d'], pure4['GOLDTEN']) if v is not None),
                   regimeLabels=['Oct 2023 – Dec 2024', 'Apr 2025 – Sep 2026', 'Jan–Mar 2026 crash'])
 

@@ -688,6 +688,13 @@ def build_all_site_data(output_dir: str = 'frontend/public/data'):
     print("--- 7c. Evidence checks: test-year status, slippage, multiple testing, switch ---")
     from pipeline.evidence import build as build_evidence
     ev = build_evidence(output_dir)
+    pb = ev['petal_break']
+    for r in regime_records:      # the break is located from the data (evidence.py), not typed in
+        if r['pair_id'] in ('GUINEA_PETAL', 'M_PETAL'):
+            r['comment'] = (f"Level shift: GOLDPETAL repriced from cheap to slightly rich, sharpest "
+                            f"{pd.Timestamp(pb['start']).strftime('%d %b')}–{pd.Timestamp(pb['end']).strftime('%d %b %Y')}. "
+                            f"Cause not confirmed; no MCX notice found.")
+    save_json(os.path.join(output_dir, 'regimes.json'), regime_records)
 
     b = new_sum[str(BASE_SLIPPAGE)]
     o = old_sum[str(BASE_SLIPPAGE)]
@@ -768,7 +775,7 @@ def build_all_site_data(output_dir: str = 'frontend/public/data'):
             f"{hist['window']['from'][:4]}–{hist['window']['to'][:4]} check is the clean one.",
             'GOLDTEN contracts listed only on 31-Mar-2025, offering limited historical depth.',
             f'Test period contains only {int(per_pair_n.min()) if len(per_pair_n) else 0} to {int(per_pair_n.max()) if len(per_pair_n) else 0} trades per pair ({b["test_n"]} in total); small samples preclude high certainty.',
-            'GOLDPETAL\'s level shifted around Dec-24 / Mar-25; the cause is not yet confirmed against MCX circulars.',
+            'GOLDPETAL repriced against the other contracts: ' + pb['summary'],
             f'Trades closed during the {CRASH_LABEL} made {rs(b["crash_net_rs"])} of the test-year result ({rs(b["test_net_rs"])} in total). '
             'The crash window was named after the results were seen, so this split is a check, not a test.',
             'The training switch rests on thin evidence: ' + ev['switch']['note'],

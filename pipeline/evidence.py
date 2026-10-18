@@ -140,6 +140,57 @@ def _boot_share_above_zero(x: List[float], seed: int = 7, draws: int = 10000) ->
     return round(100 * above / draws)
 
 
+def _bps(v: float) -> str:
+    return f"{float(v):+.0f} bps".replace('-', '−')
+
+
+def petal_break(data_dir: str, window: int = 5, span: int = 60) -> Dict[str, Any]:
+    """Locate the GOLDPETAL level shift from the data instead of typing dates in.
+    1. The break is where the median gap over the `span` observations before and after differs most.
+    2. Within `span` observations of it, the sharpest `window`-day fall in GOLDGUINEA - GOLDPETAL marks the days.
+    GOLDM - GOLDGUINEA over the same days shows which contract moved (flat -> GOLDPETAL repriced)."""
+    def series(p):
+        x = pd.DataFrame(_load(data_dir, f'pairs/{p}.json'))
+        x['d'] = pd.to_datetime(x['d'])
+        return x.set_index('d')
+    gp, mg, mp = series('GUINEA_PETAL'), series('M_GUINEA'), series('M_PETAL')
+    s = gp['s'].to_numpy(dtype=float)
+    shift = [np.median(s[i - span:i]) - np.median(s[i:i + span]) for i in range(span, len(s) - span)]
+    k = span + int(np.argmax(shift))
+    chg = gp['s'] - gp['s'].shift(window)
+    near = chg.iloc[max(window, k - span):k + span]
+    end = near.idxmin()
+    start = gp.index[gp.index.get_loc(end) - window]
+    same_contract = bool(gp.loc[start, 'ea'] == gp.loc[end, 'ea'])
+    mg_chg = float(mg['s'].asof(end) - mg['s'].asof(start))
+    mp_chg = float(mp['s'].asof(end) - mp['s'].asof(start))
+    i_end = gp.index.get_loc(end)
+    before = gp['s'].iloc[max(0, i_end - window - 2 * span):i_end - window]
+    after = gp['s'].iloc[i_end + span:i_end + 3 * span]          # skip the unsettled months right after
+    fd = lambda d: pd.Timestamp(d).strftime('%d %b %Y')
+    fm = lambda d: pd.Timestamp(d).strftime('%b %Y')
+    return {
+        'start': start.strftime('%Y-%m-%d'), 'end': end.strftime('%Y-%m-%d'),
+        'gap_start_bps': round(float(gp.loc[start, 's']), 1), 'gap_end_bps': round(float(gp.loc[end, 's']), 1),
+        'same_contract': same_contract, 'contract_expiry': gp.loc[end, 'ea'],
+        'm_guinea_change_bps': round(mg_chg, 1), 'm_petal_change_bps': round(mp_chg, 1),
+        'before': {'from': before.index[0].strftime('%Y-%m-%d'), 'to': before.index[-1].strftime('%Y-%m-%d'),
+                   'median_bps': round(float(before.median()), 1)},
+        'after': {'from': after.index[0].strftime('%Y-%m-%d'), 'to': after.index[-1].strftime('%Y-%m-%d'),
+                  'median_bps': round(float(after.median()), 1)},
+        'cause_confirmed': False,
+        'summary': (
+            f"GOLDGUINEA − GOLDPETAL fell from {_bps(gp.loc[start, 's'])[:-4]} to {_bps(gp.loc[end, 's'])} between {fd(start)} and "
+            f"{fd(end)}" + (f", inside one contract (expiry {fm(gp.loc[end, 'ea'])})" if same_contract else '')
+            + f". Against GOLDM over the same days, GOLDPETAL rose about {-mp_chg:.0f} bps and GOLDGUINEA about {-mg_chg:.0f} bps, "
+            f"so most of the move was GOLDPETAL repricing. "
+            f"The gap swung back part-way for a few weeks, then settled: median {_bps(before.median())} from "
+            f"{fm(before.index[0])} to {fm(before.index[-1])}, {_bps(after.median())} from {fm(after.index[0])} to "
+            f"{fm(after.index[-1])}. We found no MCX notice explaining it, so the cause is not confirmed."
+        ),
+    }
+
+
 def build(data_dir: str = 'frontend/public/data', csv_path: str = 'data/raw/gold_bhavcopy_clean.csv') -> Dict[str, Any]:
     df, _, _ = load_clean_bhavcopy(csv_path)
     rc = _load(data_dir, 'backtest/rule_comparison.json')
@@ -241,7 +292,8 @@ def build(data_dir: str = 'frontend/public/data', csv_path: str = 'data/raw/gold
             f"is a weak filter, not proof." for p, v in sw.items()),
     }
 
-    out = {'test_year': test_year, 'slippage': slippage, 'multiple_testing': multiple, 'switch': switch}
+    out = {'test_year': test_year, 'slippage': slippage, 'multiple_testing': multiple, 'switch': switch,
+           'petal_break': petal_break(data_dir)}
     with open(os.path.join(data_dir, 'evidence.json'), 'w', encoding='utf-8') as f:
         json.dump(out, f, indent=1, ensure_ascii=False)
     return out

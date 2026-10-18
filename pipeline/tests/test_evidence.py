@@ -90,3 +90,13 @@ def test_verdict_leads_with_the_clean_test_and_never_calls_the_test_year_unseen(
     site = _j('site-data.json')
     assert site['conclusion'] == v
     assert site['evidence']['slippage']['assumed_share_of_cost_pct'] > 50
+
+
+def test_petal_break_is_located_from_the_data():
+    pb = _j('evidence.json')['petal_break']
+    assert pb['start'] < pb['end'] and pb['gap_start_bps'] - pb['gap_end_bps'] > 100
+    assert pb['before']['median_bps'] > 150 and pb['after']['median_bps'] < 0      # cheap before, slightly rich after
+    assert abs(pb['m_petal_change_bps']) > abs(pb['m_guinea_change_bps'])          # GOLDPETAL moved most
+    assert pb['cause_confirmed'] is False
+    site = _j('site-data.json')
+    assert site['events']['petalStart'] == pb['start'] and site['events']['petalEnd'] == pb['end']
