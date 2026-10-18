@@ -75,6 +75,12 @@ def cross_check_raw_vs_clean(df: pd.DataFrame, raw_path: str = 'data/raw/mcx_bha
         return {'raw_rows': 0, 'matched_rows': 0, 'mismatches': None,
                 'status': 'Raw file not present in this build; cross-check not run.'}
     raw = pd.read_csv(raw_path)
+    sup_path = os.path.join(os.path.dirname(raw_path), 'mcx_bhavcopy_supplement.csv')
+    n_sup = 0
+    if os.path.exists(sup_path):                     # rows our download missed, from the MCX history book
+        sup = pd.read_csv(sup_path)
+        n_sup = len(sup)
+        raw = pd.concat([raw, sup[[c for c in raw.columns]]], ignore_index=True)
     raw['date'] = pd.to_datetime(raw['Date'], format='%m/%d/%Y')
     raw['expiry'] = pd.to_datetime(raw['ExpiryDate'], format='%d%b%Y')
     raw['symbol'] = raw['Symbol'].astype(str).str.strip()
@@ -87,14 +93,15 @@ def cross_check_raw_vs_clean(df: pd.DataFrame, raw_path: str = 'data/raw/mcx_bha
     only_clean = int((m['_merge'] == 'right_only').sum())
     n_bad = int(bad.sum()) + only_raw + only_clean
     return {
-        'raw_rows': int(len(raw)),
+        'raw_rows': int(len(raw)), 'supplement_rows': int(n_sup),
         'matched_rows': int(len(both)),
         'value_mismatches': int(bad.sum()),
         'rows_only_in_raw': only_raw,
         'rows_only_in_clean': only_clean,
         'mismatches': n_bad,
         'fields_compared': ['open', 'close', 'volume_lots', 'open_interest_lots'],
-        'status': (f"Raw MCX file vs cleaned data: {len(both):,} rows compared on open, close, volume and OI, "
+        'status': (f"Raw MCX rows vs cleaned data: {len(both):,} rows compared on open, close, volume and OI "
+                   f"({n_sup} of them from the MCX history book, filling gaps in our download), "
                    f"{n_bad} mismatch{'es' if n_bad != 1 else ''}. Runs on every build."),
     }
 

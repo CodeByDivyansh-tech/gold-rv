@@ -2,6 +2,8 @@
 
 How the data is laid out
   data/raw/mcx_bhavcopy_raw_api.csv   rows exactly as the MCX endpoint returns them (the source of truth)
+  data/raw/mcx_bhavcopy_supplement.csv official MCX rows our download missed, taken from the MCX history book
+                                      (same columns plus Source): the Oct/Nov/Dec-2023 contracts and 1 Oct 2026
   data/raw/gold_bhavcopy_clean.csv    derived from the raw file by raw_to_clean() below
   data/raw/contract_calendar.csv      derived from the clean file by contract_calendar() below
   data/raw/retrieval_log.csv          one line per request
@@ -30,6 +32,7 @@ import pandas as pd
 from pipeline.config import CONTRACT_SPECS, THIN_OI_THRESHOLD, THIN_VOLUME_THRESHOLD
 
 RAW_PATH = 'data/raw/mcx_bhavcopy_raw_api.csv'
+SUPPLEMENT_PATH = 'data/raw/mcx_bhavcopy_supplement.csv'   # official MCX rows from the MCX history book, same format + Source
 CLEAN_PATH = 'data/raw/gold_bhavcopy_clean.csv'
 CAL_PATH = 'data/raw/contract_calendar.csv'
 LOG_PATH = 'data/raw/retrieval_log.csv'
@@ -194,8 +197,20 @@ def update(today: Optional[dt.date] = None) -> int:
     return added
 
 
-def rebuild():
+def load_raw(with_supplement: bool = True) -> pd.DataFrame:
+    """The MCX download, plus the supplement rows (never overlapping: a clash stops the build)."""
     raw = pd.read_csv(RAW_PATH)
+    if with_supplement and os.path.exists(SUPPLEMENT_PATH):
+        sup = pd.read_csv(SUPPLEMENT_PATH)
+        merged = merge_raw(raw.astype(str), sup[RAW_COLS].astype(str))
+        if len(merged) != len(raw) + len(sup):
+            raise ValueError('supplement rows overlap the MCX download')
+        raw = pd.concat([raw, sup[RAW_COLS]], ignore_index=True)
+    return raw
+
+
+def rebuild():
+    raw = load_raw()
     clean = raw_to_clean(raw)
     dups = clean.duplicated(PK, keep=False)
     if dups.any():

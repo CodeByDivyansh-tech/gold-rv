@@ -5,11 +5,14 @@ import numpy as np
 from typing import Tuple, Dict
 from pipeline.config import CONTRACT_SPECS, THIN_VOLUME_THRESHOLD, THIN_OI_THRESHOLD
 
-def load_clean_bhavcopy(csv_path: str = 'data/raw/gold_bhavcopy_clean.csv', end: str = None) -> Tuple[pd.DataFrame, np.ndarray, Dict[pd.Timestamp, int]]:
+def load_clean_bhavcopy(csv_path: str = 'data/raw/gold_bhavcopy_clean.csv', end: str = None,
+                        original_only: bool = False) -> Tuple[pd.DataFrame, np.ndarray, Dict[pd.Timestamp, int]]:
     """
     Loads and preprocesses gold_bhavcopy_clean.csv.
     end: if given (YYYY-MM-DD), rows after this date are dropped first. Tests that check the published
          research figures pass end=TEST_END, so a data refresh cannot change what they check.
+    original_only: drop the rows that came from the MCX history book supplement (data/raw/mcx_bhavcopy_supplement.csv),
+         giving the dataset the original study (reference/reference_summary.csv) was computed on.
     Returns:
         df: preprocessed dataframe sorted by (symbol, expiry, date)
         dates: array of sorted unique trading dates
@@ -21,6 +24,12 @@ def load_clean_bhavcopy(csv_path: str = 'data/raw/gold_bhavcopy_clean.csv', end:
     df = pd.read_csv(csv_path, parse_dates=['date', 'expiry_date'])
     if end is not None:
         df = df[df['date'] <= pd.Timestamp(end)].copy()
+    sup_path = os.path.join(os.path.dirname(csv_path), 'mcx_bhavcopy_supplement.csv')
+    if original_only and os.path.exists(sup_path):
+        sup = pd.read_csv(sup_path)
+        keys = set(zip(sup['Symbol'].str.strip(), pd.to_datetime(sup['ExpiryDate'], format='%d%b%Y'),
+                       pd.to_datetime(sup['Date'], format='%m/%d/%Y')))
+        df = df[[k not in keys for k in zip(df['symbol'].str.strip(), df['expiry_date'], df['date'])]].copy()
     
     # Rename columns to standard names if needed
     if 'expiry_date' in df.columns and 'expiry' not in df.columns:

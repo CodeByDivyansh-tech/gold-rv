@@ -52,3 +52,14 @@ def test_long_chart_series_is_weekly_and_stops_before_our_data():
         assert len(L[sym]) == len(L['d'])
     gaps = pd.to_datetime(pd.Series(L['d'])).diff().dt.days.dropna()
     assert gaps.max() <= 14                                   # one point a week (a holiday week can stretch it)
+
+
+def test_our_data_has_every_contract_and_day_the_data_book_has_in_our_window():
+    """Completeness: the Oct-Dec 2023 contracts were once missing from our download. Never again."""
+    ours = pd.read_csv('data/raw/gold_bhavcopy_clean.csv', parse_dates=['date', 'expiry_date'])
+    b = load_book()
+    w = b[(b['date'] >= ours['date'].min()) & (b['date'] <= ours['date'].max())]
+    have = set(zip(ours['symbol'], ours['expiry_date'], ours['date']))
+    missing = [k for k in zip(w['symbol'], w['expiry'], w['date']) if k not in have]
+    assert missing == [], f'{len(missing)} book rows missing from our data, e.g. {missing[:3]}'
+    assert set(w['date']) <= set(ours['date'])

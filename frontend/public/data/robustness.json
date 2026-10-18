@@ -3,12 +3,12 @@
  "round_trip_cost_bps": 24.4,
  "alerts": {
   "alert": {
-   "n": 55,
-   "halfway_pct": 78,
-   "median_closed_bps": 35.5,
-   "mean_closed_bps": 40.2,
-   "median_gap_bps": 80.8,
-   "median_days_to_half": 2
+   "n": 56,
+   "halfway_pct": 79,
+   "median_closed_bps": 35.6,
+   "mean_closed_bps": 40.1,
+   "median_gap_bps": 78.7,
+   "median_days_to_half": 2.0
   },
   "alert_test": {
    "n": 19,
@@ -19,30 +19,30 @@
    "median_days_to_half": 2.0
   },
   "alert_train": {
-   "n": 36,
-   "halfway_pct": 69,
-   "median_closed_bps": 18.6,
-   "mean_closed_bps": 23.7,
-   "median_gap_bps": 75.5,
-   "median_days_to_half": 3
+   "n": 37,
+   "halfway_pct": 70,
+   "median_closed_bps": 19.6,
+   "mean_closed_bps": 24.0,
+   "median_gap_bps": 74.4,
+   "median_days_to_half": 2.5
   },
   "alert_forward": {
    "n": 0
   },
   "unusual_small": {
-   "n": 211,
+   "n": 216,
    "halfway_pct": 75,
-   "median_closed_bps": 20.5,
-   "mean_closed_bps": 32.5,
-   "median_gap_bps": 49.6,
+   "median_closed_bps": 20.4,
+   "mean_closed_bps": 32.4,
+   "median_gap_bps": 50.0,
    "median_days_to_half": 2.0
   },
   "ordinary": {
-   "n": 1820,
+   "n": 1855,
    "halfway_pct": 82,
-   "median_closed_bps": -6.2,
+   "median_closed_bps": -6.3,
    "mean_closed_bps": -12.8,
-   "median_gap_bps": 10.1,
+   "median_gap_bps": 10.2,
    "median_days_to_half": 2
   }
  },
@@ -632,25 +632,36 @@
   },
   {
    "pair": "M_PETAL",
-   "date": "2023-12-27",
+   "date": "2023-12-01",
    "seg": "train",
-   "z": 2.02,
-   "gap_bps": 86.0,
+   "z": 2.18,
+   "gap_bps": 84.6,
    "halfway_10d": true,
-   "closed_bps": 81.2,
-   "days_to_half": 2,
-   "trade_net_rs": -301.6
+   "closed_bps": 73.7,
+   "days_to_half": 1,
+   "trade_net_rs": 5051.7
+  },
+  {
+   "pair": "GUINEA_PETAL",
+   "date": "2023-11-30",
+   "seg": "train",
+   "z": 3.32,
+   "gap_bps": 55.2,
+   "halfway_10d": true,
+   "closed_bps": 35.7,
+   "days_to_half": 8,
+   "trade_net_rs": -1722.7
   },
   {
    "pair": "M_GUINEA",
-   "date": "2023-12-11",
+   "date": "2023-11-08",
    "seg": "train",
-   "z": -2.77,
-   "gap_bps": -92.3,
+   "z": -2.97,
+   "gap_bps": -88.5,
    "halfway_10d": true,
-   "closed_bps": 65.5,
-   "days_to_half": 3,
-   "trade_net_rs": 1537.8
+   "closed_bps": 71.5,
+   "days_to_half": 1,
+   "trade_net_rs": 449.3
   }
  ],
  "bootstrap": {
@@ -735,11 +746,11 @@
    }
   },
   "train_5": {
-   "n": 37,
-   "total": -19056.4,
-   "lo": -80292.7,
-   "hi": 41338.0,
-   "above_zero_pct": 26
+   "n": 38,
+   "total": -16514.4,
+   "lo": -77229.8,
+   "hi": 43637.4,
+   "above_zero_pct": 30
   }
  },
  "seed": 7,

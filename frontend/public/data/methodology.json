@@ -3,7 +3,7 @@
     {
       "step": 1,
       "name": "Load & Validate",
-      "desc": "Parse 11,954 rows, strip symbols, check primary keys, compare against the raw MCX file, flag no-trade days."
+      "desc": "Parse 12,267 rows, strip symbols, check primary keys, compare against the raw MCX file, flag no-trade days."
     },
     {
       "step": 2,
@@ -63,11 +63,11 @@
     "Test period contains only 2 to 5 trades per pair (20 in total); small samples preclude high certainty.",
     "GOLDPETAL repriced against the other contracts: GOLDGUINEA \u2212 GOLDPETAL fell from +203 to +19 bps between 04 Nov 2024 and 11 Nov 2024, inside one contract (expiry Nov 2024). Against GOLDM over the same days, GOLDPETAL rose about 249 bps and GOLDGUINEA about 66 bps, so most of the move was GOLDPETAL repricing. The gap swung back part-way for a few weeks, then settled: median +255 bps from May 2024 to Nov 2024, \u221229 bps from Feb 2025 to Jul 2025. We found no MCX notice explaining it, so the cause is not confirmed.",
     "Trades closed during the Jan\u2013Mar 2026 crash made \u20b91,37,985 of the test-year result (\u20b91,13,598 in total). The crash window was named after the results were seen, so this split is a check, not a test.",
-    "The training switch rests on thin evidence: GOLDM \u00b7 GOLDPETAL: training made +\u20b91,280 over 17 trades (t = 0.06; 52% of resamples above zero), close to a coin flip, so the switch is a weak filter, not proof.",
+    "The training switch rests on thin evidence: GOLDM \u00b7 GOLDPETAL: training made +\u20b96,633 over 17 trades (t = 0.19; 61% of resamples above zero), close to a coin flip, so the switch is a weak filter, not proof.",
     "When the pair series switches to new contracts, open trades are closed; this adds cost.",
     "Exchange transaction charges and statutory rates should be regularly verified against MCX circulars."
   ],
-  "honest_conclusion": "Cross-contract gold gaps are real and measurable, but no persistent edge is proven after costs. The cleanest test is 2011\u20132023: the rule and its settings were frozen before that data was used. There it lost \u20b95,49,070 over 151 trades at 5 bps slippage (t = \u22123.63), and lost \u20b92,35,391 even with zero slippage. The 2025\u201326 test year made \u20b91,13,598 over 20 trades, but it is not a clean test: the five-check rule was written after that year's first results were seen. Its profit also rests on one episode (trades that closed during the Jan\u2013Mar 2026 crash made \u20b91,37,985; outside it the rule lost \u20b924,387), and it is not significant (t = 1.89, p = 0.07, or 0.22 allowing for the 3 rule versions scored on that year). In training the same rule lost \u20b919,056 over 37 trades, and training would have switched on only 1 of 6 pairs.",
+  "honest_conclusion": "Cross-contract gold gaps are real and measurable, but no persistent edge is proven after costs. The cleanest test is 2011\u20132023: the rule and its settings were frozen before that data was used. There it lost \u20b95,49,070 over 151 trades at 5 bps slippage (t = \u22123.63), and lost \u20b92,35,391 even with zero slippage. The 2025\u201326 test year made \u20b91,13,598 over 20 trades, but it is not a clean test: the five-check rule was written after that year's first results were seen. Its profit also rests on one episode (trades that closed during the Jan\u2013Mar 2026 crash made \u20b91,37,985; outside it the rule lost \u20b924,387), and it is not significant (t = 1.89, p = 0.07, or 0.22 allowing for the 3 rule versions scored on that year). In training the same rule lost \u20b916,514 over 38 trades, and training would have switched on only 1 of 6 pairs.",
   "original_rule_note": "The original study used only four of the five checks (no cost line). Under it: 54 test-year trades, \u20b916,387 at 5 bps. It is kept on the site for comparison only.",
   "retrieval_log": [
     {

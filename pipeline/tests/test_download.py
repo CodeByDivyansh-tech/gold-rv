@@ -10,8 +10,9 @@ from pipeline.download import (RAW_COLS, contract_calendar, fetch, merge_raw, pl
                                RAW_PATH, CLEAN_PATH, CAL_PATH)
 
 
-def test_raw_file_rebuilds_the_committed_clean_csv_and_calendar_byte_for_byte():
-    clean = raw_to_clean(pd.read_csv(RAW_PATH))
+def test_raw_file_and_supplement_rebuild_the_committed_clean_csv_and_calendar_byte_for_byte():
+    from pipeline.download import load_raw
+    clean = raw_to_clean(load_raw())
     buf = io.StringIO(); clean.to_csv(buf, index=False)
     assert buf.getvalue() == open(CLEAN_PATH, encoding='utf-8').read()
     buf = io.StringIO(); contract_calendar(clean).to_csv(buf, index=False)

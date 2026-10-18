@@ -16,62 +16,62 @@
   "by_symbol": {
    "GOLDM": {
     "half_tick_bps": 0.034,
-    "roll_contracts": 38,
-    "roll_zero_share_pct": 63,
+    "roll_contracts": 39,
+    "roll_zero_share_pct": 62,
     "roll_median_bps": 0.0,
-    "cs_days": 2872,
+    "cs_days": 2937,
     "cs_negative_share_pct": 52,
     "cs_monthly_median_bps": 0.0,
-    "cs_clipped_mean_bps": 26.5
+    "cs_clipped_mean_bps": 26.3
    },
    "GOLDTEN": {
-    "half_tick_bps": 0.034,
+    "half_tick_bps": 0.033,
     "roll_contracts": 21,
     "roll_zero_share_pct": 76,
     "roll_median_bps": 0.0,
-    "cs_days": 1887,
+    "cs_days": 1892,
     "cs_negative_share_pct": 52,
     "cs_monthly_median_bps": 0.0,
-    "cs_clipped_mean_bps": 31.0
+    "cs_clipped_mean_bps": 31.1
    },
    "GOLDGUINEA": {
     "half_tick_bps": 0.042,
-    "roll_contracts": 37,
-    "roll_zero_share_pct": 86,
+    "roll_contracts": 39,
+    "roll_zero_share_pct": 87,
     "roll_median_bps": 0.0,
-    "cs_days": 2842,
+    "cs_days": 2948,
     "cs_negative_share_pct": 48,
     "cs_monthly_median_bps": 0.0,
-    "cs_clipped_mean_bps": 26.4
+    "cs_clipped_mean_bps": 25.9
    },
    "GOLDPETAL": {
-    "half_tick_bps": 0.336,
-    "roll_contracts": 37,
-    "roll_zero_share_pct": 86,
+    "half_tick_bps": 0.333,
+    "roll_contracts": 39,
+    "roll_zero_share_pct": 85,
     "roll_median_bps": 0.0,
-    "cs_days": 3336,
+    "cs_days": 3451,
     "cs_negative_share_pct": 47,
     "cs_monthly_median_bps": 0.0,
-    "cs_clipped_mean_bps": 26.3
+    "cs_clipped_mean_bps": 25.9
    }
   },
-  "floor_max_bps": 0.336,
+  "floor_max_bps": 0.333,
   "cs_clipped_range_bps": [
-   26.3,
-   31.0
+   25.9,
+   31.1
   ],
   "participation": {
-   "fills": 228,
-   "median_pct": 0.06,
-   "p90_pct": 1.08,
+   "fills": 232,
+   "median_pct": 0.07,
+   "p90_pct": 1.11,
    "max_pct": 52.9,
    "over_5pct": 2
   },
   "breakeven": {
    "train": {
-    "net_at_0": 60591.2,
-    "per_bps": -15929.5,
-    "breakeven_bps": 3.8,
+    "net_at_0": 65047.7,
+    "per_bps": -16312.4,
+    "breakeven_bps": 4.0,
     "loses_even_at_0": false
    },
    "test": {
@@ -88,7 +88,7 @@
    }
   },
   "measurable_from_eod": false,
-  "summary": "Daily data cannot measure slippage. Both standard estimators find no spread on most contracts and months (it is smaller than a normal day's price noise), and with negative readings set to zero they give 26–31 bps for every contract alike, which is the day's volatility, not a spread. The hard floor is half a tick: at most 0.34 bps. Our trades were a median 0.06% of the day's volume. Training breaks even at 3.8 bps per order, the test year at 14.3 bps, and 2011–2023 loses money even with zero slippage. Only real broker fills (a forward test) can settle the number."
+  "summary": "Daily data cannot measure slippage. Both standard estimators find no spread on most contracts and months (it is smaller than a normal day's price noise), and with negative readings set to zero they give 26–31 bps for every contract alike, which is the day's volatility, not a spread. The hard floor is half a tick: at most 0.33 bps. Our trades were a median 0.07% of the day's volume. Training breaks even at 4.0 bps per order, the test year at 14.3 bps, and 2011–2023 loses money even with zero slippage. Only real broker fills (a forward test) can settle the number."
  },
  "multiple_testing": {
   "rule_versions_scored_on_test": 3,
@@ -107,12 +107,12 @@
   "detail": {
    "M_PETAL": {
     "train_n": 17,
-    "train_net_rs": 1280.0,
-    "train_t": 0.06,
-    "boot_above_zero_pct": 52
+    "train_net_rs": 6633.3,
+    "train_t": 0.19,
+    "boot_above_zero_pct": 61
    }
   },
-  "note": "GOLDM · GOLDPETAL: training made +₹1,280 over 17 trades (t = 0.06; 52% of resamples above zero), close to a coin flip, so the switch is a weak filter, not proof."
+  "note": "GOLDM · GOLDPETAL: training made +₹6,633 over 17 trades (t = 0.19; 61% of resamples above zero), close to a coin flip, so the switch is a weak filter, not proof."
  },
  "petal_break": {
   "start": "2024-11-04",
