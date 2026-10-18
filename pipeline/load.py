@@ -5,9 +5,11 @@ import numpy as np
 from typing import Tuple, Dict
 from pipeline.config import CONTRACT_SPECS, THIN_VOLUME_THRESHOLD, THIN_OI_THRESHOLD
 
-def load_clean_bhavcopy(csv_path: str = 'data/raw/gold_bhavcopy_clean.csv') -> Tuple[pd.DataFrame, np.ndarray, Dict[pd.Timestamp, int]]:
+def load_clean_bhavcopy(csv_path: str = 'data/raw/gold_bhavcopy_clean.csv', end: str = None) -> Tuple[pd.DataFrame, np.ndarray, Dict[pd.Timestamp, int]]:
     """
     Loads and preprocesses gold_bhavcopy_clean.csv.
+    end: if given (YYYY-MM-DD), rows after this date are dropped first. Tests that check the published
+         research figures pass end=TEST_END, so a data refresh cannot change what they check.
     Returns:
         df: preprocessed dataframe sorted by (symbol, expiry, date)
         dates: array of sorted unique trading dates
@@ -17,6 +19,8 @@ def load_clean_bhavcopy(csv_path: str = 'data/raw/gold_bhavcopy_clean.csv') -> T
         raise FileNotFoundError(f"Clean bhavcopy dataset not found at {csv_path}")
 
     df = pd.read_csv(csv_path, parse_dates=['date', 'expiry_date'])
+    if end is not None:
+        df = df[df['date'] <= pd.Timestamp(end)].copy()
     
     # Rename columns to standard names if needed
     if 'expiry_date' in df.columns and 'expiry' not in df.columns:

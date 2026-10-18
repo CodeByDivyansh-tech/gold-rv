@@ -1,0 +1,52 @@
+# Runs on every push and pull request: Python tests, page tests, the site build, and a check
+# that the committed website data is exactly what the pipeline produces from the committed code.
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install Python packages
+        run: pip install -r requirements.txt
+
+      - name: Clean CSV and calendar rebuild from the raw MCX file
+        run: |
+          python -m pipeline.download --rebuild-only
+          git diff --exit-code -- data/raw/
+
+      - name: Committed website data matches the pipeline
+        run: |
+          python -m pipeline.build_site_data
+          python - <<'PY'
+          import json, subprocess
+          old = json.loads(subprocess.check_output(['git', 'show', 'HEAD:frontend/public/data/meta.json']))
+          new = json.load(open('frontend/public/data/meta.json'))
+          old.pop('build_time', None); new.pop('build_time', None)
+          assert old == new, 'meta.json differs from a fresh build (beyond build_time)'
+          PY
+          git checkout -- frontend/public/data/meta.json
+          git diff --exit-code -- frontend/public/data/ || (echo "::error::Website data is stale. Run python -m pipeline.build_site_data and commit frontend/public/data/." && exit 1)
+
+      - name: Python tests
+        run: python -m pytest pipeline/tests/ -q
+
+      - name: Page tests and site build
+        working-directory: frontend
+        run: |
+          npm test
+          npm run build

@@ -382,7 +382,7 @@ class Component extends DCLogic {
       date: this.fd(tr.e), dir: tr.side < 0 ? 'Sell ' + P.a + ', buy ' + P.b : 'Buy ' + P.a + ', sell ' + P.b,
       z: this.sgn(tr.z, 2), days: tr.days, why: WHY[tr.why] || tr.why,
       rs: this.srs(tr.net), bps: this.sgn(tr.bps, 1) + ' bps', color: tr.net > 0 ? 'var(--up)' : 'var(--down)',
-      seg: tr.seg === 'test' ? 'Test year' : 'Training',
+      seg: tr.seg === 'test' ? 'Test year' : (tr.seg === 'forward' ? 'Forward' : 'Training'),
       segStyle: 'font-size: 12px; padding: 4px 8px; border-radius: 999px; white-space: nowrap; ' + (tr.seg === 'test' ? 'background: var(--glow); color: var(--gold)' : 'background: var(--raised); color: var(--muted)')
     }));
     const nt = P.trades.filter((x) => x.seg === 'test').length;

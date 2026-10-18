@@ -15,6 +15,7 @@ from pipeline.config import (
     TRAIN_END,
     TEST_START,
     TEST_END,
+    segment_of,
     WINDOW_GRID,
     Z_ENTRY_GRID,
     Z_EXIT,
@@ -309,7 +310,7 @@ def run_grid_search(
             t = run_pair_backtest(pair_id, p_df, P, dates, tdi, W, ze, mh, slip_bps=BASE_SLIPPAGE, rule=rule)
             if not t.empty:
                 t_train = t[t['entry'] <= t_end]
-                t_test = t[t['entry'] > t_end]
+                t_test = t[(t['entry'] > t_end) & (t['entry'] <= pd.Timestamp(TEST_END))]   # never the forward period
             else:
                 t_train = pd.DataFrame()
                 t_test = pd.DataFrame()
@@ -371,7 +372,7 @@ def run_all_scenarios(
         for slip in SLIPPAGE_SCENARIOS:
             t = run_pair_backtest(pair_id, p_df, P, dates, tdi, W, ze, mh, slip_bps=slip, rule=rule)
             if not t.empty:
-                t['seg'] = np.where(t['entry'] <= t_end, 'train', 'test')
+                t['seg'] = segment_of(t['entry'].values) if t_end == pd.Timestamp(TRAIN_END) else np.where(t['entry'] <= t_end, 'train', 'test')
                 t['slip'] = slip
                 all_trades.append(t)
                 

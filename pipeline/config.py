@@ -85,6 +85,16 @@ TRAIN_START = '2023-10-10'
 TRAIN_END = '2025-09-30'
 TEST_START = '2025-10-01'
 TEST_END = '2026-09-30'
+# Anything after TEST_END (after a data refresh) is the 'forward' period: the frozen rule on data nobody
+# had when the rule was written. It is reported on its own and never mixed into the train/test results.
+
+
+def segment_of(dates):
+    """'train' up to TRAIN_END, 'test' up to TEST_END, 'forward' after that (dates: anything pandas can parse)."""
+    import numpy as np
+    import pandas as pd
+    d = pd.to_datetime(pd.Series(dates))
+    return np.where(d <= pd.Timestamp(TRAIN_END), 'train', np.where(d <= pd.Timestamp(TEST_END), 'test', 'forward'))
 
 # Trading parameters & thresholds (Sections 5.2, 5.3, 5.4)
 TENDER_BUFFER_TD = 4        # Days before expiry to force square-off

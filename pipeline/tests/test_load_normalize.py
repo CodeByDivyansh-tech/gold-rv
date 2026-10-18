@@ -3,6 +3,7 @@ import pytest
 import pandas as pd
 import numpy as np
 from pipeline.load import load_clean_bhavcopy
+from pipeline.config import TEST_END   # research snapshot: a data refresh must not change these checks
 from pipeline.normalize import calculate_px_per_g_pure
 from pipeline.config import CONTRACT_SPECS
 
@@ -24,7 +25,7 @@ def test_normalization_fixtures():
 
 def test_dataset_integrity():
     """Test primary key uniqueness and volume_grams / volume_lots consistency."""
-    df, dates, tdi = load_clean_bhavcopy('data/raw/gold_bhavcopy_clean.csv')
+    df, dates, tdi = load_clean_bhavcopy('data/raw/gold_bhavcopy_clean.csv', end=TEST_END)
     
     # 0 duplicate primary keys
     assert not df.duplicated(subset=['symbol', 'expiry', 'date']).any(), "Duplicate primary keys found!"

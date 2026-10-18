@@ -26,6 +26,9 @@
    "median_gap_bps": 75.5,
    "median_days_to_half": 3
   },
+  "alert_forward": {
+   "n": 0
+  },
   "unusual_small": {
    "n": 211,
    "halfway_pct": 75,

@@ -385,7 +385,7 @@ class Component extends DCLogic {
       dir: (h.direction.indexOf('Short A') === 0 ? 'Sell ' + p.a + ', buy ' + p.b : 'Buy ' + p.a + ', sell ' + p.b),
       z: this.sgn(h.z, 2), outcome: OUT[h.outcome] || h.outcome,
       rs: this.srs(h.net_rs), bps: this.sgn(h.net_bps, 1) + ' bps', color: h.net_rs > 0 ? 'var(--up)' : 'var(--down)',
-      seg: h.seg === 'test' ? 'Test year' : 'Training',
+      seg: h.seg === 'test' ? 'Test year' : (h.seg === 'forward' ? 'Forward' : 'Training'),
       segStyle: 'font-size: 12px; padding: 4px 8px; border-radius: 999px; white-space: nowrap; ' + (h.seg === 'test' ? 'background: var(--glow); color: var(--gold)' : 'background: var(--raised); color: var(--muted)')
     }));
     const wins = hist.filter((h) => h.net_rs > 0).length;
