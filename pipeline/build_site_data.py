@@ -105,6 +105,20 @@ def cross_check_raw_vs_clean(df: pd.DataFrame, raw_path: str = 'data/raw/mcx_bha
                    f"{n_bad} mismatch{'es' if n_bad != 1 else ''}. Runs on every build."),
     }
 
+def supplement_summary(path: str = 'data/raw/mcx_bhavcopy_supplement.csv') -> Dict[str, Any]:
+    """What the Parity-book supplement adds to our MCX download (see pipeline/download.py)."""
+    if not os.path.exists(path):
+        return {'rows': 0, 'missing_contracts': [], 'extra_days': []}
+    s = pd.read_csv(path)
+    miss = s[s['Source'].str.contains('missing', case=False)]
+    later = s[s['Source'].str.contains('after', case=False)]
+    keys = miss.groupby(['Symbol', 'ExpiryDate']).size().reset_index()
+    return {
+        'rows': int(len(s)), 'missing_rows': int(len(miss)), 'extra_day_rows': int(len(later)),
+        'missing_contracts': [f"{r.Symbol} {pd.to_datetime(r.ExpiryDate, format='%d%b%Y').strftime('%b %Y')}" for r in keys.itertuples()],
+        'extra_days': sorted(pd.to_datetime(later['Date'], format='%m/%d/%Y').dt.strftime('%Y-%m-%d').unique().tolist()),
+    }
+
 CRASH_START, CRASH_END, CRASH_LABEL = '2026-01-01', '2026-03-31', 'Jan–Mar 2026 crash'
 
 def _tstat(x: pd.Series) -> Optional[float]:
@@ -216,6 +230,7 @@ def build_all_site_data(output_dir: str = 'frontend/public/data'):
         'thin_rows_count': int(df['thin'].sum()),
         'weekend_sessions': weekend_dates,
         'raw_cross_check': raw_check,
+        'supplement': supplement_summary(),
         'num_contracts': len(CONTRACT_SPECS),
         'num_pairs': len(PAIRS),
         'unseen_test_months': 12,

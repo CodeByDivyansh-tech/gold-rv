@@ -8,7 +8,7 @@
     <link rel="icon" type="image/svg+xml" href="favicon.svg" />
     <link rel="alternate icon" href="favicon.ico" />
     <link rel="apple-touch-icon" href="apple-touch-icon.png" />
-    <meta name="theme-color" content="#070D14" />
+    <meta name="theme-color" content="#120D06" />
     <meta property="og:type" content="website" />
     <meta property="og:title" content="Gold RV Intelligence" />
     <meta property="og:description" content="Same gold, four prices. A cost-aware, walk-forward study of MCX gold contracts." />
@@ -19,15 +19,15 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
     <style>
-      html, body { margin: 0; background: #070D14; color: #EAF0F6; }
-      html.light, html.light body { background: #F3F5F8; color: #0C1622; }
+      html, body { margin: 0; background: #120D06; color: #F6ECD8; }
+      html.light, html.light body { background: #F8F2E4; color: #231809; }
       body { font-family: 'Geist', 'Segoe UI', system-ui, -apple-system, sans-serif; -webkit-font-smoothing: antialiased; }
       .boot { min-height: 100vh; display: grid; place-items: center; }
       .boot svg { width: 72px; height: auto; animation: boot 1.2s ease-in-out infinite alternate; }
       @keyframes boot { from { opacity: .35 } to { opacity: 1 } }
       @media (prefers-reduced-motion: reduce) { .boot svg { animation: none } }
       .boot-error { margin: 15vh auto; max-width: 420px; padding: 24px; display: flex; flex-direction: column; gap: 12px; font-size: 16px; }
-      .boot-error button { align-self: flex-start; min-height: 44px; padding: 0 16px; border-radius: 12px; border: 0; background: #F2A93B; color: #1A1204; font: 600 14px inherit; cursor: pointer; }
+      .boot-error button { align-self: flex-start; min-height: 44px; padding: 0 16px; border-radius: 12px; border: 0; background: #E5B04A; color: #1B1305; font: 600 14px inherit; cursor: pointer; }
     </style>
     <script>
       // Paint the saved theme before the page loads, so there is no flash
@@ -40,10 +40,11 @@
   <body>
     <div id="app">
       <div class="boot" role="status" aria-label="Loading Gold RV Intelligence">
-        <svg viewBox="8 18 48 28" aria-hidden="true"><path fill="#F2A93B" d="M8 28L12 18H44L48 28Z M16 46L20 36H52L56 46Z"/></svg>
+        <svg viewBox="8 18 48 28" aria-hidden="true"><path fill="#E5B04A" d="M8 28L12 18H44L48 28Z M16 46L20 36H52L56 46Z"/></svg>
       </div>
     </div>
     <noscript><p style="padding: 24px">Gold RV Intelligence needs JavaScript to draw its charts.</p></noscript>
+    <script src="app/theme.js"></script>
     <script src="app/dc.js"></script>
     <script src="app/main.js"></script>
     <script src="app/glossary.js"></script>

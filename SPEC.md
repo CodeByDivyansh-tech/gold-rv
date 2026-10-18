@@ -15,6 +15,7 @@ Hack in Hills '26 · Problem 03: Commodity Derivatives Intelligence
 >   money there. Data after 30-Sep-2026 is reported as a separate forward period.
 > - **GOLDPETAL break (Section 3)**: located from the data at 4–11 Nov 2024, not Dec-24 → Mar-25; cause still unconfirmed.
 > - **Slippage** cannot be measured from daily data (`pipeline/evidence.py`); 5 bps remains an assumption.
+> - **Data**: our MCX download had missed the Oct/Nov/Dec-2023 contracts (289 rows); they are now added from the Parity data book (`data/raw/mcx_bhavcopy_supplement.csv`), so the counts below (11,954 rows, 138 contracts) are the original download's.
 Data, formulas and every number below were checked against real MCX data (11,954 rows pulled from the MCX Bhavcopy API on 01-Oct-2026, cross-checked row-for-row against the manually downloaded files).
 
 ---

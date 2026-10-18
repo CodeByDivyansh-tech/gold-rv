@@ -13,15 +13,15 @@
 <style>
 body{margin:0}
 a{color:inherit}a:hover{color:inherit}
-button:focus-visible,a:focus-visible,input:focus-visible{outline:2px solid #F2A93B;outline-offset:2px}
+button:focus-visible,a:focus-visible,input:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
 .rail{display:flex}.phonebar{display:none}.tabbar{display:none}.headmeta{display:flex}.wide{display:block}.cards{display:none}
 .scrub{position:absolute;inset:0;width:100%;height:100%;background:transparent;border:0;padding:0;margin:0;cursor:crosshair;touch-action:pan-y;border-radius:8px}
 .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 @media (max-width: 899px){.rail{display:none}.phonebar{display:flex}.tabbar{display:flex}.headmeta{display:none}.wide{display:none}.cards{display:flex}.pagepad{padding-bottom:104px !important}}
-input[type=range]{accent-color:#F2A93B}
+input[type=range]{accent-color:var(--gold)}
 </style>
 </helmet>
-<div style="--bg: {{t.bg}}; --panel: {{t.panel}}; --raised: {{t.raised}}; --line: {{t.line}}; --fg: {{t.fg}}; --muted: {{t.muted}}; --gold: {{t.gold}}; --glow: {{t.glow}}; --ongold: {{t.ongold}}; --up: {{t.up}}; --down: {{t.down}}; background: var(--bg); color: var(--fg); font-family: 'Geist', 'Segoe UI', system-ui, sans-serif; min-height: 100vh; display: flex; align-items: stretch">
+<div style="--bg: {{t.bg}}; --panel: {{t.panel}}; --raised: {{t.raised}}; --line: {{t.line}}; --fg: {{t.fg}}; --muted: {{t.muted}}; --gold: {{t.gold}}; --glow: {{t.glow}}; --ongold: {{t.ongold}}; --up: {{t.up}}; --down: {{t.down}}; --c1: {{t.c1}}; --c2: {{t.c2}}; --c3: {{t.c3}}; --c4: {{t.c4}}; --area: {{t.area}}; --hover: {{t.hover}}; background: var(--bg); color: var(--fg); font-family: 'Geist', 'Segoe UI', system-ui, sans-serif; min-height: 100vh; display: flex; align-items: stretch">
 
   <dc-import name="Rail" current="Today"></dc-import>
 
@@ -37,14 +37,14 @@ input[type=range]{accent-color:#F2A93B}
         <sc-if value="{{dark}}" hint-placeholder-val="{{ true }}"><svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true" style="fill: none; stroke: currentColor; stroke-width: 1.8px; stroke-linecap: round"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"></path></svg></sc-if>
         <sc-if value="{{light}}" hint-placeholder-val="{{ false }}"><svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true" style="fill: none; stroke: currentColor; stroke-width: 1.8px; stroke-linejoin: round"><path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"></path></svg></sc-if>
       </button>
-      <button type="button" class="grv-tool pbtn" data-grv="words" aria-haspopup="dialog" aria-label="Words explained" data-label="Words explained (?)" style="width: 44px; height: 44px; flex: none; border-radius: 12px; border: 1px solid var(--line); background: var(--raised); color: var(--fg); display: grid; place-items: center; cursor: pointer; padding: 0"><span aria-hidden="true" style="display: grid; place-items: center; width: 22px; height: 22px; border-radius: 50%; background: #F2A93B; color: #1A1204; font: 700 14px 'Geist', system-ui, sans-serif">?</span></button>
+      <button type="button" class="grv-tool pbtn" data-grv="words" aria-haspopup="dialog" aria-label="Words explained" data-label="Words explained (?)" style="width: 44px; height: 44px; flex: none; border-radius: 12px; border: 1px solid var(--line); background: var(--raised); color: var(--fg); display: grid; place-items: center; cursor: pointer; padding: 0"><span aria-hidden="true" style="display: grid; place-items: center; width: 22px; height: 22px; border-radius: 50%; background: var(--gold); color: var(--ongold); font: 700 14px 'Geist', system-ui, sans-serif">?</span></button>
     </div>
 
     <main class="pagepad" style="flex: 1 1 auto; box-sizing: border-box; width: 100%; max-width: 1240px; margin: 0 auto; padding: 32px clamp(16px, 4vw, 48px) 48px; display: flex; flex-direction: column; gap: 28px">
 
       <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-start; gap: 20px">
         <div style="display: flex; flex-direction: column; gap: 12px; max-width: 720px">
-          <h1 style="margin: 0; font-size: clamp(30px, 4vw, 44px); font-weight: 600; letter-spacing: -0.03em; line-height: 1.05">Is any gap worth trading today?</h1>
+          <h1 class="grv-foil" style="margin: 0; font-size: clamp(30px, 4vw, 44px); font-weight: 600; letter-spacing: -0.03em; line-height: 1.05">Is any gap worth trading today?</h1>
           <p style="margin: 0; font-size: 16px; line-height: 1.6; color: var(--muted); max-width: 64ch">For each of the six pairs we measure how far the price gap is from its normal level, after adjusting for the different expiry dates. A trade only makes sense when that gap passes the cost line: twice the cost of trading in and out.</p>
         </div>
         <div class="headmeta" style="align-items: center; gap: 12px">
@@ -55,7 +55,7 @@ input[type=range]{accent-color:#F2A93B}
             <sc-if value="{{dark}}" hint-placeholder-val="{{ true }}"><svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true" style="fill: none; stroke: currentColor; stroke-width: 1.8px; stroke-linecap: round"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"></path></svg></sc-if>
             <sc-if value="{{light}}" hint-placeholder-val="{{ false }}"><svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true" style="fill: none; stroke: currentColor; stroke-width: 1.8px; stroke-linejoin: round"><path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"></path></svg></sc-if>
           </button>
-          <button type="button" class="grv-tool" data-grv="words" aria-haspopup="dialog" aria-label="Words explained" data-label="Words explained (?)" style="width: 44px; height: 44px; border-radius: 12px; border: 1px solid var(--line); background: var(--panel); color: var(--fg); display: grid; place-items: center; cursor: pointer; padding: 0"><span aria-hidden="true" style="display: grid; place-items: center; width: 22px; height: 22px; border-radius: 50%; background: #F2A93B; color: #1A1204; font: 700 14px 'Geist', system-ui, sans-serif">?</span></button>
+          <button type="button" class="grv-tool" data-grv="words" aria-haspopup="dialog" aria-label="Words explained" data-label="Words explained (?)" style="width: 44px; height: 44px; border-radius: 12px; border: 1px solid var(--line); background: var(--panel); color: var(--fg); display: grid; place-items: center; cursor: pointer; padding: 0"><span aria-hidden="true" style="display: grid; place-items: center; width: 22px; height: 22px; border-radius: 50%; background: var(--gold); color: var(--ongold); font: 700 14px 'Geist', system-ui, sans-serif">?</span></button>
         </div>
       </div>
 
@@ -64,12 +64,12 @@ input[type=range]{accent-color:#F2A93B}
       </sc-if>
 
       <sc-if value="{{failed}}" hint-placeholder-val="{{ false }}">
-        <div role="alert" style="background: var(--panel); border: 1px solid var(--down); border-radius: 16px; padding: 18px 20px; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px"><span style="display: flex; flex-direction: column; gap: 4px"><span style="font-weight: 600; font-size: 16px">The data didn't load</span><span style="font-size: 14px; color: var(--muted)">Check your internet connection, then try again.</span></span><button type="button" onClick="{{retry}}" style="min-height: 44px; padding: 0 16px; border-radius: 12px; border: 0; background: var(--gold); color: var(--ongold); font: 600 14px 'Geist', system-ui, sans-serif; cursor: pointer">Try again</button></div>
+        <div role="alert" style="background: var(--panel); border: 1px solid var(--down); border-radius: 16px; padding: 18px 20px; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px"><span style="display: flex; flex-direction: column; gap: 4px"><span style="font-weight: 600; font-size: 16px">The data didn't load</span><span style="font-size: 14px; color: var(--muted)">Check your internet connection, then try again.</span></span><button class="grv-goldbtn" type="button" onClick="{{retry}}" style="min-height: 44px; padding: 0 16px; border-radius: 12px; border: 0; background: var(--gold); color: var(--ongold); font: 600 14px 'Geist', system-ui, sans-serif; cursor: pointer">Try again</button></div>
       </sc-if>
       <sc-if value="{{ready}}" hint-placeholder-val="{{ true }}">
         <section aria-label="Summary" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(240px, 100%), 1fr)); gap: 14px">
           <sc-for list="{{tiles}}" as="k" hint-placeholder-count="3">
-            <div style="background: var(--panel); border: 1px solid var(--line); border-radius: 18px; padding: 18px 20px; display: flex; flex-direction: column; gap: 6px">
+            <div class="grv-card" style="background: var(--panel); border: 1px solid var(--line); border-radius: 18px; padding: 18px 20px; display: flex; flex-direction: column; gap: 6px">
               <span style="font-size: 13px; color: var(--muted)">{{k.label}}</span>
               <span style="font-family: 'Geist Mono', ui-monospace, monospace; font-size: 28px; font-weight: 600; letter-spacing: -0.02em; color: {{k.color}}">{{k.value}}</span>
               <span style="font-size: 13px; color: var(--muted)">{{k.note}}</span>
@@ -77,7 +77,7 @@ input[type=range]{accent-color:#F2A93B}
           </sc-for>
         </section>
 
-        <section aria-labelledby="hurdle-h" style="background: var(--panel); border: 1px solid var(--line); border-radius: 20px; padding: clamp(18px, 2.5vw, 28px); display: flex; flex-direction: column; gap: 18px">
+        <section class="grv-card" aria-labelledby="hurdle-h" style="background: var(--panel); border: 1px solid var(--line); border-radius: 20px; padding: clamp(18px, 2.5vw, 28px); display: flex; flex-direction: column; gap: 18px">
           <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-end; gap: 12px">
             <div style="display: flex; flex-direction: column; gap: 4px">
               <h2 id="hurdle-h" style="margin: 0; font-size: 20px; font-weight: 600">The hurdle</h2>
@@ -112,14 +112,14 @@ input[type=range]{accent-color:#F2A93B}
           <p style="margin: 0; font-size: 13px; line-height: 1.6; color: var(--muted)">Gap and cost line are in basis points (1 bps = 0.01%). Cost line = 2 × the {{rt}} bps round-trip cost at 5 bps slippage. Both today's alert and every backtest trade need a gap to pass it, as a safety margin.</p>
         </section>
 
-        <section aria-labelledby="replay-h" style="background: var(--panel); border: 1px solid var(--line); border-radius: 20px; padding: clamp(18px, 2.5vw, 28px); display: flex; flex-direction: column; gap: 18px">
+        <section class="grv-card" aria-labelledby="replay-h" style="background: var(--panel); border: 1px solid var(--line); border-radius: 20px; padding: clamp(18px, 2.5vw, 28px); display: flex; flex-direction: column; gap: 18px">
           <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-start; gap: 16px">
             <div style="display: flex; flex-direction: column; gap: 4px; max-width: 640px">
               <h2 id="replay-h" style="margin: 0; font-size: 20px; font-weight: 600">Replay three years</h2>
               <span style="font-size: 14px; color: var(--muted); line-height: 1.5">The same view, week by week since October 2023. Each bar shows that week's biggest gap from normal.</span>
             </div>
             <div style="display: flex; align-items: center; gap: 8px">
-              <button type="button" onClick="{{replay.togglePlay}}" style="min-height: 44px; padding: 0 18px; border-radius: 12px; border: 0; background: var(--gold); color: var(--ongold); font: 600 14px 'Geist', system-ui, sans-serif; cursor: pointer; display: flex; align-items: center; gap: 8px">
+              <button class="grv-goldbtn" type="button" onClick="{{replay.togglePlay}}" style="min-height: 44px; padding: 0 18px; border-radius: 12px; border: 0; background: var(--gold); color: var(--ongold); font: 600 14px 'Geist', system-ui, sans-serif; cursor: pointer; display: flex; align-items: center; gap: 8px">
                 <sc-if value="{{replay.playing}}" hint-placeholder-val="{{ false }}"><svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true" style="fill: currentColor"><rect x="6" y="5" width="4" height="14" rx="1"></rect><rect x="14" y="5" width="4" height="14" rx="1"></rect></svg></sc-if>
                 <sc-if value="{{replay.paused}}" hint-placeholder-val="{{ true }}"><svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true" style="fill: currentColor"><path d="M7 5v14l12-7z"></path></svg></sc-if>
                 {{replay.playLabel}}
@@ -186,7 +186,7 @@ input[type=range]{accent-color:#F2A93B}
                 <tr style="text-align: left; color: var(--muted); font-size: 12px">
                   <th style="padding: 14px 16px; font-weight: 500">Pair</th>
                   <th style="padding: 14px 12px; font-weight: 500; text-align: right">Spread now</th>
-                  <th style="padding: 14px 12px; font-weight: 500; text-align: right">In ₹ per 10 g</th>
+                  <th style="padding: 14px 12px; font-weight: 500; text-align: right; white-space: nowrap">₹ per 10 g</th>
                   <th style="padding: 14px 12px; font-weight: 500; text-align: right">Normal level</th>
                   <th style="padding: 14px 12px; font-weight: 500; text-align: right">Gap from normal</th>
                   <th style="padding: 14px 12px; font-weight: 500; text-align: right">z (needed)</th>
@@ -197,11 +197,11 @@ input[type=range]{accent-color:#F2A93B}
                 <sc-for list="{{rows}}" as="p" hint-placeholder-count="6">
                   <tr style="border-top: 1px solid var(--line)">
                     <td style="padding: 14px 16px; font-weight: 600">{{p.label}}</td>
-                    <td style="padding: 14px 12px; text-align: right; font-family: 'Geist Mono', ui-monospace, monospace">{{p.spread}} bps</td>
-                    <td style="padding: 14px 12px; text-align: right; font-family: 'Geist Mono', ui-monospace, monospace">{{p.spreadRs}}</td>
-                    <td style="padding: 14px 12px; text-align: right; font-family: 'Geist Mono', ui-monospace, monospace">{{p.mu}} bps</td>
-                    <td style="padding: 14px 12px; text-align: right; font-family: 'Geist Mono', ui-monospace, monospace">{{p.dev}} bps</td>
-                    <td style="padding: 14px 12px; text-align: right; font-family: 'Geist Mono', ui-monospace, monospace">{{p.z}} ({{p.zNeed}})</td>
+                    <td style="padding: 14px 12px; text-align: right; font-family: 'Geist Mono', ui-monospace, monospace; white-space: nowrap">{{p.spread}} bps</td>
+                    <td style="padding: 14px 12px; text-align: right; font-family: 'Geist Mono', ui-monospace, monospace; white-space: nowrap">{{p.spreadRs}}</td>
+                    <td style="padding: 14px 12px; text-align: right; font-family: 'Geist Mono', ui-monospace, monospace; white-space: nowrap">{{p.mu}} bps</td>
+                    <td style="padding: 14px 12px; text-align: right; font-family: 'Geist Mono', ui-monospace, monospace; white-space: nowrap">{{p.dev}} bps</td>
+                    <td style="padding: 14px 12px; text-align: right; font-family: 'Geist Mono', ui-monospace, monospace; white-space: nowrap">{{p.z}} ({{p.zNeed}})</td>
                     <td style="padding: 14px 16px; color: var(--muted)">{{p.failed}}</td>
                   </tr>
                 </sc-for>
@@ -241,9 +241,10 @@ class Component extends DCLogic {
   componentWillUnmount() { if (this.timer) clearInterval(this.timer); }
 
   tokens(dark) {
-    return dark
-      ? { bg: '#070D14', panel: '#0F1822', raised: '#18232F', line: '#1E2B38', fg: '#EAF0F6', muted: '#93A3B4', gold: '#F2A93B', glow: 'rgba(242,169,59,0.12)', ongold: '#1A1204', up: '#4FD1A1', down: '#FF8F85' }
-      : { bg: '#F3F5F8', panel: '#FFFFFF', raised: '#E9EDF2', line: '#DCE2E9', fg: '#0C1622', muted: '#55636F', gold: '#975600', glow: 'rgba(151,86,0,0.10)', ongold: '#FFFFFF', up: '#0B7A55', down: '#B42318' };
+    // shared gold-tinted themes (app/theme.js); also puts the tokens on <html> for the overlays
+    if (typeof GRVTheme === 'undefined') return {};
+    GRVTheme.apply(dark);
+    return GRVTheme.tokens(dark);
   }
 
   inr(n) { return (n < 0 ? '−' : '+') + '₹' + Math.abs(Math.round(n)).toLocaleString('en-IN'); }
@@ -341,7 +342,7 @@ class Component extends DCLogic {
       listed: 'GOLDTEN first traded ' + this.fd(EV.goldtenListed), rows: rrows, playing, paused: !playing,
       playLabel: playing ? 'Pause' : (i >= max ? 'Replay 3 years' : 'Play'),
       speed: speed + '×', speedLabel: 'Replay speed ' + speed + '×, change speed',
-      caption: 'In ' + R.crossWeeks + ' of ' + R.weeks + ' weeks at least one gap passed the cost line: ' + per[0][0] + ' of them in the thin early period before GOLDTEN was listed, and ' + crashText + ' of the ' + EV.crashLabel + '. The model traded in ' + R.signalWeeks + ' weeks (marked "traded"). Every trade had to pass all five checks, the cost line included, and both contracts had to be liquid, which rules out the thin early weeks. Passing the line is not the same as making money: in the 12-month test year, trades closed during the ' + EV.crashShort + ' made ' + rsA(D.rule.current['5'].crash_net_rs) + ', and the rest ' + (D.rule.current['5'].ex_crash_net_rs < 0 ? 'lost ' : 'made ') + rsA(D.rule.current['5'].ex_crash_net_rs) + '.',
+      caption: 'In ' + R.crossWeeks + ' of ' + R.weeks + ' weeks at least one gap passed the cost line: ' + per[0][0] + ' of them in the quieter early period before GOLDTEN was listed (far fewer lots traded), and ' + crashText + ' of the ' + EV.crashLabel + '. The model traded in ' + R.signalWeeks + ' weeks (marked "traded"). Every trade had to pass all five checks, the cost line included, and both contracts had to be liquid, which rules out many of the quieter early weeks. Passing the line is not the same as making money: in the 12-month test year, trades closed during the ' + EV.crashShort + ' made ' + rsA(D.rule.current['5'].crash_net_rs) + ', and the rest ' + (D.rule.current['5'].ex_crash_net_rs < 0 ? 'lost ' : 'made ') + rsA(D.rule.current['5'].ex_crash_net_rs) + '.',
       togglePlay: () => {
         if (this.timer) { clearInterval(this.timer); this.timer = null; this.setState({ playing: false }); return; }
         const start = i >= max ? 0 : i;

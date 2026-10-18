@@ -27,6 +27,24 @@
     ],
     "status": "Raw MCX rows vs cleaned data: 12,267 rows compared on open, close, volume and OI (313 of them from the Parity data book, filling gaps in our download), 0 mismatches. Runs on every build."
   },
+  "supplement": {
+    "rows": 313,
+    "missing_rows": 289,
+    "extra_day_rows": 24,
+    "missing_contracts": [
+      "GOLDGUINEA Dec 2023",
+      "GOLDGUINEA Nov 2023",
+      "GOLDGUINEA Oct 2023",
+      "GOLDM Nov 2023",
+      "GOLDM Dec 2023",
+      "GOLDPETAL Dec 2023",
+      "GOLDPETAL Nov 2023",
+      "GOLDPETAL Oct 2023"
+    ],
+    "extra_days": [
+      "2026-10-01"
+    ]
+  },
   "num_contracts": 4,
   "num_pairs": 6,
   "unseen_test_months": 12,
@@ -76,6 +94,6 @@
       "oi": 198482
     }
   ],
-  "build_time": "2026-10-18T20:59:33.476490+00:00",
+  "build_time": "2026-10-18T21:24:54.306685+00:00",
   "source": "MCX Bhavcopy (EOD) \u00b7 Data to 01-Oct-2026"
 }

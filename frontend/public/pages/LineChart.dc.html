@@ -1,0 +1,358 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Gold RV Intelligence: chart</title>
+</head>
+<body>
+<!--
+  Shared time-series chart. Pages import it as a dc-import named LineChart and pass:
+    dates    ISO dates, sorted (the x axis is real time)
+    series   [{ key, label, color, values, width?, dash?, area?, step? }]   values line up with dates; null = gap
+    bands    [{ from, to, label?, fill? }]          shaded date ranges (fill defaults to var(--glow))
+    envelope { lo: [], hi: [], label }              a shaded band that follows the data (for example normal range)
+    markers  [{ date, value, fill, ring?, label }]  dots (for example trades); their label shows in the tooltip
+    fmt      'rs' | 'srs' | 'bps' | 'pct' | 'num'   how values are written
+    height   px (default 300) · zero: draw a zero line · compare: offer a "% change" view
+    clamp-lo / clamp-hi: fix the y range; points beyond it are cut at the edge (the page should say so)
+    label    what the chart shows, for screen readers
+  Interaction: crosshair tooltip with every series; drag to zoom, double-click or Reset to undo; the strip
+  below jumps the zoom window; legend chips hide or show a series; keys ← → move, + − zoom, 0 resets.
+-->
+<x-dc>
+<helmet>
+<style>
+.lc-wrap{position:relative;user-select:none;-webkit-user-select:none}
+.lc-hit{position:absolute;inset:0;width:100%;height:100%;background:transparent;border:0;padding:0;margin:0;cursor:crosshair;touch-action:pan-y;border-radius:8px}
+.lc-hit:focus-visible{outline:2px solid var(--gold);outline-offset:4px}
+.lc-chip{display:inline-flex;align-items:center;gap:8px;min-height:32px;padding:0 10px;border-radius:999px;border:1px solid var(--line);background:transparent;color:var(--fg);font:500 13px 'Geist',system-ui,sans-serif;cursor:pointer}
+.lc-chip[aria-pressed="false"]{opacity:.45}
+.lc-chip:hover{border-color:var(--gold)}
+.lc-seg{min-height:32px;padding:0 12px;border:1px solid var(--line);background:transparent;color:var(--fg);font:500 13px 'Geist',system-ui,sans-serif;cursor:pointer}
+.lc-seg[aria-pressed="true"]{background:var(--glow);color:var(--gold);border-color:var(--gold)}
+.lc-strip{position:relative;height:34px;margin-top:6px;border-radius:8px;background:var(--raised);cursor:pointer;overflow:hidden;border:0;padding:0;width:100%;display:block}
+.lc-strip:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+.lc-tip{position:absolute;z-index:3;pointer-events:none;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:9px 11px;font-size:12px;white-space:nowrap;box-shadow:var(--card-shadow);display:flex;flex-direction:column;gap:4px;box-sizing:border-box;overflow:hidden}
+.lc-mono{font-family:'Geist Mono',ui-monospace,monospace;font-variant-numeric:tabular-nums}
+</style>
+</helmet>
+<div style="display: flex; flex-direction: column; gap: 10px">
+  <sc-if value="{{showTools}}" hint-placeholder-val="{{ true }}">
+    <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 8px 16px">
+      <div role="group" aria-label="Show or hide lines" style="display: flex; flex-wrap: wrap; gap: 6px">
+        <sc-for list="{{chips}}" as="c" hint-placeholder-count="3">
+          <button type="button" class="lc-chip" aria-pressed="{{c.pressed}}" onClick="{{c.toggle}}" title="{{c.title}}"><span aria-hidden="true" style="width: 14px; height: 3px; border-radius: 2px; background: {{c.color}}"></span>{{c.label}}<span class="lc-mono" style="color: var(--muted)">{{c.value}}</span></button>
+        </sc-for>
+      </div>
+      <sc-if value="{{compare}}" hint-placeholder-val="{{ false }}">
+        <div role="group" aria-label="Value or percentage change" style="display: flex">
+          <button type="button" class="lc-seg" aria-pressed="{{modeAbs}}" onClick="{{setAbs}}" style="border-radius: 10px 0 0 10px">{{absLabel}}</button>
+          <button type="button" class="lc-seg" aria-pressed="{{modePct}}" onClick="{{setPct}}" style="border-radius: 0 10px 10px 0; border-left: 0">% change</button>
+        </div>
+      </sc-if>
+    </div>
+  </sc-if>
+
+  <div class="lc-wrap" style="height: {{h}}px">
+    <sc-for list="{{bandEls}}" as="b" hint-placeholder-count="2">
+      <div style="position: absolute; top: 0; bottom: 0; left: {{b.x}}; width: {{b.w}}; background: {{b.fill}}; pointer-events: none"></div>
+      <span style="position: absolute; top: 4px; left: {{b.x}}; padding-left: 6px; font-size: 11px; color: {{b.ink}}; pointer-events: none; max-width: 180px; line-height: 1.3">{{b.label}}</span>
+    </sc-for>
+    <sc-for list="{{grid}}" as="g" hint-placeholder-count="4">
+      <div style="position: absolute; left: 0; right: 0; top: {{g.y}}; border-top: 1px dashed var(--line); pointer-events: none"></div>
+      <span class="lc-mono" style="position: absolute; right: 0; top: {{g.y}}; transform: translateY(-115%); font-size: 11px; color: var(--muted); pointer-events: none; background: var(--panel); padding-left: 4px">{{g.label}}</span>
+    </sc-for>
+    <svg viewBox="0 0 1000 {{h}}" preserveAspectRatio="none" role="img" aria-label="{{aria}}" style="position: absolute; inset: 0; width: 100%; height: 100%; display: block; overflow: visible">
+      <g id="{{revealId}}" class="grv-reveal">
+        <sc-if value="{{hasEnv}}" hint-placeholder-val="{{ false }}"><path d="{{env}}" style="fill: var(--glow); stroke: none"></path></sc-if>
+        <sc-if value="{{hasZero}}" hint-placeholder-val="{{ false }}"><path d="{{zeroPath}}" style="fill: none; stroke: var(--muted); stroke-width: 1px; stroke-dasharray: 4 4; vector-effect: non-scaling-stroke; opacity: 0.8"></path></sc-if>
+        <sc-for list="{{areas}}" as="a" hint-placeholder-count="1">
+          <path d="{{a.d}}" style="fill: var(--area); stroke: none"></path>
+        </sc-for>
+        <sc-for list="{{lines}}" as="l" hint-placeholder-count="2">
+          <path d="{{l.d}}" style="fill: none; stroke: {{l.color}}; stroke-width: {{l.width}}px; stroke-dasharray: {{l.dash}}; vector-effect: non-scaling-stroke; stroke-linejoin: round; stroke-linecap: round"></path>
+        </sc-for>
+      </g>
+    </svg>
+    <sc-for list="{{markerEls}}" as="m" hint-placeholder-count="3">
+      <div style="position: absolute; left: {{m.x}}; top: {{m.y}}; width: 10px; height: 10px; margin: -5px 0 0 -5px; border-radius: 50%; background: {{m.fill}}; box-shadow: 0 0 0 2px var(--panel){{m.ring}}; pointer-events: none"></div>
+    </sc-for>
+    <sc-if value="{{drag.on}}" hint-placeholder-val="{{ false }}">
+      <div style="position: absolute; top: 0; bottom: 0; left: {{drag.x}}; width: {{drag.w}}; background: var(--glow); border-left: 1px solid var(--gold); border-right: 1px solid var(--gold); pointer-events: none"></div>
+    </sc-if>
+    <sc-if value="{{hover.on}}" hint-placeholder-val="{{ false }}">
+      <div style="position: absolute; top: 0; bottom: 0; left: {{hover.x}}; width: 1px; background: var(--muted); opacity: 0.7; pointer-events: none"></div>
+      <sc-for list="{{hover.dots}}" as="d" hint-placeholder-count="2">
+        <div style="position: absolute; left: {{hover.x}}; top: {{d.y}}; width: 10px; height: 10px; margin: -5px 0 0 -5px; border-radius: 50%; background: {{d.color}}; box-shadow: 0 0 0 2px var(--panel); pointer-events: none"></div>
+      </sc-for>
+      <div class="lc-tip" style="top: 8px; {{hover.pos}}">
+        <span style="color: var(--muted)">{{hover.date}}</span>
+        <sc-for list="{{hover.rows}}" as="r" hint-placeholder-count="2">
+          <span style="display: flex; align-items: center; gap: 8px; justify-content: space-between"><span style="display: inline-flex; align-items: center; gap: 6px"><span aria-hidden="true" style="width: 10px; height: 3px; border-radius: 2px; background: {{r.color}}"></span>{{r.label}}</span><span class="lc-mono" style="font-weight: 600">{{r.value}}</span></span>
+        </sc-for>
+        <sc-if value="{{hover.hasNote}}" hint-placeholder-val="{{ false }}"><span style="color: var(--gold); font-weight: 600; white-space: normal; max-width: 260px">{{hover.note}}</span></sc-if>
+      </div>
+    </sc-if>
+    <button type="button" class="lc-hit" aria-label="{{hitLabel}}" onPointerDown="{{down}}" onPointerMove="{{move}}" onPointerUp="{{up}}" onPointerCancel="{{cancel}}" onPointerLeave="{{leave}}" onDblClick="{{reset}}" onKeyDown="{{key}}"></button>
+    <span style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap" aria-live="polite">{{say}}</span>
+  </div>
+
+  <div class="lc-mono" style="display: flex; justify-content: space-between; gap: 8px; font-size: 12px; color: var(--muted)">
+    <span>{{xStart}}</span><span>{{xMid}}</span><span>{{xEnd}}</span>
+  </div>
+
+  <sc-if value="{{showStrip}}" hint-placeholder-val="{{ true }}">
+    <button type="button" class="lc-strip" aria-label="{{stripLabel}}" onClick="{{jump}}">
+      <svg viewBox="0 0 1000 34" preserveAspectRatio="none" aria-hidden="true" style="position: absolute; inset: 0; width: 100%; height: 100%; display: block">
+        <path d="{{stripPath}}" style="fill: none; stroke: var(--muted); stroke-width: 1px; vector-effect: non-scaling-stroke; opacity: 0.8"></path>
+      </svg>
+      <span aria-hidden="true" style="position: absolute; top: 0; bottom: 0; left: {{win.x}}; width: {{win.w}}; background: var(--glow); border: 1px solid var(--gold); border-radius: 6px; box-sizing: border-box"></span>
+    </button>
+  </sc-if>
+  <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 8px; font-size: 12px; color: var(--muted)">
+    <span>{{hint}}</span>
+    <sc-if value="{{zoomed}}" hint-placeholder-val="{{ false }}">
+      <button type="button" onClick="{{reset}}" style="min-height: 32px; padding: 0 12px; border-radius: 10px; border: 1px solid var(--gold); background: var(--glow); color: var(--gold); font: 600 12px 'Geist', system-ui, sans-serif; cursor: pointer">Reset zoom</button>
+    </sc-if>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"height":{"editor":"number","default":300}}'>
+class Component extends DCLogic {
+  fd(s) { const M = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']; const p = String(s).slice(0, 10).split('-'); return (+p[2]) + ' ' + M[+p[1] - 1] + ' ' + p[0]; }
+
+  fmt(v, kind) {
+    if (v == null || !isFinite(v)) return '–';
+    const neg = v < 0, a = Math.abs(v);
+    const inr = (x) => Math.round(x).toLocaleString('en-IN');
+    if (kind === 'rs') return (neg ? '−' : '') + '₹' + inr(a);
+    if (kind === 'srs') return (neg ? '−' : '+') + '₹' + inr(a);
+    if (kind === 'bps') return (neg ? '−' : '+') + a.toFixed(1) + ' bps';
+    if (kind === 'pct') return (neg ? '−' : '+') + a.toFixed(2) + '%';
+    return (neg ? '−' : '') + a.toLocaleString('en-IN', { maximumFractionDigits: 2 });
+  }
+
+  // nice tick step for a span
+  step(span) {
+    const raw = span / 4, p = Math.pow(10, Math.floor(Math.log10(raw || 1))), n = raw / p;
+    return (n < 1.5 ? 1 : n < 3 ? 2 : n < 7 ? 5 : 10) * p;
+  }
+
+  // keep at most ~2 points per pixel column: first, min, max, last of each bucket (spikes survive)
+  thin(idx, vals) {
+    if (idx.length <= 700) return idx;
+    const out = [], per = Math.ceil(idx.length / 350);
+    for (let s = 0; s < idx.length; s += per) {
+      const b = idx.slice(s, s + per); let lo = b[0], hi = b[0];
+      b.forEach((i) => { if (vals[i] != null) { if (vals[lo] == null || vals[i] < vals[lo]) lo = i; if (vals[hi] == null || vals[i] > vals[hi]) hi = i; } });
+      const keep = [b[0], lo, hi, b[b.length - 1]].filter((v, k, arr) => arr.indexOf(v) === k).sort((x, y) => x - y);
+      keep.forEach((i) => out.push(i));
+    }
+    return out;
+  }
+
+  model() {
+    const P = this.props, st = this.state || {};
+    const dates = P.dates || [];
+    const n = dates.length;
+    const sig = n + ':' + (dates[0] || '') + ':' + (dates[n - 1] || '') + ':' + (P.series || []).map((s) => s.key + (s.values ? s.values.length : 0)).join(',');
+    if (this._sig !== sig) { this._sig = sig; this._cache = null; if (st.zoom || st.hover != null) { this.state = Object.assign({}, st, { zoom: null, hover: null, drag: null }); } }
+    const S = this.state || {};
+    const hidden = S.hidden || {};
+    const mode = S.mode === 'pct' && P.compare ? 'pct' : 'abs';
+    const z = S.zoom && S.zoom[1] - S.zoom[0] >= 2 ? S.zoom : [0, Math.max(0, n - 1)];
+    const key = sig + '|' + z.join('-') + '|' + mode + '|' + Object.keys(hidden).filter((k) => hidden[k]).join(',');
+    if (this._cache && this._cache.key === key) return this._cache;
+
+    const H = +(P.height || 300), W = 1000, pad = 14;
+    const T = dates.map((d) => Date.parse(String(d).slice(0, 10)));
+    const t0 = T[z[0]], t1 = T[z[1]] === t0 ? t0 + 1 : T[z[1]];
+    const X = (i) => ((T[i] - t0) / (t1 - t0)) * W;
+    const vis = (P.series || []).filter((s) => !hidden[s.key]);
+    // values in view (rebased to % change from the first visible value in compare mode)
+    const view = {};
+    (P.series || []).forEach((s) => {
+      const v = s.values || [];
+      if (mode === 'pct') {
+        let base = null; for (let i = z[0]; i <= z[1]; i++) if (v[i] != null) { base = v[i]; break; }
+        view[s.key] = v.map((x) => (x == null || base == null ? null : (x / base - 1) * 100));
+      } else view[s.key] = v;
+    });
+    let lo = Infinity, hi = -Infinity;
+    const take = (x) => { if (x != null && isFinite(x)) { if (x < lo) lo = x; if (x > hi) hi = x; } };
+    for (let i = z[0]; i <= z[1]; i++) {
+      vis.forEach((s) => take(view[s.key][i]));
+      if (P.envelope && mode === 'abs') { take(P.envelope.lo[i]); take(P.envelope.hi[i]); }
+    }
+    if (P.zero) { take(0); }
+    if (mode === 'abs' && P.clampLo != null) lo = Math.max(lo, +P.clampLo);
+    if (mode === 'abs' && P.clampHi != null) hi = Math.min(hi, +P.clampHi);
+    if (!isFinite(lo)) { lo = 0; hi = 1; }
+    if (hi - lo < 1e-9) { hi += 1; lo -= 1; }
+    const spanPad = (hi - lo) * 0.06; lo -= spanPad; hi += spanPad;
+    const Y = (v) => pad + (1 - (Math.max(lo, Math.min(hi, v)) - lo) / (hi - lo)) * (H - 2 * pad);
+    const idx = []; for (let i = z[0]; i <= z[1]; i++) idx.push(i);
+
+    const pathOf = (vals, step) => {
+      const ids = this.thin(idx, vals); let d = '', open = false, py = null;
+      ids.forEach((i) => {
+        const v = vals[i];
+        if (v == null || !isFinite(v)) { open = false; return; }
+        const x = X(i).toFixed(1), y = Y(v).toFixed(1);
+        if (!open) { d += 'M' + x + ' ' + y; open = true; }
+        else if (step) d += ' L' + x + ' ' + py + ' L' + x + ' ' + y;
+        else d += ' L' + x + ' ' + y;
+        py = y;
+      });
+      return d;
+    };
+    const lines = vis.map((s) => ({ d: pathOf(view[s.key], s.step), color: s.color, width: s.width || 2, dash: s.dash || 'none' }));
+    const areas = vis.filter((s) => s.area).map((s) => {
+      const d = pathOf(view[s.key], s.step); if (!d) return { d: '' };
+      const base = Y(P.zero ? 0 : lo).toFixed(1);
+      const xs = d.match(/M(-?[\d.]+)/), last = d.match(/(-?[\d.]+) (-?[\d.]+)$/);
+      return { d: d + ' L' + (last ? last[1] : W) + ' ' + base + ' L' + (xs ? xs[1] : 0) + ' ' + base + ' Z' };
+    });
+    let env = '';
+    if (P.envelope && mode === 'abs') {
+      const E = P.envelope, ids = idx.filter((i) => E.lo[i] != null && E.hi[i] != null);
+      let seg = [];
+      const flush = () => { if (seg.length > 1) { env += 'M' + seg.map((i) => X(i).toFixed(1) + ' ' + Y(E.hi[i]).toFixed(1)).join(' L') + ' L' + seg.slice().reverse().map((i) => X(i).toFixed(1) + ' ' + Y(E.lo[i]).toFixed(1)).join(' L') + ' Z'; } seg = []; };
+      ids.forEach((i, k) => { if (k && i !== ids[k - 1] + 1) flush(); seg.push(i); }); flush();
+    }
+    const st5 = this.step((hi - lo) / 1.12);
+    const grid = [];
+    for (let v = Math.ceil(lo / st5) * st5; v <= hi; v += st5) grid.push({ y: (Y(v) / H * 100).toFixed(2) + '%', label: this.fmt(v, mode === 'pct' ? 'pct' : (P.fmt === 'srs' ? 'srs' : P.fmt)).replace(/\.0 bps$/, ' bps') });
+    const tsOf = (d) => Date.parse(String(d).slice(0, 10));
+    const bandEls = (P.bands || []).map((b) => {
+      const a = Math.max(tsOf(b.from), t0), c = Math.min(tsOf(b.to), t1);
+      if (c <= a && !(b.from === b.to)) return null;
+      const x = (a - t0) / (t1 - t0) * 100, w = Math.max(0.35, (c - a) / (t1 - t0) * 100);
+      return { x: x.toFixed(2) + '%', w: w.toFixed(2) + '%', fill: b.fill || 'var(--glow)', label: b.label || '', ink: b.ink || 'var(--muted)' };
+    }).filter(Boolean);
+    const markerEls = (P.markers || []).filter((m) => { const t = tsOf(m.date); return t >= t0 && t <= t1; })
+      .map((m) => ({ x: ((tsOf(m.date) - t0) / (t1 - t0) * 100).toFixed(2) + '%', y: (Y(m.value) / H * 100).toFixed(2) + '%', fill: m.fill, ring: m.ring ? ', 0 0 0 3.5px ' + m.ring : '' }));
+    const hasZero = !!P.zero && lo < 0 && hi > 0;
+    const zeroPath = 'M0 ' + Y(0).toFixed(1) + ' L' + W + ' ' + Y(0).toFixed(1);
+    // overview strip: first visible series over the full range
+    const sv = vis.length ? (P.series || []).find((s) => s.key === vis[0].key).values : [];
+    let sl = Infinity, sh = -Infinity; sv.forEach((v) => { if (v != null) { sl = Math.min(sl, v); sh = Math.max(sh, v); } });
+    const TA = T[0], TB = T[n - 1] === TA ? TA + 1 : T[n - 1];
+    const allIdx = []; for (let i = 0; i < n; i++) allIdx.push(i);
+    let stripPath = '', o = false;
+    this.thin(allIdx, sv).forEach((i) => { const v = sv[i]; if (v == null) { o = false; return; } const x = ((T[i] - TA) / (TB - TA) * 1000).toFixed(1), y = (3 + (1 - (v - sl) / ((sh - sl) || 1)) * 28).toFixed(1); stripPath += (o ? ' L' : 'M') + x + ' ' + y; o = true; });
+    const win = { x: ((t0 - TA) / (TB - TA) * 100).toFixed(2) + '%', w: Math.max(1, (t1 - t0) / (TB - TA) * 100).toFixed(2) + '%' };
+    this._cache = { key, H, X, Y, T, t0, t1, z, n, view, vis, lines, areas, env, grid, bandEls, markerEls, hasZero, zeroPath, mode, lo, hi, stripPath, win, dates };
+    return this._cache;
+  }
+
+  idxAt(frac) {
+    const m = this.model(); const t = m.t0 + frac * (m.t1 - m.t0);
+    let best = m.z[0], bd = Infinity;
+    for (let i = m.z[0]; i <= m.z[1]; i++) { const d = Math.abs(m.T[i] - t); if (d < bd) { bd = d; best = i; } }
+    return best;
+  }
+
+  frac(e) { const r = e.currentTarget.getBoundingClientRect(); return Math.max(0, Math.min(1, (e.clientX - r.left) / (r.width || 1))); }
+
+  zoomTo(a, b) {
+    const n = (this.props.dates || []).length; a = Math.max(0, a); b = Math.min(n - 1, b);
+    if (b - a < 4) { const c = Math.round((a + b) / 2); a = Math.max(0, c - 2); b = Math.min(n - 1, c + 2); }
+    this.setState({ zoom: (a === 0 && b === n - 1) ? null : [a, b], hover: null, drag: null });
+  }
+
+  renderVals() {
+    const P = this.props, st = this.state || {};
+    const m = this.model();
+    const n = m.n, fmtKind = m.mode === 'pct' ? 'pct' : P.fmt;
+    const showTools = (P.series || []).length > 1 || !!P.compare;
+    const hidden = st.hidden || {};
+    const hv = st.hover != null && st.hover >= m.z[0] && st.hover <= m.z[1] ? st.hover : null;
+    const at = hv != null ? hv : m.z[1];
+    const chips = (P.series || []).map((s) => ({
+      label: s.label, color: s.color, pressed: hidden[s.key] ? 'false' : 'true',
+      value: this.fmt(m.view[s.key][at], fmtKind),
+      title: (hidden[s.key] ? 'Show ' : 'Hide ') + s.label,
+      toggle: () => {
+        const h = Object.assign({}, hidden); h[s.key] = !h[s.key];
+        if ((P.series || []).every((x) => h[x.key])) return;   // keep at least one line
+        this.setState({ hidden: h });
+      }
+    }));
+    let hover = { on: false };
+    if (hv != null) {
+      const f = (m.T[hv] - m.t0) / (m.t1 - m.t0);
+      const rows = m.vis.map((s) => ({ label: s.label, color: s.color, v: m.view[s.key][hv] })).filter((r) => r.v != null);
+      const mk = (P.markers || []).filter((x) => String(x.date).slice(0, 10) === String(m.dates[hv]).slice(0, 10)).map((x) => x.label).filter(Boolean);
+      if (P.envelope && m.mode === 'abs' && P.envelope.lo[hv] != null) rows.push({ label: P.envelope.label || 'Range', color: 'var(--glow)', v: null, text: this.fmt(P.envelope.lo[hv], P.fmt) + ' to ' + this.fmt(P.envelope.hi[hv], P.fmt) });
+      hover = {
+        on: true, x: (f * 100).toFixed(2) + '%',
+        // open toward the side with more room, and never wider than that room (keeps it on screen on phones)
+        pos: f > 0.5 ? 'right: calc(' + (100 - f * 100).toFixed(2) + '% + 12px); max-width: calc(' + (f * 100).toFixed(2) + '% - 12px)'
+                     : 'left: calc(' + (f * 100).toFixed(2) + '% + 12px); max-width: calc(' + (100 - f * 100).toFixed(2) + '% - 12px)',
+        date: this.fd(m.dates[hv]),
+        rows: rows.map((r) => ({ label: r.label, color: r.color, value: r.text || this.fmt(r.v, fmtKind) })),
+        dots: m.vis.filter((s) => m.view[s.key][hv] != null).map((s) => ({ color: s.color, y: (m.Y(m.view[s.key][hv]) / m.H * 100).toFixed(2) + '%' })),
+        hasNote: mk.length > 0, note: mk.join(' · ')
+      };
+    }
+    const dr = st.drag;
+    const drag = dr && Math.abs(dr.b - dr.a) > 0.004 ? { on: true, x: (Math.min(dr.a, dr.b) * 100).toFixed(2) + '%', w: (Math.abs(dr.b - dr.a) * 100).toFixed(2) + '%' } : { on: false };
+    const zoomed = !!(st.zoom && !(st.zoom[0] === 0 && st.zoom[1] === n - 1));
+    const midI = Math.round((m.z[0] + m.z[1]) / 2);
+    const revealId = 'lc-' + m.key.replace(/[^a-zA-Z0-9]/g, '').slice(-60);
+    const say = hover.on ? hover.date + ': ' + hover.rows.map((r) => r.label + ' ' + r.value).join(', ') : '';
+    return {
+      h: m.H, showTools, chips, compare: !!P.compare, absLabel: P.absLabel || 'Value',
+      modeAbs: m.mode === 'abs' ? 'true' : 'false', modePct: m.mode === 'pct' ? 'true' : 'false',
+      setAbs: () => this.setState({ mode: 'abs' }), setPct: () => this.setState({ mode: 'pct' }),
+      bandEls: m.bandEls, grid: m.grid, lines: m.lines, areas: m.areas.filter((a) => a.d), hasEnv: !!m.env, env: m.env,
+      hasZero: m.hasZero, zeroPath: m.zeroPath, markerEls: m.markerEls, hover, drag, revealId,
+      aria: (P.label || 'Chart') + ', ' + this.fd(m.dates[m.z[0]] || '') + ' to ' + this.fd(m.dates[m.z[1]] || ''),
+      hitLabel: (P.label || 'Chart') + '. Move across it to read values; drag to zoom; double-click to reset. Keys: arrows move, plus and minus zoom, 0 resets.',
+      say,
+      xStart: n ? this.fd(m.dates[m.z[0]]) : '', xMid: n ? this.fd(m.dates[midI]) : '', xEnd: n ? this.fd(m.dates[m.z[1]]) : '',
+      showStrip: n > 60, stripPath: m.stripPath, win: m.win,
+      stripLabel: 'Overview of the whole period. Click to move the zoom window there.',
+      zoomed, hint: zoomed ? 'Zoomed: drag again to zoom further, or reset.' : 'Drag across the chart to zoom in.' + (m.mode === 'pct' ? ' % change is measured from the first day in view.' : ''),
+      reset: () => this.setState({ zoom: null, hover: null, drag: null }),
+      jump: (e) => {
+        const r = e.currentTarget.getBoundingClientRect(); const f = (e.clientX - r.left) / (r.width || 1);
+        const T = m.T, t = T[0] + f * (T[n - 1] - T[0]);
+        let c = 0, bd = Infinity; T.forEach((x, i) => { const d = Math.abs(x - t); if (d < bd) { bd = d; c = i; } });
+        const half = Math.max(10, Math.round((m.z[1] - m.z[0]) / 2) || Math.round(n / 8));
+        this.zoomTo(c - half, c + half);
+      },
+      down: (e) => { if (e.pointerType === 'mouse' && e.button !== 0) return; try { e.currentTarget.setPointerCapture(e.pointerId); } catch (x) {} const f = this.frac(e); this.setState({ drag: { a: f, b: f }, hover: this.idxAt(f) }); },
+      move: (e) => {
+        const f = this.frac(e), d = (this.state || {}).drag;
+        if (d) this.setState({ drag: { a: d.a, b: f }, hover: this.idxAt(f) });
+        else this.setState({ hover: this.idxAt(f) });
+      },
+      up: (e) => {
+        const d = (this.state || {}).drag; if (!d) return;
+        if (Math.abs(d.b - d.a) > 0.025) { const a = this.idxAt(Math.min(d.a, d.b)), b = this.idxAt(Math.max(d.a, d.b)); this.zoomTo(a, b); }
+        else this.setState({ drag: null });
+      },
+      cancel: () => this.setState({ drag: null }),
+      leave: (e) => { if (e && e.pointerType === 'touch') return; if ((this.state || {}).drag) return; this.setState({ hover: null }); },
+      key: (e) => {
+        const s = this.state || {}; let i = s.hover != null ? s.hover : m.z[1];
+        const span = m.z[1] - m.z[0];
+        if (e.key === 'ArrowLeft') i -= 1; else if (e.key === 'ArrowRight') i += 1;
+        else if (e.key === 'PageUp') i -= 10; else if (e.key === 'PageDown') i += 10;
+        else if (e.key === 'Home') i = m.z[0]; else if (e.key === 'End') i = m.z[1];
+        else if (e.key === '+' || e.key === '=') { e.preventDefault(); const c = s.hover != null ? s.hover : Math.round((m.z[0] + m.z[1]) / 2); this.zoomTo(c - Math.round(span / 4), c + Math.round(span / 4)); return; }
+        else if (e.key === '-' || e.key === '_') { e.preventDefault(); const c = Math.round((m.z[0] + m.z[1]) / 2); this.zoomTo(c - span, c + span); return; }
+        else if (e.key === '0') { e.preventDefault(); this.setState({ zoom: null }); return; }
+        else if (e.key === 'Escape') { this.setState({ hover: null, drag: null }); return; }
+        else return;
+        e.preventDefault();
+        this.setState({ hover: Math.max(m.z[0], Math.min(m.z[1], i)) });
+      }
+    };
+  }
+}
+</script>
+</body>
+</html>

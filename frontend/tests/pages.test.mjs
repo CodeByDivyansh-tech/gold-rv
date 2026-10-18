@@ -3,6 +3,7 @@
 import { readFileSync } from 'node:fs'
 import assert from 'node:assert/strict'
 
+globalThis.window = globalThis; new Function(readFileSync('public/app/theme.js', 'utf8'))()   // shared themes, as in the browser
 const D = JSON.parse(readFileSync('public/data/site-data.json', 'utf8'))
 const R = JSON.parse(readFileSync('public/data/robustness.json', 'utf8'))
 const H = JSON.parse(readFileSync('public/data/history.json', 'utf8'))

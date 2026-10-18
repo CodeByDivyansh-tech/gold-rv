@@ -13,14 +13,14 @@
 <style>
 body{margin:0}
 a{color:inherit}a:hover{color:inherit}
-button:focus-visible,a:focus-visible,input:focus-visible{outline:2px solid #F2A93B;outline-offset:2px}
+button:focus-visible,a:focus-visible,input:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
 .rail{display:flex}.phonebar{display:none}.tabbar{display:none}.headmeta{display:flex}.wide{display:block}.cards{display:none}
 .scrub{position:absolute;inset:0;width:100%;height:100%;background:transparent;border:0;padding:0;margin:0;cursor:crosshair;touch-action:pan-y;border-radius:8px}
 .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 @media (max-width: 899px){.rail{display:none}.phonebar{display:flex}.tabbar{display:flex}.headmeta{display:none}.wide{display:none}.cards{display:flex}.pagepad{padding-bottom:104px !important}}
 </style>
 </helmet>
-<div style="--bg: {{t.bg}}; --panel: {{t.panel}}; --raised: {{t.raised}}; --line: {{t.line}}; --fg: {{t.fg}}; --muted: {{t.muted}}; --gold: {{t.gold}}; --glow: {{t.glow}}; --ongold: {{t.ongold}}; --up: {{t.up}}; --down: {{t.down}}; background: var(--bg); color: var(--fg); font-family: 'Geist', 'Segoe UI', system-ui, sans-serif; min-height: 100vh; display: flex; align-items: stretch">
+<div style="--bg: {{t.bg}}; --panel: {{t.panel}}; --raised: {{t.raised}}; --line: {{t.line}}; --fg: {{t.fg}}; --muted: {{t.muted}}; --gold: {{t.gold}}; --glow: {{t.glow}}; --ongold: {{t.ongold}}; --up: {{t.up}}; --down: {{t.down}}; --c1: {{t.c1}}; --c2: {{t.c2}}; --c3: {{t.c3}}; --c4: {{t.c4}}; --area: {{t.area}}; --hover: {{t.hover}}; background: var(--bg); color: var(--fg); font-family: 'Geist', 'Segoe UI', system-ui, sans-serif; min-height: 100vh; display: flex; align-items: stretch">
 
   <dc-import name="Rail" current="Home"></dc-import>
 
@@ -36,14 +36,14 @@ button:focus-visible,a:focus-visible,input:focus-visible{outline:2px solid #F2A9
         <sc-if value="{{dark}}" hint-placeholder-val="{{ true }}"><svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true" style="fill: none; stroke: currentColor; stroke-width: 1.8px; stroke-linecap: round"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"></path></svg></sc-if>
         <sc-if value="{{light}}" hint-placeholder-val="{{ false }}"><svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true" style="fill: none; stroke: currentColor; stroke-width: 1.8px; stroke-linejoin: round"><path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"></path></svg></sc-if>
       </button>
-      <button type="button" class="grv-tool pbtn" data-grv="words" aria-haspopup="dialog" aria-label="Words explained" data-label="Words explained (?)" style="width: 44px; height: 44px; flex: none; border-radius: 12px; border: 1px solid var(--line); background: var(--raised); color: var(--fg); display: grid; place-items: center; cursor: pointer; padding: 0"><span aria-hidden="true" style="display: grid; place-items: center; width: 22px; height: 22px; border-radius: 50%; background: #F2A93B; color: #1A1204; font: 700 14px 'Geist', system-ui, sans-serif">?</span></button>
+      <button type="button" class="grv-tool pbtn" data-grv="words" aria-haspopup="dialog" aria-label="Words explained" data-label="Words explained (?)" style="width: 44px; height: 44px; flex: none; border-radius: 12px; border: 1px solid var(--line); background: var(--raised); color: var(--fg); display: grid; place-items: center; cursor: pointer; padding: 0"><span aria-hidden="true" style="display: grid; place-items: center; width: 22px; height: 22px; border-radius: 50%; background: var(--gold); color: var(--ongold); font: 700 14px 'Geist', system-ui, sans-serif">?</span></button>
     </div>
 
     <main class="pagepad" style="flex: 1 1 auto; box-sizing: border-box; width: 100%; max-width: 1240px; margin: 0 auto; padding: 32px clamp(16px, 4vw, 48px) 48px; display: flex; flex-direction: column; gap: 32px">
 
       <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-start; gap: 20px">
         <div style="display: flex; flex-direction: column; gap: 14px; max-width: 680px">
-          <h1 style="margin: 0; font-size: clamp(34px, 5vw, 56px); font-weight: 600; letter-spacing: -0.03em; line-height: 1.02">Same gold.<br>Four prices.</h1>
+          <h1 class="grv-foil" style="margin: 0; font-size: clamp(34px, 5vw, 56px); font-weight: 600; letter-spacing: -0.03em; line-height: 1.02">Same gold.<br>Four prices.</h1>
           <p style="margin: 0; font-size: 17px; line-height: 1.55; color: var(--muted); max-width: 56ch">MCX trades gold in four contract sizes. We price each one per 10 g of pure gold, then test whether the gaps between them are worth trading.</p>
         </div>
         <div class="headmeta" style="align-items: center; gap: 12px">
@@ -54,7 +54,7 @@ button:focus-visible,a:focus-visible,input:focus-visible{outline:2px solid #F2A9
             <sc-if value="{{dark}}" hint-placeholder-val="{{ true }}"><svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true" style="fill: none; stroke: currentColor; stroke-width: 1.8px; stroke-linecap: round"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"></path></svg></sc-if>
             <sc-if value="{{light}}" hint-placeholder-val="{{ false }}"><svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true" style="fill: none; stroke: currentColor; stroke-width: 1.8px; stroke-linejoin: round"><path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"></path></svg></sc-if>
           </button>
-          <button type="button" class="grv-tool" data-grv="words" aria-haspopup="dialog" aria-label="Words explained" data-label="Words explained (?)" style="width: 44px; height: 44px; border-radius: 12px; border: 1px solid var(--line); background: var(--panel); color: var(--fg); display: grid; place-items: center; cursor: pointer; padding: 0"><span aria-hidden="true" style="display: grid; place-items: center; width: 22px; height: 22px; border-radius: 50%; background: #F2A93B; color: #1A1204; font: 700 14px 'Geist', system-ui, sans-serif">?</span></button>
+          <button type="button" class="grv-tool" data-grv="words" aria-haspopup="dialog" aria-label="Words explained" data-label="Words explained (?)" style="width: 44px; height: 44px; border-radius: 12px; border: 1px solid var(--line); background: var(--panel); color: var(--fg); display: grid; place-items: center; cursor: pointer; padding: 0"><span aria-hidden="true" style="display: grid; place-items: center; width: 22px; height: 22px; border-radius: 50%; background: var(--gold); color: var(--ongold); font: 700 14px 'Geist', system-ui, sans-serif">?</span></button>
         </div>
       </div>
 
@@ -63,15 +63,15 @@ button:focus-visible,a:focus-visible,input:focus-visible{outline:2px solid #F2A9
       </sc-if>
 
       <sc-if value="{{failed}}" hint-placeholder-val="{{ false }}">
-        <div role="alert" style="background: var(--panel); border: 1px solid var(--down); border-radius: 16px; padding: 18px 20px; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px"><span style="display: flex; flex-direction: column; gap: 4px"><span style="font-weight: 600; font-size: 16px">The data didn't load</span><span style="font-size: 14px; color: var(--muted)">Check your internet connection, then try again.</span></span><button type="button" onClick="{{retry}}" style="min-height: 44px; padding: 0 16px; border-radius: 12px; border: 0; background: var(--gold); color: var(--ongold); font: 600 14px 'Geist', system-ui, sans-serif; cursor: pointer">Try again</button></div>
+        <div role="alert" style="background: var(--panel); border: 1px solid var(--down); border-radius: 16px; padding: 18px 20px; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px"><span style="display: flex; flex-direction: column; gap: 4px"><span style="font-weight: 600; font-size: 16px">The data didn't load</span><span style="font-size: 14px; color: var(--muted)">Check your internet connection, then try again.</span></span><button class="grv-goldbtn" type="button" onClick="{{retry}}" style="min-height: 44px; padding: 0 16px; border-radius: 12px; border: 0; background: var(--gold); color: var(--ongold); font: 600 14px 'Geist', system-ui, sans-serif; cursor: pointer">Try again</button></div>
       </sc-if>
       <sc-if value="{{ready}}" hint-placeholder-val="{{ true }}">
         <section aria-label="Contract prices" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(240px, 100%), 1fr)); gap: 14px">
           <sc-for list="{{quotes}}" as="q" hint-placeholder-count="4">
-            <article style="background: var(--panel); border: 1px solid var(--line); border-radius: 18px; padding: 20px 20px 16px; display: flex; flex-direction: column; gap: 10px">
-              <div style="display: flex; justify-content: space-between; align-items: baseline; gap: 8px">
+            <article class="grv-card" style="background: var(--panel); border: 1px solid var(--line); border-radius: 18px; padding: 20px 20px 16px; display: flex; flex-direction: column; gap: 10px">
+              <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 2px 8px">
                 <span style="font-weight: 600; font-size: 16px">{{q.sym}}</span>
-                <span style="font-size: 12px; color: var(--muted)">{{q.name}} · {{q.lot}} lot</span>
+                <span style="font-size: 12px; color: var(--muted); white-space: nowrap">{{q.name}} · {{q.lot}} lot</span>
               </div>
               <div style="display: flex; align-items: baseline; gap: 6px; flex-wrap: wrap">
                 <span style="font-family: 'Geist Mono', ui-monospace, monospace; font-size: 28px; font-weight: 600; letter-spacing: -0.02em">{{q.price}}</span>
@@ -90,7 +90,7 @@ button:focus-visible,a:focus-visible,input:focus-visible{outline:2px solid #F2A9
           </sc-for>
         </section>
 
-        <section aria-labelledby="answer-h" style="background: var(--panel); border: 1px solid var(--line); border-radius: 20px; padding: clamp(20px, 3vw, 32px); display: grid; grid-template-columns: repeat(auto-fit, minmax(min(380px, 100%), 1fr)); gap: 28px; align-items: center">
+        <section class="grv-card" aria-labelledby="answer-h" style="background: var(--panel); border: 1px solid var(--line); border-radius: 20px; padding: clamp(20px, 3vw, 32px); display: grid; grid-template-columns: repeat(auto-fit, minmax(min(380px, 100%), 1fr)); gap: 28px; align-items: center">
           <div style="display: flex; flex-direction: column; gap: 12px">
             <h2 id="answer-h" style="margin: 0; font-size: 17px; font-weight: 500; color: var(--muted)">Is any gap between them worth trading today?</h2>
             <p style="margin: 0; font-size: 48px; font-weight: 600; letter-spacing: -0.03em; line-height: 1; color: {{answer.color}}">{{answer.word}}</p>
@@ -114,7 +114,7 @@ button:focus-visible,a:focus-visible,input:focus-visible{outline:2px solid #F2A9
           </div>
         </section>
 
-        <section aria-labelledby="chart-h" style="background: var(--panel); border: 1px solid var(--line); border-radius: 20px; padding: clamp(18px, 2.5vw, 26px); display: flex; flex-direction: column; gap: 16px">
+        <section class="grv-card" aria-labelledby="chart-h" style="background: var(--panel); border: 1px solid var(--line); border-radius: 20px; padding: clamp(18px, 2.5vw, 26px); display: flex; flex-direction: column; gap: 16px">
           <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-end; gap: 14px">
             <div style="display: flex; flex-direction: column; gap: 6px">
               <h2 id="chart-h" style="margin: 0; font-size: 16px; font-weight: 600">Gold price, per 10 g of pure gold</h2>
@@ -130,27 +130,7 @@ button:focus-visible,a:focus-visible,input:focus-visible{outline:2px solid #F2A9
               </sc-for>
             </div>
           </div>
-          <div style="position: relative; height: 280px">
-            <svg viewBox="0 0 1000 280" preserveAspectRatio="none" role="img" aria-label="{{chart.aria}}" style="position: absolute; inset: 0; width: 100%; height: 100%; display: block; overflow: visible">
-              <path d="{{chart.area}}" style="fill: var(--gold); opacity: 0.10"></path>
-              <path d="{{chart.line}}" style="fill: none; stroke: var(--gold); stroke-width: 2.25px; vector-effect: non-scaling-stroke; stroke-linejoin: round"></path>
-            </svg>
-            <sc-if value="{{hover.on}}" hint-placeholder-val="{{ false }}">
-              <div style="position: absolute; top: 0; bottom: 0; left: {{hover.x}}; width: 1px; background: var(--muted); opacity: 0.6; pointer-events: none"></div>
-              <div style="position: absolute; top: {{hover.y}}; left: {{hover.x}}; width: 10px; height: 10px; margin: -5px 0 0 -5px; border-radius: 50%; background: var(--gold); box-shadow: 0 0 0 3px var(--panel); pointer-events: none"></div>
-              <div style="position: absolute; top: 8px; left: {{hover.x}}; transform: {{hover.shift}}; background: var(--raised); border: 1px solid var(--line); border-radius: 10px; padding: 8px 10px; font-size: 12px; white-space: nowrap; pointer-events: none; display: flex; flex-direction: column; gap: 2px">
-                <span style="color: var(--muted)">{{hover.date}}</span>
-                <span style="font-family: 'Geist Mono', ui-monospace, monospace; font-weight: 600; font-size: 14px">{{hover.value}}</span>
-              </div>
-            </sc-if>
-            <button type="button" class="scrub" aria-label="{{chart.scrubLabel}}" onPointerMove="{{chart.move}}" onPointerDown="{{chart.move}}" onPointerLeave="{{chart.leave}}" onKeyDown="{{chart.key}}"></button>
-            <span class="sr" aria-live="polite">{{hover.say}}</span>
-          </div>
-          <div style="display: flex; justify-content: space-between; gap: 8px; font-size: 12px; color: var(--muted); font-family: 'Geist Mono', ui-monospace, monospace">
-            <span>{{chart.start}}</span>
-            <span>Low {{chart.low}} · High {{chart.high}}</span>
-            <span>{{chart.end}}</span>
-          </div>
+          <dc-import name="LineChart" dates="{{chart.dates}}" series="{{chart.series}}" fmt="rs" height="280" label="{{chart.aria}}" hint-size="100%,400px"></dc-import>
           <sc-if value="{{chart.hasNote}}" hint-placeholder-val="{{ false }}">
             <p style="margin: 0; font-size: 12px; line-height: 1.5; color: var(--muted)">{{chart.note}}</p>
           </sc-if>
@@ -215,9 +195,10 @@ class Component extends DCLogic {
   }
 
   tokens(dark) {
-    return dark
-      ? { bg: '#070D14', panel: '#0F1822', raised: '#18232F', line: '#1E2B38', fg: '#EAF0F6', muted: '#93A3B4', gold: '#F2A93B', glow: 'rgba(242,169,59,0.12)', ongold: '#1A1204', up: '#4FD1A1', down: '#FF8F85' }
-      : { bg: '#F3F5F8', panel: '#FFFFFF', raised: '#E9EDF2', line: '#DCE2E9', fg: '#0C1622', muted: '#55636F', gold: '#975600', glow: 'rgba(151,86,0,0.10)', ongold: '#FFFFFF', up: '#0B7A55', down: '#B42318' };
+    // shared gold-tinted themes (app/theme.js); also puts the tokens on <html> for the overlays
+    if (typeof GRVTheme === 'undefined') return {};
+    GRVTheme.apply(dark);
+    return GRVTheme.tokens(dark);
   }
 
   inr(n) { return (n < 0 ? '−' : '') + '₹' + Math.abs(Math.round(n)).toLocaleString('en-IN'); }
@@ -265,13 +246,13 @@ class Component extends DCLogic {
     let pts, period, longNote = '';
     if (range === '1M') { pts = all.slice(-21); period = 'in the last month'; }
     else if (range === '3M') { pts = all.slice(-63); period = 'in the last 3 months'; }
-    else if (range === '1Y') { pts = all.slice(-252).filter((p, i, a) => (a.length - 1 - i) % 2 === 0); period = 'in the last year'; }
-    else if (range === '3Y') { pts = all.filter((p, i, a) => (a.length - 1 - i) % 5 === 0); period = 'since ' + this.fd(all[0][0]).replace(/^\d+ /, ''); }
+    else if (range === '1Y') { pts = all.slice(-252); period = 'in the last year'; }
+    else if (range === '3Y') { pts = all; period = 'since ' + this.fd(all[0][0]).replace(/^\d+ /, ''); }
     else {
       // 10Y and All: weekly GOLDM prices from the shared data book before our own data, then our own (weekly)
       const cut = range === '10Y' ? (+D.asOf.slice(0, 4) - 10) + D.asOf.slice(4) : '0000';
       const old = LG.d.map((d, i) => [d, LG.GOLDM[i]]).filter((p) => p[1] != null && p[0] >= cut);
-      pts = old.concat(all.filter((p, i, a) => (a.length - 1 - i) % 5 === 0));
+      pts = old.concat(all);
       period = range === '10Y' ? 'in the last 10 years' : 'since ' + this.fd(pts[0][0]).replace(/^\d+ /, '');
       longNote = 'Weekly prices before ' + this.fd(D.start) + ' come from the Parity team\'s data book (official MCX Bhavcopy); from ' + this.fd(D.start) + ' on, our own MCX download.';
     }
@@ -286,6 +267,7 @@ class Component extends DCLogic {
       say: this.fd(pts[hi][0]) + ': ' + this.inr(pts[hi][1]) + ' per 10 g of pure gold'
     } : { on: false, say: '' };
     const chart = {
+      dates: pts.map((p) => p[0]), series: [{ key: 'GOLDM', label: 'GOLDM, per 10 g pure', color: 'var(--gold)', values: vals, width: 2.25, area: true }],
       line: g.line, area: g.area, last: this.inr(vals[vals.length - 1]),
       high: this.inr(g.hi), low: this.inr(g.lo), start: this.fd(pts[0][0]), end: this.fd(pts[pts.length - 1][0]),
       changeText: (ch >= 0 ? '+' : '−') + Math.abs(ch).toFixed(Math.abs(ch) >= 100 ? 0 : 1) + '%', changeColor: ch >= 0 ? 'var(--up)' : 'var(--down)', period,

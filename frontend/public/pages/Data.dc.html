@@ -13,14 +13,14 @@
 <style>
 body{margin:0}
 a{color:inherit}a:hover{color:inherit}
-button:focus-visible,a:focus-visible,input:focus-visible{outline:2px solid #F2A93B;outline-offset:2px}
+button:focus-visible,a:focus-visible,input:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
 .rail{display:flex}.phonebar{display:none}.tabbar{display:none}.headmeta{display:flex}.wide{display:block}.cards{display:none}
 .scrub{position:absolute;inset:0;width:100%;height:100%;background:transparent;border:0;padding:0;margin:0;cursor:crosshair;touch-action:pan-y;border-radius:8px}
 .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 @media (max-width: 899px){.rail{display:none}.phonebar{display:flex}.tabbar{display:flex}.headmeta{display:none}.wide{display:none}.cards{display:flex}.pagepad{padding-bottom:104px !important}}
 </style>
 </helmet>
-<div style="--bg: {{t.bg}}; --panel: {{t.panel}}; --raised: {{t.raised}}; --line: {{t.line}}; --fg: {{t.fg}}; --muted: {{t.muted}}; --gold: {{t.gold}}; --glow: {{t.glow}}; --ongold: {{t.ongold}}; --up: {{t.up}}; --down: {{t.down}}; background: var(--bg); color: var(--fg); font-family: 'Geist', 'Segoe UI', system-ui, sans-serif; min-height: 100vh; display: flex; align-items: stretch">
+<div style="--bg: {{t.bg}}; --panel: {{t.panel}}; --raised: {{t.raised}}; --line: {{t.line}}; --fg: {{t.fg}}; --muted: {{t.muted}}; --gold: {{t.gold}}; --glow: {{t.glow}}; --ongold: {{t.ongold}}; --up: {{t.up}}; --down: {{t.down}}; --c1: {{t.c1}}; --c2: {{t.c2}}; --c3: {{t.c3}}; --c4: {{t.c4}}; --area: {{t.area}}; --hover: {{t.hover}}; background: var(--bg); color: var(--fg); font-family: 'Geist', 'Segoe UI', system-ui, sans-serif; min-height: 100vh; display: flex; align-items: stretch">
 
   <dc-import name="Rail" current="Data"></dc-import>
 
@@ -36,14 +36,14 @@ button:focus-visible,a:focus-visible,input:focus-visible{outline:2px solid #F2A9
         <sc-if value="{{dark}}" hint-placeholder-val="{{ true }}"><svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true" style="fill: none; stroke: currentColor; stroke-width: 1.8px; stroke-linecap: round"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"></path></svg></sc-if>
         <sc-if value="{{light}}" hint-placeholder-val="{{ false }}"><svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true" style="fill: none; stroke: currentColor; stroke-width: 1.8px; stroke-linejoin: round"><path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"></path></svg></sc-if>
       </button>
-      <button type="button" class="grv-tool pbtn" data-grv="words" aria-haspopup="dialog" aria-label="Words explained" data-label="Words explained (?)" style="width: 44px; height: 44px; flex: none; border-radius: 12px; border: 1px solid var(--line); background: var(--raised); color: var(--fg); display: grid; place-items: center; cursor: pointer; padding: 0"><span aria-hidden="true" style="display: grid; place-items: center; width: 22px; height: 22px; border-radius: 50%; background: #F2A93B; color: #1A1204; font: 700 14px 'Geist', system-ui, sans-serif">?</span></button>
+      <button type="button" class="grv-tool pbtn" data-grv="words" aria-haspopup="dialog" aria-label="Words explained" data-label="Words explained (?)" style="width: 44px; height: 44px; flex: none; border-radius: 12px; border: 1px solid var(--line); background: var(--raised); color: var(--fg); display: grid; place-items: center; cursor: pointer; padding: 0"><span aria-hidden="true" style="display: grid; place-items: center; width: 22px; height: 22px; border-radius: 50%; background: var(--gold); color: var(--ongold); font: 700 14px 'Geist', system-ui, sans-serif">?</span></button>
     </div>
 
     <main class="pagepad" style="flex: 1 1 auto; box-sizing: border-box; width: 100%; max-width: 1240px; margin: 0 auto; padding: 32px clamp(16px, 4vw, 48px) 48px; display: flex; flex-direction: column; gap: 28px">
 
       <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-start; gap: 20px">
         <div style="display: flex; flex-direction: column; gap: 12px; max-width: 720px">
-          <h1 style="margin: 0; font-size: clamp(30px, 4vw, 44px); font-weight: 600; letter-spacing: -0.03em; line-height: 1.05">Where the numbers come from</h1>
+          <h1 class="grv-foil" style="margin: 0; font-size: clamp(30px, 4vw, 44px); font-weight: 600; letter-spacing: -0.03em; line-height: 1.05">Where the numbers come from</h1>
           <p style="margin: 0; font-size: 16px; line-height: 1.6; color: var(--muted); max-width: 62ch">Every price on this site is an official MCX end-of-day settlement from the Bhavcopy. Here is what we collected, how we checked it, and what it cannot tell you.</p>
         </div>
         <div class="headmeta" style="align-items: center; gap: 12px">
@@ -54,7 +54,7 @@ button:focus-visible,a:focus-visible,input:focus-visible{outline:2px solid #F2A9
             <sc-if value="{{dark}}" hint-placeholder-val="{{ true }}"><svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true" style="fill: none; stroke: currentColor; stroke-width: 1.8px; stroke-linecap: round"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"></path></svg></sc-if>
             <sc-if value="{{light}}" hint-placeholder-val="{{ false }}"><svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true" style="fill: none; stroke: currentColor; stroke-width: 1.8px; stroke-linejoin: round"><path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"></path></svg></sc-if>
           </button>
-          <button type="button" class="grv-tool" data-grv="words" aria-haspopup="dialog" aria-label="Words explained" data-label="Words explained (?)" style="width: 44px; height: 44px; border-radius: 12px; border: 1px solid var(--line); background: var(--panel); color: var(--fg); display: grid; place-items: center; cursor: pointer; padding: 0"><span aria-hidden="true" style="display: grid; place-items: center; width: 22px; height: 22px; border-radius: 50%; background: #F2A93B; color: #1A1204; font: 700 14px 'Geist', system-ui, sans-serif">?</span></button>
+          <button type="button" class="grv-tool" data-grv="words" aria-haspopup="dialog" aria-label="Words explained" data-label="Words explained (?)" style="width: 44px; height: 44px; border-radius: 12px; border: 1px solid var(--line); background: var(--panel); color: var(--fg); display: grid; place-items: center; cursor: pointer; padding: 0"><span aria-hidden="true" style="display: grid; place-items: center; width: 22px; height: 22px; border-radius: 50%; background: var(--gold); color: var(--ongold); font: 700 14px 'Geist', system-ui, sans-serif">?</span></button>
         </div>
       </div>
 
@@ -63,12 +63,12 @@ button:focus-visible,a:focus-visible,input:focus-visible{outline:2px solid #F2A9
       </sc-if>
 
       <sc-if value="{{failed}}" hint-placeholder-val="{{ false }}">
-        <div role="alert" style="background: var(--panel); border: 1px solid var(--down); border-radius: 16px; padding: 18px 20px; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px"><span style="display: flex; flex-direction: column; gap: 4px"><span style="font-weight: 600; font-size: 16px">The data didn't load</span><span style="font-size: 14px; color: var(--muted)">Check your internet connection, then try again.</span></span><button type="button" onClick="{{retry}}" style="min-height: 44px; padding: 0 16px; border-radius: 12px; border: 0; background: var(--gold); color: var(--ongold); font: 600 14px 'Geist', system-ui, sans-serif; cursor: pointer">Try again</button></div>
+        <div role="alert" style="background: var(--panel); border: 1px solid var(--down); border-radius: 16px; padding: 18px 20px; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px"><span style="display: flex; flex-direction: column; gap: 4px"><span style="font-weight: 600; font-size: 16px">The data didn't load</span><span style="font-size: 14px; color: var(--muted)">Check your internet connection, then try again.</span></span><button class="grv-goldbtn" type="button" onClick="{{retry}}" style="min-height: 44px; padding: 0 16px; border-radius: 12px; border: 0; background: var(--gold); color: var(--ongold); font: 600 14px 'Geist', system-ui, sans-serif; cursor: pointer">Try again</button></div>
       </sc-if>
       <sc-if value="{{ready}}" hint-placeholder-val="{{ true }}">
         <section aria-label="Dataset in numbers" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(220px, 100%), 1fr)); gap: 14px">
           <sc-for list="{{big}}" as="b" hint-placeholder-count="4">
-            <div style="background: var(--panel); border: 1px solid var(--line); border-radius: 18px; padding: 20px; display: flex; flex-direction: column; gap: 6px">
+            <div class="grv-card" style="background: var(--panel); border: 1px solid var(--line); border-radius: 18px; padding: 20px; display: flex; flex-direction: column; gap: 6px">
               <span style="font-family: 'Geist Mono', ui-monospace, monospace; font-size: 36px; font-weight: 600; letter-spacing: -0.03em; color: {{b.color}}">{{b.value}}</span>
               <span style="font-size: 15px; font-weight: 600">{{b.label}}</span>
               <span style="font-size: 13px; color: var(--muted); line-height: 1.5">{{b.note}}</span>
@@ -89,7 +89,7 @@ button:focus-visible,a:focus-visible,input:focus-visible{outline:2px solid #F2A9
         </section>
 
         <sc-if value="{{hx.show}}" hint-placeholder-val="{{ true }}">
-        <section aria-labelledby="hx-h" style="background: var(--panel); border: 1px solid var(--line); border-radius: 20px; padding: clamp(18px, 2.5vw, 26px); display: flex; flex-direction: column; gap: 14px">
+        <section class="grv-card" aria-labelledby="hx-h" style="background: var(--panel); border: 1px solid var(--line); border-radius: 20px; padding: clamp(18px, 2.5vw, 26px); display: flex; flex-direction: column; gap: 14px">
           <div style="display: flex; flex-direction: column; gap: 4px">
             <h2 id="hx-h" style="margin: 0; font-size: 18px; font-weight: 600">More history, shared by the Parity team</h2>
             <span style="font-size: 13px; color: var(--muted); line-height: 1.6; max-width: 82ch">{{hx.intro}}</span>
@@ -106,7 +106,7 @@ button:focus-visible,a:focus-visible,input:focus-visible{outline:2px solid #F2A9
         </section>
         </sc-if>
 
-        <section aria-labelledby="pipe-h" style="background: var(--panel); border: 1px solid var(--line); border-radius: 20px; padding: clamp(18px, 2.5vw, 26px); display: flex; flex-direction: column; gap: 16px">
+        <section class="grv-card" aria-labelledby="pipe-h" style="background: var(--panel); border: 1px solid var(--line); border-radius: 20px; padding: clamp(18px, 2.5vw, 26px); display: flex; flex-direction: column; gap: 16px">
           <div style="display: flex; flex-direction: column; gap: 4px">
             <h2 id="pipe-h" style="margin: 0; font-size: 18px; font-weight: 600">From raw files to this website, in eight steps</h2>
             <span style="font-size: 13px; color: var(--muted)">A Python pipeline runs these in order and writes the results as static files. There is no server.</span>
@@ -122,7 +122,7 @@ button:focus-visible,a:focus-visible,input:focus-visible{outline:2px solid #F2A9
         </section>
 
         <div style="display: flex; flex-wrap: wrap; gap: 14px; align-items: stretch">
-          <section aria-labelledby="pit-h" style="flex: 1 1 360px; background: var(--panel); border: 1px solid var(--line); border-radius: 20px; padding: 22px; display: flex; flex-direction: column; gap: 12px">
+          <section class="grv-card" aria-labelledby="pit-h" style="flex: 1 1 360px; background: var(--panel); border: 1px solid var(--line); border-radius: 20px; padding: 22px; display: flex; flex-direction: column; gap: 12px">
             <h2 id="pit-h" style="margin: 0; font-size: 16px; font-weight: 600">How we avoid peeking at the future</h2>
             <ul style="margin: 0; padding: 0 0 0 18px; display: flex; flex-direction: column; gap: 8px; font-size: 14px; line-height: 1.55">
               <sc-for list="{{rules}}" as="r" hint-placeholder-count="5">
@@ -130,7 +130,7 @@ button:focus-visible,a:focus-visible,input:focus-visible{outline:2px solid #F2A9
               </sc-for>
             </ul>
           </section>
-          <section aria-labelledby="lim-h" style="flex: 1 1 360px; background: var(--panel); border: 1px solid var(--line); border-radius: 20px; padding: 22px; display: flex; flex-direction: column; gap: 12px">
+          <section class="grv-card" aria-labelledby="lim-h" style="flex: 1 1 360px; background: var(--panel); border: 1px solid var(--line); border-radius: 20px; padding: 22px; display: flex; flex-direction: column; gap: 12px">
             <h2 id="lim-h" style="margin: 0; font-size: 16px; font-weight: 600">What this data cannot tell you</h2>
             <ul style="margin: 0; padding: 0 0 0 18px; display: flex; flex-direction: column; gap: 8px; font-size: 14px; line-height: 1.55; color: var(--muted)">
               <sc-for list="{{limits}}" as="l" hint-placeholder-count="7">
@@ -144,7 +144,7 @@ button:focus-visible,a:focus-visible,input:focus-visible{outline:2px solid #F2A9
           <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 8px">
             <div style="display: flex; flex-direction: column; gap: 4px">
               <h2 id="log-h" style="margin: 0; font-size: 18px; font-weight: 600">Download log</h2>
-              <span style="font-size: 13px; color: var(--muted)">One request per contract and expiry, {{logCount}} in total. Every row can be traced back to its request.</span>
+              <span style="font-size: 13px; color: var(--muted)">One request per contract and expiry, {{logCount}} in total. Every row can be traced back to its request. The contracts filled from the Parity data book are not in this log; their rows are in the supplement file.</span>
             </div>
             <button type="button" onClick="{{toggleLog}}" aria-expanded="{{logExpanded}}" style="min-height: 44px; padding: 0 16px; border-radius: 12px; border: 1px solid var(--line); background: var(--panel); color: var(--fg); font: 600 14px 'Geist', system-ui, sans-serif; cursor: pointer">{{logButton}}</button>
           </div>
@@ -183,12 +183,12 @@ button:focus-visible,a:focus-visible,input:focus-visible{outline:2px solid #F2A9
           </div>
         </section>
 
-        <section style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px; background: var(--panel); border: 1px solid var(--line); border-radius: 20px; padding: 22px">
+        <section class="grv-card" style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px; background: var(--panel); border: 1px solid var(--line); border-radius: 20px; padding: 22px">
           <div style="display: flex; flex-direction: column; gap: 4px; max-width: 60ch">
             <span style="font-weight: 600; font-size: 16px">Check it yourself</span>
             <span style="font-size: 14px; color: var(--muted); line-height: 1.55">The cleaned dataset, the download log and the full pipeline are public. Running it again reproduces every number on this site.</span>
           </div>
-          <a href="https://github.com/CodeByDivyansh-tech/gold-rv" style="text-decoration: none; min-height: 44px; display: flex; align-items: center; padding: 0 18px; border-radius: 12px; background: var(--gold); color: var(--ongold); font-weight: 600; font-size: 14px">Data and code on GitHub</a>
+          <a class="grv-goldbtn" href="https://github.com/CodeByDivyansh-tech/gold-rv" style="text-decoration: none; min-height: 44px; display: flex; align-items: center; padding: 0 18px; border-radius: 12px; background: var(--gold); color: var(--ongold); font-weight: 600; font-size: 14px">Data and code on GitHub</a>
         </section>
       </sc-if>
     </main>
@@ -223,9 +223,10 @@ class Component extends DCLogic {
   }
 
   tokens(dark) {
-    return dark
-      ? { bg: '#070D14', panel: '#0F1822', raised: '#18232F', line: '#1E2B38', fg: '#EAF0F6', muted: '#93A3B4', gold: '#F2A93B', glow: 'rgba(242,169,59,0.12)', ongold: '#1A1204', up: '#4FD1A1', down: '#FF8F85' }
-      : { bg: '#F3F5F8', panel: '#FFFFFF', raised: '#E9EDF2', line: '#DCE2E9', fg: '#0C1622', muted: '#55636F', gold: '#975600', glow: 'rgba(151,86,0,0.10)', ongold: '#FFFFFF', up: '#0B7A55', down: '#B42318' };
+    // shared gold-tinted themes (app/theme.js); also puts the tokens on <html> for the overlays
+    if (typeof GRVTheme === 'undefined') return {};
+    GRVTheme.apply(dark);
+    return GRVTheme.tokens(dark);
   }
 
   fd(s) { const M = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']; const p = s.split('-'); return (+p[2]) + ' ' + M[+p[1] - 1] + ' ' + p[0]; }
@@ -277,7 +278,7 @@ class Component extends DCLogic {
     const HX = st.H;
     let hx = { show: false, facts: [], intro: '', note: '' };
     if (HX && HX.source && HX.check) {
-      const cv = HX.source.coverage || {}, k = HX.check;
+      const cv = HX.source.coverage || {}, k = HX.check, SUP = (D.meta.supplement && D.meta.supplement.missing_contracts) ? D.meta.supplement : { missing_contracts: [], extra_days: [] };
       const since = ['GOLDM', 'GOLDGUINEA', 'GOLDPETAL', 'GOLDTEN'].filter((x) => cv[x]).map((x) => x + ' from ' + this.fd(cv[x].first).replace(/^\d+ /, '')).join(', ');
       hx = {
         show: true,
@@ -286,9 +287,9 @@ class Component extends DCLogic {
           { value: n(HX.source.rows), label: 'extra daily settlements', note: since + '.', color: 'var(--fg)' },
           { value: n(HX.source.contracts), label: 'contracts in the book', note: 'Each contract listed under its own expiry, exactly as MCX published it.', color: 'var(--fg)' },
           { value: String(k.mismatches), label: 'mismatches with our data', note: n(k.shared_rows) + ' rows both sources cover, compared on open, high, low, close, volume, open interest and value.', color: k.mismatches === 0 ? 'var(--up)' : 'var(--down)' },
-          { value: String(k.only_in_book_contracts), label: 'contracts our download missed', note: 'Near-month contracts trading in Oct–Dec 2023 (' + n(k.only_in_book) + ' rows). Our main results do not use them yet.', color: 'var(--fg)' }
+          { value: String(SUP.missing_contracts.length), label: 'contracts our download missed, now added', note: (SUP.missing_rows || 0) + ' traded rows: ' + SUP.missing_contracts.join(', ') + '. They were the busiest contracts in Oct–Dec 2023.', color: 'var(--fg)' }
         ],
-        note: 'We use the book only for the long-history check on the Backtesting page (' + this.fd(HX.window.from) + ' to ' + this.fd(HX.window.to) + '). Everything else on this site comes from our own MCX download, listed below.'
+        note: 'We use the book for two things: the long-history check on the Backtesting page (' + this.fd(HX.window.from) + ' to ' + this.fd(HX.window.to) + '), and to fill gaps in our own MCX download: the ' + SUP.missing_contracts.length + ' contracts above' + (SUP.extra_days && SUP.extra_days.length ? ' and ' + SUP.extra_days.map((d) => this.fd(d)).join(', ') + ', the day after our download ended' : '') + '. Those rows are kept in a separate, labelled file. Everything else comes from our own MCX download, listed below.'
       };
     }
     return {
