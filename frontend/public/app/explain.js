@@ -36,7 +36,7 @@
     [/^GOLD\S+ · GOLD\S+\ngap today/, 'Pick a pair', 'Tap a pair to switch everything below to it.'],
     [/^GOLD\S+ · GOLD\S+: \w+ \d{4} to/, 'The gap over time', 'The brown line is the gap between the two contracts. Each dot is a trade: green made money, red lost money.'],
     [/^Every trade the model took/, 'Trade list', 'Every trade: when it started, why it ended, and how much it made or lost after costs.'],
-    [/^On the 12 unseen months/, 'Test-year score', 'The score for the year the model had never seen. With so few trades, it could easily be luck.'],
+    [/^On the 12-month test year/, 'Test-year score', 'The score for the year after training. With so few trades, it could easily be luck, and the rule was revised after this year was first seen.'],
     // Signals
     [/^Why is it quiet\?/, 'Why quiet?', 'A signal is like a green traffic light. It only turns green when all five checks pass at once. Today they do not.'],
     [/^GOLD\S+ · GOLD\S+\nQuiet/, 'Pick a pair', 'Tap a pair to see its five checks.'],
@@ -48,17 +48,20 @@
     [/^After an alert, does the gap close\?/, 'Do alerts work?', 'After an alert, did the gap really shrink? Green means it shrank by more than the cost.'],
     [/^Every trade the backtest took for this pair/, 'Past trades', 'All the practice trades this pair made in the past, with the result of each.'],
     // Backtesting
-    [/^Did it make money\?/, 'The test', 'We practised on two years of real prices, froze the rules, then tested on one year the model had never seen.'],
+    [/^Did it make money\?/, 'The test', 'We practised on two years of real prices, froze the rules and tested on the next year. The clean test is 13 earlier years the rule never saw.'],
     [/^The verdict|^No persistent edge proven after costs/, 'The final answer', 'We could not prove the idea makes money reliably. Saying "no" honestly, with proof, is a real result.'],
-    [/^Take out one crash and it loses/, 'The storm', 'Gold bars are trades during the Jan–Mar 2026 gold crash; grey bars are all the others. At our 5 bps cost, everything outside the crash adds up to a loss.'],
+    [/^Test year: take out one crash and it loses/, 'The storm', 'Gold bars are trades during the Jan–Mar 2026 gold crash; grey bars are all the others. At our 5 bps cost, everything outside the crash adds up to a loss.'],
     [/^How sure can we be\?/, 'Luck check', 'We reshuffled the trades 10,000 times to see how much luck matters. A long bar means "not sure".'],
     [/^One rule for alerts and backtest/, 'One rule', 'The same five checks decide today\'s alerts and the past test, so nothing is hidden.'],
     [/^GOLDM · GOLDPETAL\nGOLDM · GOLD/, 'Choose what to test', 'Pick a pair and a slippage level. Every number below changes.'],
-    [/^(Trades in the unseen year|Won\n|Average per trade|Total after costs|t-statistic)/, 'Score card', 'The test-year score in five numbers. Read them together: few trades means the score is shaky.'],
-    [/^GOLD\S+ · GOLD\S+ at \d+ bps slippage/, 'Money over time', 'The running total, trade after trade. The shaded part is the year the model had never seen.'],
+    [/^(Trades in the test year|Won\n|Average per trade|Total after costs|t-statistic)/, 'Score card', 'The test-year score in five numbers. Read them together: few trades means the score is shaky.'],
+    [/^GOLD\S+ · GOLD\S+ at \d+ bps slippage/, 'Money over time', 'The running total, trade after trade. The shaded part is the test year.'],
     [/^Same trades, different costs/, 'Cheaper or dearer trading', 'The same trades with cheaper or dearer trading. More slippage means less profit.'],
     [/^Where the result came from/, 'Where the money came from', 'Did it come from the gap closing (what we bet on) or from gold\'s price moving? Almost all of it came from the gap.'],
-    [/^13 more years: does the rule hold up\?/, 'Long history', 'The same frozen rule tested on 2011–2023, years it never saw. 151 trades instead of 20: it loses money after costs, so the test-year profit was not a lasting edge.'],
+    [/^The clean test: 13 years the rule never saw/, 'The clean test', 'The same frozen rule tested on 2011–2023, years no version of it had seen. Far more trades than the test year, and it loses money after costs, so the test-year profit was not a lasting edge.'],
+    [/^Can daily data measure slippage\?/, 'Slippage', 'Slippage is the price you lose each time you buy or sell. It is most of our cost, but daily prices are too coarse to measure it, so the real number needs real broker fills.'],
+    [/^Read this year with care/, 'Why the test year is not clean', 'We looked at this year\'s results before we wrote the final rule. A clean test uses data nobody has looked at yet, which is why 2011–2023 counts for more.'],
+    [/^How many looks\?/, 'Many tries', 'The more versions of a rule you score on the same data, the more likely one looks good by luck. This adjusts for that.'],
     [/^Settings for /, 'The frozen settings', 'The exact rules this pair used, fixed before the test year started.'],
     // Data
     [/^Where the numbers come from/, 'Our data', 'Every number on this site comes from MCX\'s official end-of-day price files.'],
@@ -109,11 +112,11 @@
     '4': 'Build the six pairs and the price gap (spread) of each one.',
     '5': 'Measure how unusual each gap is (the z-score), using only earlier days.',
     '6': 'Apply the five checks that decide both the alerts and the backtest trades.',
-    '7': 'Tune on two years, freeze the settings, then test on the next year the model never saw.',
+    '7': 'Tune on two years, freeze the settings, test on the next year, then check 2011–2023, which the rule never saw.',
     '8': 'Subtract every MCX cost, then split the result into spread moves, gold price moves and costs.'
   };
   var GROUP = {
-    'Alerts, unseen year': 'Days in the test year when all five checks passed (an alert).',
+    'Alerts, test year': 'Days in the test year when all five checks passed (an alert).',
     'Alerts, training years': 'Alert days in the two training years.',
     'Unusual gap, no alert': 'Days with an unusual gap that still failed another check, so no alert.',
     'Ordinary days': 'Normal days with nothing unusual, for comparison.'
@@ -150,7 +153,7 @@
     [new RegExp('^' + P + ' ([\\d.]+) bps$'), function (m) { var c = costLine(), g = n(m[3]); return [m[1] + ' vs ' + m[2], 'The price gap between ' + m[1] + ' and ' + m[2] + ' is ' + m[3] + ' bps (' + pc(m[3]) + ') away from its normal level. To be worth trading it must pass the cost line of ' + c + ' bps' + (g < n(c) ? ', so it is ' + (n(c) - g).toFixed(1) + ' bps short.' : '. It does.')]; }],
     [/^([\d,]+) daily settlements checked$/, function (m) { return ['Prices checked', 'We checked ' + m[1] + ' official end-of-day prices: one per contract for every trading day.']; }],
     [/^(\d+) years (.+)$/, function (m) { return ['How long', 'Our data covers about ' + m[1] + ' years of trading: ' + m[2] + '.']; }],
-    [/^(\d+) trades in 12 months the model never saw$/, function (m) { return ['The test year', 'We kept the last 12 months hidden while building the model. In that unseen year the rules made ' + m[1] + ' trades.']; }],
+    [/^(\d+) trades in the 12-month test year$/, function (m) { return ['The test year', 'The 12 months after the training years. The rules made ' + m[1] + ' trades there. The rule was revised after its first results there were seen, so the clean test is 2011–2023.']; }],
     [/^([−+-]₹[\d,]+) that year after costs, leaving out the (.+) crash$/, function (m) { return ['Without the crash', 'If you leave out the unusual gold crash of ' + m[2] + ', the test-year trades ' + money(m[1]) + ' after costs. That is why we do not claim a reliable edge.']; }],
     // Today
     [/^Pairs above the cost line (\d+) of (\d+) (.+)$/, function (m) { return ['Pairs above the line', m[1] + ' of the ' + m[2] + ' pairs have a gap bigger than the cost line today. ' + (m[1] === '0' ? 'So nothing is worth trading; we wait.' : 'Those are worth a closer look on the Signals page.')]; }],
@@ -180,11 +183,11 @@
     [/^Normal level ([−+-]?[\d.]+) bps$/, function (m) { return ['Normal level', 'The usual spread for ' + pairOnPage() + ' over the last 30 trading days: ' + m[1] + ' bps. A trade bets on the spread coming back to this.']; }],
     [/^History since (.+)$/, function (m) { return ['History', 'We have prices for this pair from ' + m[1] + ' to today.']; }],
     [/^Model settings \(tuned on training data\) (\d+)-day window · enter at \|z\| ≥ ([\d.]+) · exit at \|z\| ≤ ([\d.]+) · hold ≤ (\d+) days$/, function (m) { return ['The rules', '"Normal" is measured over the last ' + m[1] + ' trading days. A trade starts when the gap is unusual (z ' + m[2] + ' or more), ends when it is back near normal (z ' + m[3] + ' or less), and never lasts more than ' + m[4] + ' days.']; }],
-    [/^(\d+ \w+ \d{4}) (Buy|Sell) (GOLD\w+), (buy|sell) (GOLD\w+) ([−+-][\d.]+) (\d+) (.+?) ([−+-]₹[\d,]+) ([−+-][\d.]+) bps (Unseen test|Training)$/, function (m) {
-      return ['Trade on ' + m[1], 'The model ' + (m[2] === 'Buy' ? 'bought ' : 'sold ') + m[3] + ' and ' + (m[4] === 'buy' ? 'bought ' : 'sold ') + m[5] + ' because the gap was unusual (z = ' + m[6].replace('−', '-') + '). It held ' + m[7] + (m[7] === '1' ? ' day' : ' days') + ' and closed because ' + (WHY[m[8]] || m[8].toLowerCase()) + '. After costs it ' + money(m[9]) + ' (' + m[10] + ' bps). ' + (m[11] === 'Training' ? 'This was in the training years.' : 'This was in the unseen test year.')]; }],
+    [/^(\d+ \w+ \d{4}) (Buy|Sell) (GOLD\w+), (buy|sell) (GOLD\w+) ([−+-][\d.]+) (\d+) (.+?) ([−+-]₹[\d,]+) ([−+-][\d.]+) bps (Test year|Training)$/, function (m) {
+      return ['Trade on ' + m[1], 'The model ' + (m[2] === 'Buy' ? 'bought ' : 'sold ') + m[3] + ' and ' + (m[4] === 'buy' ? 'bought ' : 'sold ') + m[5] + ' because the gap was unusual (z = ' + m[6].replace('−', '-') + '). It held ' + m[7] + (m[7] === '1' ? ' day' : ' days') + ' and closed because ' + (WHY[m[8]] || m[8].toLowerCase()) + '. After costs it ' + money(m[9]) + ' (' + m[10] + ' bps). ' + (m[11] === 'Training' ? 'This was in the training years.' : 'This was in the test year.')]; }],
     [/^Entered Trade z Days Why it closed Result Period$/, function () { return ['The columns', 'Entered: start date. Trade: what was bought and sold. z: how unusual the gap was. Days: how long it was held. Result: profit or loss after costs.']; }],
     // Score cards (Pair Explorer and Backtesting)
-    [/^Trades (\d+)$|^Trades in the unseen year (\d+)(.*)$/, function (m) { var k = m[1] || m[2]; return ['Number of trades', k + ' trades in the year the model never saw. With fewer than about 30, results are shaky and can easily be luck.']; }],
+    [/^Trades (\d+)$|^Trades in the test year (\d+)(.*)$/, function (m) { var k = m[1] || m[2]; return ['Number of trades', k + ' trades in the test year. With fewer than about 30, results are shaky and can easily be luck.']; }],
     [/^Won (\d+)%( after costs)?$/, function (m) { return ['Won', m[1] + '% of the trades made money after costs.']; }],
     [/^Average per trade ([−+-][\d.]+) bps(?: every trade counts equally · before costs ([−+-][\d.]+) bps)?$/, function (m) { return ['Average per trade', 'Each trade made ' + m[1] + ' bps on average (' + pc(m[1]) + ' of one leg) after costs' + (m[2] ? '; before costs it was ' + m[2] + ' bps.' : '.')]; }],
     [/^Total after costs ([−+-]?₹[\d,]+)(?: bigger trades count more · costs paid ₹([\d,]+))?$/, function (m) { return ['Total after costs', 'All the trades together ' + money(m[1]) + ' after paying every fee' + (m[2] ? ' (₹' + m[2] + ' in costs).' : '.')]; }],
@@ -203,15 +206,15 @@
     [/^Your cost line ([\d.]+) bps (.+)$/, function (m) { return ['Your cost line', 'Twice your round-trip cost, as a safety margin: ' + m[1] + ' bps. A gap must be bigger than this to be worth trading.']; }],
     [/^Pairs above your line today (\d+) of 6 with our ([\d.]+) bps line: (\d+) of 6$/, function (m) { return ['Pairs above your line', 'With your costs, ' + m[1] + ' of 6 pairs would be worth trading today. With our ' + m[2] + ' bps line it is ' + m[3] + ' of 6.']; }],
     [new RegExp('^' + P + ' ([\\d.]+) bps · (short by|above by|over by) ([\\d.]+)$'), function (m) { return [m[1] + ' vs ' + m[2], 'Today\'s gap is ' + m[3] + ' bps. Compared with your cost line it is ' + m[4] + ' ' + m[5] + ' bps' + (m[4] === 'short by' ? ', so not worth trading.' : ', so it would be worth a look.')]; }],
-    [/^(Alerts, unseen year|Alerts, training years|Unusual gap, no alert|Ordinary days) (.+?) · median gap ([\d.]+) bps (shrank|grew) ([\d.]+) bps (\d+)% closed at least halfway$/, function (m) { return [m[1], GROUP[m[1]] + ' ' + m[2] + '. The typical gap was ' + m[3] + ' bps; 10 trading days later it had ' + (m[4] === 'shrank' ? 'shrunk' : 'grown') + ' by ' + m[5] + ' bps (one round trip costs 24.4 bps). ' + m[6] + '% closed at least halfway.']; }],
+    [/^(Alerts, test year|Alerts, training years|Unusual gap, no alert|Ordinary days) (.+?) · median gap ([\d.]+) bps (shrank|grew) ([\d.]+) bps (\d+)% closed at least halfway$/, function (m) { return [m[1], GROUP[m[1]] + ' ' + m[2] + '. The typical gap was ' + m[3] + ' bps; 10 trading days later it had ' + (m[4] === 'shrank' ? 'shrunk' : 'grown') + ' by ' + m[5] + ' bps (one round trip costs 24.4 bps). ' + m[6] + '% closed at least halfway.']; }],
     [/^Signal Held Trade z Outcome Result Period$/, function () { return ['The columns', 'Signal: the day it fired. Held: days in the trade. z: how unusual the gap was. Result: profit or loss after costs.']; }],
     // Backtesting
     [/^Closed during the Jan–Mar 2026 crash Every other trade$/, function () { return ['The two colours', 'Gold bars: trades that closed during the Jan–Mar 2026 gold crash. Grey bars: all the other trades.']; }],
     [/^at (\d+) bps( \(ours\))? ([−+-]₹[\d.]+L) ([−+-]₹[\d.]+L)$/, function (m) { return ['At ' + m[1] + ' bps slippage' + (m[2] ? ' (ours)' : ''), 'Trades that closed during the crash ' + money(m[3]) + '; all other trades ' + money(m[4]) + '. L means lakh (₹1,00,000).']; }],
-    [/^(Unseen year, all trades|Unseen year, without the crash|Training years) (.+?) ([−+-]₹[\d,]+) 95% range ([−+-]₹[\d,]+) to ([−+-]₹[\d,]+) (\d+)% of resamples above ₹0$/, function (m) { return [m[1], m[2] + ': the result was ' + m[3] + '. Reshuffling these trades 10,000 times, 95% of results fell between ' + m[4] + ' and ' + m[5] + '. ' + m[6] + '% were above zero, so ' + (n(m[6]) >= 95 ? 'it is fairly solid.' : 'we cannot rule out luck.')]; }],
+    [/^(Test year, all trades|Test year, without the crash|Training years) (.+?) ([−+-]₹[\d,]+) 95% range ([−+-]₹[\d,]+) to ([−+-]₹[\d,]+) (\d+)% of resamples above ₹0$/, function (m) { return [m[1], m[2] + ': the result was ' + m[3] + '. Reshuffling these trades 10,000 times, 95% of results fell between ' + m[4] + ' and ' + m[5] + '. ' + m[6] + '% were above zero, so ' + (n(m[6]) >= 95 ? 'it is fairly solid.' : 'we cannot rule out luck.')]; }],
     [/^95% range of resampled results/, function () { return ['How to read the bars', 'Each bar is the range where 95% of the reshuffled results fell. The dot is the real result. A bar crossing ₹0 means it could be a loss.']; }],
-    [/^(Five checks: what this site shows|Original study: four checks, no cost line|Five checks \+ training switch \(.+?\)) (\S+) (\S+) (\S+) (\S+) (\S+) (\S+)$/, function (m) { function v(x) { return x === '–' ? 'not tested' : x; } return [m[1].replace(/:.*/, ''), 'Training: ' + v(m[2]) + ' trades, ' + v(m[3]) + '. Unseen year: ' + v(m[4]) + ' trades, ' + v(m[5]) + '. Outside the crash: ' + v(m[6]) + '. t-statistic: ' + v(m[7]) + ' (needs about 2).']; }],
-    [/^Rule Training trades Training result Unseen trades Unseen result Outside the crash t-statistic$/, function () { return ['The columns', 'Each row is one version of the rule, scored on the training years and on the unseen year. "Outside the crash" leaves out Jan–Mar 2026.']; }],
+    [/^(Five checks: what this site shows|Original study: four checks, no cost line|Five checks \+ training switch \(.+?\)) (\S+) (\S+) (\S+) (\S+) (\S+) (\S+)$/, function (m) { function v(x) { return x === '–' ? 'not tested' : x; } return [m[1].replace(/:.*/, ''), 'Training: ' + v(m[2]) + ' trades, ' + v(m[3]) + '. Test year: ' + v(m[4]) + ' trades, ' + v(m[5]) + '. Outside the crash: ' + v(m[6]) + '. t-statistic: ' + v(m[7]) + ' (needs about 2).']; }],
+    [/^Rule Training trades Training result Test-year trades Test-year result Outside the crash t-statistic$/, function () { return ['The columns', 'Each row is one version of the rule, scored on the training years and on the test year. "Outside the crash" leaves out Jan–Mar 2026.']; }],
     [new RegExp('^' + P + ' · (On|Off) (.+)$'), function (m) { return [m[1] + ' vs ' + m[2] + ': ' + m[3], 'Training switch ' + m[3].toLowerCase() + ': ' + m[4].charAt(0).toLowerCase() + m[4].slice(1) + '. A pair is only traded in the test year if it had at least 10 training trades and made money in training.']; }],
     [/^Slippage per order 0 bps/, function () { return ['Slippage', 'Pick how much you lose per order to slippage. Everything below is recalculated.']; }],
     [/^(\d+) bps( \(our assumption\))? (\d+) ([−+-][\d.]+) bps ([−+-][\d.]+) bps ([−+-]₹[\d,]+) (\d+)%$/, function (m) { return ['At ' + m[1] + ' bps slippage', m[3] + ' trades. Average ' + m[4] + ' bps before costs and ' + m[5] + ' bps after. In total they ' + money(m[6]) + '; ' + m[7] + '% won.']; }],

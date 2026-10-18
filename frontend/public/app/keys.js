@@ -48,8 +48,9 @@
     'background:#0F1822;color:#EAF0F6;border:1px solid #2A3846;border-radius:8px;padding:6px 10px;font:600 12px Geist,system-ui,sans-serif;pointer-events:none;box-shadow:0 8px 24px rgba(7,13,20,.3)}' +
     '[data-grv="search"]:not(.pbtn):hover::after{display:none}}' +
     '@media (max-width:430px){.phonebar .pbtn,.phonebar button{width:40px !important;height:40px !important}.phonebar .pb-sub{max-width:96px}.phonebar{gap:6px !important;padding-left:14px !important;padding-right:14px !important}}' +
-    '.km-tip{position:absolute;z-index:66;max-width:300px;background:#F2A93B;color:#1A1204;border-radius:14px;padding:12px 14px;' +
+    '.km-tip{position:fixed;right:20px;bottom:20px;z-index:66;max-width:300px;background:#F2A93B;color:#1A1204;border-radius:14px;padding:12px 14px;' +
     'font:500 13px/1.5 Geist,system-ui,sans-serif;box-shadow:0 12px 34px rgba(7,13,20,.35)}' +
+    '@media (max-width:899px){.km-tip{left:16px;right:16px;bottom:88px;max-width:none}}' +
     '.km-tip b{font-weight:700}.km-tip button{margin-top:8px;min-height:32px;padding:0 12px;border-radius:8px;border:0;background:#1A1204;color:#F2A93B;font:600 12px Geist,system-ui,sans-serif;cursor:pointer}' +
     '';
   var st = document.createElement('style'); st.textContent = css; document.head.appendChild(st);
@@ -156,13 +157,8 @@
     if (act === 'search') { if (back) close(); else open(); }
     else if (act === 'words' && window.GRVGlossary) window.GRVGlossary.open('');
   });
-  function visibleSearch() {
-    var all = document.querySelectorAll('[data-grv="search"]');
-    for (var i = 0; i < all.length; i++) { if (all[i].offsetParent) return all[i]; }
-    return null;
-  }
 
-  // One-time tip on a visitor's first visit (per browser); never blocks the page
+  // One-time tip on a visitor's first visit (per browser); sits in a corner, never over the content
   var seen = false;
   try { seen = localStorage.getItem('grv-keys-tip') === '1'; } catch (e) { seen = true; }
   if (!seen) {
@@ -174,12 +170,8 @@
         : 'Tip: <b>double-click</b> any box and Goldie explains it. Press <b>' + (isMac ? '⌘' : 'Ctrl') + ' O</b> to search, or <b>1–7</b> to jump between pages.<br><button type="button">Got it</button>';
       var done = function () { tip.remove(); try { localStorage.setItem('grv-keys-tip', '1'); } catch (e) {} };
       tip.querySelector('button').addEventListener('click', done);
-      var sb = visibleSearch();
-      if (!sb) return;
+      // a small popup in the bottom corner (above the tab bar on phones), so it never covers the page's content
       document.body.appendChild(tip);
-      var r = sb.getBoundingClientRect();
-      tip.style.top = (r.bottom + scrollY + 10) + 'px';
-      tip.style.left = Math.max(16, Math.min(r.left + scrollX, innerWidth - tip.offsetWidth - 16)) + 'px';
       setTimeout(function () { if (tip.isConnected) done(); }, 9000);
     }, 1200);
   }
