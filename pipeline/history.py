@@ -185,7 +185,8 @@ def build(output_dir: str = 'frontend/public/data', book_path: str = BOOK_PATH, 
                        coverage=cov),
         'check': cross_check(book, ours),
         'window': {'from': HISTORY_START, 'to': end.strftime('%Y-%m-%d'), 'pairs': HISTORY_PAIRS, 'params': params,
-                   'slip': BASE_SLIPPAGE},
+                   'slip': BASE_SLIPPAGE,
+                   'rows': int(((book['date'] >= HISTORY_START) & (book['date'] <= end)).sum())},   # book prices the clean test ran on
         'result': summarise(T) if len(T) else None,
         'long': long_series(book, end),
     }

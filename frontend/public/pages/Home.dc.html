@@ -315,14 +315,17 @@ class Component extends DCLogic {
       line: (p.hurdle / scale * 100).toFixed(1) + '%', fill: p.dev >= p.hurdle ? 'var(--gold)' : 'var(--muted)'
     }));
 
-    const pooled = D.pooled['5'];
+    // One line for the whole study, 18 Apr 2011 to today: every number is computed from the data files.
+    // The Parity book covers the clean test (2011-2023); our own MCX download covers training and the test year.
+    const R = D.rule.current['5'], L = D.longrun;
+    const yrs = Math.round((Date.parse(D.asOf) - Date.parse(L.start)) / 3.15576e10);
+    const n = (x) => x.toLocaleString('en-IN');
     const facts = [
-      { value: D.meta.rows.toLocaleString('en-IN'), label: 'daily settlements checked' },
-      // full span tested: the Parity data book (clean test) plus our own MCX download, computed from the data
-      { value: Math.round((Date.parse(D.asOf) - Date.parse(D.longrun.start)) / 3.15576e10) + ' years', label: this.fd(D.longrun.start) + ' to ' + this.fd(D.asOf) + ': the Parity data book until ' + this.fd(D.longrun.end).replace(/^\d+ /, '') + ', our own MCX download after' },
-      { value: pooled.n + ' trades', label: 'in the 12-month test year' },
-      { value: this.inr(D.rule.current['5'].ex_crash_net_rs), label: 'that year after costs, leaving out the ' + D.events.crashShort },
-      { value: this.inr(D.longrun.net), label: 'the clean test: ' + D.longrun.n + ' trades on ' + D.longrun.start.slice(0, 4) + '–' + D.longrun.end.slice(0, 4) + ', years the rule never saw' }
+      { value: n(L.rows + D.meta.rows), label: 'official MCX daily prices: ' + n(L.rows) + ' from the Parity book, ' + n(D.meta.rows) + ' from our own download' },
+      { value: yrs + ' years', label: 'tested, ' + this.fd(L.start) + ' to ' + this.fd(D.asOf) },
+      { value: n(L.n + R.train_n + R.test_n) + ' trades', label: L.n + ' in ' + L.start.slice(0, 4) + '–' + L.end.slice(0, 4) + ', ' + R.train_n + ' in training, ' + R.test_n + ' in the test year' },
+      { value: this.inr(L.net), label: 'the clean test, ' + L.start.slice(0, 4) + '–' + L.end.slice(0, 4) + ', after costs: ' + L.losingYears + ' of ' + L.years + ' years lost money' },
+      { value: (R.test_net_rs >= 0 ? '+' : '') + this.inr(R.test_net_rs), label: 'the 12-month test year, but ' + this.inr(R.ex_crash_net_rs) + ' without the ' + D.events.crashShort }
     ];
 
     return { ...shell, loading: false, ready: true, quotes, answer, bars, chart, hover: hov, ranges, facts };
