@@ -3,6 +3,7 @@ import pytest
 import pandas as pd
 import numpy as np
 from pipeline.load import load_clean_bhavcopy
+from pipeline.config import TEST_END   # research snapshot: a data refresh must not change these checks
 from pipeline.carry import compute_reference_carry
 from pipeline.pairs import build_all_pairs
 from pipeline.backtest import prepare_contract_lookup, run_grid_search, run_all_scenarios
@@ -11,7 +12,7 @@ from pipeline.lifecycle import compute_contract_lifecycle
 
 def test_alerts_on_last_date():
     """Alerts on 2026-09-30: all six pairs QUIET with failed gates matching Section 6."""
-    df, dates, tdi = load_clean_bhavcopy('data/raw/gold_bhavcopy_clean.csv')
+    df, dates, tdi = load_clean_bhavcopy('data/raw/gold_bhavcopy_clean.csv', end=TEST_END)
     carry_series, _ = compute_reference_carry(df, dates)
     pairs = build_all_pairs(df, carry_series)
     P = prepare_contract_lookup(df)
@@ -43,7 +44,7 @@ def test_alerts_on_last_date():
 
 def test_trades_within_lifecycle_windows():
     """Every trade's entry and exit lie inside its contracts' lifecycle windows."""
-    df, dates, tdi = load_clean_bhavcopy('data/raw/gold_bhavcopy_clean.csv')
+    df, dates, tdi = load_clean_bhavcopy('data/raw/gold_bhavcopy_clean.csv', end=TEST_END)
     carry_series, _ = compute_reference_carry(df, dates)
     pairs = build_all_pairs(df, carry_series)
     P = prepare_contract_lookup(df)

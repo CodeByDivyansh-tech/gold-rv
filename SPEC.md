@@ -1,6 +1,21 @@
 # Gold RV Intelligence — Build Spec for Antigravity
 
 Hack in Hills '26 · Problem 03: Commodity Derivatives Intelligence
+
+> **Status (Oct 2026): this is the original build spec.** The data, formulas (Section 4) and backtest mechanics
+> (Section 5) are still what the pipeline implements. What changed since, so read README.md for the current state:
+> - **Frontend**: shipped as static HTML pages with a small in-house renderer (`frontend/public/app/dc.js`), not
+>   React + Tailwind + Recharts; light/dark theme with the Geist font, not the Stitch navy tokens (Sections 8–10).
+> - **Hosting**: Vercel (Render Static Site still works the same way, Section 8.2).
+> - **Rule**: the backtest now uses the same five checks as the alerts, including the cost line (Section 6), plus
+>   a stop-loss entry band and no fills on 6%+ days (`config.ALERT_RULE`). The original rule is kept as `LEGACY_RULE`
+>   and still reproduces `reference_summary.csv`.
+> - **The test year (Section 5.1) is not a clean out-of-sample test** for the five-check rule, which was written
+>   after its first results were seen. The clean test is 2011–2023 (`pipeline/history.py`): the frozen rule lost
+>   money there. Data after 30-Sep-2026 is reported as a separate forward period.
+> - **GOLDPETAL break (Section 3)**: located from the data at 4–11 Nov 2024, not Dec-24 → Mar-25; cause still unconfirmed.
+> - **Slippage** cannot be measured from daily data (`pipeline/evidence.py`); 5 bps remains an assumption.
+> - **Data**: our MCX download had missed the Oct/Nov/Dec-2023 contracts (289 rows); they are now added from the Parity data book (`data/raw/mcx_bhavcopy_supplement.csv`), so the counts below (11,954 rows, 138 contracts) are the original download's.
 Data, formulas and every number below were checked against real MCX data (11,954 rows pulled from the MCX Bhavcopy API on 01-Oct-2026, cross-checked row-for-row against the manually downloaded files).
 
 ---
@@ -123,7 +138,7 @@ All from `reference_check.py` on the full dataset.
 
    Jan–Mar 2026 (a violent gold move; 30-Jan-2026 alone moved spreads by 300–700 bps) is an outlier quarter for every pair.
 
-   Consequences: (a) the signal must be the deviation from a **rolling** mean, never from zero or from a full-sample mean; (b) the GOLDPETAL flip is a **structural break** — show it on the Market Analysis screen as such and do not claim to know its cause (it may relate to a contract or delivery change; check MCX circulars if time allows); (c) a rolling window needs a few weeks to adapt after a break, so signals during the transition are mostly false — the backtest includes them rather than hiding them.
+   Consequences: (a) the signal must be the deviation from a **rolling** mean, never from zero or from a full-sample mean; (b) the GOLDPETAL flip is a **structural break** (later located at 4–11 Nov 2024 by `pipeline/evidence.py`) — show it on the Market Analysis screen as such and do not claim to know its cause (it may relate to a contract or delivery change; check MCX circulars if time allows); (c) a rolling window needs a few weeks to adapt after a break, so signals during the transition are mostly false — the backtest includes them rather than hiding them.
 
 2. **Carry sanity check passes.** GOLDPETAL calendar spreads imply an annualized carry of median **8.0%** (IQR 6.2–10.9%), in line with Indian interest rates plus storage/insurance. Automated test: median between 3% and 12%.
 
@@ -361,6 +376,8 @@ From `contract_calendar.csv` (recompute in the pipeline): `first_seen`, `liquid_
 
 ## 8. Architecture — a static website (no live server)
 
+> As planned. Shipped with plain HTML pages instead of React, and on Vercel; see the status note at the top.
+
 The site is deployed as a **Render Static Site**, not a Web Service, so it never shows a spin-down loading screen. All numbers are precomputed by a Python pipeline and written as JSON files that the frontend reads. There is **no FastAPI / no server at runtime**.
 
 ```
@@ -422,6 +439,8 @@ Keep the total under ~10 MB (round floats to 4 decimals; prices can be sampled w
 ---
 
 ## 9. Design system
+
+> Superseded: the shipped site uses its own light/dark tokens and the Geist font (see each page's `tokens()`).
 
 Use the YAML front-matter tokens in `DESIGN.md` (these are what the screens' Tailwind config uses). Ignore the different hex values in the prose part of DESIGN.md.
 

@@ -5,7 +5,7 @@ shared with us with their permission), saved as data/raw/parity_data_book.csv.
 
 What it does
   1. Compares the book with our own MCX download on every day both cover (Oct 2023 - Sep 2026).
-  2. Takes the settings the main build chose on our training years (read from site-data.json,
+  2. Takes the settings the main build chose on our training years (read from its backtest files,
      so nothing is re-tuned) and runs the same five-check rule, with the same costs,
      on 18 Apr 2011 (first GOLDPETAL day) to the day before our own data starts.
   3. Writes frontend/public/data/history.json for the website.
@@ -99,9 +99,14 @@ def cross_check(book: pd.DataFrame, ours: pd.DataFrame) -> Dict[str, Any]:
     }
 
 
-def frozen_params(site_data_path: str) -> Dict[str, Dict[str, float]]:
-    d = json.load(open(site_data_path, encoding='utf-8'))
-    return {pid: {k: d['pairs'][pid]['params'][k] for k in ('W', 'ze', 'mh')} for pid in HISTORY_PAIRS}
+def frozen_params(output_dir: str) -> Dict[str, Dict[str, float]]:
+    """Settings the main build chose on training, read from its backtest files (nothing is re-tuned)."""
+    out = {}
+    for pid in HISTORY_PAIRS:
+        with open(os.path.join(output_dir, f'backtest/{pid}_{BASE_SLIPPAGE}.json'), encoding='utf-8') as f:
+            p = json.load(f)['params']
+        out[pid] = {k: p[k] for k in ('W', 'ze', 'mh')}
+    return out
 
 
 def run_history(book: pd.DataFrame, end: pd.Timestamp, params: Dict[str, Dict[str, float]]) -> pd.DataFrame:
@@ -170,7 +175,7 @@ def build(output_dir: str = 'frontend/public/data', book_path: str = BOOK_PATH, 
     book = load_book(book_path)
     ours = pd.read_csv(ours_path, parse_dates=['date', 'expiry_date'])
     end = ours['date'].min() - pd.Timedelta(days=1)
-    params = frozen_params(os.path.join(output_dir, 'site-data.json'))
+    params = frozen_params(output_dir)
     T = run_history(book, end, params)
     cov = {s: {'first': g['date'].min().strftime('%Y-%m-%d'), 'last': g['date'].max().strftime('%Y-%m-%d'),
                'rows': int(len(g)), 'contracts': int(g['expiry'].nunique())} for s, g in book.groupby('symbol')}

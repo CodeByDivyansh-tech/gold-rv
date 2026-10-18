@@ -3,14 +3,21 @@ import pytest
 import numpy as np
 import pandas as pd
 from pipeline.load import load_clean_bhavcopy
+from pipeline.config import TEST_END   # research snapshot: a data refresh must not change these checks
 from pipeline.carry import compute_reference_carry
 from pipeline.pairs import build_pair_series, compute_rolling_z, build_all_pairs
 
 def test_pair_counts_and_spreads():
-    """Verify pair counts and last spreads match reference."""
-    df, dates, tdi = load_clean_bhavcopy('data/raw/gold_bhavcopy_clean.csv')
+    """Pair counts and last spreads match the reference on the original rows; the Parity-book supplement only
+    adds days (the Oct-Dec 2023 contracts our download missed) and changes nothing on 2026-09-30."""
+    df, dates, tdi = load_clean_bhavcopy('data/raw/gold_bhavcopy_clean.csv', end=TEST_END, original_only=True)
     carry_series, _ = compute_reference_carry(df, dates)
     pairs = build_all_pairs(df, carry_series)
+    dff, datesf, _ = load_clean_bhavcopy('data/raw/gold_bhavcopy_clean.csv', end=TEST_END)
+    full = build_all_pairs(dff, compute_reference_carry(dff, datesf)[0])
+    for pid in pairs:
+        assert len(full[pid]) >= len(pairs[pid])
+        assert round(full[pid]['spread'].iloc[-1], 1) == round(pairs[pid]['spread'].iloc[-1], 1)
     
     expected = {
         'GUINEA_PETAL': (754, 5.3),
@@ -29,7 +36,7 @@ def test_pair_counts_and_spreads():
 
 def test_lookahead_pair_selection():
     """Pair selection at date t must be strictly identical if future data is truncated."""
-    df, dates, tdi = load_clean_bhavcopy('data/raw/gold_bhavcopy_clean.csv')
+    df, dates, tdi = load_clean_bhavcopy('data/raw/gold_bhavcopy_clean.csv', end=TEST_END)
     carry_series, _ = compute_reference_carry(df, dates)
     
     # Pick a test trading date in the middle of the series
@@ -50,7 +57,7 @@ def test_lookahead_pair_selection():
 
 def test_lookahead_rolling_z():
     """z at date t must be strictly identical if future data is truncated."""
-    df, dates, tdi = load_clean_bhavcopy('data/raw/gold_bhavcopy_clean.csv')
+    df, dates, tdi = load_clean_bhavcopy('data/raw/gold_bhavcopy_clean.csv', end=TEST_END)
     carry_series, _ = compute_reference_carry(df, dates)
     
     cutoff_date = pd.Timestamp('2025-11-20')
