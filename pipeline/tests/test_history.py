@@ -28,7 +28,9 @@ def test_history_uses_frozen_settings_and_only_earlier_days():
     assert h['window']['from'] == HISTORY_START
     ours_start = pd.read_csv('data/raw/gold_bhavcopy_clean.csv', usecols=['date'])['date'].min()
     assert h['window']['to'] < ours_start                      # never overlaps the years used to tune
-    assert h['window']['params'] == frozen_params(os.path.join(DATA, 'site-data.json'))
+    assert h['window']['params'] == frozen_params(DATA)
+    site = json.load(open(os.path.join(DATA, 'site-data.json'), encoding='utf-8'))
+    assert all(h['window']['params'][p] == {k: site['pairs'][p]['params'][k] for k in ('W', 'ze', 'mh')} for p in HISTORY_PAIRS)
     assert set(h['window']['pairs']) == set(HISTORY_PAIRS)
 
 

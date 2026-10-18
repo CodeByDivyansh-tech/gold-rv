@@ -174,7 +174,18 @@ def build_web_data(data_dir: str = 'frontend/public/data', out_path: str = None)
                   goldtenListed=next(d for d, v in zip(pure4['d'], pure4['GOLDTEN']) if v is not None),
                   regimeLabels=['Oct 2023 – Dec 2024', 'Apr 2025 – Sep 2026', 'Jan–Mar 2026 crash'])
 
+    # evidence checks (pipeline/evidence.py): test-year status, slippage, multiple testing, switch
+    evidence = J('evidence.json')
+    slip_bps = next(c['bps'] for c in costs if c['name'] == 'Slippage')
+    evidence['slippage']['assumed_share_of_cost_pct'] = round(100 * slip_bps / cost_total)
+    hist = J('history.json')
+    hr = hist['result']
+    longrun = dict(start=hist['window']['from'], end=hist['window']['to'], pairs=hist['window']['pairs'],
+                   n=hr['by_slip'][str(SL)]['n'], net=hr['by_slip'][str(SL)]['net_rs'], t=hr['by_slip'][str(SL)]['t'],
+                   net0=hr['by_slip']['0']['net_rs'], losingYears=hr['years_count'] - hr['years_positive'], years=hr['years_count'])
+
     data = dict(costs=costs, costTotal=round(cost_total, 2), slip=SL, notional=N, events=events,
+        evidence=evidence, longrun=longrun,
                 minVol=C.MIN_VOLUME_LOTS, minOi=C.MIN_OI_LOTS, minTd=C.MIN_ENTRY_TD,
         asOf=meta['coverage_end'], start=meta['coverage_start'], split=meth['split_dates'],
         meta=dict(rows=meta['rows_count'], contracts=meta['contracts_count'], days=meta['trading_dates_count'],

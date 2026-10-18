@@ -123,5 +123,14 @@ FILL_SEARCH_TD = 10        # trading days to look ahead for the next fillable ex
 MIN_TRAIN_TRADES = 10      # walk-forward switch: a pair is traded in Test only if its chosen
                            # setting made >= 10 trades AND a positive net (after costs) in Train
 
+# Section 5.10: how clean is each out-of-sample test? (Oct-2026 review)
+# The original study's test-year table is already in SPEC.md in the earliest commit (7a29bae, 2 Oct 2026).
+# The five-check rule was committed on 4 Oct 2026 (1229c37), after those results were known, so the
+# 2025-26 test year is NOT a clean out-of-sample test for it. The 2011-2023 history check (step 10) is:
+# it ran on 7 Oct 2026 with the rule and settings already frozen, and nothing was changed afterwards.
+TEST_YEAR_FIRST_SEEN = '2026-10-02'
+RULE_FROZEN_ON = '2026-10-04'
+TEST_YEAR_RULE_VERSIONS = 3   # rule versions scored on the test year: original, five checks, five checks + switch
+
 LEGACY_RULE = {'use_hurdle': False, 'entry_band': False, 'max_fill_move': None}   # original study (reference_summary.csv)
 ALERT_RULE = {'use_hurdle': True, 'entry_band': True, 'max_fill_move': MAX_FILL_MOVE}  # the rule the site shows
