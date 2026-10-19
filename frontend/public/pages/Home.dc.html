@@ -352,7 +352,7 @@ class Component extends DCLogic {
     const facts = [
       { value: n(L.rows + D.meta.rows), label: 'official MCX daily prices: ' + n(L.rows) + ' from the history book, ' + n(D.meta.rows) + ' from our own download' },
       { value: yrs + ' years', label: 'tested, ' + this.fd(L.start) + ' to ' + this.fd(D.asOf) },
-      { value: n(L.n + R.train_n + R.test_n) + ' trades', label: L.n + ' in ' + L.start.slice(0, 4) + '–' + L.end.slice(0, 4) + ', ' + R.train_n + ' in training, ' + R.test_n + ' in the test year' },
+      { value: n(L.n + R.train_n + R.test_n + (R.forward_n || 0)) + ' trades', label: L.n + ' in ' + L.start.slice(0, 4) + '–' + L.end.slice(0, 4) + ', ' + R.train_n + ' in training, ' + R.test_n + ' in the test year' + (R.forward_n ? ', ' + R.forward_n + ' after it' : '') },
       { value: this.inr(L.net), label: 'the clean test, ' + L.start.slice(0, 4) + '–' + L.end.slice(0, 4) + ', after costs: ' + L.losingYears + ' of ' + L.years + ' years lost money' },
       { value: (R.test_net_rs >= 0 ? '+' : '') + this.inr(R.test_net_rs), label: 'the 12-month test year, but ' + this.inr(R.ex_crash_net_rs) + ' without the ' + D.events.crashShort }
     ];

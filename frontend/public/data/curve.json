@@ -1,7 +1,7 @@
 {
-  "median_carry_pct": 7.97,
+  "median_carry_pct": 8.01,
   "iqr_carry_pct": [
-    6.31,
+    6.36,
     10.63
   ],
   "reference_carry_series": [
@@ -3080,6 +3080,46 @@
     {
       "date": "2026-10-01",
       "carry_pct": 10.626
+    },
+    {
+      "date": "2026-10-05",
+      "carry_pct": 10.37
+    },
+    {
+      "date": "2026-10-06",
+      "carry_pct": 10.399
+    },
+    {
+      "date": "2026-10-07",
+      "carry_pct": 10.002
+    },
+    {
+      "date": "2026-10-08",
+      "carry_pct": 10.208
+    },
+    {
+      "date": "2026-10-09",
+      "carry_pct": 11.02
+    },
+    {
+      "date": "2026-10-12",
+      "carry_pct": 10.28
+    },
+    {
+      "date": "2026-10-13",
+      "carry_pct": 10.508
+    },
+    {
+      "date": "2026-10-14",
+      "carry_pct": 9.884
+    },
+    {
+      "date": "2026-10-15",
+      "carry_pct": 9.714
+    },
+    {
+      "date": "2026-10-16",
+      "carry_pct": 10.645
     }
   ],
   "snapshots": [
@@ -3746,200 +3786,200 @@
       ]
     },
     {
-      "date": "2026-10-01",
-      "reference_carry_pct": 10.63,
+      "date": "2026-10-16",
+      "reference_carry_pct": 10.64,
       "contracts": [
         {
           "symbol": "GOLDGUINEA",
           "expiry": "2026-10-30",
-          "days_to_exp": 29,
-          "px_per_g_pure": 15014.14,
-          "px_per_10g_pure": 150141.39,
-          "oi": 13525
+          "days_to_exp": 14,
+          "px_per_g_pure": 14765.89,
+          "px_per_10g_pure": 147658.91,
+          "oi": 13938
         },
         {
           "symbol": "GOLDGUINEA",
           "expiry": "2026-11-30",
-          "days_to_exp": 60,
-          "px_per_g_pure": 15158.53,
-          "px_per_10g_pure": 151585.34,
-          "oi": 7551
+          "days_to_exp": 45,
+          "px_per_g_pure": 14916.92,
+          "px_per_10g_pure": 149169.17,
+          "oi": 8835
         },
         {
           "symbol": "GOLDGUINEA",
           "expiry": "2026-12-31",
-          "days_to_exp": 91,
-          "px_per_g_pure": 15286.66,
-          "px_per_10g_pure": 152866.62,
-          "oi": 3301
+          "days_to_exp": 76,
+          "px_per_g_pure": 15044.67,
+          "px_per_10g_pure": 150446.7,
+          "oi": 4020
         },
         {
           "symbol": "GOLDGUINEA",
           "expiry": "2027-01-29",
-          "days_to_exp": 120,
-          "px_per_g_pure": 15418.17,
-          "px_per_10g_pure": 154181.68,
-          "oi": 1753
+          "days_to_exp": 105,
+          "px_per_g_pure": 15182.68,
+          "px_per_10g_pure": 151826.83,
+          "oi": 1896
         },
         {
           "symbol": "GOLDGUINEA",
           "expiry": "2027-02-26",
-          "days_to_exp": 148,
-          "px_per_g_pure": 15524.52,
-          "px_per_10g_pure": 155245.25,
-          "oi": 452
+          "days_to_exp": 133,
+          "px_per_g_pure": 15323.2,
+          "px_per_10g_pure": 153231.98,
+          "oi": 563
         },
         {
           "symbol": "GOLDGUINEA",
           "expiry": "2027-03-31",
-          "days_to_exp": 181,
-          "px_per_g_pure": 15521.77,
-          "px_per_10g_pure": 155217.72,
-          "oi": 0
-        },
-        {
-          "symbol": "GOLDM",
-          "expiry": "2026-10-05",
-          "days_to_exp": 4,
-          "px_per_g_pure": 14847.14,
-          "px_per_10g_pure": 148471.36,
-          "oi": 1589
+          "days_to_exp": 166,
+          "px_per_g_pure": 15463.34,
+          "px_per_10g_pure": 154633.38,
+          "oi": 88
         },
         {
           "symbol": "GOLDM",
           "expiry": "2026-11-05",
-          "days_to_exp": 35,
-          "px_per_g_pure": 14980.4,
-          "px_per_10g_pure": 149804.02,
-          "oi": 42632
+          "days_to_exp": 20,
+          "px_per_g_pure": 14716.08,
+          "px_per_10g_pure": 147160.8,
+          "oi": 49954
         },
         {
           "symbol": "GOLDM",
           "expiry": "2026-12-04",
-          "days_to_exp": 64,
-          "px_per_g_pure": 15112.96,
-          "px_per_10g_pure": 151129.65,
-          "oi": 14420
+          "days_to_exp": 49,
+          "px_per_g_pure": 14860.9,
+          "px_per_10g_pure": 148609.05,
+          "oi": 19078
         },
         {
           "symbol": "GOLDM",
           "expiry": "2027-01-05",
-          "days_to_exp": 96,
-          "px_per_g_pure": 15239.1,
-          "px_per_10g_pure": 152390.95,
-          "oi": 3687
+          "days_to_exp": 81,
+          "px_per_g_pure": 14997.69,
+          "px_per_10g_pure": 149976.88,
+          "oi": 4382
         },
         {
           "symbol": "GOLDM",
           "expiry": "2027-02-05",
-          "days_to_exp": 127,
-          "px_per_g_pure": 15391.96,
-          "px_per_10g_pure": 153919.6,
-          "oi": 1815
+          "days_to_exp": 112,
+          "px_per_g_pure": 15131.56,
+          "px_per_10g_pure": 151315.58,
+          "oi": 2250
         },
         {
           "symbol": "GOLDM",
           "expiry": "2027-03-05",
-          "days_to_exp": 155,
-          "px_per_g_pure": 15539.4,
-          "px_per_10g_pure": 155393.97,
-          "oi": 239
+          "days_to_exp": 140,
+          "px_per_g_pure": 15269.55,
+          "px_per_10g_pure": 152695.48,
+          "oi": 407
+        },
+        {
+          "symbol": "GOLDM",
+          "expiry": "2027-04-05",
+          "days_to_exp": 171,
+          "px_per_g_pure": 15393.07,
+          "px_per_10g_pure": 153930.65,
+          "oi": 34
         },
         {
           "symbol": "GOLDPETAL",
           "expiry": "2026-10-30",
-          "days_to_exp": 29,
-          "px_per_g_pure": 15017.02,
-          "px_per_10g_pure": 150170.17,
-          "oi": 198482
+          "days_to_exp": 14,
+          "px_per_g_pure": 14769.77,
+          "px_per_10g_pure": 147697.7,
+          "oi": 192717
         },
         {
           "symbol": "GOLDPETAL",
           "expiry": "2026-11-30",
-          "days_to_exp": 60,
-          "px_per_g_pure": 15153.15,
-          "px_per_10g_pure": 151531.53,
-          "oi": 124644
+          "days_to_exp": 45,
+          "px_per_g_pure": 14903.9,
+          "px_per_10g_pure": 149039.04,
+          "oi": 151841
         },
         {
           "symbol": "GOLDPETAL",
           "expiry": "2026-12-31",
-          "days_to_exp": 91,
-          "px_per_g_pure": 15293.29,
-          "px_per_10g_pure": 152932.93,
-          "oi": 52214
+          "days_to_exp": 76,
+          "px_per_g_pure": 15050.05,
+          "px_per_10g_pure": 150500.5,
+          "oi": 70642
         },
         {
           "symbol": "GOLDPETAL",
           "expiry": "2027-01-29",
-          "days_to_exp": 120,
-          "px_per_g_pure": 15438.44,
-          "px_per_10g_pure": 154384.38,
-          "oi": 36316
+          "days_to_exp": 105,
+          "px_per_g_pure": 15191.19,
+          "px_per_10g_pure": 151911.91,
+          "oi": 38951
         },
         {
           "symbol": "GOLDPETAL",
           "expiry": "2027-02-26",
-          "days_to_exp": 148,
-          "px_per_g_pure": 15576.58,
-          "px_per_10g_pure": 155765.77,
-          "oi": 11492
+          "days_to_exp": 133,
+          "px_per_g_pure": 15326.33,
+          "px_per_10g_pure": 153263.26,
+          "oi": 13943
         },
         {
           "symbol": "GOLDPETAL",
           "expiry": "2027-03-31",
-          "days_to_exp": 181,
-          "px_per_g_pure": 15708.71,
-          "px_per_10g_pure": 157087.09,
-          "oi": 282
+          "days_to_exp": 166,
+          "px_per_g_pure": 15437.44,
+          "px_per_10g_pure": 154374.37,
+          "oi": 5070
         },
         {
           "symbol": "GOLDTEN",
           "expiry": "2026-10-30",
-          "days_to_exp": 29,
-          "px_per_g_pure": 14958.56,
-          "px_per_10g_pure": 149585.59,
-          "oi": 29866
+          "days_to_exp": 14,
+          "px_per_g_pure": 14696.6,
+          "px_per_10g_pure": 146965.97,
+          "oi": 29161
         },
         {
           "symbol": "GOLDTEN",
           "expiry": "2026-11-30",
-          "days_to_exp": 60,
-          "px_per_g_pure": 15098.5,
-          "px_per_10g_pure": 150984.98,
-          "oi": 15703
+          "days_to_exp": 45,
+          "px_per_g_pure": 14838.54,
+          "px_per_10g_pure": 148385.39,
+          "oi": 18730
         },
         {
           "symbol": "GOLDTEN",
           "expiry": "2026-12-31",
-          "days_to_exp": 91,
-          "px_per_g_pure": 15228.03,
-          "px_per_10g_pure": 152280.28,
-          "oi": 6801
+          "days_to_exp": 76,
+          "px_per_g_pure": 14987.09,
+          "px_per_10g_pure": 149870.87,
+          "oi": 8321
         },
         {
           "symbol": "GOLDTEN",
           "expiry": "2027-01-29",
-          "days_to_exp": 120,
+          "days_to_exp": 105,
+          "px_per_g_pure": 15132.83,
+          "px_per_10g_pure": 151328.33,
+          "oi": 4004
+        },
+        {
+          "symbol": "GOLDTEN",
+          "expiry": "2027-02-26",
+          "days_to_exp": 133,
+          "px_per_g_pure": 15261.06,
+          "px_per_10g_pure": 152610.61,
+          "oi": 1043
+        },
+        {
+          "symbol": "GOLDTEN",
+          "expiry": "2027-03-31",
+          "days_to_exp": 166,
           "px_per_g_pure": 15376.48,
           "px_per_10g_pure": 153764.76,
-          "oi": 2923
-        },
-        {
-          "symbol": "GOLDTEN",
-          "expiry": "2027-02-26",
-          "days_to_exp": 148,
-          "px_per_g_pure": 15506.51,
-          "px_per_10g_pure": 155065.07,
-          "oi": 823
-        },
-        {
-          "symbol": "GOLDTEN",
-          "expiry": "2027-03-31",
-          "days_to_exp": 181,
-          "px_per_g_pure": 15581.78,
-          "px_per_10g_pure": 155817.82,
-          "oi": 21
+          "oi": 187
         }
       ]
     }

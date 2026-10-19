@@ -152,11 +152,12 @@ class Component extends DCLogic {
         const b = D.backtest[id][s], c = HC && HC.pairs[id] ? HC.pairs[id].trades[s] : [];
         const cn = c.length, cnet = c.reduce((a, t) => a + t[5], 0);
         const has = !!(HC && HC.pairs[id]);
+        const f = b.fwd || { n_trades: 0, net_rs: 0 };
         rows.push([D.pairs[id].label, s, has ? cn : 'not listed', has ? Math.round(cnet) : '', b.train.n_trades, Math.round(b.train.net_rs), b.test.n_trades, Math.round(b.test.net_rs), b.test.t_stat,
-          cn + b.train.n_trades + b.test.n_trades, Math.round(cnet + b.train.net_rs + b.test.net_rs)]);
+          f.n_trades, Math.round(f.net_rs), cn + b.train.n_trades + b.test.n_trades + f.n_trades, Math.round(cnet + b.train.net_rs + b.test.net_rs + f.net_rs)]);
       }));
       return { title: 'Backtest by period, ' + D.longrun.start.slice(0, 4) + ' to ' + D.asOf.slice(0, 4),
-        head: ['Pair', 'Slippage (bps)', 'Clean test trades', 'Clean test after costs (Rs)', 'Training trades', 'Training after costs (Rs)', 'Test-year trades', 'Test year after costs (Rs)', 'Test-year t-statistic', 'All trades', 'All years after costs (Rs)'], rows };
+        head: ['Pair', 'Slippage (bps)', 'Clean test trades', 'Clean test after costs (Rs)', 'Training trades', 'Training after costs (Rs)', 'Test-year trades', 'Test year after costs (Rs)', 'Test-year t-statistic', 'After the test year: trades', 'After the test year (Rs)', 'All trades', 'All years after costs (Rs)'], rows };
     }
     return { title: 'Research report', head: ['Section', 'Contents'], rows: [['Verdict', 'No persistent edge proven after costs'], ['Today', 'Six pairs against the cost line'], ['Backtest', 'Clean test 2011–2023, training and test year, all pairs'], ['Costs', 'Round trip ' + D.costTotal.toFixed(1) + ' bps'], ['Data', D.longrun.allRows + ' daily settlements, ' + D.longrun.start.slice(0, 4) + '–' + D.asOf.slice(0, 4) + ' (' + D.longrun.rows + ' history book 2011–2023, ' + D.meta.rows + ' our MCX download), ' + D.meta.mismatches + ' mismatches']] };
   }
@@ -192,10 +193,11 @@ class Component extends DCLogic {
       '<h2>Today (' + this.fd(D.asOf) + '): gap from normal vs cost line, in bps</h2>' + tbl(['Pair', 'Gap from normal', 'Cost line', 'Status', 'Checks failed'], today) +
       '<h2>Clean test: ' + this.fd(D.longrun.start) + ' to ' + this.fd(D.longrun.end) + ' (rule frozen before this data was used)</h2>' +
       tbl(['Trades', 'After costs at 5 bps', 'After costs at 0 bps', 't-statistic', 'Losing years'], [[D.longrun.n, this.rs(D.longrun.net), this.rs(D.longrun.net0), String(D.longrun.t), (D.longrun.losingYears + ' of ' + D.longrun.years)]]) +
-      '<h2>Each pair, every year (5 bps slippage)</h2>' + tbl(['Pair', 'Clean test', 'Training', 'Test year', 'All years after costs'], Object.keys(D.backtest).map((id) => {
+      '<h2>Each pair, every year (5 bps slippage)</h2>' + tbl(['Pair', 'Clean test', 'Training', 'Test year', 'After the test year', 'All years after costs'], Object.keys(D.backtest).map((id) => {
         const b = D.backtest[id]['5'], c = HC && HC.pairs[id] ? HC.pairs[id].trades['5'] : null;
         const cn = c ? c.reduce((a, t) => a + t[5], 0) : 0;
-        return [D.pairs[id].label, c ? c.length + ' trades, ' + this.rs(cn) : 'not listed yet', b.train.n_trades + ' trades, ' + this.rs(b.train.net_rs), b.test.n_trades + ' trades, ' + this.rs(b.test.net_rs), this.rs(cn + b.train.net_rs + b.test.net_rs)];
+        const f = b.fwd || { n_trades: 0, net_rs: 0 };
+        return [D.pairs[id].label, c ? c.length + ' trades, ' + this.rs(cn) : 'not listed yet', b.train.n_trades + ' trades, ' + this.rs(b.train.net_rs), b.test.n_trades + ' trades, ' + this.rs(b.test.net_rs), f.n_trades + ' trades, ' + this.rs(f.net_rs), this.rs(cn + b.train.net_rs + b.test.net_rs + f.net_rs)];
       })) +
       '<h2>Slippage check</h2><p>' + this.html(D.evidence.slippage.summary) + '</p>' +
       '<p>' + this.html(D.evidence.multiple_testing.note) + '</p>' +
