@@ -5,7 +5,7 @@ rmSync('dist', { recursive: true, force: true })
 mkdirSync('dist')
 cpSync('index.html', 'dist/index.html')
 cpSync('public', 'dist', { recursive: true })
-for (const f of ['dist/index.html', 'dist/app/dc.js', 'dist/app/theme.js', 'dist/app/main.js', 'dist/app/glossary.js', 'dist/app/explain.js', 'dist/app/keys.js', 'dist/app/prefs.js', 'dist/app/pdf.js', 'dist/app/rail.js', 'dist/intro/index.html', 'dist/intro/intro.js', 'dist/pages/Explore.dc.html', 'dist/data/explore.json', 'dist/data/robustness.json', 'dist/data/history.json', 'dist/data/history_charts.json', 'dist/data/site-data.json', 'dist/pages/Home.dc.html', 'dist/pages/Rail.dc.html', 'dist/pages/TabBar.dc.html', 'dist/data/evidence.json']) {
+for (const f of ['dist/index.html', 'dist/app/dc.js', 'dist/app/theme.js', 'dist/app/main.js', 'dist/app/glossary.js', 'dist/app/explain.js', 'dist/app/keys.js', 'dist/app/prefs.js', 'dist/app/pdf.js', 'dist/app/rail.js', 'dist/intro/index.html', 'dist/intro/intro.js', 'dist/intro/footer.js', 'dist/pages/Explore.dc.html', 'dist/data/explore.json', 'dist/data/robustness.json', 'dist/data/history.json', 'dist/data/history_charts.json', 'dist/data/site-data.json', 'dist/pages/Home.dc.html', 'dist/pages/Rail.dc.html', 'dist/pages/TabBar.dc.html', 'dist/data/evidence.json']) {
   if (!existsSync(f)) { console.error('Missing after build: ' + f); process.exit(1) }
 }
 console.log('Built dist/')
