@@ -3,12 +3,20 @@
  "round_trip_cost_bps": 24.4,
  "alerts": {
   "alert": {
-   "n": 56,
-   "halfway_pct": 79,
-   "median_closed_bps": 35.6,
-   "mean_closed_bps": 40.1,
-   "median_gap_bps": 78.7,
-   "median_days_to_half": 2.0
+   "n": 202,
+   "halfway_pct": 63,
+   "median_closed_bps": 24.1,
+   "mean_closed_bps": 5.4,
+   "median_gap_bps": 74.5,
+   "median_days_to_half": 3.0
+  },
+  "alert_clean": {
+   "n": 146,
+   "halfway_pct": 58,
+   "median_closed_bps": 18.3,
+   "mean_closed_bps": -7.9,
+   "median_gap_bps": 73.4,
+   "median_days_to_half": 3.0
   },
   "alert_test": {
    "n": 19,
@@ -30,22 +38,23 @@
    "n": 0
   },
   "unusual_small": {
-   "n": 216,
-   "halfway_pct": 75,
-   "median_closed_bps": 20.4,
-   "mean_closed_bps": 32.4,
-   "median_gap_bps": 50.0,
-   "median_days_to_half": 2.0
+   "n": 769,
+   "halfway_pct": 58,
+   "median_closed_bps": 14.9,
+   "mean_closed_bps": 11.6,
+   "median_gap_bps": 66.8,
+   "median_days_to_half": 2
   },
   "ordinary": {
-   "n": 1855,
-   "halfway_pct": 82,
-   "median_closed_bps": -6.3,
-   "mean_closed_bps": -12.8,
-   "median_gap_bps": 10.2,
+   "n": 7255,
+   "halfway_pct": 80,
+   "median_closed_bps": -10.9,
+   "mean_closed_bps": -20.8,
+   "median_gap_bps": 11.6,
    "median_days_to_half": 2
   }
  },
+ "groups_from": "2011-04-18",
  "alert_list": [
   {
    "pair": "M_GUINEA",
@@ -751,6 +760,13 @@
    "lo": -77229.8,
    "hi": 43637.4,
    "above_zero_pct": 30
+  },
+  "clean_5": {
+   "n": 151,
+   "total": -549069.8,
+   "lo": -846623,
+   "hi": -281414,
+   "above_zero_pct": 0
   }
  },
  "seed": 7,

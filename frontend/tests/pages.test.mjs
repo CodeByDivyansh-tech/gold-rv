@@ -8,6 +8,7 @@ const D = JSON.parse(readFileSync('public/data/site-data.json', 'utf8'))
 const R = JSON.parse(readFileSync('public/data/robustness.json', 'utf8'))
 const H = JSON.parse(readFileSync('public/data/history.json', 'utf8'))
 const HC = JSON.parse(readFileSync('public/data/history_charts.json', 'utf8'))
+const E = JSON.parse(readFileSync('public/data/explore.json', 'utf8'))
 const PAIRS = ['M_TEN', 'M_PETAL', 'M_GUINEA', 'TEN_PETAL', 'GUINEA_TEN', 'GUINEA_PETAL']
 const SLIPS = ['0', '2', '5', '10']
 
@@ -24,12 +25,14 @@ const states = {
   Home: [{}, { range: '1M', hover: 5 }, { range: '3Y', hover: 100 }, { dark: false }, { H, range: '10Y', hover: 200 }, { H, range: 'All', hover: 900 }, { range: 'All' }],
   Today: [{}, { ri: 0 }, { ri: 60 }, { ri: 120, speed: 2 }, { HC }, { HC, ri: 0 }, { HC, ri: 400 }, { HC, rspan: 'ours', ri: 10 }],
   Market: [{}, { range: '3M', hover: 10 }, { range: '3Y', hover: 150 }, { H, range: '10Y', hover: 100 }, { H, range: 'All', hover: 1000 }, { range: '10Y' }, { HC }, { HC, vspan: 'ours' }],
-  Pairs: PAIRS.flatMap((pair) => [{ pair }, { pair, hover: 20, allTrades: true }, { pair, HC, allTrades: true }, { pair, HC, span: 'ours' }]),
+  Pairs: PAIRS.flatMap((pair) => [{ pair }, { pair, hover: 20, allTrades: true }, { pair, HC, allTrades: true }, { pair, HC, span: 'ours' }, { pair, HC, story: D.pairs[pair].trades.length ? D.pairs[pair].trades[0].sig + '|' + D.pairs[pair].trades[0].e : null }]),
   Signals: PAIRS.map((pair) => ({ pair, allPast: true })).concat([{ R }, { R, cs: '0', cb: '0', cz: '1' }, { R, cs: '', cb: 'abc', cz: '0' }, { cs: '10', cb: '50', cz: '25' }]),
   Backtesting: PAIRS.flatMap((pair) => SLIPS.map((slip) => ({ pair, slip, hover: 0 }))).concat([{ R }, { R, H }, { H, pair: 'GUINEA_TEN', slip: '10' }]).concat(PAIRS.flatMap((pair) => SLIPS.map((slip) => ({ pair, slip, HC })))).concat([{ HC, espan: 'ours' }]),
   Data: [{}, { all: true }, { H }, { H, all: true }],
+  Explore: [{ E }, { E, xpair: 'M_TEN' }, { E, xpair: 'GUINEA_PETAL', slip: '0' }, { E, pub: '0', ze: '3.0', W: '10', mh: '20', h: '0' },
+    { E, xpair: 'ALL', pub: '0', ze: '1.5' }, ...PAIRS.flatMap((xpair) => ['0', '10'].map((slip) => ({ E, xpair, slip, pub: '0' })))],
   DownloadPanel: ['today', 'prices', 'trades', 'backtest', 'report'].flatMap((what) =>
-    ['3m', 'all'].map((period) => ({ what, period, pair: 'ALL' }))),
+    ['3m', 'all', 'test'].map((period) => ({ what, period, pair: 'ALL', H, HC }))),
 }
 
 let runs = 0
@@ -62,7 +65,7 @@ for (const [name, list] of Object.entries(states)) {
   const v = c.renderVals()
   assert.equal(v.calc.rt, D.costTotal.toFixed(2))
   assert.equal(v.calc.count, D.today.filter((p) => p.dev >= 2 * D.rt).length + ' of ' + D.today.length)
-  assert.ok(v.ft.show && v.ft.rows.length === 4)
+  assert.ok(v.ft.show && v.ft.rows.length === 5 && /clean test/.test(v.ft.rows[0].name), 'follow-through starts with the clean test')
 }
 // Shared menus: exactly one item is marked as the current page, on every page
 for (const name of ['Rail', 'TabBar']) {
@@ -75,7 +78,7 @@ for (const name of ['Rail', 'TabBar']) {
   }
 }
 // Every page uses the shared menus instead of its own copy
-for (const name of ['Home', 'Today', 'Market', 'Pairs', 'Signals', 'Backtesting', 'Data']) {
+for (const name of ['Home', 'Today', 'Market', 'Pairs', 'Signals', 'Backtesting', 'Explore', 'Data']) {
   const src = readFileSync(`public/pages/${name}.dc.html`, 'utf8')
   assert.ok(src.includes(`<dc-import name="Rail" current="${name}">`) && src.includes(`<dc-import name="TabBar" current="${name}">`), `${name} uses the shared menus`)
   assert.ok(!src.includes('<aside class="rail"') && !src.includes('<nav class="tabbar"'), `${name} still has its own menu copy`)
@@ -143,3 +146,101 @@ console.log(`pages ok: ${runs} page states rendered against site-data.json`)
   assert.match(r.title, /Replay 15 years/)
 }
 console.log('full-history charts ok')
+
+// Try your own rule: the published setting for all pairs adds up to the published results, period by period
+{
+  const x = new (load('Explore'))(); x.props = {}; x.state = { D, E }
+  const v = x.renderVals()
+  const cur = D.rule.current['5'], L = D.longrun
+  const want = L.net + Object.keys(D.backtest).reduce((a, p) => a + D.backtest[p]['5'].train.net_rs + D.backtest[p]['5'].test.net_rs, 0)
+  const got = +v.res.total.replace(/[^0-9]/g, '') * (v.res.total.startsWith('−') ? -1 : 1)
+  assert.ok(Math.abs(got - want) <= 12, 'published total ' + got + ' vs ' + want)
+  assert.equal(v.modeLabel, 'Published rule')
+  assert.match(v.periods[0].detail, new RegExp('^' + L.n + ' trades'))
+  assert.equal(v.years.n, E.years.length)
+  const c = new (load('Explore'))(); c.props = {}; c.state = { D, E, pub: '0', ze: '3.0' }
+  const w = c.renderVals()
+  assert.equal(w.modeLabel, 'Your settings'); assert.match(w.res.compare, /published rule/)
+  const g = new (load('Explore'))(); g.props = {}; g.state = { D, E, xpair: 'M_TEN' }
+  assert.equal(g.renderVals().periods[0].net, 'GOLDTEN not listed yet')
+}
+console.log('explorer ok')
+
+// ---------------------------------------------------------------------------------------------
+// Guard: a part of the study must never stand in for the whole (Oct-2026 review, twice reported).
+// The study runs 2011 to today. The 12-month test year and our own 3-year MCX download are parts of it:
+// they may be shown, but always named as parts, never as the headline result or the dataset size.
+{
+  const PAGES = ['Home', 'Today', 'Market', 'Pairs', 'Signals', 'Backtesting', 'Explore', 'Data', 'DownloadPanel']
+  // 1) phrases that presented a part as the whole, in the page files themselves
+  const BANNED = [/On the 12-month test year/, /Trades in the test year/, /Results on the test year/, /Training period, for comparison/,
+    /tested it on the next twelve months/, /'daily settlements checked'/, /'Everything'\]/, /Backtest on the test year/]
+  for (const name of PAGES) {
+    const src = readFileSync(`public/pages/${name}.dc.html`, 'utf8')
+    for (const re of BANNED) assert.ok(!re.test(src), `${name}: still says ${re}`)
+  }
+  // 2) rendered text: our download's row count may appear only where it is named as our download / the raw MCX file
+  const ours = D.meta.rows.toLocaleString('en-IN'), L = D.longrun
+  const S = { D, H, HC, R, E }
+  for (const name of PAGES) {
+    const c = new (load(name))(); c.props = name === 'DownloadPanel' ? { dark: true, onClose: () => {} } : {}; c.state = { ...S }
+    const strs = []
+    JSON.stringify(c.renderVals(), (k, x) => { if (typeof x === 'string') strs.push(x); return typeof x === 'function' ? undefined : x })
+    for (const t of strs) {
+      if (t === ours || t.includes(ours + ' daily') || t.includes(ours + ' rows')) {
+        assert.ok(/download|MCX file|raw MCX|history book|our own|Oct 2023/i.test(t), `${name}: shows ${ours} (our download only) without saying so: "${t.slice(0, 120)}"`)
+      }
+      assert.ok(!/^\d+ trades in the test year$/.test(t), `${name}: test-year trade count used as a headline: "${t}"`)
+    }
+  }
+  // 3) the headline numbers themselves cover every year
+  const dv = new (load('Data'))(); dv.props = {}; dv.state = { D, H }
+  const dvals = dv.renderVals()
+  assert.equal(dvals.big[0].value, L.allRows.toLocaleString('en-IN'), 'Data page leads with every daily price since 2011')
+  assert.equal(dvals.big[2].value, L.allDays.toLocaleString('en-IN'))
+  assert.match(dvals.big[0].note, new RegExp(L.rows.toLocaleString('en-IN') + '.*' + ours))
+  for (const pair of ['M_PETAL', 'M_GUINEA', 'GUINEA_PETAL']) {
+    const pg = new (load('Pairs'))(); pg.props = {}; pg.state = { D, HC, pair }
+    const v = pg.renderVals()
+    assert.match(v.sumTitle, /^This pair, Apr 2011 – Oct 2026$/)
+    const n = HC.pairs[pair].trades['5'].length + D.pairs[pair].trades.length
+    assert.equal(v.testKpis[0].value, String(n), pair + ': headline trade count covers every year')
+    assert.equal(v.periods[0].name, 'Clean test')
+    const b = new (load('Backtesting'))(); b.props = {}; b.state = { D, HC, pair, slip: '5' }
+    const k = b.renderVals().kpis
+    assert.equal(k[0].label, 'Trades, 2011–2026'); assert.equal(k[0].value, String(HC.pairs[pair].trades['5'].length + D.backtest[pair]['5'].train.n_trades + D.backtest[pair]['5'].test.n_trades))
+  }
+  // without the 2011-2023 file the totals wait ("…"); they never fall back to the test year alone
+  const pw = new (load('Pairs'))(); pw.props = {}; pw.state = { D, pair: 'M_PETAL' }
+  assert.equal(pw.renderVals().testKpis[0].value, '…')
+  const bw = new (load('Backtesting'))(); bw.props = {}; bw.state = { D, pair: 'M_PETAL' }
+  assert.equal(bw.renderVals().kpis[0].value, '…')
+  console.log('partial-period guard ok')
+}
+
+// New features: trade story, compare periods, compare pairs, next step, how we know
+{
+  const pg = new (load('Pairs'))(); pg.props = {}; pg.state = { D, HC, pair: 'M_PETAL' }
+  const t0 = HC.pairs.M_PETAL.trades['5'][0]
+  pg.state.story = t0[0] + '|' + t0[1]
+  const sv = pg.renderVals().story
+  assert.equal(sv.on, true); assert.equal(sv.steps.length, 4); assert.ok(sv.dates.length > 10 && sv.markers.length === 2)
+  assert.match(sv.sub, /clean test/)
+  const ours = D.pairs.M_PETAL.trades[0]; pg.state.story = ours.sig + '|' + ours.e
+  assert.equal(pg.renderVals().story.on, true)
+  const b = new (load('Backtesting'))(); b.props = {}; b.state = { D, HC, R, cmpA: 'clean', cmpB: 'exc', mpSel: 'M_PETAL,M_TEN' }
+  const v = b.renderVals()
+  assert.equal(v.cmp.rows[0].a, String(L_N()))
+  assert.equal(v.cmp.nameB, 'Test year without the crash')
+  assert.equal(v.cmp.rows[0].b, String(D.rule.current['5'].ex_crash_n))
+  assert.equal(v.mp.series.length, 2); assert.equal(v.mp.dates[0], HC.from)
+  const mpl = v.mp.series[0].values; assert.ok(Math.abs(mpl[mpl.length - 1] - (HC.pairs.M_PETAL.trades['5'].reduce((a, t) => a + t[5], 0) + D.backtest.M_PETAL['5'].curve.reduce((a, c) => a + c[2], 0))) < 3)
+  const tv = new (load('Today'))(); tv.props = {}; tv.state = { D, HC }
+  const nx = tv.renderVals().next
+  assert.match(nx.fresh, /not a live feed/); assert.match(nx.text, /Since Apr 2011/)
+  const dv = new (load('Data'))(); dv.props = {}; dv.state = { D, H }
+  const hw = dv.renderVals().how
+  assert.equal(hw[0].value, D.longrun.allRows.toLocaleString('en-IN')); assert.ok(hw.length >= 5)
+  console.log('new features ok')
+}
+function L_N() { return D.longrun.n }

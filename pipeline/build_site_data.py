@@ -711,6 +711,9 @@ def build_all_site_data(output_dir: str = 'frontend/public/data'):
     print("--- 7b. Long-history check: frozen rule on 2011-2023 (MCX history book) ---")
     from pipeline.history import build as build_history
     hist = build_history(output_dir)
+    print("--- 7b2. Explorer grid: the real engine over a grid of settings ('Try your own rule') ---")
+    from pipeline.explore import build as build_explore
+    build_explore(output_dir)
     print("--- 7c. Evidence checks: test-year status, slippage, multiple testing, switch ---")
     from pipeline.evidence import build as build_evidence
     ev = build_evidence(output_dir)
@@ -769,13 +772,13 @@ def build_all_site_data(output_dir: str = 'frontend/public/data'):
     )
     methodology_data = {
         'stages': [
-            {'step': 1, 'name': 'Load & Validate', 'desc': f'Parse {len(df):,} rows, strip symbols, check primary keys, compare against the raw MCX file, flag no-trade days.'},
+            {'step': 1, 'name': 'Load & Validate', 'desc': f'Parse {hist["window"]["rows"] + len(df):,} daily prices: {hist["window"]["rows"]:,} from the MCX history book (2011–2023) and {len(df):,} from our own MCX download (Oct 2023 on). Strip symbols, check primary keys, compare against the raw MCX file and the book, flag no-trade days.'},
             {'step': 2, 'name': 'Normalize', 'desc': 'Divide close by quote grams and purity to get a price per gram of pure gold.'},
             {'step': 3, 'name': 'Implied Carry', 'desc': 'Estimate the cost of carry from GOLDPETAL calendar spreads; forward-fill only.'},
             {'step': 4, 'name': 'Pair Construction', 'desc': 'Pick contracts using the previous day\'s open interest, so nothing from the future is used.'},
             {'step': 5, 'name': 'Point-in-Time z-scores', 'desc': 'Rolling mean and spread of each gap use only earlier days.'},
             {'step': 6, 'name': 'One rule: five checks', 'desc': f'The same five checks drive today\'s alerts and every backtest trade: enough history, an unusual gap that is not already past the stop-loss, a gap bigger than {HURDLE_MULTIPLE:.0f}× the round-trip cost, liquidity, and contract life.'},
-            {'step': 7, 'name': 'Walk-Forward Test', 'desc': f'Settings tuned on Train ({TRAIN_START[:7]} to {TRAIN_END[:7]}) and frozen for Test ({TEST_START[:7]} to {TEST_END[:7]}). A pair is traded in Test only if training gave at least {MIN_TRAIN_TRADES} trades and a profit.'},
+            {'step': 7, 'name': 'Walk-Forward Test', 'desc': f'Settings tuned on Train ({TRAIN_START[:7]} to {TRAIN_END[:7]}) and frozen for Test ({TEST_START[:7]} to {TEST_END[:7]}). A pair is traded in Test only if training gave at least {MIN_TRAIN_TRADES} trades and a profit. The same frozen rule is then run on {hist["window"]["from"][:4]}–{hist["window"]["to"][:4]}, years it never saw: the clean test.'},
             {'step': 8, 'name': 'Costs & Attribution', 'desc': f'Each closed trade is split into spread and gold parts after statutory costs and slippage. No fills on days a leg moved {MAX_FILL_MOVE*100:.0f}% or more.'},
         ],
         'split_dates': {

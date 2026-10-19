@@ -23,17 +23,29 @@
         </div>
         <a href="Signals.dc.html" aria-current="{{nav.Signals.cur}}" style="text-decoration: none; padding: 14px 12px; border-radius: 12px; {{nav.Signals.sheet}}; font-size: 15px">Signals: why it's quiet</a>
         <a href="Backtesting.dc.html" aria-current="{{nav.Backtesting.cur}}" style="text-decoration: none; padding: 14px 12px; border-radius: 12px; {{nav.Backtesting.sheet}}; font-size: 15px">Backtesting: did it make money?</a>
+        <a href="Explore.dc.html" aria-current="{{nav.Explore.cur}}" style="text-decoration: none; padding: 14px 12px; border-radius: 12px; {{nav.Explore.sheet}}; font-size: 15px">Try your own rule: change the settings</a>
         <a href="Data.dc.html" aria-current="{{nav.Data.cur}}" style="text-decoration: none; padding: 14px 12px; border-radius: 12px; {{nav.Data.sheet}}; font-size: 15px">Data: where the numbers come from</a>
+        <button type="button" onClick="{{toggleSimple}}" aria-pressed="{{simplePressed}}" title="Simple view hides the technical deep-dives. The numbers stay the same." style="min-height: 48px; padding: 0 12px; border-radius: 12px; border: 1px solid var(--line); background: transparent; color: var(--fg); font: 500 15px 'Geist', system-ui, sans-serif; cursor: pointer; display: flex; align-items: center; justify-content: space-between; gap: 10px; text-align: left"><span>Simple view</span><span style="font-size: 12px; padding: 2px 8px; border-radius: 999px; {{simpleBadge}}">{{simpleState}}</span></button>
+        <button type="button" onClick="{{share}}" style="margin-top: 6px; min-height: 48px; padding: 0 12px; border-radius: 12px; border: 1px solid var(--line); background: transparent; color: var(--fg); font: 500 15px 'Geist', system-ui, sans-serif; cursor: pointer; display: flex; align-items: center; gap: 10px; text-align: left"><svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true" style="fill: none; stroke: currentColor; stroke-width: 1.8px; stroke-linecap: round; stroke-linejoin: round"><path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1"></path><path d="M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"></path></svg>{{shareLabel}}</button>
+        <span role="status" aria-live="polite" style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0)">{{shareSay}}</span>
       </div>
     </div>
   </sc-if>
 </x-dc>
-<script type="text/x-dc" data-dc-script data-props='{"current":{"editor":"enum","options":["Home","Today","Market","Pairs","Signals","Backtesting","Data"],"default":"Home"}}'>
+<script type="text/x-dc" data-dc-script data-props='{"current":{"editor":"enum","options":["Home","Today","Market","Pairs","Signals","Backtesting","Explore","Data"],"default":"Home"}}'>
 class Component extends DCLogic {
+  share() {
+    if (typeof GRVPrefs === 'undefined') return;
+    GRVPrefs.copyLink().then((ok) => {
+      this.setState({ copied: ok ? 'yes' : 'no' });
+      clearTimeout(this._ct); this._ct = setTimeout(() => this.setState({ copied: null }), 2500);
+    });
+  }
+
   renderVals() {
     const cur = this.props.current || 'Home';
     const nav = {};
-    ['Home', 'Today', 'Market', 'Pairs', 'Signals', 'Backtesting', 'Data'].forEach((p) => {
+    ['Home', 'Today', 'Market', 'Pairs', 'Signals', 'Backtesting', 'Explore', 'Data'].forEach((p) => {
       const on = p === cur;
       nav[p] = {
         cur: on ? 'page' : null,
@@ -42,9 +54,16 @@ class Component extends DCLogic {
         sheet: on ? 'background: var(--glow); color: var(--gold); font-weight: 600' : 'background: var(--raised)'
       };
     });
-    const deep = ['Signals', 'Backtesting', 'Data'].indexOf(cur) >= 0;
+    const deep = ['Signals', 'Backtesting', 'Explore', 'Data'].indexOf(cur) >= 0;
     const st = this.state || {};
     return {
+      share: () => this.share(),
+      toggleSimple: () => { if (typeof GRVTheme !== 'undefined' && GRVTheme.simple) { GRVTheme.simple(!GRVTheme.simple()); this.setState({ simpleTick: Date.now() }); } },
+      simplePressed: typeof GRVTheme !== 'undefined' && GRVTheme.simple && GRVTheme.simple() ? 'true' : 'false',
+      simpleState: typeof GRVTheme !== 'undefined' && GRVTheme.simple && GRVTheme.simple() ? 'On' : 'Off',
+      simpleBadge: typeof GRVTheme !== 'undefined' && GRVTheme.simple && GRVTheme.simple() ? 'background: var(--glow); color: var(--gold)' : 'background: var(--raised); color: var(--muted)',
+      shareLabel: st.copied === 'yes' ? 'Link copied' : (st.copied === 'no' ? 'Copy failed: use the address bar' : 'Copy link to this view'),
+      shareSay: st.copied === 'yes' ? 'Link to this view copied' : (st.copied === 'no' ? 'Could not copy the link' : ''),
       nav, more: !!st.more, moreExpanded: st.more ? 'true' : 'false',
       moreBtn: { weight: deep ? '600' : '400', color: deep ? 'var(--gold)' : 'var(--muted)' },
       openMore: () => this.setState({ more: true }), closeMore: () => this.setState({ more: false })

@@ -1,9 +1,11 @@
 """Two extra checks on the published results (run after build_site_data):
 
 1. Alert follow-through: after a signal fires, does the gap from normal actually close?
-   Compared with days that did not fire, using each pair's own daily series.
+   Compared with days that did not fire, using each pair's own daily series, over every year we have:
+   the clean test 2011-2023 (MCX history book, the three pairs that existed) plus our own download.
 2. How sure can we be: a bootstrap 95% range for the unseen-year result, by resampling
-   the closed trades (10,000 draws, fixed seed so the numbers never change).
+   the closed trades (10,000 draws, fixed seed so the numbers never change), for the clean test,
+   training and the test year.
 
 Reads only files in frontend/public/data and writes frontend/public/data/robustness.json.
 Run: python -m pipeline.robustness
@@ -74,13 +76,49 @@ def bootstrap(values, rng, draws=DRAWS):
                 above_zero_pct=round(100 * sum(1 for t in totals if t > 0) / draws))
 
 
+def _history_series(data_dir):
+    """The clean-test years (2011-2023) as daily pair series in the same shape as pairs/{p}.json, plus the
+    clean-test signal days, so follow-through is measured the same way on every year we have."""
+    import pandas as pd
+    from pipeline.history import HISTORY_PAIRS, HISTORY_START, BOOK_PATH, OURS_PATH, history_frame, load_book
+    from pipeline.pairs import build_pair_series, compute_rolling_z
+    book = load_book(BOOK_PATH)
+    end = pd.read_csv(OURS_PATH, parse_dates=['date'])['date'].min() - pd.Timedelta(days=1)
+    df, dates, tdi, carry = history_frame(book, end)
+    hc = _load(data_dir, 'history_charts.json')
+    out, sigs = {}, {}
+    for p in HISTORY_PAIRS:
+        W = _load(data_dir, f'backtest/{p}_5.json')['params']['W']
+        x = compute_rolling_z(build_pair_series(df, p, carry), W=int(W))
+        x = x[x['date'] >= pd.Timestamp(HISTORY_START)]
+        out[p] = [dict(d=r.date.strftime('%Y-%m-%d'), ea=r.expiry_a.strftime('%Y-%m-%d'), eb=r.expiry_b.strftime('%Y-%m-%d'),
+                       s=float(r.spread), mu=None if pd.isna(r.mu) else float(r.mu), z=None if pd.isna(r.z) else float(r.z))
+                  for r in x.itertuples()]
+        sigs[p] = {t[0]: t[5] for t in hc['pairs'][p]['trades']['5']}
+    return out, sigs
+
+
 def build(data_dir='frontend/public/data'):
     history = _load(data_dir, 'signals_history.json')
     rt_cost = round(_load(data_dir, 'site-data.json')['rt'], 2) if os.path.exists(os.path.join(data_dir, 'site-data.json')) else 24.38
     sig_days = {(h['pair'], h['date']): h for h in history}
 
-    groups = {'alert': [], 'alert_test': [], 'alert_train': [], 'alert_forward': [], 'unusual_small': [], 'ordinary': []}
+    groups = {'alert': [], 'alert_clean': [], 'alert_test': [], 'alert_train': [], 'alert_forward': [], 'unusual_small': [], 'ordinary': []}
     per_alert = []
+    hist, hsig = _history_series(data_dir)
+    for p, series in hist.items():
+        ze = _load(data_dir, f'backtest/{p}_5.json')['params']['ze']
+        for i, r in enumerate(series):
+            ft = follow_through(series, i)
+            if ft is None:
+                continue
+            if r['d'] in hsig[p]:
+                groups['alert'].append(ft)
+                groups['alert_clean'].append(ft)
+            elif abs(r['z']) >= ze:
+                groups['unusual_small'].append(ft)
+            elif abs(r['z']) < 1.0:
+                groups['ordinary'].append(ft)
     for p in PAIRS:
         ze = _load(data_dir, f'backtest/{p}_5.json')['params']['ze']
         series = _load(data_dir, f'pairs/{p}.json')
@@ -123,8 +161,12 @@ def build(data_dir='frontend/public/data'):
         train5 += [t['net'] for t in _load(data_dir, f'backtest/{p}_5.json')['trades'] if t['seg'] == 'train']
     boot['train_5'] = bootstrap(train5, rng)
     boot['train_5']['total'] = by_slip['5']['train_net_rs']
+    hc = _load(data_dir, 'history_charts.json')
+    clean5 = [t[5] for p in hc['pairs'].values() for t in p['trades']['5']]
+    boot['clean_5'] = bootstrap(clean5, rng)
+    boot['clean_5']['total'] = _load(data_dir, 'history.json')['result']['by_slip']['5']['net_rs']
 
-    out = dict(horizon_days=HORIZON, round_trip_cost_bps=rt_cost, alerts=alerts,
+    out = dict(horizon_days=HORIZON, round_trip_cost_bps=rt_cost, alerts=alerts, groups_from=hc['from'],
                alert_list=sorted(per_alert, key=lambda a: a['date'], reverse=True),
                bootstrap=boot, seed=SEED, draws=DRAWS, crash_window=list(CRASH))
     with open(os.path.join(data_dir, 'robustness.json'), 'w', encoding='utf-8') as f:

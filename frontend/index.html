@@ -27,6 +27,8 @@
       @keyframes boot { from { opacity: .35 } to { opacity: 1 } }
       @media (prefers-reduced-motion: reduce) { .boot svg { animation: none } }
       .boot-error { margin: 15vh auto; max-width: 420px; padding: 24px; display: flex; flex-direction: column; gap: 12px; font-size: 16px; }
+      .grv-skip { position: fixed; left: 12px; top: -80px; z-index: 70; }
+      .grv-skip:focus { top: 12px; }
       .boot-error button { align-self: flex-start; min-height: 44px; padding: 0 16px; border-radius: 12px; border: 0; background: #E5B04A; color: #1B1305; font: 600 14px inherit; cursor: pointer; }
     </style>
     <script>
@@ -38,6 +40,7 @@
     </script>
   </head>
   <body>
+    <button type="button" class="grv-skip" onclick="var m=document.querySelector('#app main');if(m){m.setAttribute('tabindex','-1');m.focus();m.scrollIntoView();}">Skip to the page content</button>
     <div id="app">
       <div class="boot" role="status" aria-label="Loading Gold RV Intelligence">
         <svg viewBox="8 18 48 28" aria-hidden="true"><path fill="#E5B04A" d="M8 28L12 18H44L48 28Z M16 46L20 36H52L56 46Z"/></svg>
@@ -46,6 +49,7 @@
     <noscript><p style="padding: 24px">Gold RV Intelligence needs JavaScript to draw its charts.</p></noscript>
     <script src="app/theme.js"></script>
     <script src="app/dc.js"></script>
+    <script src="app/prefs.js"></script>
     <script src="app/main.js"></script>
     <script src="app/glossary.js"></script>
     <script src="app/explain.js"></script>
