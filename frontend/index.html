@@ -32,6 +32,11 @@
       .boot-error button { align-self: flex-start; min-height: 44px; padding: 0 16px; border-radius: 12px; border: 0; background: #E5B04A; color: #1B1305; font: 600 14px inherit; cursor: pointer; }
     </style>
     <script>
+      // First visit to the home page: show the 3D intro once (intro/ remembers it was seen). Links to any other page,
+      // and ?nointro, go straight to the site.
+      try {
+        if (!localStorage.getItem('grv-intro-seen') && (location.hash === '' || location.hash === '#/' || location.hash === '#') && !/[?&]nointro/.test(location.search)) location.replace('intro/');
+      } catch (e) {}
       // Paint the saved theme before the page loads, so there is no flash
       try {
         var t = localStorage.getItem('grv-theme');
