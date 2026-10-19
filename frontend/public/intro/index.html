@@ -36,13 +36,21 @@
   section { position: relative; min-height: 130vh; padding: 0 clamp(16px, 5vw, 64px); }
   section.long { min-height: 260vh; }
   .card { position: sticky; top: 18vh; max-width: 470px; padding: 26px 26px 24px; border-radius: 22px; border: 1px solid var(--line);
-    background: linear-gradient(180deg, rgba(229,176,74,.12), rgba(24,17,8,.84) 30%, rgba(18,13,6,.80));
-    -webkit-backdrop-filter: blur(16px) saturate(140%); backdrop-filter: blur(16px) saturate(140%);
+    background: linear-gradient(180deg, rgba(229,176,74,.14), rgba(30,21,10,.66) 32%, rgba(18,13,6,.62));
+    -webkit-backdrop-filter: blur(22px) saturate(150%); backdrop-filter: blur(22px) saturate(150%);
     box-shadow: inset 0 1px 0 rgba(255,236,190,.12), 0 24px 60px rgba(0,0,0,.35); }
   .card.right { margin-left: auto; }
   .card.center { margin: 0 auto; text-align: center; max-width: 620px; }
   .hero { min-height: 100vh; display: flex; align-items: flex-end; padding-bottom: 12vh; }
-  .hero .card { position: relative; top: 0; background: none; border: 0; box-shadow: none; -webkit-backdrop-filter: none; backdrop-filter: none; padding: 0; max-width: 720px; }
+  .hero .card { position: relative; top: 0; max-width: 680px; padding: 34px 34px 28px; }
+  /* lit glass, as in the site's left menu: warm gold light falling from the top edge */
+  .card { overflow: hidden; }
+  .card::before { content: ""; position: absolute; left: 0; right: 0; top: 0; height: 150px; pointer-events: none;
+    background: radial-gradient(90% 100% at 50% 0%, rgba(240,197,102,.24), rgba(240,197,102,0) 72%); }
+  .card::after { content: ""; position: absolute; left: 18px; right: 18px; top: 0; height: 1px; pointer-events: none;
+    background: linear-gradient(90deg, transparent, rgba(255,226,160,.75), transparent); }
+  .card > * { position: relative; }
+  .brand { padding: 8px 14px 8px 10px; border-radius: 999px; border: 1px solid var(--line); background: rgba(20,14,7,.5); -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px); }
   h1 { margin: 0; font-size: clamp(44px, 8vw, 104px); line-height: .95; letter-spacing: -0.045em; font-weight: 800;
     background: linear-gradient(100deg, #FFE7A8 0%, #E5B04A 35%, #E070AE 70%, #9B6BD6 100%); -webkit-background-clip: text; background-clip: text; color: transparent; }
   h2 { margin: 0 0 12px; font-size: clamp(26px, 3.4vw, 38px); line-height: 1.08; letter-spacing: -0.025em; font-weight: 700; }
