@@ -93,6 +93,16 @@ button:focus-visible,a:focus-visible,input:focus-visible{outline:2px solid var(-
               <span style="display: flex; align-items: center; gap: 6px"><span style="width: 10px; height: 10px; border-radius: 50%; border: 2px solid var(--down); box-sizing: border-box"></span>Lost money</span>
             </div>
           </div>
+          <sc-if value="{{chart.hasSpans}}" hint-placeholder-val="{{ true }}">
+            <div role="group" aria-label="Period shown" style="display: flex; flex-wrap: wrap; gap: 8px">
+              <sc-for list="{{chart.spans}}" as="b" hint-placeholder-count="2">
+                <button type="button" onClick="{{b.pick}}" aria-pressed="{{b.pressed}}" style="{{b.style}}">{{b.label}}</button>
+              </sc-for>
+            </div>
+          </sc-if>
+          <sc-if value="{{chart.hasSpanNote}}" hint-placeholder-val="{{ false }}">
+            <p style="margin: 0; font-size: 13px; color: var(--muted); line-height: 1.6">{{chart.spanNote}}</p>
+          </sc-if>
           <dc-import name="LineChart" dates="{{chart.dates}}" series="{{chart.series}}" envelope="{{chart.envelope}}" markers="{{chart.markers}}" bands="{{chart.bands}}" fmt="bps" height="340" zero="{{ true }}" clamp-lo="{{chart.vlo}}" clamp-hi="{{chart.vhi}}" label="{{chart.aria}}" hint-size="100%,460px"></dc-import>
           <sc-if value="{{chart.clipped}}" hint-placeholder-val="{{ false }}">
             <p style="margin: 0; font-size: 13px; color: var(--muted); line-height: 1.6">{{chart.clipNote}}</p>
@@ -206,6 +216,11 @@ class Component extends DCLogic {
       .then((r) => r.json())
       .then((d) => this.setState({ D: d }))
       .catch(() => this.setState({ failed: true }));
+    // 2011-2023 daily spreads and clean-test trades (MCX history book), for the full-history view
+    fetch('data/history_charts.json')
+      .then((r) => r.json())
+      .then((h) => this.setState({ HC: h }))
+      .catch(() => {});
   }
 
   tokens(dark) {
@@ -249,7 +264,21 @@ class Component extends DCLogic {
 
     const ORDER = ['M_PETAL', 'M_GUINEA', 'M_TEN', 'GUINEA_TEN', 'TEN_PETAL', 'GUINEA_PETAL'];
     const pid = st.pair || this.props.startPair || 'M_PETAL';
-    const P = D.pairs[pid];
+    const P0 = D.pairs[pid];
+    // Full history: for the three pairs that existed before GOLDTEN, put 2011-2023 (MCX history book, the clean test)
+    // in front of our own download, so the chart and trade list cover every day we have.
+    const HP = st.HC && st.HC.pairs && st.HC.pairs[pid];
+    const span = HP && st.span !== 'ours' ? 'all' : 'ours';
+    const toTrade = (t) => ({ sig: t[0], e: t[1], x: t[2], side: t[3], z: t[4], net: t[5], bps: t[7], why: t[8], days: t[9], seg: 'clean' });
+    const P = span === 'all'
+      ? Object.assign({}, P0, { d: HP.d.concat(P0.d), s: HP.s.concat(P0.s), mu: HP.mu.concat(P0.mu), sd: HP.sd.concat(P0.sd),
+          trades: HP.trades['5'].map(toTrade).concat(P0.trades) })
+      : P0;
+    const spanBtn = (k, label) => ({ label, pressed: span === k ? 'true' : 'false', pick: () => this.setState({ span: k, hover: null, allTrades: false }),
+      style: 'min-height: 40px; padding: 0 12px; border-radius: 10px; cursor: pointer; font: 500 13px \'Geist\', system-ui, sans-serif; ' +
+        (span === k ? 'background: var(--glow); color: var(--gold); border: 1px solid var(--gold)' : 'background: transparent; color: var(--fg); border: 1px solid var(--line)') });
+    const spans = HP ? [spanBtn('all', 'All data, ' + st.HC.from.slice(0, 4) + '–' + D.asOf.slice(0, 4)), spanBtn('ours', 'Since ' + this.fd(P0.d[0]).replace(/^\d+ /, ''))] : [];
+    const spanNote = HP ? '' : (st.HC ? 'GOLDTEN\'s first trading day on MCX was ' + this.fd(D.events.goldtenListed) + ', so this pair has no earlier history.' : '');
     const TD = {}; D.today.forEach((x) => { TD[x.id] = x; });
     const chips = ORDER.map((id) => {
       const on = id === pid;
@@ -331,7 +360,9 @@ class Component extends DCLogic {
       envelope: { label: 'Entry band', lo: P.mu.map((m, i) => (m == null || P.sd[i] == null ? null : m - pr.ze * P.sd[i])), hi: P.mu.map((m, i) => (m == null || P.sd[i] == null ? null : m + pr.ze * P.sd[i])) },
       markers: P.trades.map((tr) => ({ date: tr.sig, value: sAt[tr.sig] ?? sAt[tr.e] ?? 0, fill: tr.net > 0 ? 'var(--up)' : 'var(--panel)', ring: tr.net > 0 ? '' : 'var(--down)',
         label: 'Trade signal (entered ' + this.fd(tr.e) + '): ' + this.srs(tr.net) + ' after costs, closed at ' + (WHYS[tr.why] || tr.why) })),
-      bands: [{ from: D.split.test_start, to: D.asOf, label: 'Test year', fill: 'var(--glow)', ink: 'var(--gold)' }],
+      bands: (span === 'all' ? [{ from: st.HC.from, to: st.HC.to, label: 'Clean test', fill: 'var(--hover)', ink: 'var(--muted)' }] : [])
+        .concat([{ from: D.split.test_start, to: D.split.test_end, label: 'Test year', fill: 'var(--glow)', ink: 'var(--gold)' }]),
+      spans, hasSpans: spans.length > 0, spanNote, hasSpanNote: !!spanNote,
       title: P.label + ': ' + this.fd(P.d[0]).replace(/^\d+ /, '') + ' to ' + this.fd(D.asOf).replace(/^\d+ /, ''),
       line, mu, band, zero: 'M0 ' + Y(0).toFixed(1) + ' L' + W + ' ' + Y(0).toFixed(1), marks,
       testX: (X(Date.parse(D.split.test_start)) / W * 100).toFixed(2) + '%',
@@ -366,7 +397,7 @@ class Component extends DCLogic {
       date: this.fd(tr.e), dir: tr.side < 0 ? 'Sell ' + P.a + ', buy ' + P.b : 'Buy ' + P.a + ', sell ' + P.b,
       z: this.sgn(tr.z, 2), days: tr.days, why: WHY[tr.why] || tr.why,
       rs: this.srs(tr.net), bps: this.sgn(tr.bps, 1) + ' bps', color: tr.net > 0 ? 'var(--up)' : 'var(--down)',
-      seg: tr.seg === 'test' ? 'Test year' : (tr.seg === 'forward' ? 'Forward' : 'Training'),
+      seg: tr.seg === 'test' ? 'Test year' : (tr.seg === 'forward' ? 'Forward' : (tr.seg === 'clean' ? 'Clean test' : 'Training')),
       segStyle: 'font-size: 12px; padding: 4px 8px; border-radius: 999px; white-space: nowrap; ' + (tr.seg === 'test' ? 'background: var(--glow); color: var(--gold)' : 'background: var(--raised); color: var(--muted)')
     }));
     const nt = P.trades.filter((x) => x.seg === 'test').length;
@@ -395,7 +426,7 @@ class Component extends DCLogic {
 
     return {
       ...shell, loading: false, ready: true, chips, facts, chart, hover, trades, moreTrades, entryRule, testKpis, verdict, trainText,
-      tradeCount: P.trades.length + ' trades, ' + nt + ' in the test year',
+      tradeCount: P.trades.length + ' trades' + (span === 'all' ? ' (' + HP.trades['5'].length + ' in the clean test ' + st.HC.from.slice(0, 4) + '–' + st.HC.to.slice(0, 4) + ')' : '') + ', ' + nt + ' in the test year',
       split: this.fd(D.split.test_start) + ' to ' + this.fd(D.split.test_end) + ', settings frozen beforehand'
     };
   }

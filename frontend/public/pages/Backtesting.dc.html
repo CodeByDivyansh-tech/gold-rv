@@ -302,9 +302,16 @@ button:focus-visible,a:focus-visible,input:focus-visible{outline:2px solid var(-
           <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-start; gap: 12px">
             <div style="display: flex; flex-direction: column; gap: 4px">
               <h2 id="eq-h" style="margin: 0; font-size: 18px; font-weight: 600">{{eq.title}}</h2>
-              <span style="font-size: 13px; color: var(--muted)">Running total in ₹, updated each time a trade closes. Training and test year on one timeline; drag to zoom, hover a dot for that trade.</span>
+              <span style="font-size: 13px; color: var(--muted)">Running total in ₹, updated each time a trade closes. Clean test, training and test year on one timeline; drag to zoom, hover a dot for that trade.</span>
             </div>
           </div>
+          <sc-if value="{{eq.hasSpans}}" hint-placeholder-val="{{ true }}">
+            <div role="group" aria-label="Period shown" style="display: flex; flex-wrap: wrap; gap: 8px">
+              <sc-for list="{{eq.spans}}" as="b" hint-placeholder-count="2">
+                <button type="button" onClick="{{b.pick}}" aria-pressed="{{b.pressed}}" style="{{b.style}}">{{b.label}}</button>
+              </sc-for>
+            </div>
+          </sc-if>
           <dc-import name="LineChart" dates="{{eq.dates}}" series="{{eq.series}}" markers="{{eq.markers}}" bands="{{eq.bands}}" fmt="srs" height="320" zero="{{ true }}" label="{{eq.aria}}" hint-size="100%,440px"></dc-import>
           <p style="margin: 0; font-size: 14px; line-height: 1.6">{{eq.note}}</p>
         </section>
@@ -406,6 +413,11 @@ class Component extends DCLogic {
     fetch('data/history.json')
       .then((r) => r.json())
       .then((h) => this.setState({ H: h }))
+      .catch(() => {});
+    // 2011-2023 clean-test trades per pair and slippage, for the full-history running total
+    fetch('data/history_charts.json')
+      .then((r) => r.json())
+      .then((h) => this.setState({ HC: h }))
       .catch(() => {});
   }
 
@@ -518,7 +530,21 @@ class Component extends DCLogic {
     const W = 1000, H = 320, pad = 16;
     const t0 = Date.parse(D.start), t1 = Date.parse(D.asOf);
     const X = (d) => ((Date.parse(d) - t0) / (t1 - t0)) * W;
-    const cur = B.curve;
+    // Full history: the clean-test trades (2011-2023, MCX history book) come first and the running total carries on
+    // through training and the test year, so the line shows the frozen rule over every year we have.
+    const HPq = st.HC && st.HC.pairs && st.HC.pairs[pid];
+    const espan = HPq && st.espan !== 'ours' ? 'all' : 'ours';
+    let cur = B.curve;
+    if (espan === 'all') {
+      let cn = 0, cg = 0;
+      const pre = HPq.trades[slip].map((t) => { cn += t[5]; cg += t[6]; return [t[1], t[2], t[5], cn, cg, 'clean', t[7]]; });
+      cur = pre.concat(B.curve.map((c) => [c[0], c[1], c[2], c[3] + cn, c[4] + cg, c[5], c[6]]));
+    }
+    const eStart = espan === 'all' ? st.HC.from : D.start;
+    const ebtn = (k, label) => ({ label, pressed: espan === k ? 'true' : 'false', pick: () => this.setState({ espan: k, hover: null }), style: chipStyle(espan === k) });
+    const espans = HPq ? [ebtn('all', 'All data, ' + st.HC.from.slice(0, 4) + '–' + D.asOf.slice(0, 4)), ebtn('ours', 'Training + test year')] : [];
+    const cleanCur = cur.filter((c) => c[5] === 'clean');
+    const cleanNet = cleanCur.length ? cleanCur[cleanCur.length - 1][3] : 0;
     const vals = [0].concat(cur.map((c) => c[3]), cur.map((c) => c[4]));
     const lo = Math.min(...vals), hi = Math.max(...vals), sp = (hi - lo) || 1;
     const Y = (v) => pad + (1 - (v - lo) / sp) * (H - 2 * pad);
@@ -544,21 +570,23 @@ class Component extends DCLogic {
     else if (testNet > 0 && crashSum >= testNet) note = 'Trades closed during the ' + EV.crashLabel + ' made ' + abs(crashSum) + ', more than this pair\'s whole test-year profit of ' + abs(testNet) + '. Without the crash, it loses money.';
     else if (testNet > 0) note = 'The test year made ' + abs(testNet) + ' after costs. ' + crashPart;
     else note = 'The test year lost ' + abs(testNet) + ' after costs. ' + crashPart;
+    if (espan === 'all') note = 'In the clean test (' + st.HC.from.slice(0, 4) + '–' + st.HC.to.slice(0, 4) + ') this pair ' + (cleanNet >= 0 ? 'made ' : 'lost ') + abs(cleanNet) + ' after costs over ' + cleanCur.length + ' trades. ' + note;
+    else if (!HPq && st.HC) note = 'GOLDTEN\'s first trading day was ' + this.fd(EV.goldtenListed) + ', so this pair has no 2011–2023 history. ' + note;
     const hv = st.hover;
     let hover = { on: false };
     if (hv != null && hv < cur.length) {
       const c = cur[hv], f = X(c[1]) / W;
       hover = {
         on: true, x: (f * 100).toFixed(2) + '%', y: (Y(c[3]) / H * 100).toFixed(2) + '%', shift: f > 0.7 ? 'translateX(calc(-100% - 10px))' : 'translateX(10px)',
-        date: this.fd(c[1]), seg: c[5] === 'test' ? 'test year' : (c[5] === 'forward' ? 'forward (after the test year)' : 'training'), net: this.srs(c[2]), cum: this.srs(c[3]), color: c[2] > 0 ? 'var(--up)' : 'var(--down)'
+        date: this.fd(c[1]), seg: c[5] === 'test' ? 'test year' : (c[5] === 'forward' ? 'forward (after the test year)' : (c[5] === 'clean' ? 'clean test' : 'training')), net: this.srs(c[2]), cum: this.srs(c[3]), color: c[2] > 0 ? 'var(--up)' : 'var(--down)'
       };
     }
     const xs = cur.map((c) => X(c[1]) / W);
     // step series on a real time axis: flat between trade closes; one point per closing day (the day's last total)
-    const eqD = [D.start], eqN = [0], eqG = [0];
+    const eqD = [eStart], eqN = [0], eqG = [0];
     cur.forEach((c) => { if (eqD[eqD.length - 1] === c[1]) { eqN[eqN.length - 1] = c[3]; eqG[eqG.length - 1] = c[4]; } else { eqD.push(c[1]); eqN.push(c[3]); eqG.push(c[4]); } });
     if (eqD[eqD.length - 1] !== D.asOf) { eqD.push(D.asOf); eqN.push(eqN[eqN.length - 1]); eqG.push(eqG[eqG.length - 1]); }
-    const SEGN = { test: 'test year', train: 'training', forward: 'forward' };
+    const SEGN = { test: 'test year', train: 'training', forward: 'forward', clean: 'clean test' };
     const eq = {
       dates: eqD,
       series: [
@@ -566,16 +594,17 @@ class Component extends DCLogic {
         { key: 'gross', label: 'Before costs', color: 'var(--fg)', values: eqG, width: 1.25, step: true, dash: '2 3' }
       ],
       markers: cur.map((c) => ({ date: c[1], value: c[3], fill: c[2] > 0 ? 'var(--up)' : 'var(--down)', label: 'Trade closed (' + (SEGN[c[5]] || c[5]) + '): ' + this.srs(c[2]) })),
-      bands: [
+      spans: espans, hasSpans: espans.length > 0,
+      bands: (espan === 'all' ? [{ from: st.HC.from, to: st.HC.to, label: 'Clean test', fill: 'var(--hover)', ink: 'var(--muted)' }] : []).concat([
         { from: D.split.test_start, to: D.split.test_end, label: 'Test year', fill: 'var(--glow)', ink: 'var(--gold)' },
         { from: EV.crashStart, to: EV.crashEnd, label: EV.crashShort, fill: 'var(--hover)', ink: 'var(--muted)' }
-      ],
-      title: D.pairs[pid].label + ' at ' + slip + ' bps slippage',
+      ]),
+      title: D.pairs[pid].label + ' at ' + slip + ' bps slippage' + (espan === 'all' ? ', ' + st.HC.from.slice(0, 4) + '–' + D.asOf.slice(0, 4) : ''),
       net, gross, zero: 'M0 ' + Y(0).toFixed(1) + ' L' + W + ' ' + Y(0).toFixed(1), zeroY: (Y(0) / H * 100).toFixed(2) + '%',
       testX: (X(D.split.test_start) / W * 100).toFixed(2) + '%', testDate: this.fd(D.split.test_start),
       crashX: (X(EV.crashStart) / W * 100).toFixed(2) + '%', crashW: ((X(EV.crashEnd) - X(EV.crashStart)) / W * 100).toFixed(2) + '%', crashLabel: EV.crashShort,
       start: this.fd(D.start), end: this.fd(D.asOf), low: this.srs(lo), high: this.srs(hi), note,
-      aria: 'Running total after costs for ' + D.pairs[pid].label + ' from ' + this.fd(D.start) + ' to ' + this.fd(D.asOf) + ', ending at ' + this.srs(pn),
+      aria: 'Running total after costs for ' + D.pairs[pid].label + ' from ' + this.fd(eStart) + ' to ' + this.fd(D.asOf) + ', ending at ' + this.srs(pn),
       move: (e) => {
         if (!xs.length) return;
         const r = e.currentTarget.getBoundingClientRect(); const f = (e.clientX - r.left) / r.width;
