@@ -142,7 +142,16 @@ def build_web_data(data_dir: str = 'frontend/public/data', out_path: str = None)
             for tr in b['trades']:
                 cum += tr['net']; cg += tr['gross']
                 curve.append([tr['entry'], tr['exit'], round(tr['net']), round(cum), round(cg), tr['seg'], round(tr['net_bps'], 1)])
-            backtest[p][str(slip)] = dict(test=b['metrics_test'], train=b['metrics_train'], curve=curve,
+            # after the test year ("forward"): the frozen rule on data nobody had when it was written. Same fields
+            # the pages add up for the other periods, so every all-years total includes it.
+            ft = [tr for tr in b['trades'] if tr['seg'] == 'forward']
+            n_f = len(ft)
+            fwd = dict(n_trades=n_f, net_rs=round(sum(t['net'] for t in ft), 1), cost_rs=round(sum(t['cost'] for t in ft), 1),
+                       spread_rs=round(sum(t['spread_pnl'] for t in ft), 1), gold_rs=round(sum(t['gold'] for t in ft), 1),
+                       hit_rate=round(sum(1 for t in ft if t['net'] > 0) / n_f, 3) if n_f else 0.0,
+                       net_bps=round(sum(t['net_bps'] for t in ft) / n_f, 1) if n_f else 0.0,
+                       gross_bps=round(sum(t['gross_bps'] for t in ft) / n_f, 1) if n_f else 0.0)
+            backtest[p][str(slip)] = dict(test=b['metrics_test'], train=b['metrics_train'], fwd=fwd, curve=curve,
                                           attr=b['attribution'], params=b['params'], switch=b['switch'])
     pooled = {}
     for slip in (0, 2, 5, 10):

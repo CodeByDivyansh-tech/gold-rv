@@ -522,7 +522,8 @@ class Component extends DCLogic {
     });
     const spRsA = (n) => '₹' + Math.abs(Math.round(n)).toLocaleString('en-IN');
     const spB5 = spRC['5'];
-    const fwText = spB5.forward_n > 0 ? ' Since the test year ended (' + this.fd(D.split.test_end) + '), the frozen rule has ' + (spB5.forward_net_rs < 0 ? 'lost ' : 'made ') + spRsA(spB5.forward_net_rs) + ' over ' + spB5.forward_n + ' trades: data nobody had when the rule was written.' : '';
+    const fwDays = D.pure4.d.filter((d) => d > D.split.test_end).length;
+    const fwText = spB5.forward_n === 0 && fwDays > 0 ? ' Since the test year ended (' + this.fd(D.split.test_end) + '), the frozen rule has made no trades in ' + fwDays + ' trading days of new data: no pair passed all five checks.' : spB5.forward_n > 0 ? ' Since the test year ended (' + this.fd(D.split.test_end) + '), the frozen rule has ' + (spB5.forward_net_rs < 0 ? 'lost ' : 'made ') + spRsA(spB5.forward_net_rs) + ' over ' + spB5.forward_n + ' trades: data nobody had when the rule was written.' : '';
     const splitText = 'At our 5 bps assumption, the ' + spB5.crash_n + ' trades that closed during the crash made ' + spRsA(spB5.crash_net_rs) + '. The other ' + spB5.ex_crash_n + ' ' + (spB5.ex_crash_net_rs < 0 ? 'lost ' : 'made ') + spRsA(spB5.ex_crash_net_rs) + '. In training the same rule ' + (spB5.train_net_rs < 0 ? 'lost ' : 'made ') + spRsA(spB5.train_net_rs) + ' over ' + spB5.train_n + ' trades.' + fwText;
 
     const spTTxt = (v) => (v == null ? '–' : this.sgn(v, 2));
@@ -560,21 +561,21 @@ class Component extends DCLogic {
     const HCp = st.HC && st.HC.pairs && st.HC.pairs[pid];
     const pend = CLEANPAIR && !HCp;
     const ct = HCp ? HCp.trades[slip] : [];          // [sig, entry, exit, side, z, net, gross, net_bps, reason, days, gross_bps, spread, gold, cost]
-    const Tr = B.train;
+    const Tr = B.train, F = B.fwd || { n_trades: 0, net_rs: 0, cost_rs: 0, spread_rs: 0, gold_rs: 0, hit_rate: 0, net_bps: 0, gross_bps: 0 };
     const cleanN = ct.length, pcNet = ct.reduce((a, t) => a + t[5], 0), cleanWon = ct.filter((t) => t[5] > 0).length;
     const cb = ct.map((t) => t[7]), cAvg = cleanN ? cb.reduce((a, x) => a + x, 0) / cleanN : 0;
     const cSd = cleanN > 2 ? Math.sqrt(cb.reduce((a, x) => a + (x - cAvg) * (x - cAvg), 0) / (cleanN - 1)) : 0;
     const cleanT = cSd > 0 ? cAvg / (cSd / Math.sqrt(cleanN)) : null;
-    const AN = cleanN + Tr.n_trades + T.n_trades;
-    const ANet = pcNet + Tr.net_rs + T.net_rs;
-    const AWon = cleanWon + Math.round(Tr.hit_rate * Tr.n_trades) + Math.round(T.hit_rate * T.n_trades);
-    const ANetBps = AN ? (cb.reduce((a, x) => a + x, 0) + Tr.net_bps * Tr.n_trades + T.net_bps * T.n_trades) / AN : 0;
-    const AGrossBps = AN ? (ct.reduce((a, t) => a + t[10], 0) + Tr.gross_bps * Tr.n_trades + T.gross_bps * T.n_trades) / AN : 0;
-    const ACost = ct.reduce((a, t) => a + t[13], 0) + Tr.cost_rs + T.cost_rs;
+    const AN = cleanN + Tr.n_trades + T.n_trades + F.n_trades;
+    const ANet = pcNet + Tr.net_rs + T.net_rs + F.net_rs;
+    const AWon = cleanWon + Math.round(Tr.hit_rate * Tr.n_trades) + Math.round(T.hit_rate * T.n_trades) + Math.round(F.hit_rate * F.n_trades);
+    const ANetBps = AN ? (cb.reduce((a, x) => a + x, 0) + Tr.net_bps * Tr.n_trades + T.net_bps * T.n_trades + F.net_bps * F.n_trades) / AN : 0;
+    const AGrossBps = AN ? (ct.reduce((a, t) => a + t[10], 0) + Tr.gross_bps * Tr.n_trades + T.gross_bps * T.n_trades + F.gross_bps * F.n_trades) / AN : 0;
+    const ACost = ct.reduce((a, t) => a + t[13], 0) + Tr.cost_rs + T.cost_rs + F.cost_rs;
     const yr0 = CLEANPAIR ? (st.HC ? st.HC.from : '2011-04-18') : D.events.goldtenListed;
     const spanTxt = yr0.slice(0, 4) + '–' + D.asOf.slice(0, 4);
     const none = AN === 0;
-    const split = (CLEANPAIR ? cleanN + ' clean test · ' : '') + Tr.n_trades + ' training · ' + T.n_trades + ' test year';
+    const split = (CLEANPAIR ? cleanN + ' clean test · ' : '') + Tr.n_trades + ' training · ' + T.n_trades + ' test year' + (F.n_trades ? ' · ' + F.n_trades + ' after' : '');
     const dots = (l) => ({ label: l, value: '…', note: st.HCfail ? 'The 2011–2023 trades did not load' : 'Loading 2011–2023', color: 'var(--muted)' });
     const kpis = pend ? ['Trades, ' + spanTxt, 'Won', 'Average per trade', 'Total after costs', 't-statistic, clean test'].map(dots) : none ? [
       { label: 'Trades, ' + spanTxt, value: '0', note: 'This pair never passed all five checks', color: 'var(--fg)' },
@@ -691,14 +692,15 @@ class Component extends DCLogic {
     // Same trades at every slippage, over every year we have (clean test + training + test year)
     const allAt = (sl) => {
       const b = D.backtest[pid][sl], c = HCp ? HCp.trades[sl] : [];
-      const n = c.length + b.train.n_trades + b.test.n_trades;
-      const net = c.reduce((a, t) => a + t[5], 0) + b.train.net_rs + b.test.net_rs;
-      const won = c.filter((t) => t[5] > 0).length + Math.round(b.train.hit_rate * b.train.n_trades) + Math.round(b.test.hit_rate * b.test.n_trades);
-      const nb = n ? (c.reduce((a, t) => a + t[7], 0) + b.train.net_bps * b.train.n_trades + b.test.net_bps * b.test.n_trades) / n : 0;
-      const gb = n ? (c.reduce((a, t) => a + t[10], 0) + b.train.gross_bps * b.train.n_trades + b.test.gross_bps * b.test.n_trades) / n : 0;
-      const sp = c.reduce((a, t) => a + t[11], 0) + b.train.spread_rs + b.test.spread_rs;
-      const gd = c.reduce((a, t) => a + t[12], 0) + b.train.gold_rs + b.test.gold_rs;
-      const co = c.reduce((a, t) => a + t[13], 0) + b.train.cost_rs + b.test.cost_rs;
+      const f = b.fwd || { n_trades: 0, net_rs: 0, cost_rs: 0, spread_rs: 0, gold_rs: 0, hit_rate: 0, net_bps: 0, gross_bps: 0 };
+      const n = c.length + b.train.n_trades + b.test.n_trades + f.n_trades;
+      const net = c.reduce((a, t) => a + t[5], 0) + b.train.net_rs + b.test.net_rs + f.net_rs;
+      const won = c.filter((t) => t[5] > 0).length + Math.round(b.train.hit_rate * b.train.n_trades) + Math.round(b.test.hit_rate * b.test.n_trades) + Math.round(f.hit_rate * f.n_trades);
+      const nb = n ? (c.reduce((a, t) => a + t[7], 0) + b.train.net_bps * b.train.n_trades + b.test.net_bps * b.test.n_trades + f.net_bps * f.n_trades) / n : 0;
+      const gb = n ? (c.reduce((a, t) => a + t[10], 0) + b.train.gross_bps * b.train.n_trades + b.test.gross_bps * b.test.n_trades + f.gross_bps * f.n_trades) / n : 0;
+      const sp = c.reduce((a, t) => a + t[11], 0) + b.train.spread_rs + b.test.spread_rs + f.spread_rs;
+      const gd = c.reduce((a, t) => a + t[12], 0) + b.train.gold_rs + b.test.gold_rs + f.gold_rs;
+      const co = c.reduce((a, t) => a + t[13], 0) + b.train.cost_rs + b.test.cost_rs + f.cost_rs;
       return { n, net, won, nb, gb, sp, gd, co, clean: c.reduce((a, t) => a + t[5], 0), test: b.test.net_rs };
     };
     const SLS = ['0', '2', '5', '10'];
@@ -750,6 +752,7 @@ class Component extends DCLogic {
       ['train', 'Training', () => ours.filter((t) => t.seg === 'train')],
       ['test', 'Test year', () => ours.filter((t) => t.seg === 'test')],
       ['exc', 'Test year without the crash', () => ours.filter((t) => t.seg === 'test' && !(t.x >= EVc.crashStart && t.x <= EVc.crashEnd))],
+      ['fwd', 'After the test year (from ' + this.fd(D.split.test_end).replace(/^\d+ /, '') + ')', () => ours.filter((t) => t.seg === 'forward')],
       ['all', 'All years ' + D.longrun.start.slice(0, 4) + '–' + D.asOf.slice(0, 4), () => (cleanAll ? cleanAll.concat(ours) : null)]
     ];
     const pa = PER.find((x) => x[0] === st.cmpA) || PER[0], pb = PER.find((x) => x[0] === st.cmpB) || PER[2];
