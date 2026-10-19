@@ -61,6 +61,17 @@ body{margin:0}
               <button type="button" onClick="{{p.pick}}" aria-pressed="{{p.pressed}}" style="{{p.style}}">{{p.label}}</button>
             </sc-for>
           </div>
+          <sc-if value="{{custom.on}}" hint-placeholder-val="{{ false }}">
+            <div role="group" aria-label="Custom date range" style="display: flex; flex-wrap: wrap; gap: 10px 14px; align-items: flex-end; border: 1px solid var(--line); border-radius: 12px; padding: 12px">
+              <label style="display: flex; flex-direction: column; gap: 4px; font-size: 12px; color: var(--muted)">From
+                <input type="date" value="{{custom.from}}" min="{{custom.min}}" max="{{custom.max}}" onChange="{{custom.setFrom}}" onInput="{{custom.setFrom}}" style="min-height: 44px; padding: 0 10px; border-radius: 10px; border: 1px solid var(--line); background: var(--raised); color: var(--fg); font: 500 14px 'Geist', system-ui, sans-serif; color-scheme: {{custom.scheme}}">
+              </label>
+              <label style="display: flex; flex-direction: column; gap: 4px; font-size: 12px; color: var(--muted)">To
+                <input type="date" value="{{custom.to}}" min="{{custom.min}}" max="{{custom.max}}" onChange="{{custom.setTo}}" onInput="{{custom.setTo}}" style="min-height: 44px; padding: 0 10px; border-radius: 10px; border: 1px solid var(--line); background: var(--raised); color: var(--fg); font: 500 14px 'Geist', system-ui, sans-serif; color-scheme: {{custom.scheme}}">
+              </label>
+              <span style="flex: 1 1 200px; font-size: 12px; line-height: 1.5; color: {{custom.noteColor}}">{{custom.note}}</span>
+            </div>
+          </sc-if>
         </div>
       </sc-if>
 
@@ -117,9 +128,18 @@ class Component extends DCLogic {
   rs(n) { return (n < 0 ? '-' : '') + 'Rs ' + Math.abs(Math.round(n)).toLocaleString('en-IN'); }
 
   // Builds {head, rows, title} for the chosen file. Values stay plain (no ₹ signs) so spreadsheets read them as numbers.
-  table(D, what, pair, period, H, HC) {
-    const from = period === '3m' ? D.pure4.d[Math.max(0, D.pure4.d.length - 63)] : period === '1y' ? D.pure4.d[Math.max(0, D.pure4.d.length - 252)] : period === 'test' ? D.split.test_start : D.longrun.start;
-    const inP = (d) => d >= from && d <= D.asOf;
+  // The dates a period covers: preset periods end on the last settlement; a custom range uses the dates the visitor picked.
+  range(D, period, cFrom, cTo) {
+    const yearsBack = (k) => (+D.asOf.slice(0, 4) - k) + D.asOf.slice(4);
+    if (period === 'custom') return { from: cFrom, to: cTo };
+    const from = period === '3m' ? D.pure4.d[Math.max(0, D.pure4.d.length - 63)] : period === '1y' ? yearsBack(1) : period === '3y' ? yearsBack(3)
+      : period === 'test' ? D.split.test_start : D.longrun.start;
+    return { from, to: period === 'test' ? D.split.test_end : D.asOf };
+  }
+
+  table(D, what, pair, period, H, HC, cFrom, cTo) {
+    const rg = this.range(D, period, cFrom, cTo), from = rg.from, to = rg.to;
+    const inP = (d) => d >= from && d <= to;
     const WHY = { revert: 'Back to normal', stop: 'Stop-loss', time: 'Time limit', roll: 'Contract roll', expiry: 'Near expiry' };
     if (what === 'today') {
       return { title: 'Today\'s six pairs', head: ['Pair', 'Contracts', 'Spread (bps)', 'Spread (Rs per 10 g)', 'Normal level (bps)', 'Gap from normal (bps)', 'Cost line (bps)', 'z', 'z needed', 'Status', 'Checks failed'],
@@ -263,8 +283,16 @@ class Component extends DCLogic {
     const showPair = what === 'trades', showPeriod = what === 'trades' || what === 'prices';
     const pairs = [{ id: 'ALL', label: 'All six pairs' }].concat(Object.keys(D.pairs).map((id) => ({ id, label: D.pairs[id].label })))
       .map((p) => ({ label: p.label, pressed: p.id === pair ? 'true' : 'false', pick: () => this.setState({ pair: p.id, status: '' }), style: opt(p.id === pair) + '; font-size: 13px; font-weight: 500; padding: 0 10px' }));
-    const PER = [['3m', 'Last 3 months'], ['1y', 'Last year'], ['test', 'Test year'], ['all', 'Everything since 2011']];
-    const periodLabel = (PER.find((p) => p[0] === period) || PER[3])[1];
+    const PER = [['3m', 'Last 3 months'], ['1y', 'Last year'], ['3y', 'Last 3 years'], ['test', 'Test year'], ['all', 'Everything since 2011'], ['custom', 'Custom dates']];
+    // custom range: defaults to the last year, always kept inside the dates the site has
+    const minD = D.longrun.start, maxD = D.asOf;
+    const clamp = (d) => (d < minD ? minD : d > maxD ? maxD : d);
+    const okDate = (d) => /^\d{4}-\d{2}-\d{2}$/.test(d || '') && !isNaN(Date.parse(d));
+    const rawFrom = st.cFrom ?? ((+maxD.slice(0, 4) - 1) + maxD.slice(4)), rawTo = st.cTo ?? maxD;
+    const cFrom = okDate(rawFrom) ? clamp(rawFrom) : minD, cTo = okDate(rawTo) ? clamp(rawTo) : maxD;
+    const badOrder = period === 'custom' && cFrom > cTo;
+    const clamped = period === 'custom' && ((okDate(rawFrom) && rawFrom !== cFrom) || (okDate(rawTo) && rawTo !== cTo));
+    const periodLabel = period === 'custom' ? this.fd(cFrom) + ' to ' + this.fd(cTo) : (PER.find((p) => p[0] === period) || PER[4])[1];
     const periods = PER.map(([id, label]) => ({ label, pressed: id === period ? 'true' : 'false', pick: () => this.setState({ period: id, status: '' }), style: opt(id === period) + '; font-size: 13px; font-weight: 500; padding: 0 10px' }));
     const canPrint = what === 'trades' || what === 'report';
     const csvOnly = what !== 'report';
@@ -276,26 +304,36 @@ class Component extends DCLogic {
     if (canPrint) FM.push(['html', 'Printable statement', 'Open, then Print → Save as PDF']);
     const formats = FM.map(([id, label, desc]) => ({ label, desc, pressed: id === format ? 'true' : 'false', pick: () => this.setState({ format: id, status: '' }), style: opt(id === format) + '; display: flex; flex-direction: column; align-items: flex-start; gap: 2px; padding: 10px 14px' }));
 
-    const tb = this.table(D, what, pair, period, st.H, st.HC);
+    const tb = this.table(D, what, pair, period, st.H, st.HC, cFrom, cTo);   // a reversed range simply matches no rows
     const slug = (s) => s.toLowerCase().replace(/'/g, '').replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
     const parts = ['gold-rv', slug(tb.title)];
     if (showPair) parts.push(pair === 'ALL' ? 'all-pairs' : slug(D.pairs[pair].label));
-    if (showPeriod) parts.push(slug(periodLabel));
+    if (showPeriod) parts.push(period === 'custom' ? cFrom + '-to-' + cTo : slug(periodLabel));
     parts.push(D.asOf);
     const filename = parts.join('_') + (format === 'csv' ? '.csv' : '.html');
     const preview = {
-      count: what === 'report' ? 'Report sections' : tb.rows.length.toLocaleString('en-IN') + (tb.rows.length === 1 ? ' row' : ' rows') + (tb.rows.length > 4 ? ', first 4 shown' : ''),
+      count: what === 'report' ? 'Report sections' : badOrder ? 'No rows: the start date is after the end date' : tb.rows.length.toLocaleString('en-IN') + (tb.rows.length === 1 ? ' row' : ' rows') + (tb.rows.length > 4 ? ', first 4 shown' : ''),
       head: tb.head.slice(0, 5).map((v) => ({ v })),
       rows: tb.rows.slice(0, 4).map((r) => ({ cells: r.slice(0, 5).map((v) => ({ v: v == null ? '–' : v })) }))
     };
+    const custom = {
+      on: showPeriod && period === 'custom', from: cFrom, to: cTo, min: minD, max: maxD, scheme: st.dark === false || this.props.dark === false ? 'light' : 'dark',
+      setFrom: (e) => this.setState({ cFrom: e.target.value, status: '' }), setTo: (e) => this.setState({ cTo: e.target.value, status: '' }),
+      noteColor: badOrder ? 'var(--down)' : 'var(--muted)',
+      note: badOrder ? 'The start date is after the end date. Pick a start on or before ' + this.fd(cTo) + '.'
+        : (clamped ? 'Moved inside the dates we have. ' : '') + 'Data runs from ' + this.fd(minD) + ' to ' + this.fd(maxD) + '.' +
+          (what === 'prices' && cFrom < D.start ? ' Before ' + this.fd(D.start) + ' prices are weekly (Parity data book); after that, daily.' : '') +
+          (what === 'trades' ? ' Trades are included by the day they were entered.' : '')
+    };
     const download = async () => {
+      if (badOrder) { this.setState({ status: 'Fix the dates first: the start is after the end.', bad: true }); return; }
       if (!tb.rows.length) { this.setState({ status: 'Nothing to download for this choice. Try a longer period.', bad: true }); return; }
       const data = format === 'csv' ? this.csv(tb) : this.statement(D, what, pair, periodLabel, tb);
       const msg = await this.save(filename, data);
       this.setState({ status: msg, bad: /blocked|cancelled|already/.test(msg) });
     };
     return {
-      ...base, loading: false, ready: true, asOf: this.fd(D.asOf), whats, showPair, showPeriod, pairs, periods,
+      ...base, loading: false, ready: true, asOf: this.fd(D.asOf), whats, showPair, showPeriod, pairs, periods, custom,
       periodStep: showPair ? 3 : 2, formatStep: (showPair ? 3 : 2) + (showPeriod ? 1 : 0), formats, preview, filename, download,
       hasStatus: !!st.status, status: st.status || '', statusColor: st.bad ? 'var(--down)' : 'var(--up)'
     };
