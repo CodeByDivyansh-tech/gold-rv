@@ -311,3 +311,16 @@ function L_N() { return D.longrun.n }
   p.componentDidMount(); assert.equal(p.state.format, 'pdf'); assert.equal(globalThis.GRVWantPdf, false)
   console.log('pdf downloads ok')
 }
+
+// Chart downloads are named from the chart title in whole words (Oct-2026 live check: names were cut mid-number)
+{
+  const C = load('LineChart')
+  const name = (label) => { const c = new C(); c.props = { label }; return c.slug() }
+  assert.equal(name('Gold per 10 g of pure gold since Nov 2003: from ₹5,925 to ₹1,47,161. Move across it'), 'gold-per-10-g-of-pure-gold-since-nov-2003')
+  assert.equal(name('Spread of GOLDGUINEA · GOLDPETAL in basis points from 11 Oct 2023 to 16 Oct 2026'), 'spread-of-goldguinea-goldpetal-in-basis-points')
+  for (const l of ['Price of 10 g of pure gold for GOLDM, GOLDTEN, GOLDGUINEA and GOLDPETAL from 18 Apr 2011', 'Running total after costs for GOLDM · GOLDPETAL from 10 Oct 2023', '', 'x'.repeat(200)]) {
+    const n = name(l)
+    assert.ok(n.length <= 60 && !/-$/.test(n) && !/-(and|of|for|from|to|\d{1,2}|oct)$/.test(n), `chart file name "${n}"`)
+  }
+  console.log('chart file names ok')
+}
