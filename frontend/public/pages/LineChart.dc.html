@@ -56,7 +56,7 @@
   <div class="lc-wrap" style="height: {{h}}px">
     <sc-for list="{{bandEls}}" as="b" hint-placeholder-count="2">
       <div style="position: absolute; top: 0; bottom: 0; left: {{b.x}}; width: {{b.w}}; background: {{b.fill}}; pointer-events: none"></div>
-      <span style="position: absolute; top: 4px; left: {{b.x}}; padding-left: 6px; font-size: 11px; color: {{b.ink}}; pointer-events: none; max-width: 180px; line-height: 1.3">{{b.label}}</span>
+      <span style="position: absolute; top: 4px; left: {{b.lx}}; padding-left: 6px; font-size: 11px; color: {{b.ink}}; pointer-events: none; max-width: 180px; line-height: 1.3; white-space: nowrap">{{b.label}}</span>
     </sc-for>
     <sc-for list="{{grid}}" as="g" hint-placeholder-count="4">
       <div style="position: absolute; left: 0; right: 0; top: {{g.y}}; border-top: 1px dashed var(--line); pointer-events: none"></div>
@@ -224,11 +224,22 @@ class Component extends DCLogic {
     const grid = [];
     for (let v = Math.ceil(lo / st5) * st5; v <= hi; v += st5) grid.push({ y: (Y(v) / H * 100).toFixed(2) + '%', label: this.fmt(v, mode === 'pct' ? 'pct' : (P.fmt === 'srs' ? 'srs' : P.fmt)).replace(/\.0 bps$/, ' bps') });
     const tsOf = (d) => Date.parse(String(d).slice(0, 10));
+    // Band labels never pile up: bands are labelled in the order given (first = most important), a label is
+    // dropped if it would overlap one already placed, and one near the right edge is pulled back inside.
+    // The shading always stays; zooming in brings the dropped labels back.
+    const plotPx = typeof window !== 'undefined' && window.innerWidth ? Math.max(260, Math.min(window.innerWidth - 90, 1100)) : 1000;
+    const placed = [];
     const bandEls = (P.bands || []).map((b) => {
       const a = Math.max(tsOf(b.from), t0), c = Math.min(tsOf(b.to), t1);
       if (c <= a && !(b.from === b.to)) return null;
       const x = (a - t0) / (t1 - t0) * 100, w = Math.max(0.35, (c - a) / (t1 - t0) * 100);
-      return { x: x.toFixed(2) + '%', w: w.toFixed(2) + '%', fill: b.fill || 'var(--glow)', label: b.label || '', ink: b.ink || 'var(--muted)' };
+      let label = b.label || '', lx = x;
+      if (label) {
+        const lw = Math.min(180, label.length * 6.3 + 10) / plotPx * 100;
+        lx = Math.min(x, 100 - lw);
+        if (placed.some((q) => lx < q[1] && lx + lw > q[0])) label = ''; else placed.push([lx, lx + lw]);
+      }
+      return { x: x.toFixed(2) + '%', w: w.toFixed(2) + '%', lx: lx.toFixed(2) + '%', fill: b.fill || 'var(--glow)', label, ink: b.ink || 'var(--muted)' };
     }).filter(Boolean);
     const markerEls = (P.markers || []).filter((m) => { const t = tsOf(m.date); return t >= t0 && t <= t1; })
       .map((m) => ({ x: ((tsOf(m.date) - t0) / (t1 - t0) * 100).toFixed(2) + '%', y: (Y(m.value) / H * 100).toFixed(2) + '%', fill: m.fill, ring: m.ring ? ', 0 0 0 3.5px ' + m.ring : '' }));

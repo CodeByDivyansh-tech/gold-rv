@@ -289,7 +289,7 @@ class Component extends DCLogic {
           { value: String(k.mismatches), label: 'mismatches with our data', note: n(k.shared_rows) + ' rows both sources cover, compared on open, high, low, close, volume, open interest and value.', color: k.mismatches === 0 ? 'var(--up)' : 'var(--down)' },
           { value: String(SUP.missing_contracts.length), label: 'contracts our download missed, now added', note: (SUP.missing_rows || 0) + ' traded rows: ' + SUP.missing_contracts.join(', ') + '. They were the busiest contracts in Oct–Dec 2023.', color: 'var(--fg)' }
         ],
-        note: 'We use the book for two things: the long-history check on the Backtesting page (' + this.fd(HX.window.from) + ' to ' + this.fd(HX.window.to) + '), and to fill gaps in our own MCX download: the ' + SUP.missing_contracts.length + ' contracts above' + (SUP.extra_days && SUP.extra_days.length ? ' and ' + SUP.extra_days.map((d) => this.fd(d)).join(', ') + ', the day after our download ended' : '') + '. Those rows are kept in a separate, labelled file. Everything else comes from our own MCX download, listed below.'
+        note: 'We use the book for three things: the long-history check on the Backtesting page (' + this.fd(HX.window.from) + ' to ' + this.fd(HX.window.to) + '), the 2011–2023 part of every chart ("All data" on the Market, Pairs, Backtesting and Today pages), and to fill gaps in our own MCX download: the ' + SUP.missing_contracts.length + ' contracts above' + (SUP.extra_days && SUP.extra_days.length ? ' and ' + SUP.extra_days.map((d) => this.fd(d)).join(', ') + ', the day after our download ended' : '') + '. Those rows are kept in a separate, labelled file. Everything else comes from our own MCX download, listed below.'
       };
     }
     return {
