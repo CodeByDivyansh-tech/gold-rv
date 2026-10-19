@@ -24,6 +24,7 @@
     ['?', 'Words explained', 'Plain meanings of bps, z-score, carry…', function () { window.GRVGlossary && window.GRVGlossary.open(''); }],
     ['', 'Download as PDF', 'Statements, prices, backtest or the full report (' + (isMac ? '⌘' : 'Ctrl') + ' P)', function () { pdf(); }],
     ['', 'Ask Goldie', 'Double-click any box and Goldie explains it', function () { toast('Double-click (or double-tap) any box and Goldie explains it', 3500); }],
+    ['', 'Watch the intro', 'The problem and our answer, in 3D', function () { location.href = 'intro/'; }],
     ['', '3D pitch', 'The 17-slide pitch for the judges', function () { location.href = 'pitch/'; }],
     ['', 'Code and data on GitHub', 'github.com/CodeByDivyansh-tech/gold-rv', function () { window.open('https://github.com/CodeByDivyansh-tech/gold-rv', '_blank', 'noopener'); }]
   ];

@@ -1,0 +1,270 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Gold RV Intelligence: the problem and our answer</title>
+<meta name="description" content="Same gold, four prices: the MCX gold relative-value problem, how we tested it on 15 years of official prices, and the answer.">
+<link rel="icon" type="image/svg+xml" href="../favicon.svg">
+<meta name="theme-color" content="#0E0A05">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700;800&family=Geist+Mono:wght@500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0E0A05; --fg: #F6ECD8; --muted: #C9B794; --gold: #E5B04A; --line: rgba(229,176,74,.22);
+    --c1: #BC8424; --c2: #2193E0; --c3: #CD6199; --c4: #7D4DAD; --foil: linear-gradient(100deg, #F8DB97 0%, #E5B04A 38%, #B98428 62%, #F3D184 88%); --up: #6FCF9A; --hot: #FFD27A;
+    --wash: radial-gradient(80% 60% at 70% 25%, rgba(229,176,74,.22), transparent 60%), radial-gradient(70% 60% at 15% 85%, rgba(185,132,40,.14), transparent 60%);
+  }
+  * { box-sizing: border-box; }
+  html { background: var(--bg); color: var(--fg); scroll-behavior: auto; }
+  body { margin: 0; font-family: 'Geist', 'Segoe UI', system-ui, sans-serif; -webkit-font-smoothing: antialiased; background: var(--bg); }
+  /* the colour wash behind the 3D scene changes with the chapter */
+  .wash { position: fixed; inset: 0; z-index: 2; background: var(--wash); transition: background 1.2s ease; pointer-events: none; mix-blend-mode: screen; }
+  #scene { position: fixed; inset: 0; z-index: 1; width: 100%; height: 100%; display: block; }
+  .top { position: fixed; z-index: 5; top: 0; left: 0; right: 0; display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 18px clamp(16px, 4vw, 40px); pointer-events: none; }
+  .top > * { pointer-events: auto; }
+  .brand { display: flex; align-items: center; gap: 10px; color: var(--fg); text-decoration: none; font-weight: 700; font-size: 17px; letter-spacing: -0.01em; }
+  .brand svg { width: 34px; height: auto; }
+  .skip { min-height: 40px; padding: 0 16px; border-radius: 999px; border: 1px solid var(--line); background: rgba(20,14,7,.55); color: var(--fg); font: 600 14px 'Geist', system-ui, sans-serif; display: inline-flex; align-items: center; text-decoration: none; -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); }
+  .skip:hover { border-color: var(--gold); }
+  .bar { position: fixed; z-index: 6; left: 0; top: 0; height: 3px; width: 100%; transform-origin: 0 50%; transform: scaleX(0); background: var(--foil); }
+  .dots { position: fixed; z-index: 5; right: clamp(10px, 2vw, 24px); top: 50%; transform: translateY(-50%); display: flex; flex-direction: column; gap: 12px; }
+  html.foot-in .dots { opacity: 0; pointer-events: none; }
+  .dots { transition: opacity .3s; }
+  .dots button { position: relative; }
+  .dots button::after { content: attr(data-label); position: absolute; right: 22px; top: 50%; transform: translate(6px, -50%); white-space: nowrap; pointer-events: none;
+    padding: 6px 10px; border-radius: 10px; border: 1px solid var(--line); background: rgba(20,14,7,.78); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px);
+    color: var(--fg); font: 600 12px 'Geist', system-ui, sans-serif; opacity: 0; transition: opacity .2s, transform .2s; }
+  .dots button:hover::after, .dots button:focus-visible::after { opacity: 1; transform: translate(0, -50%); }
+  .flash { position: fixed; inset: 0; z-index: 2; pointer-events: none; opacity: 0; mix-blend-mode: screen;
+    background: radial-gradient(60% 50% at 50% 45%, rgba(243,209,132,.20), rgba(243,209,132,0) 70%); }
+  .flash.go { animation: flash .9s ease-out; }
+  @keyframes flash { 0% { opacity: 0 } 25% { opacity: 1 } 100% { opacity: 0 } }
+  .dots button { width: 12px; height: 12px; padding: 0; border-radius: 50%; border: 1px solid var(--muted); background: transparent; cursor: pointer; }
+  .dots button[aria-current="true"] { background: var(--gold); border-color: var(--gold); box-shadow: 0 0 12px rgba(229,176,74,.7); }
+  main { position: relative; z-index: 3; }
+  section { position: relative; min-height: 130vh; padding: 0 clamp(16px, 5vw, 64px); }
+  section.long { min-height: 260vh; }
+  .card { position: sticky; top: 18vh; max-width: 470px; padding: 26px 26px 24px; border-radius: 22px; border: 1px solid var(--line);
+    background: linear-gradient(180deg, rgba(229,176,74,.14), rgba(30,21,10,.66) 32%, rgba(18,13,6,.62));
+    -webkit-backdrop-filter: blur(22px) saturate(150%); backdrop-filter: blur(22px) saturate(150%);
+    box-shadow: inset 0 1px 0 rgba(255,236,190,.12), 0 24px 60px rgba(0,0,0,.35); }
+  .card.right { margin-left: auto; }
+  .card.center { margin: 0 auto; text-align: center; max-width: 620px; }
+  .hero { min-height: 100vh; display: flex; align-items: flex-end; padding-bottom: 12vh; }
+  .hero .card { position: relative; top: 0; max-width: 680px; padding: 34px 34px 28px; }
+  /* lit glass, as in the site's left menu: warm gold light falling from the top edge */
+  .card { overflow: hidden; }
+  .card::before { content: ""; position: absolute; left: 0; right: 0; top: 0; height: 150px; pointer-events: none;
+    background: radial-gradient(90% 100% at 50% 0%, rgba(240,197,102,.24), rgba(240,197,102,0) 72%); }
+  .card::after { content: ""; position: absolute; left: 18px; right: 18px; top: 0; height: 1px; pointer-events: none;
+    background: linear-gradient(90deg, transparent, rgba(255,226,160,.75), transparent); }
+  .card > * { position: relative; }
+  .brand { padding: 8px 14px 8px 10px; border-radius: 999px; border: 1px solid var(--line); background: rgba(20,14,7,.5); -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px); }
+  h1 { margin: 0; font-size: clamp(44px, 8vw, 104px); line-height: .95; letter-spacing: -0.045em; font-weight: 800;
+    background: var(--foil); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  h2 { margin: 0 0 12px; font-size: clamp(26px, 3.4vw, 38px); line-height: 1.08; letter-spacing: -0.025em; font-weight: 700; }
+  p { margin: 0 0 12px; font-size: 16px; line-height: 1.6; color: var(--muted); }
+  p b, li b { color: var(--fg); font-weight: 600; }
+  .lead { font-size: clamp(17px, 1.6vw, 20px); color: #E8D9B8; max-width: 560px; margin-top: 18px; }
+  .tag { display: inline-block; margin-bottom: 14px; padding: 5px 12px; border-radius: 999px; font: 600 13px 'Geist', system-ui, sans-serif; color: #1B1305; background: var(--foil); }
+  .hint { margin-top: 26px; display: inline-flex; align-items: center; gap: 10px; color: var(--muted); font-size: 14px; }
+  .hint i { width: 22px; height: 34px; border: 2px solid var(--muted); border-radius: 12px; position: relative; }
+  .hint i::after { content: ""; position: absolute; left: 50%; top: 6px; width: 4px; height: 7px; margin-left: -2px; border-radius: 2px; background: var(--gold); animation: wheel 1.6s ease-in-out infinite; }
+  @keyframes wheel { 0% { transform: translateY(0); opacity: 1 } 80% { transform: translateY(12px); opacity: 0 } 100% { opacity: 0 } }
+  .chips { display: flex; flex-wrap: wrap; gap: 8px; margin: 14px 0 4px; }
+  .chip { display: inline-flex; align-items: center; gap: 8px; padding: 6px 10px; border-radius: 10px; border: 1px solid var(--line); background: rgba(255,255,255,.03); font-size: 13px; color: var(--fg); }
+  .chip i { width: 10px; height: 10px; border-radius: 3px; flex: none; }
+  .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin: 16px 0 14px; }
+  .stat { padding: 12px; border-radius: 14px; background: rgba(255,255,255,.04); border: 1px solid var(--line); }
+  .stat b { display: block; font-size: 22px; letter-spacing: -0.02em; color: var(--fg); }
+  .stat span { font-size: 12px; color: var(--muted); }
+  ul { margin: 0 0 12px; padding-left: 18px; color: var(--muted); line-height: 1.6; }
+  .no { font-size: clamp(30px, 4vw, 44px); font-weight: 800; letter-spacing: -0.03em; color: var(--fg); margin-bottom: 8px; }
+  .neg { color: #FF9C8C; font-weight: 700; }
+  .ctas { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-top: 18px; }
+  .btn { min-height: 48px; padding: 0 22px; border-radius: 14px; display: inline-flex; align-items: center; text-decoration: none; font: 600 15px 'Geist', system-ui, sans-serif; }
+  .btn.gold { background: linear-gradient(180deg, #F0C566, #DDA43C 55%, #C48A2A); color: #1B1305; }
+  .btn.ghost { border: 1px solid var(--line); color: var(--fg); background: rgba(255,255,255,.04); }
+  .btn:focus-visible, .skip:focus-visible, .dots button:focus-visible { outline: 2px solid var(--gold); outline-offset: 3px; }
+  .card.low { margin: 0 auto; max-width: 780px; top: 54vh; }
+  .card.low ul { columns: 2; column-gap: 28px; }
+  .end { min-height: 120vh; }
+  .end .card { top: 56vh; }
+  .note { font-size: 12px; color: var(--muted); margin-top: 14px; }
+  /* phones: cards at the bottom, the scene above them */
+  @media (max-width: 760px) {
+    .top { background: linear-gradient(180deg, rgba(14,10,5,.92), rgba(14,10,5,0)); padding-bottom: 26px; }
+    section { min-height: 125vh; padding-top: 60vh; }
+    section.long { min-height: 230vh; }
+    .hero { padding-top: 0; }
+    .card, .card.right, .card.low, .card.center { position: relative; top: auto; margin: 0; padding: 20px; }
+    .card.low ul { columns: 1; }
+    .end { min-height: 100vh; padding-top: 44vh; padding-bottom: 16px; }
+    .end .card { top: auto; }
+    .stats { grid-template-columns: 1fr 1fr 1fr; }
+    .stat b { font-size: 17px; }
+    .dots { display: none; }
+  }
+  /* no 3D (reduced motion, or no WebGL): a still, colourful page that reads top to bottom */
+  html.still #scene { display: none; }
+  html.still section, html.still section.long { min-height: auto; padding-top: 12vh; padding-bottom: 12vh; }
+  html.still .card, html.still .end .card { position: relative; top: 0; margin-top: 0; }
+  html.still .hero { min-height: 92vh; }
+  html.still .still-art { display: block; }
+  .still-art { display: none; position: fixed; z-index: 1; right: 6vw; top: 22vh; width: min(40vw, 460px); opacity: .9; }
+  /* halftone wordmark footer (footer.js) */
+  .hwf-root { position: relative; z-index: 4; width: 100%; height: clamp(420px, 44vw, 560px); overflow: hidden; isolation: isolate; background: var(--bg); color: var(--fg); border-top: 1px solid var(--line); }
+  .hwf-root canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+  .hwf-top { position: relative; z-index: 1; display: grid; grid-template-columns: minmax(0, 1.3fr) repeat(3, minmax(0, 1fr)); gap: 24px;
+    padding: clamp(24px, 3.4vw, 40px) max(20px, env(safe-area-inset-right, 0px)) 0 max(20px, env(safe-area-inset-left, 0px));
+    font-family: 'Geist Mono', ui-monospace, Menlo, monospace; font-size: 11px; letter-spacing: .16em; text-transform: uppercase; line-height: 1.85; }
+  .hwf-brand strong { display: block; font-weight: 600; color: var(--gold); }
+  .hwf-brand span { color: var(--muted); }
+  .hwf-col h3 { margin: 0; font: inherit; color: var(--muted); font-weight: 500; }
+  .hwf-col ul { list-style: none; margin: 0; padding: 0; }
+  .hwf-col a, .hwf-up { color: var(--fg); text-decoration: none; opacity: .82; background: none; border: 0; padding: 0; font: inherit; letter-spacing: inherit; text-transform: inherit; cursor: pointer;
+    background-image: linear-gradient(currentColor, currentColor); background-size: 0% 1px; background-repeat: no-repeat; background-position: 0 100%; transition: opacity .25s ease, background-size .35s cubic-bezier(.2,.7,.1,1); }
+  .hwf-col a:hover, .hwf-up:hover { opacity: 1; background-size: 100% 1px; color: var(--gold); }
+  .hwf-col a:focus-visible, .hwf-up:focus-visible { outline: 1px solid var(--gold); outline-offset: 3px; opacity: 1; }
+  .hwf-rule { position: relative; z-index: 1; display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap;
+    margin: clamp(18px, 2.6vw, 30px) max(20px, env(safe-area-inset-right, 0px)) 0 max(20px, env(safe-area-inset-left, 0px)); padding-top: 12px; border-top: 1px solid var(--line);
+    font-family: 'Geist Mono', ui-monospace, Menlo, monospace; font-size: 11px; letter-spacing: .16em; text-transform: uppercase; color: var(--muted); }
+  .hwf-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+  @media (max-width: 720px) { .hwf-top { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); row-gap: 18px; } .hwf-brand { grid-column: 1 / -1; } }
+  @media (prefers-reduced-motion: reduce) { .hwf-col a, .hwf-up { transition: none; } }
+  @media (prefers-reduced-motion: reduce) { .flash { display: none; } .hint i::after { animation: none; } .wash { transition: none; } }
+</style>
+<script type="importmap">
+{ "imports": { "three": "../pitch/vendor/three.module.js", "three/addons/": "../pitch/vendor/addons/" } }
+</script>
+</head>
+<body>
+<div class="wash" id="wash"></div>
+<div class="flash" id="flash" aria-hidden="true"></div>
+<canvas id="scene" aria-hidden="true"></canvas>
+<svg class="still-art" viewBox="0 0 400 300" aria-hidden="true"><g transform="translate(40 60)"><path d="M10 70L30 20H120L140 70Z" fill="#BC8424"/><path d="M170 70L186 30H260L276 70Z" fill="#2193E0"/><path d="M20 170L36 130H110L126 170Z" fill="#CD6199"/><path d="M180 170L192 140H246L258 170Z" fill="#7D4DAD"/></g></svg>
+<div class="bar" id="bar"></div>
+
+<header class="top">
+  <a class="brand" href="../" data-enter aria-label="Gold RV Intelligence, enter the site">
+    <svg viewBox="8 18 48 28" aria-hidden="true"><path d="M8 28L12 18H44L48 28Z M16 46L20 36H52L56 46Z" fill="#E5B04A"/></svg>Gold RV
+  </a>
+  <a class="skip" href="../" data-enter>Skip intro</a>
+</header>
+<nav class="dots" aria-label="Chapters" id="dots"></nav>
+
+<main>
+  <section class="hero" data-ch="0" aria-label="Same gold, four prices">
+    <div class="card">
+      <h1>Same gold.<br>Four prices.</h1>
+      <p class="lead">MCX sells one metal in four contract sizes. Their prices should match, yet they drift apart. We asked whether those gaps are money on the table, and tested it on 15 years of official prices.</p>
+      <span class="hint"><i aria-hidden="true"></i>Scroll to begin</span>
+    </div>
+  </section>
+
+  <section data-ch="1" aria-label="The problem">
+    <div class="card">
+      <span class="tag">Hack in Hills '26 · Problem 03</span>
+      <h2>The problem</h2>
+      <p><b>Commodity Derivatives Intelligence.</b> GOLDM (100 g), GOLDTEN (10 g), GOLDGUINEA (8 g) and GOLDPETAL (1 g) all trade gold on MCX. Converted to the price of 10 g of pure gold, they should cost the same.</p>
+      <p>They don't, quite. So: when two of them drift apart, can you buy the cheaper one, sell the dearer one, and still make money after <b>every</b> cost?</p>
+      <div class="chips">
+        <span class="chip"><i style="background:var(--c1)"></i>GOLDM</span>
+        <span class="chip"><i style="background:var(--c2)"></i>GOLDTEN</span>
+        <span class="chip"><i style="background:var(--c3)"></i>GOLDGUINEA</span>
+        <span class="chip"><i style="background:var(--c4)"></i>GOLDPETAL</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="long" data-ch="2" aria-label="The gaps are real">
+    <div class="card right">
+      <h2>The gaps are real</h2>
+      <p>Each column is one trading week for <b>GOLDM · GOLDPETAL</b>, from <b data-k="first">2011</b> to <b data-k="asOf">2026</b>: the biggest gap that week between the two prices and their normal level.</p>
+      <p>The red marker is one real trade: on <b data-k="tradeDate">28 May 2014</b> the gap stood <b><span data-k="tradeGap">189</span> bps</b> from normal, the biggest the rule ever traded on this pair. It still lost <span class="neg" data-k="tradeNet">₹33,453</span> after costs.</p>
+      <p>Keep scrolling to travel through <b data-k="years">15</b> years of it.</p>
+    </div>
+  </section>
+
+  <section data-ch="3" aria-label="The cost wall">
+    <div class="card">
+      <h2>But every trade must clear a wall</h2>
+      <p>Trading in and out of both contracts costs fees, taxes and slippage. A gap only pays if it beats the <b>cost line: <span data-k="hurdle">48.8</span> bps</b>.</p>
+      <p>For this pair, the gap cleared it on just <b><span data-k="pct">…</span> of days</b>, the glowing columns.</p>
+    </div>
+  </section>
+
+  <section data-ch="4" aria-label="Our solution">
+    <div class="card low">
+      <h2>Our solution: test it honestly</h2>
+      <div class="stats">
+        <div class="stat"><b data-k="rows">47,521</b><span>official MCX daily prices</span></div>
+        <div class="stat"><b data-k="contracts">599</b><span>contracts</span></div>
+        <div class="stat"><b data-k="days">4,138</b><span>trading days</span></div>
+      </div>
+      <ul>
+        <li>One rule with <b>five checks</b>, including the cost line.</li>
+        <li>Frozen before the <b>clean test</b> data was used: <span data-k="clean">2011–2023</span>.</li>
+        <li>Every MCX cost and slippage, next-day fills, ₹10 lakh per leg.</li>
+      </ul>
+      <div class="chips">
+        <span class="chip"><i style="background:var(--c4)"></i>Clean test</span>
+        <span class="chip"><i style="background:var(--c1)"></i>Training</span>
+        <span class="chip"><i style="background:var(--c3)"></i>Test year</span>
+        <span class="chip"><i style="background:var(--up)"></i>After it</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="end" data-ch="5" aria-label="The answer">
+    <div class="card center">
+      <h2>So, is there free money?</h2>
+      <div class="no">No persistent edge after costs.</div>
+      <p>The gaps are real, but they don't pay. In the clean test (<span data-k="cleanLong">18 Apr 2011 to 9 Oct 2023</span>) the frozen rule lost <span class="neg" data-k="net">₹5,49,070</span> over <b data-k="n">151</b> trades, and <span class="neg" data-k="net0">₹2,35,391</span> even with zero slippage. It lost money in <b data-k="losing">11 of 13</b> years.</p>
+      <div class="ctas">
+        <a class="btn gold" href="../" data-enter>Enter the site</a>
+        <a class="btn ghost" href="../#/today" data-enter>Is any gap worth trading today?</a>
+      </div>
+      <p class="note">Official MCX Bhavcopy settlements: 2011–2023 from the compiled MCX data book, shared with permission; 2023–2026 our own download. Research, not investment advice.</p>
+    </div>
+  </section>
+</main>
+
+<footer class="hwf-root" aria-label="Gold RV Intelligence">
+  <canvas aria-hidden="true"></canvas>
+  <span class="hwf-sr">gold rv</span>
+  <div class="hwf-top">
+    <div class="hwf-brand"><strong>Gold RV Intelligence</strong><span>MCX gold relative value · Team NEXORA</span></div>
+    <nav class="hwf-col" aria-label="Explore">
+      <h3>Explore</h3>
+      <ul><li><a href="../#/today" data-enter>Today</a></li><li><a href="../#/market" data-enter>Market</a></li><li><a href="../#/pairs" data-enter>Pair Explorer</a></li><li><a href="../#/signals" data-enter>Signals</a></li></ul>
+    </nav>
+    <nav class="hwf-col" aria-label="The study">
+      <h3>The study</h3>
+      <ul><li><a href="../#/backtesting" data-enter>Backtesting</a></li><li><a href="../#/explore" data-enter>Try your own rule</a></li><li><a href="../#/data" data-enter>Data</a></li><li><a href="../pitch/" data-enter>3D pitch</a></li></ul>
+    </nav>
+    <nav class="hwf-col" aria-label="Project">
+      <h3>Project</h3>
+      <ul><li><a href="https://github.com/CodeByDivyansh-tech/gold-rv" target="_blank" rel="noopener">Code on GitHub</a></li><li><span style="opacity:.82">Hack in Hills '26</span></li><li><span style="opacity:.82">Problem 03</span></li></ul>
+    </nav>
+  </div>
+  <div class="hwf-rule"><span>Data to <span data-k="asOf">16 Oct 2026</span> · not investment advice</span><button type="button" class="hwf-up">Back to top ↑</button></div>
+</footer>
+
+<script>
+  // seen once: the main site stops sending this browser here
+  try { localStorage.setItem('grv-intro-seen', '1'); } catch (e) {}
+  document.querySelectorAll('[data-enter]').forEach(function (a) { a.addEventListener('click', function () { try { localStorage.setItem('grv-intro-seen', '1'); } catch (e) {} }); });
+  (function () {
+    var still = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    var c = document.createElement('canvas'), gl = null;
+    try { gl = c.getContext('webgl2') || c.getContext('webgl'); } catch (e) {}
+    if (still || !gl) document.documentElement.classList.add('still');
+  })();
+</script>
+<script src="footer.js"></script>
+<script type="module" src="intro.js"></script>
+</body>
+</html>
