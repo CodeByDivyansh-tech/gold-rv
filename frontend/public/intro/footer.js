@@ -12,7 +12,7 @@
   if (!root) return;
   var canvas = root.querySelector('canvas'), ctx = canvas.getContext('2d');
   if (!ctx) return;
-  var OPT = { word: 'gold rv', gap: 6, radius: 90, crop: 0.2, grain: 0.5, face: '800 100px Geist, "Segoe UI", system-ui, sans-serif',
+  var OPT = { word: 'gold rv', gap: 6, radius: 90, crop: 0.06, grain: 0.5, face: '800 100px Geist, "Segoe UI", system-ui, sans-serif',
     bg: '#0E0A05', ink: [201, 161, 90], warm: [248, 219, 151] };
   var reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
   var w = 0, h = 0, dpr = 1, px = -1e5, py = -1e5, raf = 0, visible = true, awake = true, ring = { x: 0, y: 0, t: -1 };

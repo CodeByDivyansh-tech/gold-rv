@@ -184,13 +184,15 @@ scene.add(points);
 
 // ---------------------------------------------------------------- labels (sprites drawn on a canvas)
 function label(text, color, sizeY = 0.32) {
-  const c = document.createElement('canvas'), g = c.getContext('2d'), fs = 64;
+  const lines = Array.isArray(text) ? text : [text];
+  const c = document.createElement('canvas'), g = c.getContext('2d'), fs = 64, lh = fs * 1.3;
   g.font = `600 ${fs}px Geist, system-ui, sans-serif`;
-  c.width = Math.ceil(g.measureText(text).width) + 40; c.height = fs + 30;
-  g.font = `600 ${fs}px Geist, system-ui, sans-serif`; g.fillStyle = color; g.textBaseline = 'middle'; g.fillText(text, 20, c.height / 2);
+  c.width = Math.ceil(Math.max(...lines.map((l) => g.measureText(l).width))) + 40; c.height = Math.round(lh * lines.length + 30);
+  g.font = `600 ${fs}px Geist, system-ui, sans-serif`; g.textBaseline = 'middle';
+  lines.forEach((l, i) => { g.fillStyle = i ? '#E8D9B8' : color; g.fillText(l, 20, 15 + lh * (i + 0.5)); });
   const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace;
   const s = new THREE.Sprite(new THREE.SpriteMaterial({ map: t, transparent: true, depthWrite: false, opacity: 0, fog: false }));
-  s.scale.set(sizeY * c.width / c.height, sizeY, 1);
+  s.scale.set(sizeY * lines.length * c.width / c.height, sizeY * lines.length, 1);
   return s;
 }
 await (document.fonts ? document.fonts.ready : Promise.resolve());
@@ -219,6 +221,25 @@ weeks.forEach(([d, g], i) => {
   cTmp.copy(g > hurdle ? cHigh : cLow).multiplyScalar(g > hurdle ? 0.62 : 0.45 + g / hurdle * 0.45); cols.setColorAt(i, cTmp);
 });
 TL.add(cols);
+// one real trade: the biggest gap from normal the frozen rule traded on this pair in the clean test
+const gapOn = new Map(days);
+const pick = HC.pairs.M_PETAL.trades['5'].filter((t) => gapOn.has(t[1])).sort((a, b) => Math.abs(gapOn.get(b[1])) - Math.abs(gapOn.get(a[1])))[0];
+const trade = pick && { entry: pick[1], exit: pick[2], side: pick[3], net: pick[5], gap: Math.abs(gapOn.get(pick[1])) };
+const LOSS = '#FF8E7E';
+let tradeBits = [];
+if (trade) {
+  const tx = xOf(trade.entry), top = Math.min(trade.gap, 160) * K;
+  const beam = new THREE.Mesh(new THREE.BoxGeometry(0.06, top + 0.55, 0.06), new THREE.MeshBasicMaterial({ color: new THREE.Color(LOSS).multiplyScalar(1.3), transparent: true, opacity: 0 }));
+  beam.position.set(tx, (top + 0.55) / 2, 0.25); TL.add(beam);
+  const ringM = new THREE.Mesh(new THREE.TorusGeometry(0.32, 0.035, 8, 40), new THREE.MeshBasicMaterial({ color: new THREE.Color(LOSS).multiplyScalar(1.4), transparent: true, opacity: 0 }));
+  ringM.position.set(tx, top + 0.6, 0.25); TL.add(ringM);
+  const verb = trade.side < 0 ? 'Sold GOLDM, bought GOLDPETAL' : 'Bought GOLDM, sold GOLDPETAL';
+  const tag = label(['One real trade · ' + fd(trade.entry), verb + ', gap ' + Math.round(trade.gap) + ' bps from normal', 'Closed ' + fd(trade.exit) + ': ' + (trade.net < 0 ? '−' : '+') + inr(trade.net) + ' after costs'], LOSS, 0.19);
+  tag.position.set(tx - tag.scale.x / 2 - 0.35, top + 0.5, 0.9); TL.add(tag);   // ends just left of the marker: the chapter card sits on the right
+  tradeBits = [beam, ringM, tag];
+  Object.assign(fill, { tradeDate: fd(trade.entry), tradeGap: String(Math.round(trade.gap)), tradeNet: (trade.net < 0 ? '−' : '+') + inr(trade.net) });
+  document.querySelectorAll('[data-k^="trade"]').forEach((el) => { const v = fill[el.dataset.k]; if (v != null) el.textContent = v; });
+}
 // the cost wall
 const wallH = hurdle * K;
 const wall = new THREE.Mesh(new THREE.PlaneGeometry(span + 3, wallH), new THREE.MeshBasicMaterial({ color: COL.gold, transparent: true, opacity: 0, depthWrite: false, side: THREE.DoubleSide }));
@@ -278,7 +299,7 @@ const sections = [...document.querySelectorAll('section[data-ch]')];
 const dots = document.getElementById('dots');
 const names = ['Same gold, four prices', 'The problem', 'The gaps are real', 'The cost wall', 'Our solution', 'The answer'];
 sections.forEach((sec, i) => {
-  const b = document.createElement('button'); b.type = 'button'; b.setAttribute('aria-label', 'Go to: ' + names[i]);
+  const b = document.createElement('button'); b.type = 'button'; b.setAttribute('aria-label', 'Go to: ' + names[i]); b.dataset.label = names[i];
   b.addEventListener('click', () => scrollTo({ top: sec.offsetTop + (i === 2 ? 0 : 1), behavior: 'smooth' })); dots.appendChild(b);
 });
 const WASH = [
@@ -289,7 +310,7 @@ const WASH = [
   'radial-gradient(80% 60% at 30% 30%, rgba(229,176,74,.18), transparent 60%), radial-gradient(70% 60% at 85% 80%, rgba(125,77,173,.14), transparent 60%)',
   'radial-gradient(80% 60% at 50% 30%, rgba(229,176,74,.26), transparent 60%), radial-gradient(70% 60% at 50% 90%, rgba(185,132,40,.18), transparent 60%)'
 ];
-const wash = document.getElementById('wash'), bar = document.getElementById('bar');
+const wash = document.getElementById('wash'), bar = document.getElementById('bar'), flash = document.getElementById('flash');
 let target = 0, sNow = 0, chapter = -1;
 function readScroll() {
   const y = scrollY, vh = innerHeight;
@@ -345,6 +366,9 @@ function frame() {
   wall.material.opacity = w * 0.16; edge.material.opacity = w; wallLabel.material.opacity = w;
   wall.scale.y = 0.001 + smooth(2.7, 3.15, s); wall.position.y = wallH * wall.scale.y / 2;
   edge.position.y = wallH * wall.scale.y; wallLabel.position.y = edge.position.y + 0.45;
+  const tv = smooth(1.85, 2.1, s) * (1 - smooth(3.5, 3.8, s));
+  tradeBits.forEach((m) => { m.material.opacity = tv; });
+  if (tradeBits[1]) tradeBits[1].rotation.y = time * 1.4;
   const bd = smooth(3.6, 3.95, s) * (1 - smooth(4.4, 4.75, s));
   bands.forEach(({ m, l }) => { m.material.opacity = bd * 0.9; l.material.opacity = bd; });
   years.forEach((l) => { l.material.opacity = tl * 0.9; });
@@ -356,6 +380,7 @@ function frame() {
   camera.lookAt(camLook);
   const ch = clamp(Math.round(s - 0.3), 0, 5);
   if (ch !== chapter) {
+    if (chapter >= 0 && flash) { flash.classList.remove('go'); void flash.offsetWidth; flash.classList.add('go'); }
     chapter = ch; wash.style.background = WASH[ch];
     [...dots.children].forEach((b, i) => b.setAttribute('aria-current', i === ch ? 'true' : 'false'));
   }

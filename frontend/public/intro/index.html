@@ -32,6 +32,15 @@
   .dots { position: fixed; z-index: 5; right: clamp(10px, 2vw, 24px); top: 50%; transform: translateY(-50%); display: flex; flex-direction: column; gap: 12px; }
   html.foot-in .dots { opacity: 0; pointer-events: none; }
   .dots { transition: opacity .3s; }
+  .dots button { position: relative; }
+  .dots button::after { content: attr(data-label); position: absolute; right: 22px; top: 50%; transform: translate(6px, -50%); white-space: nowrap; pointer-events: none;
+    padding: 6px 10px; border-radius: 10px; border: 1px solid var(--line); background: rgba(20,14,7,.78); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px);
+    color: var(--fg); font: 600 12px 'Geist', system-ui, sans-serif; opacity: 0; transition: opacity .2s, transform .2s; }
+  .dots button:hover::after, .dots button:focus-visible::after { opacity: 1; transform: translate(0, -50%); }
+  .flash { position: fixed; inset: 0; z-index: 2; pointer-events: none; opacity: 0; mix-blend-mode: screen;
+    background: radial-gradient(60% 50% at 50% 45%, rgba(243,209,132,.20), rgba(243,209,132,0) 70%); }
+  .flash.go { animation: flash .9s ease-out; }
+  @keyframes flash { 0% { opacity: 0 } 25% { opacity: 1 } 100% { opacity: 0 } }
   .dots button { width: 12px; height: 12px; padding: 0; border-radius: 50%; border: 1px solid var(--muted); background: transparent; cursor: pointer; }
   .dots button[aria-current="true"] { background: var(--gold); border-color: var(--gold); box-shadow: 0 0 12px rgba(229,176,74,.7); }
   main { position: relative; z-index: 3; }
@@ -125,7 +134,7 @@
   .hwf-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
   @media (max-width: 720px) { .hwf-top { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); row-gap: 18px; } .hwf-brand { grid-column: 1 / -1; } }
   @media (prefers-reduced-motion: reduce) { .hwf-col a, .hwf-up { transition: none; } }
-  @media (prefers-reduced-motion: reduce) { .hint i::after { animation: none; } .wash { transition: none; } }
+  @media (prefers-reduced-motion: reduce) { .flash { display: none; } .hint i::after { animation: none; } .wash { transition: none; } }
 </style>
 <script type="importmap">
 { "imports": { "three": "../pitch/vendor/three.module.js", "three/addons/": "../pitch/vendor/addons/" } }
@@ -133,6 +142,7 @@
 </head>
 <body>
 <div class="wash" id="wash"></div>
+<div class="flash" id="flash" aria-hidden="true"></div>
 <canvas id="scene" aria-hidden="true"></canvas>
 <svg class="still-art" viewBox="0 0 400 300" aria-hidden="true"><g transform="translate(40 60)"><path d="M10 70L30 20H120L140 70Z" fill="#BC8424"/><path d="M170 70L186 30H260L276 70Z" fill="#2193E0"/><path d="M20 170L36 130H110L126 170Z" fill="#CD6199"/><path d="M180 170L192 140H246L258 170Z" fill="#7D4DAD"/></g></svg>
 <div class="bar" id="bar"></div>
@@ -173,6 +183,7 @@
     <div class="card right">
       <h2>The gaps are real</h2>
       <p>Each column is one trading week for <b>GOLDM · GOLDPETAL</b>, from <b data-k="first">2011</b> to <b data-k="asOf">2026</b>: the biggest gap that week between the two prices and their normal level.</p>
+      <p>The red marker is one real trade: on <b data-k="tradeDate">28 May 2014</b> the gap stood <b><span data-k="tradeGap">189</span> bps</b> from normal, the biggest the rule ever traded on this pair. It still lost <span class="neg" data-k="tradeNet">₹33,453</span> after costs.</p>
       <p>Keep scrolling to travel through <b data-k="years">15</b> years of it.</p>
     </div>
   </section>
