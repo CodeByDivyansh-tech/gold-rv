@@ -34,9 +34,16 @@
 .lc-strip:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
 .lc-tip{position:absolute;z-index:3;pointer-events:none;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:9px 11px;font-size:12px;white-space:nowrap;box-shadow:var(--card-shadow);display:flex;flex-direction:column;gap:4px;box-sizing:border-box;overflow:hidden}
 .lc-mono{font-family:'Geist Mono',ui-monospace,monospace;font-variant-numeric:tabular-nums}
+.lc-act{min-height:36px;padding:0 12px;border-radius:10px;border:1px solid var(--line);background:transparent;color:var(--fg);font:500 12px 'Geist',system-ui,sans-serif;cursor:pointer}
+.lc-act:hover{border-color:var(--gold)}
+.lc-act[aria-expanded="true"]{background:var(--glow);color:var(--gold);border-color:var(--gold)}
+.lc-tbl{width:100%;border-collapse:collapse;font-size:12px}
+.lc-tbl th,.lc-tbl td{padding:6px 10px;text-align:right;border-bottom:1px solid var(--line);white-space:nowrap}
+.lc-tbl th:first-child,.lc-tbl td:first-child{text-align:left}
+.lc-tbl thead th{position:sticky;top:0;background:var(--panel);color:var(--muted);font-weight:500}
 </style>
 </helmet>
-<div style="display: flex; flex-direction: column; gap: 10px">
+<div data-lc="1" style="display: flex; flex-direction: column; gap: 10px">
   <sc-if value="{{showTools}}" hint-placeholder-val="{{ true }}">
     <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 8px 16px">
       <div role="group" aria-label="Show or hide lines" style="display: flex; flex-wrap: wrap; gap: 6px">
@@ -115,6 +122,26 @@
       <button type="button" onClick="{{reset}}" style="min-height: 32px; padding: 0 12px; border-radius: 10px; border: 1px solid var(--gold); background: var(--glow); color: var(--gold); font: 600 12px 'Geist', system-ui, sans-serif; cursor: pointer">Reset zoom</button>
     </sc-if>
   </div>
+  <div role="group" aria-label="Chart data" style="display: flex; flex-wrap: wrap; gap: 6px">
+    <button type="button" class="lc-act" aria-expanded="{{tableOpen}}" onClick="{{toggleTable}}">{{tableLabel}}</button>
+    <button type="button" class="lc-act" onClick="{{dlCsv}}">Download data (CSV)</button>
+    <button type="button" class="lc-act" onClick="{{dlPng}}">Download image (PNG)</button>
+    <span aria-live="polite" style="font-size: 12px; color: var(--muted); align-self: center">{{dlSay}}</span>
+  </div>
+  <sc-if value="{{table.on}}" hint-placeholder-val="{{ false }}">
+    <div tabindex="0" role="region" aria-label="{{table.caption}}" style="max-height: 320px; overflow: auto; border: 1px solid var(--line); border-radius: 12px">
+      <table class="lc-tbl lc-mono">
+        <caption style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0)">{{table.caption}}</caption>
+        <thead><tr><th scope="col">Date</th><sc-for list="{{table.head}}" as="hh" hint-placeholder-count="2"><th scope="col">{{hh.label}}</th></sc-for></tr></thead>
+        <tbody>
+          <sc-for list="{{table.rows}}" as="r" hint-placeholder-count="6">
+            <tr><th scope="row" style="font-weight: 400">{{r.d}}</th><sc-for list="{{r.cells}}" as="c" hint-placeholder-count="2"><td>{{c.v}}</td></sc-for></tr>
+          </sc-for>
+        </tbody>
+      </table>
+    </div>
+    <span style="font-size: 12px; color: var(--muted)">{{table.note}}</span>
+  </sc-if>
 </div>
 </x-dc>
 <script type="text/x-dc" data-dc-script data-props='{"height":{"editor":"number","default":300}}'>
@@ -272,6 +299,70 @@ class Component extends DCLogic {
     this.setState({ zoom: (a === 0 && b === n - 1) ? null : [a, b], hover: null, drag: null });
   }
 
+  // the visible window's data: every day, the raw values (not % change), for the table and the downloads
+  exportData(m) {
+    const P = this.props, cols = (P.series || []).filter((x) => !(this.state || {}).hidden || !(this.state || {}).hidden[x.key]);
+    const rows = [];
+    for (let i = m.z[0]; i <= m.z[1]; i++) rows.push({ d: String(m.dates[i]).slice(0, 10), vals: cols.map((c) => c.values[i]) });
+    return { cols, rows };
+  }
+  slug() { return String(this.props.label || 'chart').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '').slice(0, 60) || 'chart'; }
+  save(name, blob) {
+    const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = name;
+    document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 1000);
+  }
+  csv(m) {
+    const x = this.exportData(m), esc = (v) => { const t = v == null ? '' : String(v); return /[",\n]/.test(t) ? '"' + t.replace(/"/g, '""') + '"' : t; };
+    const lines = [['Date'].concat(x.cols.map((c) => c.label)).map(esc).join(',')].concat(x.rows.map((r) => [r.d].concat(r.vals.map((v) => (v == null ? '' : v))).map(esc).join(',')));
+    this.save('gold-rv_' + this.slug() + '.csv', new Blob(['\ufeff' + lines.join('\n') + '\n'], { type: 'text/csv;charset=utf-8' }));
+    this.setState({ dlSay: 'Saved the data as CSV.' });
+  }
+  png(m, el) {
+    const root = el && el.closest ? el.closest('[data-lc]') : null;
+    const css = root ? getComputedStyle(root) : null;
+    const col = (c, fb) => { if (!c) return fb; const v = /^var\((--[\w-]+)\)$/.exec(c); return v ? ((css && css.getPropertyValue(v[1]).trim()) || fb) : c; };
+    const W = 1200, H = 660, L = 100, R = 30, T = 90, B = 70, cw = W - L - R, ch = H - T - B;
+    const cv = document.createElement('canvas'); cv.width = W; cv.height = H; const g = cv.getContext('2d');
+    const bg = col('var(--panel)', '#1B150C'), fg = col('var(--fg)', '#F6ECD8'), mu = col('var(--muted)', '#BBA987'), ln = col('var(--line)', '#3A2D1A');
+    g.fillStyle = bg; g.fillRect(0, 0, W, H);
+    g.fillStyle = fg; g.font = '600 20px Geist, system-ui, sans-serif';
+    // title: wrapped onto two lines if needed, never cut mid-word
+    const words = String(this.props.label || 'Chart').split(' '), tl = ['']; words.forEach((wd) => { const tr = (tl[tl.length - 1] + ' ' + wd).trim(); if (g.measureText(tr).width > W - L - R && tl[tl.length - 1]) tl.push(wd); else tl[tl.length - 1] = tr; });
+    tl.slice(0, 2).forEach((line, k) => g.fillText(line, L, 30 + k * 24));
+    const x = this.exportData(m), n = x.rows.length; if (!n) return;
+    let lo = Infinity, hi = -Infinity; x.rows.forEach((r) => r.vals.forEach((v) => { if (v != null) { lo = Math.min(lo, v); hi = Math.max(hi, v); } }));
+    if (this.props.zero) { lo = Math.min(lo, 0); hi = Math.max(hi, 0); }
+    if (this.props.clampLo != null) lo = Math.max(lo, this.props.clampLo); if (this.props.clampHi != null) hi = Math.min(hi, this.props.clampHi);
+    if (!(hi > lo)) { hi = lo + 1; }
+    const t0 = Date.parse(x.rows[0].d), t1 = Date.parse(x.rows[n - 1].d) || t0 + 1;
+    const X = (d) => L + (t1 === t0 ? 0 : (Date.parse(d) - t0) / (t1 - t0)) * cw, Y = (v) => T + (1 - (Math.max(lo, Math.min(hi, v)) - lo) / (hi - lo)) * ch;
+    const placed = [];
+    (this.props.bands || []).forEach((b) => {
+      const a = Math.max(Date.parse(b.from), t0), c = Math.min(Date.parse(b.to), t1); if (c <= a) return;
+      const xa = X(new Date(a).toISOString()), xc = X(new Date(c).toISOString());
+      g.globalAlpha = 0.5; g.fillStyle = col(b.fill, ln); g.fillRect(xa, T, Math.max(2, xc - xa), ch); g.globalAlpha = 1;
+      // labels in the order given; one that would overlap a placed label is left out, one near the edge moves inside
+      g.font = '13px Geist, system-ui, sans-serif'; const lw = g.measureText(b.label || '').width + 8, lx = Math.min(xa + 4, L + cw - lw);
+      if (b.label && !placed.some((q) => lx < q[1] && lx + lw > q[0])) { placed.push([lx, lx + lw]); g.fillStyle = col(b.ink, mu); g.fillText(b.label, lx, T + 16); }
+    });
+    g.strokeStyle = ln; g.lineWidth = 1; g.fillStyle = mu; g.font = '13px Geist Mono, ui-monospace, monospace';
+    // round tick values (1, 2 or 5 times a power of ten)
+    const raw = (hi - lo) / 6, pw10 = Math.pow(10, Math.floor(Math.log10(raw || 1))), stp = [1, 2, 5, 10].map((k) => k * pw10).find((v) => v >= raw) || raw;
+    for (let v = Math.ceil(lo / stp) * stp; v <= hi + 1e-9; v += stp) { const y = Y(v); g.beginPath(); g.moveTo(L, y); g.lineTo(L + cw, y); g.stroke(); g.textAlign = 'right'; g.fillText(this.fmt(v, this.props.fmt), L - 8, y + 4); }
+    g.textAlign = 'left'; g.fillText(this.fd(x.rows[0].d), L, H - B + 26); g.textAlign = 'right'; g.fillText(this.fd(x.rows[n - 1].d), L + cw, H - B + 26); g.textAlign = 'left';
+    if (this.props.zero && lo < 0 && hi > 0) { g.strokeStyle = mu; g.setLineDash([4, 4]); g.beginPath(); g.moveTo(L, Y(0)); g.lineTo(L + cw, Y(0)); g.stroke(); g.setLineDash([]); }
+    x.cols.forEach((c, ci) => {
+      g.strokeStyle = col(c.color, fg); g.lineWidth = (c.width || 1.75) * 1.4; if (c.dash) g.setLineDash(String(c.dash).split(' ').map(Number)); g.beginPath();
+      let pen = false, py = 0;
+      x.rows.forEach((r) => { const v = r.vals[ci]; if (v == null) { pen = false; return; } const px = X(r.d), yy = Y(v); if (!pen) g.moveTo(px, yy); else if (c.step) { g.lineTo(px, py); g.lineTo(px, yy); } else g.lineTo(px, yy); pen = true; py = yy; });
+      g.stroke(); g.setLineDash([]);
+    });
+    let lx = L; g.font = '14px Geist, system-ui, sans-serif';
+    x.cols.forEach((c) => { g.fillStyle = col(c.color, fg); g.fillRect(lx, H - 30, 14, 4); g.fillStyle = fg; g.fillText(c.label, lx + 20, H - 24); lx += 34 + g.measureText(c.label).width; });
+    g.fillStyle = mu; g.textAlign = 'right'; g.fillText('Gold RV Intelligence · MCX Bhavcopy · ' + this.fd(x.rows[n - 1].d), W - R, H - 24); g.textAlign = 'left';
+    cv.toBlob((blob) => { if (blob) { this.save('gold-rv_' + this.slug() + '.png', blob); this.setState({ dlSay: 'Saved the chart as an image.' }); } }, 'image/png');
+  }
+
   renderVals() {
     const P = this.props, st = this.state || {};
     const m = this.model();
@@ -327,6 +418,16 @@ class Component extends DCLogic {
       stripLabel: 'Overview of the whole period. Click to move the zoom window there.',
       zoomed, hint: zoomed ? 'Zoomed: drag again to zoom further, or reset.' : 'Drag across the chart to zoom in.' + (m.mode === 'pct' ? ' % change is measured from the first day in view.' : ''),
       reset: () => this.setState({ zoom: null, hover: null, drag: null }),
+      tableOpen: st.table ? 'true' : 'false', tableLabel: st.table ? 'Hide the table' : 'Show as table',
+      toggleTable: () => this.setState({ table: !st.table }),
+      table: (() => {
+        if (!st.table) return { on: false, head: [], rows: [], note: '', caption: '' };
+        const x = this.exportData(m), max = 250, step = Math.max(1, Math.ceil(x.rows.length / max));
+        const rows = x.rows.filter((r, i) => i % step === 0 || i === x.rows.length - 1).map((r) => ({ d: this.fd(r.d), cells: r.vals.map((v) => ({ v: this.fmt(v, P.fmt) })) }));
+        return { on: true, head: x.cols.map((c) => ({ label: c.label })), rows, caption: (P.label || 'Chart') + ' as a table',
+          note: step > 1 ? 'Showing every ' + step + 'th of ' + x.rows.length.toLocaleString('en-IN') + ' rows in view. The CSV has all of them; zoom in to see every row here.' : x.rows.length + ' rows in view.' };
+      })(),
+      dlCsv: () => this.csv(m), dlPng: (e) => this.png(m, e && e.currentTarget), dlSay: st.dlSay || '',
       jump: (e) => {
         const r = e.currentTarget.getBoundingClientRect(); const f = (e.clientX - r.left) / (r.width || 1);
         const T = m.T, t = T[0] + f * (T[n - 1] - T[0]);
