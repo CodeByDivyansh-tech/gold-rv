@@ -306,7 +306,16 @@ class Component extends DCLogic {
     for (let i = m.z[0]; i <= m.z[1]; i++) rows.push({ d: String(m.dates[i]).slice(0, 10), vals: cols.map((c) => c.values[i]) });
     return { cols, rows };
   }
-  slug() { return String(this.props.label || 'chart').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '').slice(0, 60) || 'chart'; }
+  // File name from the chart's title: the part before the first colon, whole words only (never cut mid-number)
+  slug() {
+    const words = String(this.props.label || 'chart').split(/[:.]\s/)[0].replace(/₹\s?[\d,.]+/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '').split('-').filter(Boolean);
+    const out = [];
+    for (const w of words) { if ((out.join('-') + '-' + w).length > 60) break; out.push(w); }
+    const cut = out.length < words.length;     // a shortened name drops a half date and any dangling small word
+    while (out.length > 1 && (/^(and|of|for|in|from|to|the|at|on|with|vs|versus|around|since)$/.test(out[out.length - 1]) ||
+      (cut && /^(\d{1,2}|jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)$/.test(out[out.length - 1])))) out.pop();
+    return out.join('-') || 'chart';
+  }
   save(name, blob) {
     const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = name;
     document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 1000);
