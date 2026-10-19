@@ -3,7 +3,7 @@
     {
       "step": 1,
       "name": "Load & Validate",
-      "desc": "Parse 12,267 rows, strip symbols, check primary keys, compare against the raw MCX file, flag no-trade days."
+      "desc": "Parse 47,281 daily prices: 35,014 from the Parity data book (2011\u20132023) and 12,267 from our own MCX download (Oct 2023 on). Strip symbols, check primary keys, compare against the raw MCX file and the book, flag no-trade days."
     },
     {
       "step": 2,
@@ -33,7 +33,7 @@
     {
       "step": 7,
       "name": "Walk-Forward Test",
-      "desc": "Settings tuned on Train (2023-10 to 2025-09) and frozen for Test (2025-10 to 2026-09). A pair is traded in Test only if training gave at least 10 trades and a profit."
+      "desc": "Settings tuned on Train (2023-10 to 2025-09) and frozen for Test (2025-10 to 2026-09). A pair is traded in Test only if training gave at least 10 trades and a profit. The same frozen rule is then run on 2011\u20132023, years it never saw: the clean test."
     },
     {
       "step": 8,

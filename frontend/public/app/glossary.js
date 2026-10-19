@@ -25,9 +25,9 @@
     ['Walk-forward test', 'Settings are chosen on two years of data (Oct 2023 – Sep 2025), frozen, then tested on the next 12 months. Because the rule was revised after those 12 months were first seen, the clean test is 2011–2023, which no version of the rule had seen.'],
     ['Training switch', 'A pair trades in the test year only if, with its frozen settings, it made at least 10 trades and a profit in training. Only GOLDM · GOLDPETAL qualified, and only just (close to a coin flip), so it is a weak filter.'],
     ['Clean test', 'A test on data nobody looked at while building the rule. Here that is 2011–2023: the rule was frozen before that data was used.'],
-    ['t-statistic', 'How far the average trade result is from zero compared with its noise. About 2 or more is the usual bar; ours is 1.89, so the result is not proven.'],
+    ['t-statistic', 'How far the average trade result is from zero compared with its noise. Beyond ±2 is the usual bar. In the clean test (2011–2023, 151 trades) it is −3.63: a loss that is not luck. The test year\'s +1.89 over 20 trades does not reach the bar.'],
     ['95% range (resampling)', 'We redraw the same trades 10,000 times at random to see how much the total could swing by luck. The middle 95% of those totals is the range.'],
-    ['Attribution', 'Splitting each trade\'s profit into the part from the gap closing and the part from gold\'s own price move. Gold\'s part is under 1% here.'],
+    ['Attribution', 'Splitting each trade\'s profit into the part from the gap closing and the part from gold\'s own price move. Gold\'s part is about 1% here, because both legs hold the same grams of gold.'],
     ['Leg', 'One side of a pair trade. We buy one contract and sell the other, holding the same grams of gold on each side.']
   ];
 
@@ -43,7 +43,7 @@
     '.gl-list{list-style:none;margin:0;padding:0;overflow-y:auto;flex:1}' +
     '.gl-list li{padding:12px 2px;border-bottom:1px solid var(--grv-line,#3A2D1A)}' +
     '.gl-list dt,.gl-t{font-weight:600;font-size:15px;color:var(--grv-gold,#E5B04A);margin-bottom:3px}' +
-    '.gl-d{font-size:14px;line-height:1.55;color:#C9D3DD}' +
+    '.gl-d{font-size:14px;line-height:1.55;color:var(--grv-fg,#F6ECD8);opacity:.86}' +
     '.gl-none{padding:16px 2px;color:var(--grv-muted,#BBA987);font-size:14px}' +
     '.gl-foot{margin-top:10px;font-size:12px;color:var(--grv-muted,#BBA987)}';
 

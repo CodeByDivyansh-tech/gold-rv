@@ -27,6 +27,9 @@ body{margin:0}
     <sc-if value="{{loading}}" hint-placeholder-val="{{ false }}">
       <p style="margin: 0; color: var(--muted); font-size: 14px">Loading…</p>
     </sc-if>
+    <sc-if value="{{failed}}" hint-placeholder-val="{{ false }}">
+      <p role="alert" style="margin: 0; font-size: 14px; line-height: 1.5">The data for the downloads didn't load. Check your connection, close this panel and try again.</p>
+    </sc-if>
 
     <sc-if value="{{ready}}" hint-placeholder-val="{{ true }}">
       <fieldset style="border: 0; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px">
@@ -103,6 +106,9 @@ class Component extends DCLogic {
       .then((r) => r.json())
       .then((d) => this.setState({ D: d }))
       .catch(() => this.setState({ failed: true }));
+    // 2011-2023: weekly prices (history.json) and every clean-test trade (history_charts.json), so downloads cover every year
+    fetch('data/history.json').then((r) => r.json()).then((h) => this.setState({ H: h })).catch(() => this.setState({ failed: true }));
+    fetch('data/history_charts.json').then((r) => r.json()).then((h) => this.setState({ HC: h })).catch(() => this.setState({ failed: true }));
   }
 
   fd(s) { const M = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']; const p = s.split('-'); return (+p[2]) + ' ' + M[+p[1] - 1] + ' ' + p[0]; }
@@ -111,8 +117,8 @@ class Component extends DCLogic {
   rs(n) { return (n < 0 ? '-' : '') + 'Rs ' + Math.abs(Math.round(n)).toLocaleString('en-IN'); }
 
   // Builds {head, rows, title} for the chosen file. Values stay plain (no ₹ signs) so spreadsheets read them as numbers.
-  table(D, what, pair, period) {
-    const from = period === '3m' ? D.pure4.d[Math.max(0, D.pure4.d.length - 63)] : period === '1y' ? D.pure4.d[Math.max(0, D.pure4.d.length - 252)] : period === 'test' ? D.split.test_start : D.start;
+  table(D, what, pair, period, H, HC) {
+    const from = period === '3m' ? D.pure4.d[Math.max(0, D.pure4.d.length - 63)] : period === '1y' ? D.pure4.d[Math.max(0, D.pure4.d.length - 252)] : period === 'test' ? D.split.test_start : D.longrun.start;
     const inP = (d) => d >= from && d <= D.asOf;
     const WHY = { revert: 'Back to normal', stop: 'Stop-loss', time: 'Time limit', roll: 'Contract roll', expiry: 'Near expiry' };
     if (what === 'today') {
@@ -120,37 +126,46 @@ class Component extends DCLogic {
         rows: D.today.map((p) => [p.label, p.contracts, p.spread, p.spreadRs, p.mu, p.dev, p.hurdle, p.z, p.zNeed, p.failed.length ? 'Quiet' : 'Signal', p.failed.join('; ')]) };
     }
     if (what === 'prices') {
-      const P = D.pure4, rows = [];
-      P.d.forEach((d, i) => { if (inP(d)) rows.push([d, P.GOLDM[i], P.GOLDTEN[i], P.GOLDGUINEA[i], P.GOLDPETAL[i]]); });
-      return { title: 'Price of 10 g of pure gold by contract', head: ['Date', 'GOLDM', 'GOLDTEN', 'GOLDGUINEA', 'GOLDPETAL'], rows };
+      const P = D.pure4, rows = [], L = H && H.long;
+      // before our own download: the Parity data book, one price per week (the last trading day)
+      if (L) L.d.forEach((d, i) => { if (inP(d)) rows.push([d, L.GOLDM[i], L.GOLDTEN[i], L.GOLDGUINEA[i], L.GOLDPETAL[i], 'Parity data book, weekly']); });
+      P.d.forEach((d, i) => { if (inP(d)) rows.push([d, P.GOLDM[i], P.GOLDTEN[i], P.GOLDGUINEA[i], P.GOLDPETAL[i], 'Our MCX download, daily']); });
+      return { title: 'Price of 10 g of pure gold by contract', head: ['Date', 'GOLDM', 'GOLDTEN', 'GOLDGUINEA', 'GOLDPETAL', 'Source'], rows };
     }
     if (what === 'trades') {
       const ids = pair === 'ALL' ? Object.keys(D.pairs) : [pair];
       let list = [];
       ids.forEach((id) => D.pairs[id].trades.forEach((t) => list.push({ id, t })));
+      ids.forEach((id) => { const c = HC && HC.pairs[id]; if (c) c.trades['5'].forEach((t) => list.push({ id, t: { e: t[1], x: t[2], side: t[3], z: t[4], days: t[9], why: t[8], net: t[5], bps: t[7], seg: 'clean' } })); });
       list = list.filter((x) => inP(x.t.e)).sort((a, b) => (a.t.e < b.t.e ? -1 : 1));
       let run = 0;
       const rows = list.map(({ id, t }) => {
         run += t.net; const P = D.pairs[id];
-        return [t.e, t.x, P.label, t.side < 0 ? 'Sell ' + P.a + ', buy ' + P.b : 'Buy ' + P.a + ', sell ' + P.b, t.z, t.days, WHY[t.why] || t.why, t.net, t.bps, Math.round(run), t.seg === 'test' ? 'Test year' : (t.seg === 'forward' ? 'Forward' : 'Training')];
+        return [t.e, t.x, P.label, t.side < 0 ? 'Sell ' + P.a + ', buy ' + P.b : 'Buy ' + P.a + ', sell ' + P.b, t.z, t.days, WHY[t.why] || t.why, t.net, t.bps, Math.round(run), t.seg === 'test' ? 'Test year' : (t.seg === 'forward' ? 'Forward' : (t.seg === 'clean' ? 'Clean test' : 'Training'))];
       });
       return { title: 'Trade statement', head: ['Entered', 'Closed', 'Pair', 'Trade', 'z', 'Days', 'Why it closed', 'Result after costs (Rs)', 'Result (bps)', 'Running total (Rs)', 'Period'], rows };
     }
     if (what === 'backtest') {
+      // every pair at every slippage, period by period: the clean test, training and the test year
       const rows = [];
       Object.keys(D.backtest).forEach((id) => ['0', '2', '5', '10'].forEach((s) => {
-        const T = D.backtest[id][s].test;
-        rows.push([D.pairs[id].label, s, T.n_trades, Math.round(T.hit_rate * 100), T.gross_bps, T.net_bps, Math.round(T.net_rs), T.t_stat]);
+        const b = D.backtest[id][s], c = HC && HC.pairs[id] ? HC.pairs[id].trades[s] : [];
+        const cn = c.length, cnet = c.reduce((a, t) => a + t[5], 0);
+        const has = !!(HC && HC.pairs[id]);
+        rows.push([D.pairs[id].label, s, has ? cn : 'not listed', has ? Math.round(cnet) : '', b.train.n_trades, Math.round(b.train.net_rs), b.test.n_trades, Math.round(b.test.net_rs), b.test.t_stat,
+          cn + b.train.n_trades + b.test.n_trades, Math.round(cnet + b.train.net_rs + b.test.net_rs)]);
       }));
-      return { title: 'Backtest on the test year', head: ['Pair', 'Slippage (bps)', 'Trades', 'Won (%)', 'Before costs (bps)', 'After costs (bps)', 'Total after costs (Rs)', 't-statistic'], rows };
+      return { title: 'Backtest by period, ' + D.longrun.start.slice(0, 4) + ' to ' + D.asOf.slice(0, 4),
+        head: ['Pair', 'Slippage (bps)', 'Clean test trades', 'Clean test after costs (Rs)', 'Training trades', 'Training after costs (Rs)', 'Test-year trades', 'Test year after costs (Rs)', 'Test-year t-statistic', 'All trades', 'All years after costs (Rs)'], rows };
     }
-    return { title: 'Research report', head: ['Section', 'Contents'], rows: [['Verdict', 'No persistent edge proven after costs'], ['Today', 'Six pairs against the cost line'], ['Backtest', 'Test year, all pairs at 5 bps'], ['Costs', 'Round trip ' + D.costTotal.toFixed(1) + ' bps'], ['Data', (D.longrun.rows + D.meta.rows) + ' daily settlements (' + D.longrun.rows + ' Parity book 2011–2023, ' + D.meta.rows + ' our MCX download), ' + D.meta.mismatches + ' mismatches']] };
+    return { title: 'Research report', head: ['Section', 'Contents'], rows: [['Verdict', 'No persistent edge proven after costs'], ['Today', 'Six pairs against the cost line'], ['Backtest', 'Clean test 2011–2023, training and test year, all pairs'], ['Costs', 'Round trip ' + D.costTotal.toFixed(1) + ' bps'], ['Data', D.longrun.allRows + ' daily settlements, ' + D.longrun.start.slice(0, 4) + '–' + D.asOf.slice(0, 4) + ' (' + D.longrun.rows + ' Parity book 2011–2023, ' + D.meta.rows + ' our MCX download), ' + D.meta.mismatches + ' mismatches']] };
   }
 
   // The leading byte-order mark makes Excel read the file as UTF-8 (so "·" and "–" display correctly).
   csv(t) { return '﻿' + [t.head].concat(t.rows).map((r) => r.map((v) => this.esc(v)).join(',')).join('\n') + '\n'; }
 
   statement(D, what, pair, periodLabel, t) {
+    const HC = (this.state || {}).HC;
     const style = 'body{font-family:Georgia,serif;color:#111;margin:40px;max-width:900px}h1{font-size:26px;margin:0 0 4px}h2{font-size:17px;margin:28px 0 8px}p,li{font-size:13px;line-height:1.55}table{border-collapse:collapse;width:100%;font:12px/1.4 ui-monospace,Menlo,monospace}th,td{border-bottom:1px solid #ccc;padding:5px 8px;text-align:left}th{background:#f2f2f2}.muted{color:#555}.box{border:1px solid #bbb;border-radius:8px;padding:12px 14px;margin:14px 0}@media print{body{margin:16mm}}';
     const tbl = (h, rows) => '<table><thead><tr>' + h.map((x) => '<th>' + this.html(x) + '</th>').join('') + '</tr></thead><tbody>' + rows.map((r) => '<tr>' + r.map((x) => '<td>' + this.html(x) + '</td>').join('') + '</tr>').join('') + '</tbody></table>';
     const head = '<!doctype html><html lang="en"><head><meta charset="utf-8"><title>Gold RV Intelligence: ' + this.html(t.title) + '</title><style>' + style + '</style></head><body>';
@@ -177,6 +192,11 @@ class Component extends DCLogic {
       '<h2>Today (' + this.fd(D.asOf) + '): gap from normal vs cost line, in bps</h2>' + tbl(['Pair', 'Gap from normal', 'Cost line', 'Status', 'Checks failed'], today) +
       '<h2>Clean test: ' + this.fd(D.longrun.start) + ' to ' + this.fd(D.longrun.end) + ' (rule frozen before this data was used)</h2>' +
       tbl(['Trades', 'After costs at 5 bps', 'After costs at 0 bps', 't-statistic', 'Losing years'], [[D.longrun.n, this.rs(D.longrun.net), this.rs(D.longrun.net0), String(D.longrun.t), (D.longrun.losingYears + ' of ' + D.longrun.years)]]) +
+      '<h2>Each pair, every year (5 bps slippage)</h2>' + tbl(['Pair', 'Clean test', 'Training', 'Test year', 'All years after costs'], Object.keys(D.backtest).map((id) => {
+        const b = D.backtest[id]['5'], c = HC && HC.pairs[id] ? HC.pairs[id].trades['5'] : null;
+        const cn = c ? c.reduce((a, t) => a + t[5], 0) : 0;
+        return [D.pairs[id].label, c ? c.length + ' trades, ' + this.rs(cn) : 'not listed yet', b.train.n_trades + ' trades, ' + this.rs(b.train.net_rs), b.test.n_trades + ' trades, ' + this.rs(b.test.net_rs), this.rs(cn + b.train.net_rs + b.test.net_rs)];
+      })) +
       '<h2>Slippage check</h2><p>' + this.html(D.evidence.slippage.summary) + '</p>' +
       '<p>' + this.html(D.evidence.multiple_testing.note) + '</p>' +
       '<h2>Test year (' + this.fd(D.split.test_start) + ' to ' + this.fd(D.split.test_end) + '), 5 bps slippage: not a clean test</h2><p>' + this.html(D.evidence.test_year.reason) + '</p>' + tbl(['Pair', 'Trades', 'Won', 'Average (bps)', 'Total after costs', 't-statistic'], bt) +
@@ -184,7 +204,7 @@ class Component extends DCLogic {
       '<p>Pooled at our 5 bps assumption: ' + pooled.n + ' trades, ' + pooled.bps.toFixed(1) + ' bps average after costs.</p>' +
       '<h2>One rule for alerts and backtest, at 5 bps</h2>' + tbl(['Rule', 'Training trades', 'Training result', 'Test-year trades', 'Test-year result', 'Outside the crash'], rules) +
       '<h2>Cost of one round trip (bps of one ₹10 lakh leg)</h2>' + tbl(['Item', 'How', 'bps'], D.costs.map((c) => [c.name, c.how, c.bps.toFixed(2)])) +
-      '<h2>Data</h2><p>' + (D.longrun.rows + D.meta.rows).toLocaleString('en-IN') + ' official MCX daily settlements in all: ' + D.longrun.rows.toLocaleString('en-IN') + ' from the Parity data book for the clean test (' + this.fd(D.longrun.start) + ' to ' + this.fd(D.longrun.end) + '), and our own MCX download: ' + D.meta.rows.toLocaleString('en-IN') + ' daily settlements, ' + D.meta.contracts + ' contracts, ' + D.meta.days + ' trading days (' + this.fd(D.start) + ' to ' + this.fd(D.asOf) + '). ' + this.html(D.meta.checkText) + '</p>' +
+      '<h2>Data</h2><p>' + D.longrun.allRows.toLocaleString('en-IN') + ' official MCX daily settlements, ' + D.longrun.allContracts + ' contracts and ' + D.longrun.allDays.toLocaleString('en-IN') + ' trading days (' + this.fd(D.longrun.start) + ' to ' + this.fd(D.asOf) + '): ' + D.longrun.rows.toLocaleString('en-IN') + ' from the Parity data book for the clean test (' + this.fd(D.longrun.start) + ' to ' + this.fd(D.longrun.end) + '), and our own MCX download: ' + D.meta.rows.toLocaleString('en-IN') + ' daily settlements, ' + D.meta.contracts + ' contracts, ' + D.meta.days + ' trading days (' + this.fd(D.start) + ' to ' + this.fd(D.asOf) + '). ' + this.html(D.meta.checkText) + '</p>' +
       '<h2>Limits</h2><ul>' + D.limits.map((l) => '<li>' + this.html(l) + '</li>').join('') + '</ul>' + foot;
   }
 
@@ -220,16 +240,16 @@ class Component extends DCLogic {
     const close = () => { if (overlay) this.props.onClose(); };
     const base = { rootStyle, close, onKey: (e) => { if (e.key === 'Escape') close(); } };
     const D = st.D;
-    if (!D) return { ...base, loading: true, ready: false, asOf: '…' };
+    if (!D || !st.H || !st.HC) return { ...base, loading: !st.failed, failed: !!st.failed, ready: false, asOf: '…' };
 
     const what = st.what || this.props.startWhat || 'trades';
     const pair = st.pair || this.props.startPair || 'ALL';
     const period = st.period || 'all';
     const WH = [
       ['today', 'Today\'s pairs', 'All six pairs: gap, cost line, checks'],
-      ['prices', 'Gold prices', 'Daily price of 10 g pure gold, all four contracts'],
+      ['prices', 'Gold prices', 'Price of 10 g pure gold, all four contracts: weekly from 2011, daily from Oct 2023'],
       ['trades', 'Trade statement', 'Every trade with result and running total'],
-      ['backtest', 'Backtest results', 'Test year, every pair at 0, 2, 5, 10 bps'],
+      ['backtest', 'Backtest results', 'Every pair at 0, 2, 5, 10 bps: clean test, training and test year'],
       ['report', 'Full research report', 'Verdict, today, backtest, costs and data limits']
     ];
     const opt = (on) => 'min-height: 44px; border-radius: 12px; cursor: pointer; font-family: \'Geist\', system-ui, sans-serif; color: var(--fg); ' + (on ? 'background: var(--glow); border: 1px solid var(--gold)' : 'background: transparent; border: 1px solid var(--line)');
@@ -241,7 +261,7 @@ class Component extends DCLogic {
     const showPair = what === 'trades', showPeriod = what === 'trades' || what === 'prices';
     const pairs = [{ id: 'ALL', label: 'All six pairs' }].concat(Object.keys(D.pairs).map((id) => ({ id, label: D.pairs[id].label })))
       .map((p) => ({ label: p.label, pressed: p.id === pair ? 'true' : 'false', pick: () => this.setState({ pair: p.id, status: '' }), style: opt(p.id === pair) + '; font-size: 13px; font-weight: 500; padding: 0 10px' }));
-    const PER = [['3m', 'Last 3 months'], ['1y', 'Last year'], ['test', 'Test year'], ['all', 'Everything']];
+    const PER = [['3m', 'Last 3 months'], ['1y', 'Last year'], ['test', 'Test year'], ['all', 'Everything since 2011']];
     const periodLabel = (PER.find((p) => p[0] === period) || PER[3])[1];
     const periods = PER.map(([id, label]) => ({ label, pressed: id === period ? 'true' : 'false', pick: () => this.setState({ period: id, status: '' }), style: opt(id === period) + '; font-size: 13px; font-weight: 500; padding: 0 10px' }));
     const canPrint = what === 'trades' || what === 'report';
@@ -254,7 +274,7 @@ class Component extends DCLogic {
     if (canPrint) FM.push(['html', 'Printable statement', 'Open, then Print → Save as PDF']);
     const formats = FM.map(([id, label, desc]) => ({ label, desc, pressed: id === format ? 'true' : 'false', pick: () => this.setState({ format: id, status: '' }), style: opt(id === format) + '; display: flex; flex-direction: column; align-items: flex-start; gap: 2px; padding: 10px 14px' }));
 
-    const tb = this.table(D, what, pair, period);
+    const tb = this.table(D, what, pair, period, st.H, st.HC);
     const slug = (s) => s.toLowerCase().replace(/'/g, '').replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
     const parts = ['gold-rv', slug(tb.title)];
     if (showPair) parts.push(pair === 'ALL' ? 'all-pairs' : slug(D.pairs[pair].label));

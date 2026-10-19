@@ -1,6 +1,6 @@
 /*
  * keys.js — keyboard shortcuts and a quick menu.
- *   1-7            jump to a page (Home, Today, Market, Pair Explorer, Signals, Backtesting, Data)
+ *   1-8            jump to a page (Home, Today, Market, Pair Explorer, Signals, Backtesting, Try your own rule, Data)
  *   Ctrl/Cmd + O   open the quick menu (Ctrl/Cmd + K works too)
  *   ?              Words explained (glossary.js). Double-click any box: Goldie explains it (explain.js)
  * Shortcuts are ignored while typing in a box, so the calculator and search still work.
@@ -14,7 +14,8 @@
     ['4', 'Pair Explorer', '#/pairs', 'Every pair\'s history and trades'],
     ['5', 'Signals', '#/signals', 'The five checks and your own cost'],
     ['6', 'Backtesting', '#/backtesting', 'Did it make money?'],
-    ['7', 'Data', '#/data', 'Where the numbers come from']
+    ['7', 'Try your own rule', '#/explore', 'Change the settings, see 15 years of real results'],
+    ['8', 'Data', '#/data', 'Where the numbers come from']
   ];
   var TOOLS = [
     ['?', 'Words explained', 'Plain meanings of bps, z-score, carry…', function () { window.GRVGlossary && window.GRVGlossary.open(''); }],
@@ -39,7 +40,7 @@
     '.km-t{display:flex;flex-direction:column;min-width:0}.km-n{font-weight:600;font-size:15px}.km-d{font-size:13px;color:var(--grv-muted,#BBA987)}' +
     '.km-cur{margin-left:auto;font:500 11px "Geist Mono",ui-monospace,monospace;color:var(--grv-gold,#E5B04A);letter-spacing:.08em}' +
     '.km-foot{border-top:1px solid var(--grv-line,#3A2D1A);padding:10px 16px;font-size:12px;color:var(--grv-muted,#BBA987);display:flex;flex-wrap:wrap;gap:6px 16px}' +
-    '.km-foot b{font-family:"Geist Mono",ui-monospace,monospace;color:#C9D3DD;font-weight:600}' +
+    '.km-foot b{font-family:"Geist Mono",ui-monospace,monospace;color:var(--grv-fg,#F6ECD8);font-weight:600}' +
     '.km-toast{position:fixed;z-index:65;left:50%;top:16px;transform:translateX(-50%);background:var(--grv-panel,#1B150C);color:var(--grv-fg,#F6ECD8);border:1px solid var(--grv-gold,#E5B04A);' +
     'border-radius:999px;padding:8px 16px;font:600 13px Geist,system-ui,sans-serif;box-shadow:0 10px 30px rgba(18,12,4,.35);pointer-events:none}' +
     '.grv-tool{position:relative}.grv-tool:hover{border-color:var(--grv-gold,#E5B04A) !important}.grv-tool:focus-visible{outline:2px solid var(--grv-gold,#E5B04A);outline-offset:2px}' +
@@ -132,7 +133,7 @@
       else if (e.key === 'Enter') { e.preventDefault(); if (items[sel]) items[sel].act(); }
       else if (e.key === 'Escape') { e.preventDefault(); close(); }
       else if (e.key === 'Tab') { e.preventDefault(); }
-      else if (/^[1-7]$/.test(e.key) && !q.value) { e.preventDefault(); close(); go(PAGES[+e.key - 1]); }
+      else if (/^[1-8]$/.test(e.key) && !q.value) { e.preventDefault(); close(); go(PAGES[+e.key - 1]); }
     });
     draw(); q.focus();
   }
@@ -144,7 +145,7 @@
     }
     if (mod || e.altKey || back || typing()) return;
     if (document.querySelector('.gl-back')) return;       // glossary open: let it handle keys
-    if (/^[1-7]$/.test(e.key)) { e.preventDefault(); go(PAGES[+e.key - 1]); return; }
+    if (/^[1-8]$/.test(e.key)) { e.preventDefault(); go(PAGES[+e.key - 1]); return; }
   });
 
   // The Search and Words explained buttons sit in each page's top bar (data-grv="...")
@@ -167,7 +168,7 @@
       var tip = document.createElement('div'); tip.className = 'km-tip'; tip.setAttribute('role', 'note');
       tip.innerHTML = touch
         ? 'Tip: <b>double-tap</b> any box and Goldie explains it.<br><button type="button">Got it</button>'
-        : 'Tip: <b>double-click</b> any box and Goldie explains it. Press <b>' + (isMac ? '⌘' : 'Ctrl') + ' O</b> to search, or <b>1–7</b> to jump between pages.<br><button type="button">Got it</button>';
+        : 'Tip: <b>double-click</b> any box and Goldie explains it. Press <b>' + (isMac ? '⌘' : 'Ctrl') + ' O</b> to search, or <b>1–8</b> to jump between pages.<br><button type="button">Got it</button>';
       var done = function () { tip.remove(); try { localStorage.setItem('grv-keys-tip', '1'); } catch (e) {} };
       tip.querySelector('button').addEventListener('click', done);
       // a small popup in the bottom corner (above the tab bar on phones), so it never covers the page's content

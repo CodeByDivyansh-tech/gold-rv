@@ -2,13 +2,14 @@
  * main.js — routes the URL hash to a page file and mounts it with dc.js.
  *   #/            Home        #/today     Today       #/market    Market
  *   #/pairs       Pairs       #/signals   Signals     #/backtesting  Backtesting
- *   #/data        Data
+ *   #/explore     Explore (try your own rule)      #/data        Data
+ *   A ?query after the route holds the visitor's choices (app/prefs.js); it never changes the page.
  */
 (function () {
   'use strict';
   var ROUTES = {
     '': 'Home', home: 'Home', today: 'Today', market: 'Market', pairs: 'Pairs',
-    signals: 'Signals', backtesting: 'Backtesting', data: 'Data'
+    signals: 'Signals', backtesting: 'Backtesting', explore: 'Explore', data: 'Data'
   };
   var NAMES = {};
   Object.keys(ROUTES).forEach(function (k) { if (k) NAMES[ROUTES[k]] = k; });
@@ -67,6 +68,6 @@
 
   // Warm the cache for the other pages once the first one is up
   setTimeout(function () {
-    ['Today', 'Market', 'Pairs', 'Signals', 'Backtesting', 'Data'].forEach(function (n) { DC.load(n).catch(function () {}); });
+    ['Today', 'Market', 'Pairs', 'Signals', 'Backtesting', 'Explore', 'Data'].forEach(function (n) { DC.load(n).catch(function () {}); });
   }, 1500);
 })();

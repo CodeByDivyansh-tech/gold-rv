@@ -95,7 +95,29 @@
   DCLogic.prototype.setState = function (patch) {
     var next = typeof patch === 'function' ? patch(this.state || {}, this.props) : patch;
     this.state = Object.assign({}, this.state || {}, next || {});
+    remember(this, next);
     if (this.__host) this.__host.schedule();
+  };
+  // Remembered choices (app/prefs.js). A page lists them in prefKeys(): { stateKey: [prefKey, allowedValues] }.
+  // withPrefs(state) fills in any listed choice the page has not set yet; setState stores the listed ones.
+  function remember(c, next) {
+    if (!next || typeof c.prefKeys !== 'function' || typeof window.GRVPrefs === 'undefined') return;
+    var K = c.prefKeys(), out = {}, any = false;
+    Object.keys(next).forEach(function (k) { if (K[k]) { out[K[k][0]] = next[k]; any = true; } });
+    if (any) window.GRVPrefs.set(out);
+  }
+  DCLogic.prototype.withPrefs = function (st) {
+    if (typeof this.prefKeys !== 'function' || typeof window.GRVPrefs === 'undefined') return st;
+    var K = this.prefKeys(), o = {};
+    var url = {}, any = false;
+    Object.keys(K).forEach(function (k) {
+      if (st[k] == null) { var v = window.GRVPrefs.get(K[k][0], K[k][1]); if (v != null) o[k] = v; }
+      var cur = st[k] != null ? st[k] : o[k];
+      if (cur != null && !window.GRVPrefs.inUrl(K[k][0], cur)) { url[K[k][0]] = cur; any = true; }
+    });
+    // the address always describes the whole view, so "Copy link" shares exactly what is on screen
+    if (any) window.GRVPrefs.set(url);
+    return Object.assign({}, st, o);
   };
   DCLogic.prototype.forceUpdate = function () { if (this.__host) this.__host.schedule(); };
 

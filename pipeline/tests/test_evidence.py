@@ -128,3 +128,33 @@ def test_history_chart_file_matches_the_clean_test():
         assert hc['from'] <= p['d'][0] and p['d'][-1] <= hc['to']
     r = hc['replay']
     assert len(r['d']) == len(r['f']) == len(r['sig']) and r['d'][-1] == hc['to']
+
+
+def test_explorer_grid_reproduces_the_published_rule():
+    """'Try your own rule' runs the real engine; its cell for the frozen settings must equal the published results."""
+    e, site, h = _j('explore.json'), _j('site-data.json'), _j('history.json')
+    for pid, p in site['pairs'].items():
+        pr = p['params']
+        c = e['pairs'][pid][f"{pr['W']}|{pr['ze']}|{pr['mh']}|5|1"]
+        tr, te = site['backtest'][pid]['5']['train'], site['backtest'][pid]['5']['test']
+        assert c[3] == tr['n_trades'] and abs(c[4] - tr['net_rs']) <= 1
+        assert c[6] == te['n_trades'] and abs(c[7] - te['net_rs']) <= 1
+        hp = h['result']['pairs'].get(pid)
+        if hp:
+            assert c[0] == hp['n'] and abs(c[1] - hp['net_rs']) <= 1
+        else:
+            assert c[0] == 0
+        assert abs(sum(c[12:]) - (c[1] + c[4] + c[7] + c[10])) <= len(e['years'])   # years add up to the periods
+    assert len(e['pairs']['M_PETAL']) == len(e['grid']['W']) * len(e['grid']['ze']) * len(e['grid']['mh']) * len(e['grid']['slip']) * 2
+
+
+def test_whole_study_counts_and_checks_cover_2011_on():
+    """Dataset size, alert follow-through and the luck check include the clean-test years, not only our download."""
+    site, h, r = _j('site-data.json'), _j('history.json'), _j('robustness.json')
+    L, m = site['longrun'], site['meta']
+    assert L['allRows'] == L['rows'] + m['rows'] and L['allDays'] == L['days'] + m['days']
+    assert m['contracts'] < L['allContracts'] <= L['contracts'] + m['contracts']
+    assert r['alerts']['alert_clean']['n'] > r['alerts']['alert_test']['n'] + r['alerts']['alert_train']['n']
+    assert r['bootstrap']['clean_5']['n'] == h['result']['by_slip']['5']['n']
+    assert abs(r['bootstrap']['clean_5']['total'] - h['result']['by_slip']['5']['net_rs']) < 1
+    assert site['stages'][0]['desc'].startswith(f"Parse {L['allRows']:,} daily prices")
