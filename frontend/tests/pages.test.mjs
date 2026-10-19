@@ -152,7 +152,7 @@ console.log('full-history charts ok')
   const x = new (load('Explore'))(); x.props = {}; x.state = { D, E }
   const v = x.renderVals()
   const cur = D.rule.current['5'], L = D.longrun
-  const want = L.net + Object.keys(D.backtest).reduce((a, p) => a + D.backtest[p]['5'].train.net_rs + D.backtest[p]['5'].test.net_rs, 0)
+  const want = L.net + Object.keys(D.backtest).reduce((a, p) => a + D.backtest[p]['5'].train.net_rs + D.backtest[p]['5'].test.net_rs + D.backtest[p]['5'].fwd.net_rs, 0)
   const got = +v.res.total.replace(/[^0-9]/g, '') * (v.res.total.startsWith('−') ? -1 : 1)
   assert.ok(Math.abs(got - want) <= 12, 'published total ' + got + ' vs ' + want)
   assert.equal(v.modeLabel, 'Published rule')
@@ -208,7 +208,7 @@ console.log('explorer ok')
     assert.equal(v.periods[0].name, 'Clean test')
     const b = new (load('Backtesting'))(); b.props = {}; b.state = { D, HC, pair, slip: '5' }
     const k = b.renderVals().kpis
-    assert.equal(k[0].label, 'Trades, 2011–2026'); assert.equal(k[0].value, String(HC.pairs[pair].trades['5'].length + D.backtest[pair]['5'].train.n_trades + D.backtest[pair]['5'].test.n_trades))
+    assert.equal(k[0].label, 'Trades, 2011–2026'); assert.equal(k[0].value, String(HC.pairs[pair].trades['5'].length + D.backtest[pair]['5'].train.n_trades + D.backtest[pair]['5'].test.n_trades + D.backtest[pair]['5'].fwd.n_trades))
   }
   // without the 2011-2023 file the totals wait ("…"); they never fall back to the test year alone
   const pw = new (load('Pairs'))(); pw.props = {}; pw.state = { D, pair: 'M_PETAL' }

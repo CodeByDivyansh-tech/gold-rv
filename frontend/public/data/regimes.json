@@ -75,6 +75,6 @@
     "q1_min": -555.6,
     "q1_max": -6.6,
     "q1_text": "Mean -237.3 bps [min -555.6, max -6.6]",
-    "comment": "Fairly stable: GOLDM averaged -72.1 bps vs GOLDGUINEA (carry-adjusted) over the whole period."
+    "comment": "Fairly stable: GOLDM averaged -71.8 bps vs GOLDGUINEA (carry-adjusted) over the whole period."
   }
 ]

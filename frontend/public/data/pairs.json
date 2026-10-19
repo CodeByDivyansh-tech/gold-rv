@@ -4,26 +4,26 @@
     "display_name": "GOLDGUINEA \u2212 GOLDPETAL",
     "symbol_a": "GOLDGUINEA",
     "symbol_b": "GOLDPETAL",
-    "close_a": 119993.0,
-    "close_b": 15002.0,
+    "close_a": 118009.0,
+    "close_b": 14755.0,
     "quote_grams_a": 8,
     "quote_grams_b": 1,
-    "px_per_10g_pure_a": 150141.4,
-    "px_per_10g_pure_b": 150170.2,
-    "px_per_g_pure_a": 15014.14,
-    "px_per_g_pure_b": 15017.02,
+    "px_per_10g_pure_a": 147658.9,
+    "px_per_10g_pure_b": 147697.7,
+    "px_per_g_pure_a": 14765.89,
+    "px_per_g_pure_b": 14769.77,
     "lot_ratio": "1 : 8",
     "unit_grams": 8,
     "contracts_label": "Oct-26 / Oct-26",
     "expiry_a": "2026-10-30",
     "expiry_b": "2026-10-30",
-    "spread_bps": -1.9,
-    "spread_rs_10g": -28.8,
-    "mu": 3.8,
-    "sd": 4.0,
-    "z": -1.45,
+    "spread_bps": -2.6,
+    "spread_rs_10g": -38.8,
+    "mu": 2.1,
+    "sd": 4.1,
+    "z": -1.15,
     "z_needed": 2.5,
-    "percentile": 13.4,
+    "percentile": 18.2,
     "status": "QUIET",
     "failed_gates": [
       "extreme",
@@ -37,12 +37,12 @@
       "liquidity": true,
       "lifecycle": true
     },
-    "vol_a": 11305,
-    "vol_b": 239269,
-    "oi_a": 13525,
-    "oi_b": 198482,
-    "td_to_exp_a": 21,
-    "td_to_exp_b": 21,
+    "vol_a": 7252,
+    "vol_b": 161865,
+    "oi_a": 13938,
+    "oi_b": 192717,
+    "td_to_exp_a": 10,
+    "td_to_exp_b": 10,
     "roll_flag": false,
     "chosen_params": {
       "W": 20,
@@ -85,23 +85,23 @@
       },
       {
         "bin_center": -1.54,
-        "count": 42
+        "count": 43
       },
       {
         "bin_center": -1.05,
-        "count": 82
+        "count": 85
       },
       {
         "bin_center": -0.56,
-        "count": 81
+        "count": 84
       },
       {
         "bin_center": -0.08,
-        "count": 113
+        "count": 114
       },
       {
         "bin_center": 0.41,
-        "count": 108
+        "count": 110
       },
       {
         "bin_center": 0.9,
@@ -146,26 +146,26 @@
     "display_name": "GOLDTEN \u2212 GOLDPETAL",
     "symbol_a": "GOLDTEN",
     "symbol_b": "GOLDPETAL",
-    "close_a": 149436.0,
-    "close_b": 15002.0,
+    "close_a": 146819.0,
+    "close_b": 14755.0,
     "quote_grams_a": 10,
     "quote_grams_b": 1,
-    "px_per_10g_pure_a": 149585.6,
-    "px_per_10g_pure_b": 150170.2,
-    "px_per_g_pure_a": 14958.56,
-    "px_per_g_pure_b": 15017.02,
+    "px_per_10g_pure_a": 146966.0,
+    "px_per_10g_pure_b": 147697.7,
+    "px_per_g_pure_a": 14696.6,
+    "px_per_g_pure_b": 14769.77,
     "lot_ratio": "1 : 10",
     "unit_grams": 10,
     "contracts_label": "Oct-26 / Oct-26",
     "expiry_a": "2026-10-30",
     "expiry_b": "2026-10-30",
-    "spread_bps": -38.9,
-    "spread_rs_10g": -584.6,
-    "mu": -29.0,
-    "sd": 8.6,
-    "z": -1.15,
+    "spread_bps": -49.5,
+    "spread_rs_10g": -731.7,
+    "mu": -32.9,
+    "sd": 12.3,
+    "z": -1.36,
     "z_needed": 2.0,
-    "percentile": 12.3,
+    "percentile": 10.6,
     "status": "QUIET",
     "failed_gates": [
       "extreme",
@@ -179,12 +179,12 @@
       "liquidity": true,
       "lifecycle": true
     },
-    "vol_a": 22286,
-    "vol_b": 239269,
-    "oi_a": 29866,
-    "oi_b": 198482,
-    "td_to_exp_a": 21,
-    "td_to_exp_b": 21,
+    "vol_a": 17302,
+    "vol_b": 161865,
+    "oi_a": 29161,
+    "oi_b": 192717,
+    "td_to_exp_a": 10,
+    "td_to_exp_b": 10,
     "roll_flag": false,
     "chosen_params": {
       "W": 30,
@@ -215,19 +215,19 @@
       },
       {
         "bin_center": -2.59,
-        "count": 4
+        "count": 5
       },
       {
         "bin_center": -1.95,
-        "count": 9
+        "count": 11
       },
       {
         "bin_center": -1.31,
-        "count": 36
+        "count": 42
       },
       {
         "bin_center": -0.67,
-        "count": 58
+        "count": 59
       },
       {
         "bin_center": -0.04,
@@ -288,26 +288,26 @@
     "display_name": "GOLDGUINEA \u2212 GOLDTEN",
     "symbol_a": "GOLDGUINEA",
     "symbol_b": "GOLDTEN",
-    "close_a": 119993.0,
-    "close_b": 149436.0,
+    "close_a": 118009.0,
+    "close_b": 146819.0,
     "quote_grams_a": 8,
     "quote_grams_b": 10,
-    "px_per_10g_pure_a": 150141.4,
-    "px_per_10g_pure_b": 149585.6,
-    "px_per_g_pure_a": 15014.14,
-    "px_per_g_pure_b": 14958.56,
+    "px_per_10g_pure_a": 147658.9,
+    "px_per_10g_pure_b": 146966.0,
+    "px_per_g_pure_a": 14765.89,
+    "px_per_g_pure_b": 14696.6,
     "lot_ratio": "5 : 4",
     "unit_grams": 40,
     "contracts_label": "Oct-26 / Oct-26",
     "expiry_a": "2026-10-30",
     "expiry_b": "2026-10-30",
-    "spread_bps": 37.2,
-    "spread_rs_10g": 555.8,
-    "mu": 30.8,
-    "sd": 10.7,
-    "z": 0.59,
+    "spread_bps": 47.1,
+    "spread_rs_10g": 692.9,
+    "mu": 45.9,
+    "sd": 9.6,
+    "z": 0.13,
     "z_needed": 2.0,
-    "percentile": 66.7,
+    "percentile": 54.4,
     "status": "QUIET",
     "failed_gates": [
       "extreme",
@@ -321,12 +321,12 @@
       "liquidity": true,
       "lifecycle": true
     },
-    "vol_a": 11305,
-    "vol_b": 22286,
-    "oi_a": 13525,
-    "oi_b": 29866,
-    "td_to_exp_a": 21,
-    "td_to_exp_b": 21,
+    "vol_a": 7252,
+    "vol_b": 17302,
+    "oi_a": 13938,
+    "oi_b": 29161,
+    "td_to_exp_a": 10,
+    "td_to_exp_b": 10,
     "roll_flag": false,
     "chosen_params": {
       "W": 10,
@@ -385,23 +385,23 @@
       },
       {
         "bin_center": -0.91,
-        "count": 72
+        "count": 73
       },
       {
         "bin_center": -0.04,
-        "count": 102
+        "count": 105
       },
       {
         "bin_center": 0.84,
-        "count": 80
+        "count": 82
       },
       {
         "bin_center": 1.71,
-        "count": 40
+        "count": 43
       },
       {
         "bin_center": 2.59,
-        "count": 16
+        "count": 17
       },
       {
         "bin_center": 3.46,
@@ -430,26 +430,26 @@
     "display_name": "GOLDM \u2212 GOLDPETAL",
     "symbol_a": "GOLDM",
     "symbol_b": "GOLDPETAL",
-    "close_a": 149055.0,
-    "close_b": 15002.0,
+    "close_a": 146425.0,
+    "close_b": 14755.0,
     "quote_grams_a": 10,
     "quote_grams_b": 1,
-    "px_per_10g_pure_a": 149804.0,
-    "px_per_10g_pure_b": 150170.2,
-    "px_per_g_pure_a": 14980.4,
-    "px_per_g_pure_b": 15017.02,
+    "px_per_10g_pure_a": 147160.8,
+    "px_per_10g_pure_b": 147697.7,
+    "px_per_g_pure_a": 14716.08,
+    "px_per_g_pure_b": 14769.77,
     "lot_ratio": "1 : 100",
     "unit_grams": 100,
     "contracts_label": "Nov-26 / Oct-26",
     "expiry_a": "2026-11-05",
     "expiry_b": "2026-10-30",
-    "spread_bps": -41.8,
-    "spread_rs_10g": -628.5,
-    "mu": -12.3,
-    "sd": 18.0,
-    "z": -1.65,
+    "spread_bps": -53.8,
+    "spread_rs_10g": -795.3,
+    "mu": -26.2,
+    "sd": 21.6,
+    "z": -1.28,
     "z_needed": 2.0,
-    "percentile": 10.3,
+    "percentile": 14.7,
     "status": "QUIET",
     "failed_gates": [
       "extreme",
@@ -462,12 +462,12 @@
       "liquidity": true,
       "lifecycle": true
     },
-    "vol_a": 41017,
-    "vol_b": 239269,
-    "oi_a": 42632,
-    "oi_b": 198482,
-    "td_to_exp_a": 25,
-    "td_to_exp_b": 21,
+    "vol_a": 37203,
+    "vol_b": 161865,
+    "oi_a": 49954,
+    "oi_b": 192717,
+    "td_to_exp_a": 14,
+    "td_to_exp_b": 10,
     "roll_flag": false,
     "chosen_params": {
       "W": 30,
@@ -510,11 +510,11 @@
       },
       {
         "bin_center": -1.7,
-        "count": 39
+        "count": 44
       },
       {
         "bin_center": -1.11,
-        "count": 76
+        "count": 81
       },
       {
         "bin_center": -0.52,
@@ -571,26 +571,26 @@
     "display_name": "GOLDM \u2212 GOLDTEN",
     "symbol_a": "GOLDM",
     "symbol_b": "GOLDTEN",
-    "close_a": 149055.0,
-    "close_b": 149436.0,
+    "close_a": 146425.0,
+    "close_b": 146819.0,
     "quote_grams_a": 10,
     "quote_grams_b": 10,
-    "px_per_10g_pure_a": 149804.0,
-    "px_per_10g_pure_b": 149585.6,
-    "px_per_g_pure_a": 14980.4,
-    "px_per_g_pure_b": 14958.56,
+    "px_per_10g_pure_a": 147160.8,
+    "px_per_10g_pure_b": 146966.0,
+    "px_per_g_pure_a": 14716.08,
+    "px_per_g_pure_b": 14696.6,
     "lot_ratio": "1 : 10",
     "unit_grams": 100,
     "contracts_label": "Nov-26 / Oct-26",
     "expiry_a": "2026-11-05",
     "expiry_b": "2026-10-30",
-    "spread_bps": -2.9,
-    "spread_rs_10g": -42.8,
-    "mu": 14.4,
-    "sd": 9.6,
-    "z": -1.81,
+    "spread_bps": -4.2,
+    "spread_rs_10g": -62.3,
+    "mu": 7.4,
+    "sd": 10.4,
+    "z": -1.11,
     "z_needed": 2.5,
-    "percentile": 9.2,
+    "percentile": 17.7,
     "status": "QUIET",
     "failed_gates": [
       "extreme",
@@ -604,12 +604,12 @@
       "liquidity": true,
       "lifecycle": true
     },
-    "vol_a": 41017,
-    "vol_b": 22286,
-    "oi_a": 42632,
-    "oi_b": 29866,
-    "td_to_exp_a": 25,
-    "td_to_exp_b": 21,
+    "vol_a": 37203,
+    "vol_b": 17302,
+    "oi_a": 49954,
+    "oi_b": 29161,
+    "td_to_exp_a": 14,
+    "td_to_exp_b": 10,
     "roll_flag": false,
     "chosen_params": {
       "W": 30,
@@ -660,11 +660,11 @@
       },
       {
         "bin_center": -2.04,
-        "count": 25
+        "count": 26
       },
       {
         "bin_center": -1.13,
-        "count": 53
+        "count": 62
       },
       {
         "bin_center": -0.22,
@@ -713,26 +713,26 @@
     "display_name": "GOLDM \u2212 GOLDGUINEA",
     "symbol_a": "GOLDM",
     "symbol_b": "GOLDGUINEA",
-    "close_a": 149055.0,
-    "close_b": 119993.0,
+    "close_a": 146425.0,
+    "close_b": 118009.0,
     "quote_grams_a": 10,
     "quote_grams_b": 8,
-    "px_per_10g_pure_a": 149804.0,
-    "px_per_10g_pure_b": 150141.4,
-    "px_per_g_pure_a": 14980.4,
-    "px_per_g_pure_b": 15014.14,
+    "px_per_10g_pure_a": 147160.8,
+    "px_per_10g_pure_b": 147658.9,
+    "px_per_g_pure_a": 14716.08,
+    "px_per_g_pure_b": 14765.89,
     "lot_ratio": "2 : 25",
     "unit_grams": 200,
     "contracts_label": "Nov-26 / Oct-26",
     "expiry_a": "2026-11-05",
     "expiry_b": "2026-10-30",
-    "spread_bps": -39.9,
-    "spread_rs_10g": -599.6,
-    "mu": -20.0,
-    "sd": 18.8,
-    "z": -1.06,
+    "spread_bps": -51.2,
+    "spread_rs_10g": -756.5,
+    "mu": -37.2,
+    "sd": 21.2,
+    "z": -0.66,
     "z_needed": 2.5,
-    "percentile": 19.1,
+    "percentile": 30.1,
     "status": "QUIET",
     "failed_gates": [
       "extreme",
@@ -746,12 +746,12 @@
       "liquidity": true,
       "lifecycle": true
     },
-    "vol_a": 41017,
-    "vol_b": 11305,
-    "oi_a": 42632,
-    "oi_b": 13525,
-    "td_to_exp_a": 25,
-    "td_to_exp_b": 21,
+    "vol_a": 37203,
+    "vol_b": 7252,
+    "oi_a": 49954,
+    "oi_b": 13938,
+    "td_to_exp_a": 14,
+    "td_to_exp_b": 10,
     "roll_flag": false,
     "chosen_params": {
       "W": 20,
@@ -798,15 +798,15 @@
       },
       {
         "bin_center": -1.48,
-        "count": 68
+        "count": 72
       },
       {
         "bin_center": -0.87,
-        "count": 117
+        "count": 122
       },
       {
         "bin_center": -0.25,
-        "count": 126
+        "count": 127
       },
       {
         "bin_center": 0.37,
