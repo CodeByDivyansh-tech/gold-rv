@@ -2,11 +2,14 @@
  * keys.js — keyboard shortcuts and a quick menu.
  *   1-8            jump to a page (Home, Today, Market, Pair Explorer, Signals, Backtesting, Try your own rule, Data)
  *   Ctrl/Cmd + O   open the quick menu (Ctrl/Cmd + K works too)
+ *   Ctrl/Cmd + P   PDF: opens Download with PDF chosen; pressed again while it is open, the PDF downloads
+ *                  (this replaces the browser's own Print shortcut on this site; Print stays in the browser menu)
  *   ?              Words explained (glossary.js). Double-click any box: Goldie explains it (explain.js)
  * Shortcuts are ignored while typing in a box, so the calculator and search still work.
  */
 (function () {
   'use strict';
+  var isMac = /Mac|iPhone|iPad/.test(navigator.platform || '');
   var PAGES = [
     ['1', 'Home', '#/', 'Same gold, four prices: today\'s answer'],
     ['2', 'Today', '#/today', 'Is any gap worth trading today?'],
@@ -19,6 +22,7 @@
   ];
   var TOOLS = [
     ['?', 'Words explained', 'Plain meanings of bps, z-score, carry…', function () { window.GRVGlossary && window.GRVGlossary.open(''); }],
+    ['', 'Download as PDF', 'Statements, prices, backtest or the full report (' + (isMac ? '⌘' : 'Ctrl') + ' P)', function () { pdf(); }],
     ['', 'Ask Goldie', 'Double-click any box and Goldie explains it', function () { toast('Double-click (or double-tap) any box and Goldie explains it', 3500); }],
     ['', '3D pitch', 'The 17-slide pitch for the judges', function () { location.href = 'pitch/'; }],
     ['', 'Code and data on GitHub', 'github.com/CodeByDivyansh-tech/gold-rv', function () { window.open('https://github.com/CodeByDivyansh-tech/gold-rv', '_blank', 'noopener'); }]
@@ -49,7 +53,7 @@
     'background:var(--grv-panel,#1B150C);color:var(--grv-fg,#F6ECD8);border:1px solid var(--grv-line,#3A2D1A);border-radius:8px;padding:6px 10px;font:600 12px Geist,system-ui,sans-serif;pointer-events:none;box-shadow:0 8px 24px rgba(18,12,4,.3)}' +
     '[data-grv="search"]:not(.pbtn):hover::after{display:none}}' +
     '@media (max-width:430px){.phonebar .pbtn,.phonebar button{width:40px !important;height:40px !important}.phonebar .pb-sub{max-width:96px}.phonebar{gap:6px !important;padding-left:14px !important;padding-right:14px !important}}' +
-    '.km-tip{position:fixed;right:20px;bottom:20px;z-index:66;max-width:300px;background:var(--grv-gold,#E5B04A);color:var(--grv-ongold,#1B1305);border-radius:14px;padding:12px 14px;' +
+    '.km-tip{position:fixed;right:20px;bottom:20px;z-index:45;max-width:300px;background:var(--grv-gold,#E5B04A);color:var(--grv-ongold,#1B1305);border-radius:14px;padding:12px 14px;' +
     'font:500 13px/1.5 Geist,system-ui,sans-serif;box-shadow:0 12px 34px rgba(18,12,4,.35)}' +
     '@media (max-width:899px){.km-tip{left:16px;right:16px;bottom:88px;max-width:none}}' +
     '.km-tip b{font-weight:700}.km-tip button{margin-top:8px;min-height:32px;padding:0 12px;border-radius:8px;border:0;background:var(--grv-ongold,#1B1305);color:var(--grv-gold,#E5B04A);font:600 12px Geist,system-ui,sans-serif;cursor:pointer}' +
@@ -68,6 +72,17 @@
     if (!t) { t = document.createElement('div'); t.className = 'km-toast'; t.setAttribute('role', 'status'); document.body.appendChild(t); }
     t.textContent = msg; clearTimeout(toastT);
     toastT = setTimeout(function () { t.remove(); }, ms || 1400);
+  }
+  // Ctrl/Cmd+P: the Download panel with PDF chosen; if it is already open, download the PDF now
+  function pdf() {
+    if (document.querySelector('[aria-labelledby="dl-h"]')) {
+      window.dispatchEvent(new Event('grv:pdf'));   // the panel says what happened in its own status line
+      return;
+    }
+    var btn = Array.prototype.filter.call(document.querySelectorAll('[data-dl]'), function (b) { return b.offsetParent !== null; })[0];
+    if (!btn) { toast('Open a page of the site to download a PDF', 2400); return; }
+    window.GRVWantPdf = true;
+    btn.click();
   }
   function go(p) {
     if (currentHash() !== p[2]) location.hash = p[2];
@@ -92,7 +107,7 @@
     box.innerHTML = '<label for="km-q" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)">Go to a page or tool</label>' +
       '<input id="km-q" class="km-q" type="text" placeholder="Go to a page or tool…" autocomplete="off" role="combobox" aria-expanded="true" aria-controls="km-list">' +
       '<ul id="km-list" class="km-list" role="listbox"></ul>' +
-      '<div class="km-foot"><span><b>1</b>–<b>7</b> pages</span><span><b>↑ ↓</b> move</span><span><b>Enter</b> open</span><span><b>?</b> words</span><span><b>Double-click</b> a box: Goldie explains</span><span><b>Esc</b> close</span></div>';
+      '<div class="km-foot"><span><b>1</b>–<b>8</b> pages</span><span><b>↑ ↓</b> move</span><span><b>Enter</b> open</span><span><b>?</b> words</span><span><b>' + (isMac ? '⌘' : 'Ctrl') + ' P</b> PDF</span><span><b>Double-click</b> a box: Goldie explains</span><span><b>Esc</b> close</span></div>';
     back.appendChild(box); document.body.appendChild(back);
     var q = box.querySelector('.km-q'), list = box.querySelector('.km-list');
     function draw() {
@@ -143,13 +158,15 @@
     if (mod && !e.shiftKey && !e.altKey && (e.key === 'o' || e.key === 'O' || e.key === 'k' || e.key === 'K')) {
       e.preventDefault(); if (back) close(); else open(); return;
     }
+    if (mod && !e.shiftKey && !e.altKey && (e.key === 'p' || e.key === 'P')) {
+      e.preventDefault(); if (back) close(); pdf(); return;
+    }
     if (mod || e.altKey || back || typing()) return;
     if (document.querySelector('.gl-back')) return;       // glossary open: let it handle keys
     if (/^[1-8]$/.test(e.key)) { e.preventDefault(); go(PAGES[+e.key - 1]); return; }
   });
 
   // The Search and Words explained buttons sit in each page's top bar (data-grv="...")
-  var isMac = /Mac|iPhone|iPad/.test(navigator.platform || '');
   if (isMac) document.documentElement.classList.add('grv-mac');
   document.addEventListener('click', function (e) {
     var t = e.target.closest && e.target.closest('[data-grv]');
@@ -168,7 +185,7 @@
       var tip = document.createElement('div'); tip.className = 'km-tip'; tip.setAttribute('role', 'note');
       tip.innerHTML = touch
         ? 'Tip: <b>double-tap</b> any box and Goldie explains it.<br><button type="button">Got it</button>'
-        : 'Tip: <b>double-click</b> any box and Goldie explains it. Press <b>' + (isMac ? '⌘' : 'Ctrl') + ' O</b> to search, or <b>1–8</b> to jump between pages.<br><button type="button">Got it</button>';
+        : 'Tip: <b>double-click</b> any box and Goldie explains it. Press <b>' + (isMac ? '⌘' : 'Ctrl') + ' O</b> to search, <b>' + (isMac ? '⌘' : 'Ctrl') + ' P</b> for a PDF, or <b>1–8</b> to jump between pages.<br><button type="button">Got it</button>';
       var done = function () { tip.remove(); try { localStorage.setItem('grv-keys-tip', '1'); } catch (e) {} };
       tip.querySelector('button').addEventListener('click', done);
       // a small popup in the bottom corner (above the tab bar on phones), so it never covers the page's content
@@ -176,5 +193,5 @@
       setTimeout(function () { if (tip.isConnected) done(); }, 9000);
     }, 1200);
   }
-  window.GRVKeys = { open: open, close: close, pages: PAGES };
+  window.GRVKeys = { open: open, close: close, pdf: pdf, pages: PAGES };
 })();

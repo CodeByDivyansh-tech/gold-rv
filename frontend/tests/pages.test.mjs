@@ -263,3 +263,51 @@ function L_N() { return D.longrun.n }
   assert.ok(t.table(D, 'trades', 'ALL', 'test', H, HC).rows.every((x) => x[0] >= D.split.test_start && x[0] <= D.split.test_end), 'test year stops at its end')
   console.log('custom download range ok')
 }
+
+// PDF downloads: every choice offers a PDF, and the file is a well-formed PDF with the right contents
+{
+  new Function(readFileSync('public/app/pdf.js', 'utf8'))()
+  const mk = (st) => { const c = new (load('DownloadPanel'))(); c.props = { dark: true, onClose: () => {} }; c.state = { D, H, HC, ...st }; return c }
+  const latin = (b) => Array.from(b, (x) => String.fromCharCode(x)).join('')
+  for (const what of ['today', 'prices', 'trades', 'backtest', 'report']) {
+    const c = mk({ what, period: 'all', pair: 'ALL', format: 'pdf' })
+    const v = c.renderVals()
+    assert.ok(v.formats.some((f) => f.label === 'PDF'), what + ': PDF offered')
+    assert.match(v.filename, /\.pdf$/)
+    const tb = c.table(D, what, 'ALL', 'all', H, HC)
+    const s = latin(GRVPdf.make(c.doc(D, what, 'ALL', 'Everything since 2011', tb)))
+    assert.ok(s.startsWith('%PDF-1.4') && s.trimEnd().endsWith('%%EOF'), what + ': PDF header and end')
+    // every object starts exactly where the cross-reference table says
+    const xref = +s.match(/startxref\n(\d+)/)[1]
+    const offs = s.slice(xref).split('\n').slice(3).filter((l) => / 00000 n $/.test(l)).map((l) => +l.slice(0, 10))
+    offs.forEach((o, i) => assert.equal(s.slice(o, o + String(i + 1).length + 6), (i + 1) + ' 0 obj', what + ': object ' + (i + 1) + ' offset'))
+    const pages = +s.match(/\/Count (\d+)/)[1]
+    assert.ok(pages >= 1 && s.includes('(Page ' + pages + ' of ' + pages + ')'), what + ': page numbers')
+    assert.ok(!/\bNaN\b|undefined|\[object Object\]/.test(s), what + ': no broken values in the PDF')
+  }
+  // the PDF carries the same rows as the spreadsheet
+  const c = mk({ what: 'trades', period: 'all', pair: 'ALL' })
+  const tb = c.table(D, 'trades', 'ALL', 'all', H, HC)
+  const s = latin(GRVPdf.make(c.doc(D, 'trades', 'ALL', 'Everything since 2011', tb)))
+  assert.equal((s.match(/\(\d{4}-\d\d-\d\d\) Tj/g) || []).length, 2 * tb.rows.length, 'one PDF row per trade (entry and exit dates)')
+  const net = tb.rows.reduce((a, r) => a + r[7], 0)
+  assert.ok(s.includes('(' + c.rs(net) + ')'), 'statement total in the PDF')
+  // the rupee sign is written "Rs" (standard PDF fonts have no rupee glyph); other text is kept
+  assert.equal(GRVPdf.enc('₹10 lakh · 2011–2023'), 'Rs 10 lakh \xB7 2011\x962023')
+  // defaults: the report starts as a PDF, other choices as a spreadsheet; the printable page stays for statements
+  assert.match(mk({ what: 'report' }).renderVals().filename, /\.pdf$/)
+  assert.match(mk({ what: 'prices' }).renderVals().filename, /\.csv$/)
+  assert.match(mk({ what: 'trades', format: 'html' }).renderVals().filename, /\.html$/)
+  assert.match(mk({ what: 'prices', format: 'html' }).renderVals().filename, /\.csv$/, 'no printable page for prices')
+  const html = c.statement(D, 'trades', 'ALL', 'Everything since 2011', tb)
+  assert.ok(html.includes('<b>' + c.rs(net) + '</b>') && (html.match(/<tr>/g) || []).length === tb.rows.length + 1, 'printable page unchanged')
+  // Ctrl/Cmd+P: keys.js opens the panel with PDF chosen, or downloads when it is open
+  const keys = readFileSync('public/app/keys.js', 'utf8')
+  assert.ok(/e\.key === 'p' \|\| e\.key === 'P'/.test(keys) && /grv:pdf/.test(keys) && /GRVWantPdf/.test(keys))
+  for (const name of ['Home', 'Today', 'Market', 'Pairs', 'Signals', 'Backtesting', 'Explore', 'Data'])
+    assert.ok(readFileSync(`public/pages/${name}.dc.html`, 'utf8').includes('data-dl="1" onClick="{{openDl}}"'), name + ': download button reachable by Ctrl+P')
+  globalThis.GRVWantPdf = true
+  const p = mk({}); p.componentDidMount = p.componentDidMount; globalThis.fetch = () => new Promise(() => {}); globalThis.addEventListener = () => {}
+  p.componentDidMount(); assert.equal(p.state.format, 'pdf'); assert.equal(globalThis.GRVWantPdf, false)
+  console.log('pdf downloads ok')
+}
