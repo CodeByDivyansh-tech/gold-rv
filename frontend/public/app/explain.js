@@ -21,7 +21,8 @@
     [/^Biggest gap from normal/, 'Biggest gap', 'The largest difference we found today. It is still smaller than the cost line.'],
     [/^Cost line/, 'The cost line', 'Trading costs money, like a ticket. We ask for a gap twice as big as the ticket, to be safe.'],
     [/^The hurdle/, 'The hurdle', 'Think of a high-jump bar. Each grey bar is a gap and the gold line is the bar it must clear. None clear it today.'],
-    [/^Replay three years/, 'Time machine', 'Press play or drag the slider to travel back and watch the gaps week by week since October 2023.'],
+    [/^Replay (\d+|three) years/, 'Time machine', 'Press play or drag the slider to travel back and watch the gaps week by week. "All data" starts in 2011 (three pairs back then); "Since Oct 2023" shows our own download with all six pairs.'],
+    [/^Replay every week of gaps since 2011/, 'Time machine', 'Opens the Today page replay: every week since 2011, with each pair\'s biggest gap from normal against the cost line.'],
     [/^All six pairs, in numbers/, 'The full table', 'The same six pairs with every number, and which of the five checks each one failed.'],
     // Market
     [/^Same gold, four prices/, 'Comparing the four', 'All four contracts are the same gold, so their lines should sit on top of each other. This page shows how close they really are.'],
@@ -164,7 +165,7 @@
       return [m[1] + ' vs ' + m[2], 'Today their gap is ' + m[7] + ' bps from normal. It must reach the cost line of ' + m[8] + ' bps, so it is ' + m[9] + ' bps short. Its z-score (how unusual the gap is) is ' + m[5].replace('−', '-') + '; it needs ±' + m[6] + '. Status: ' + m[10] + (m[10] === 'Quiet' ? ', so no trade.' : '.')]; }],
     [/^(\d+ \w+ \d{4}) Weeks so far with a gap above the line: (\d+) of (\d+) Weeks the model actually traded: (\d+) of (\d+)$/, function (m) { return ['Up to ' + m[1], m[2] + ' of ' + m[3] + ' weeks had at least one gap above the cost line, but the model traded in only ' + m[4] + ' weeks, because the other four checks must pass too.']; }],
     [new RegExp('^' + P + ' ([\\d.]+)$'), function (m) { return [m[1] + ' vs ' + m[2], 'In the week picked on the slider, the biggest gap from normal for this pair was ' + m[3] + ' bps. The gold line is the cost line it must pass.']; }],
-    [/^Drag to any week (.+)$/, function () { return ['The slider', 'Drag it to any week since October 2023, or press Replay. The bars above change to that week.']; }],
+    [/^Drag to any week (.+)$/, function () { return ['The slider', 'Drag it to any week (since 2011 with "All data", or since October 2023), or press Replay. The bars above change to that week.']; }],
     [new RegExp('^' + P + ' ([−+-]?[\\d.]+) bps ([−+-]?₹[\\d,]+) ([−+-]?[\\d.]+) bps ([\\d.]+) bps ([−+-]?[\\d.]+) \\(([\\d.]+)\\) ?(.*)$'), function (m) {
       return [m[1] + ' vs ' + m[2], 'Spread now: ' + m[1] + ' is ' + m[3].replace(/^[+−-]/, '') + ' bps ' + (n(m[3]) < 0 ? 'cheaper' : 'dearer') + ' than ' + m[2] + ' (about ' + m[4].replace(/^[+−-]/, '') + ' per 10 g). Its normal level is ' + m[5] + ' bps, so the gap from normal is ' + m[6] + ' bps. z = ' + m[7].replace('−', '-') + ', needs ' + m[8] + '.' + (m[9] ? ' Checks failed: ' + m[9] + '.' : ' All checks passed.')]; }],
     [/^Pair Spread now In ₹ per 10 g Normal level Gap from normal z \(needed\) Checks failed$/, function () { return ['The columns', 'Spread now: today\'s price difference. Normal level: its usual value. Gap from normal: how far today is from usual. z: how unusual that is. Checks failed: what stopped a trade.']; }],

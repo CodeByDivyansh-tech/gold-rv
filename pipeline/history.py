@@ -23,7 +23,7 @@ import pandas as pd
 from pipeline.config import ALERT_RULE, BASE_SLIPPAGE, SLIPPAGE_SCENARIOS
 from pipeline.load import load_clean_bhavcopy
 from pipeline.carry import compute_reference_carry
-from pipeline.pairs import build_pair_series
+from pipeline.pairs import build_pair_series, compute_rolling_z
 from pipeline.backtest import prepare_contract_lookup, run_pair_backtest
 
 BOOK_PATH = 'data/raw/parity_data_book.csv'
@@ -109,8 +109,8 @@ def frozen_params(output_dir: str) -> Dict[str, Dict[str, float]]:
     return out
 
 
-def run_history(book: pd.DataFrame, end: pd.Timestamp, params: Dict[str, Dict[str, float]]) -> pd.DataFrame:
-    """Same rule, same costs, frozen settings, on the book's rows before our own data starts."""
+def history_frame(book: pd.DataFrame, end: pd.Timestamp):
+    """The book's rows before our own data starts, loaded and cleaned exactly like our own download."""
     h = book[(book['date'] >= '2011-01-01') & (book['date'] <= end) & (book['symbol'] != 'GOLDTEN')]
     clean = pd.DataFrame({
         'date': h['date'].dt.strftime('%Y-%m-%d'), 'symbol': h['symbol'], 'expiry_date': h['expiry'].dt.strftime('%Y-%m-%d'),
@@ -122,8 +122,14 @@ def run_history(book: pd.DataFrame, end: pd.Timestamp, params: Dict[str, Dict[st
         path = os.path.join(tmp, 'history_clean.csv')
         clean.to_csv(path, index=False)
         df, dates, tdi = load_clean_bhavcopy(path)
-    P = prepare_contract_lookup(df)
     carry, _ = compute_reference_carry(df, dates)
+    return df, dates, tdi, carry
+
+
+def run_history(book: pd.DataFrame, end: pd.Timestamp, params: Dict[str, Dict[str, float]]) -> pd.DataFrame:
+    """Same rule, same costs, frozen settings, on the book's rows before our own data starts."""
+    df, dates, tdi, carry = history_frame(book, end)
+    P = prepare_contract_lookup(df)
     start = pd.Timestamp(HISTORY_START)
     out = []
     for pid in HISTORY_PAIRS:
@@ -136,6 +142,49 @@ def run_history(book: pd.DataFrame, end: pd.Timestamp, params: Dict[str, Dict[st
                 t['pair'], t['slip'] = pid, slip
                 out.append(t)
     return pd.concat(out, ignore_index=True) if out else pd.DataFrame()
+
+
+def r1(v):
+    return None if v is None or pd.isna(v) else round(float(v), 1)
+
+
+def chart_data(book: pd.DataFrame, end: pd.Timestamp, params: Dict[str, Dict[str, float]], T: pd.DataFrame) -> Dict[str, Any]:
+    """Daily pair series and every clean-test trade, 2011-2023, so the site's charts can show the whole study.
+    Same series, same rolling window and same trades as the clean test above (nothing re-tuned)."""
+    df, dates, tdi, carry = history_frame(book, end)
+    start = pd.Timestamp(HISTORY_START)
+    out: Dict[str, Any] = {'from': HISTORY_START, 'to': end.strftime('%Y-%m-%d'), 'pairs': {}}
+    for pid in HISTORY_PAIRS:
+        ps = compute_rolling_z(build_pair_series(df, pid, carry), W=int(params[pid]['W']))
+        ps = ps[ps['date'] >= start]
+        tr = {}
+        for slip in SLIPPAGE_SCENARIOS:
+            a = T[(T['pair'] == pid) & (T['slip'] == slip)].sort_values('exit')
+            tr[str(slip)] = [[pd.Timestamp(t['sig']).strftime('%Y-%m-%d'), pd.Timestamp(t['entry']).strftime('%Y-%m-%d'),
+                              pd.Timestamp(t['exit']).strftime('%Y-%m-%d'), int(t['side']), round(float(t['z']), 2),
+                              round(float(t['net'])), round(float(t['gross'])), round(float(t['net_bps']), 1), t['reason'], int(t['days'])]
+                             for _, t in a.iterrows()]
+        out['pairs'][pid] = {
+            'd': [d.strftime('%Y-%m-%d') for d in ps['date']], 's': [r1(v) for v in ps['spread']],
+            'mu': [r1(v) for v in ps['mu']], 'sd': [r1(v) for v in ps['sd']],
+            'trades': tr,     # [signal, entry, exit, side, z, net Rs, gross Rs, net bps, reason, days held], by slippage
+        }
+    # weekly replay frames (Today page): each week's biggest |spread - normal| per pair, and whether a trade signalled,
+    # cut into 5-trading-day blocks ending on the last history day, like the replay of our own data
+    days = [d.strftime('%Y-%m-%d') for d in pd.to_datetime(dates) if d >= start]
+    dev = {pid: {d: abs(s - m) for d, s, m in zip(out['pairs'][pid]['d'], out['pairs'][pid]['s'], out['pairs'][pid]['mu'])
+                 if s is not None and m is not None} for pid in HISTORY_PAIRS}
+    sigs = {pid: {t[0] for t in out['pairs'][pid]['trades'][str(BASE_SLIPPAGE)]} for pid in HISTORY_PAIRS}
+    ends = list(range(len(days) - 1, -1, -5))[::-1]
+    rf, rd, rs = [], [], []
+    for k, i in enumerate(ends):
+        block = days[(ends[k - 1] + 1 if k else 0):i + 1]
+        rf.append([round(max(xs), 1) if (xs := [dev[p][d] for d in block if d in dev[p]]) else None for p in HISTORY_PAIRS])
+        rs.append([1 if any(d in sigs[p] for d in block) else 0 for p in HISTORY_PAIRS])
+        rd.append(days[i])
+    out['replay'] = {'ids': HISTORY_PAIRS, 'd': rd, 'f': rf, 'sig': rs}
+    out['tradeFields'] = ['sig', 'entry', 'exit', 'side', 'z', 'net', 'gross', 'net_bps', 'reason', 'days']
+    return out
 
 
 def summarise(T: pd.DataFrame) -> Dict[str, Any]:
@@ -193,6 +242,9 @@ def build(output_dir: str = 'frontend/public/data', book_path: str = BOOK_PATH, 
     os.makedirs(output_dir, exist_ok=True)
     with open(os.path.join(output_dir, 'history.json'), 'w', encoding='utf-8') as f:
         json.dump(res, f, indent=2)
+    # charts: kept in their own file so pages that only need the summary stay light
+    with open(os.path.join(output_dir, 'history_charts.json'), 'w', encoding='utf-8') as f:
+        json.dump(chart_data(book, end, params, T), f, separators=(',', ':'))
     return res
 
 

@@ -59,7 +59,7 @@ button:focus-visible,a:focus-visible,input:focus-visible{outline:2px solid var(-
       </div>
 
       <sc-if value="{{loading}}" hint-placeholder-val="{{ false }}">
-        <p style="margin: 0; padding: 48px 0; color: var(--muted); font-size: 15px">Loading three years of prices…</p>
+        <p style="margin: 0; padding: 48px 0; color: var(--muted); font-size: 15px">Loading prices…</p>
       </sc-if>
 
       <sc-if value="{{failed}}" hint-placeholder-val="{{ false }}">
@@ -105,6 +105,13 @@ button:focus-visible,a:focus-visible,input:focus-visible{outline:2px solid var(-
             <h2 id="vsm-h" style="margin: 0; font-size: 18px; font-weight: 600">How far each contract sits from GOLDM, after adjusting for expiry</h2>
             <span style="font-size: 13px; color: var(--muted); line-height: 1.5">In basis points (100 bps = 1%). Above zero means more expensive than GOLDM for the same pure gold.</span>
           </div>
+          <sc-if value="{{vsm.hasSpans}}" hint-placeholder-val="{{ true }}">
+            <div role="group" aria-label="Period shown" style="display: flex; flex-wrap: wrap; gap: 8px">
+              <sc-for list="{{vsm.spans}}" as="b" hint-placeholder-count="2">
+                <button type="button" onClick="{{b.pick}}" aria-pressed="{{b.pressed}}" style="{{b.style}}">{{b.label}}</button>
+              </sc-for>
+            </div>
+          </sc-if>
           <dc-import name="LineChart" dates="{{vsm.dates}}" series="{{vsm.series}}" bands="{{vsm.bands}}" fmt="bps" height="300" zero="{{ true }}" clamp-lo="{{vsm.lo}}" clamp-hi="{{vsm.hi}}" label="{{vsm.aria}}" hint-size="100%,420px"></dc-import>
           <p style="margin: 0; font-size: 13px; line-height: 1.6; color: var(--muted)">{{vsm.note}}</p>
         </section>
@@ -242,6 +249,10 @@ class Component extends DCLogic {
       .then((r) => r.json())
       .then((h) => this.setState({ H: h }))
       .catch(() => {});
+    fetch('data/history_charts.json')
+      .then((r) => r.json())
+      .then((h) => this.setState({ HC: h }))
+      .catch(() => {});
   }
 
   tokens(dark) {
@@ -366,17 +377,34 @@ class Component extends DCLogic {
     const t0 = Date.parse(D.start), t1 = Date.parse(D.asOf);
     const X = (d) => ((Date.parse(d) - t0) / (t1 - t0)) * 1000;
     const VS = ['GOLDTEN', 'GOLDGUINEA', 'GOLDPETAL'];
-    const allv = VS.flatMap((s) => D.vsM[s].map((p) => p[1])).sort((a, b) => a - b);
+    // Full history: 2011-2023 gaps from the Parity data book (same carry adjustment) in front of our own download.
+    // GOLDTEN was listed only in March 2025, so it has no earlier line.
+    const HCP = st.HC && st.HC.pairs;
+    const vspan = HCP && st.vspan !== 'ours' ? 'all' : 'ours';
+    const longVs = { GOLDTEN: [], GOLDGUINEA: [], GOLDPETAL: [] };
+    if (vspan === 'all') {
+      [['M_GUINEA', 'GOLDGUINEA'], ['M_PETAL', 'GOLDPETAL']].forEach(([pp, sy]) => {
+        const L = HCP[pp]; L.d.forEach((d, i) => { if (L.s[i] != null) longVs[sy].push([d, Math.round(-L.s[i] * 10) / 10]); });
+      });
+    }
+    const VSM = {}; VS.forEach((s) => { VSM[s] = longVs[s].concat(D.vsM[s]); });
+    const allv = VS.flatMap((s) => VSM[s].map((p) => p[1])).sort((a, b) => a - b);
     const q = (f) => allv[Math.max(0, Math.min(allv.length - 1, Math.round(f * (allv.length - 1))))];
     const vlo = Math.floor(Math.min(q(0.01), -20) / 50) * 50, vhi = Math.ceil(Math.max(q(0.99), 20) / 50) * 50;
     const H = 280, pad = 12, Y = (v) => pad + (1 - (Math.max(vlo, Math.min(vhi, v)) - vlo) / (vhi - vlo)) * (H - 2 * pad);
     const vlines = VS.map((s) => ({ color: COL[s], d: D.vsM[s].map((p, i) => (i ? 'L' : 'M') + X(p[0]).toFixed(1) + ' ' + Y(p[1]).toFixed(1)).join(' ') }));
-    const extreme = Math.max(...allv.map((v) => Math.abs(v)));
+    // the note talks about the crash, so the extreme is taken over the crash months only
+    const extreme = Math.max(...VS.flatMap((s) => D.vsM[s].filter((p) => p[0] >= EV.crashStart && p[0] <= EV.crashEnd).map((p) => Math.abs(p[1]))));
     const pct = (d) => (X(d) / 10).toFixed(2) + '%';
-    const vmap = {}; VS.forEach((s) => { vmap[s] = {}; D.vsM[s].forEach((p) => { vmap[s][p[0]] = p[1]; }); });
-    const vdates = P.d.filter((d) => VS.some((s) => vmap[s][d] != null));
+    const vmap = {}; VS.forEach((s) => { vmap[s] = {}; VSM[s].forEach((p) => { vmap[s][p[0]] = p[1]; }); });
+    const longDates = vspan === 'all' ? Array.from(new Set(longVs.GOLDGUINEA.concat(longVs.GOLDPETAL).map((p) => p[0]))).sort() : [];
+    const vdates = longDates.concat(P.d.filter((d) => VS.some((s) => vmap[s][d] != null)));
+    const vbtn = (k, label) => ({ label, pressed: vspan === k ? 'true' : 'false', pick: () => this.setState({ vspan: k }),
+      style: 'min-height: 40px; padding: 0 12px; border-radius: 10px; cursor: pointer; font: 500 13px \'Geist\', system-ui, sans-serif; ' +
+        (vspan === k ? 'background: var(--glow); color: var(--gold); border: 1px solid var(--gold)' : 'background: transparent; color: var(--fg); border: 1px solid var(--line)') });
+    const vspans = HCP ? [vbtn('all', 'All data, ' + st.HC.from.slice(0, 4) + '–' + D.asOf.slice(0, 4)), vbtn('ours', 'Since ' + this.fd(D.start).replace(/^\d+ /, ''))] : [];
     const vsm = {
-      dates: vdates, lo: vlo, hi: vhi,
+      dates: vdates, lo: vlo, hi: vhi, spans: vspans, hasSpans: vspans.length > 0,
       series: VS.map((s) => ({ key: s, label: s, color: COL[s], values: vdates.map((d) => (vmap[s][d] == null ? null : vmap[s][d])), width: 1.75 })),
       bands: [
         { from: EV.petalStart, to: EV.petalEnd, label: 'GOLDPETAL reprices', fill: 'var(--glow)', ink: 'var(--gold)' },
@@ -387,8 +415,8 @@ class Component extends DCLogic {
       breakX: pct(EV.petalStart), breakW: ((X(EV.petalEnd) - X(EV.petalStart)) / 10).toFixed(2) + '%',
       crashX: pct(EV.crashStart), crashW: ((X(EV.crashEnd) - X(EV.crashStart)) / 10).toFixed(2) + '%', crashLabel: EV.crashShort,
       start: this.fd(D.start), end: this.fd(D.asOf), range: 'Scale ' + this.sgn(vlo, 0) + ' to ' + this.sgn(vhi, 0) + ' bps',
-      aria: 'Gap of GOLDTEN, GOLDGUINEA and GOLDPETAL versus GOLDM in basis points, after adjusting for expiry, from ' + this.fd(D.start) + ' to ' + this.fd(D.asOf),
-      note: 'GOLDTEN only starts on ' + this.fd(EV.goldtenListed) + ', its first trading day. During the ' + EV.crashLabel + ' the gaps swung as far as ' + Math.round(extreme) + ' bps, beyond this scale (' + this.sgn(vlo, 0) + ' to ' + this.sgn(vhi, 0) + ' bps), so the lines are cut off at the edge there. Drag across the chart to zoom into any period.'
+      aria: 'Gap of GOLDTEN, GOLDGUINEA and GOLDPETAL versus GOLDM in basis points, after adjusting for expiry, from ' + this.fd(vdates[0]) + ' to ' + this.fd(D.asOf),
+      note: (vspan === 'all' ? 'Before ' + this.fd(D.start) + ' the gaps come from the Parity team\'s data book (official MCX Bhavcopy), with the same expiry adjustment; from then on, our own MCX download. ' : '') + 'GOLDTEN only starts on ' + this.fd(EV.goldtenListed) + ', its first trading day. During the ' + EV.crashLabel + ' the gaps swung as far as ' + Math.round(extreme) + ' bps, beyond this scale (' + this.sgn(vlo, 0) + ' to ' + this.sgn(vhi, 0) + ' bps), so the lines are cut off at the edge there. Drag across the chart to zoom into any period.'
     };
     const regimeH = { a: EV.regimeLabels[0], b: EV.regimeLabels[1], c: EV.regimeLabels[2] };
 

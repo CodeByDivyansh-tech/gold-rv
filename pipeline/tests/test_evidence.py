@@ -113,3 +113,18 @@ def test_home_counts_add_up_from_the_data():
     assert site['longrun']['n'] == h['result']['by_slip']['5']['n']
     assert cur['test_n'] == site['pooled']['5']['n']
     assert site['longrun']['checked'] == h['check']['shared_rows'] and site['longrun']['checkMismatches'] == 0
+
+
+def test_history_chart_file_matches_the_clean_test():
+    """The 2011-2023 part of the charts is the clean test itself: same trades, same total, same dates."""
+    hc, h = _j('history_charts.json'), _j('history.json')
+    assert hc['from'] == h['window']['from'] and hc['to'] == h['window']['to']
+    for slip in ('0', '2', '5', '10'):
+        trades = [t for p in hc['pairs'].values() for t in p['trades'][slip]]
+        assert len(trades) == h['result']['by_slip'][slip]['n']
+        assert abs(sum(t[5] for t in trades) - h['result']['by_slip'][slip]['net_rs']) <= 0.5 * len(trades)   # each trade rounded to the rupee
+    for p in hc['pairs'].values():
+        assert len(p['d']) == len(p['s']) == len(p['mu']) == len(p['sd']) and p['d'] == sorted(p['d'])
+        assert hc['from'] <= p['d'][0] and p['d'][-1] <= hc['to']
+    r = hc['replay']
+    assert len(r['d']) == len(r['f']) == len(r['sig']) and r['d'][-1] == hc['to']

@@ -7,6 +7,7 @@ globalThis.window = globalThis; new Function(readFileSync('public/app/theme.js',
 const D = JSON.parse(readFileSync('public/data/site-data.json', 'utf8'))
 const R = JSON.parse(readFileSync('public/data/robustness.json', 'utf8'))
 const H = JSON.parse(readFileSync('public/data/history.json', 'utf8'))
+const HC = JSON.parse(readFileSync('public/data/history_charts.json', 'utf8'))
 const PAIRS = ['M_TEN', 'M_PETAL', 'M_GUINEA', 'TEN_PETAL', 'GUINEA_TEN', 'GUINEA_PETAL']
 const SLIPS = ['0', '2', '5', '10']
 
@@ -21,11 +22,11 @@ function load(name) {
 
 const states = {
   Home: [{}, { range: '1M', hover: 5 }, { range: '3Y', hover: 100 }, { dark: false }, { H, range: '10Y', hover: 200 }, { H, range: 'All', hover: 900 }, { range: 'All' }],
-  Today: [{}, { ri: 0 }, { ri: 60 }, { ri: 120, speed: 2 }],
-  Market: [{}, { range: '3M', hover: 10 }, { range: '3Y', hover: 150 }, { H, range: '10Y', hover: 100 }, { H, range: 'All', hover: 1000 }, { range: '10Y' }],
-  Pairs: PAIRS.flatMap((pair) => [{ pair }, { pair, hover: 20, allTrades: true }]),
+  Today: [{}, { ri: 0 }, { ri: 60 }, { ri: 120, speed: 2 }, { HC }, { HC, ri: 0 }, { HC, ri: 400 }, { HC, rspan: 'ours', ri: 10 }],
+  Market: [{}, { range: '3M', hover: 10 }, { range: '3Y', hover: 150 }, { H, range: '10Y', hover: 100 }, { H, range: 'All', hover: 1000 }, { range: '10Y' }, { HC }, { HC, vspan: 'ours' }],
+  Pairs: PAIRS.flatMap((pair) => [{ pair }, { pair, hover: 20, allTrades: true }, { pair, HC, allTrades: true }, { pair, HC, span: 'ours' }]),
   Signals: PAIRS.map((pair) => ({ pair, allPast: true })).concat([{ R }, { R, cs: '0', cb: '0', cz: '1' }, { R, cs: '', cb: 'abc', cz: '0' }, { cs: '10', cb: '50', cz: '25' }]),
-  Backtesting: PAIRS.flatMap((pair) => SLIPS.map((slip) => ({ pair, slip, hover: 0 }))).concat([{ R }, { R, H }, { H, pair: 'GUINEA_TEN', slip: '10' }]),
+  Backtesting: PAIRS.flatMap((pair) => SLIPS.map((slip) => ({ pair, slip, hover: 0 }))).concat([{ R }, { R, H }, { H, pair: 'GUINEA_TEN', slip: '10' }]).concat(PAIRS.flatMap((pair) => SLIPS.map((slip) => ({ pair, slip, HC })))).concat([{ HC, espan: 'ours' }]),
   Data: [{}, { all: true }, { H }, { H, all: true }],
   DownloadPanel: ['today', 'prices', 'trades', 'backtest', 'report'].flatMap((what) =>
     ['3m', 'all'].map((period) => ({ what, period, pair: 'ALL' }))),
@@ -109,3 +110,36 @@ console.log(`pages ok: ${runs} page states rendered against site-data.json`)
   const M0 = new (load('Market'))(); M0.props = {}; M0.state = { D, range: 'All' }
   assert.equal(M0.renderVals().ranges.length, 3)   // without the history file the long ranges are hidden
 }
+
+// Full-history views: every chart that has a 2011-2023 part starts on the book's first day and ends on our last day,
+// and the clean-test part adds up to the published clean-test result
+{
+  const L = D.longrun
+  let total = 0
+  for (const pair of ['M_PETAL', 'M_GUINEA', 'GUINEA_PETAL']) {
+    const p = new (load('Pairs'))(); p.props = {}; p.state = { D, HC, pair }
+    const ch = p.renderVals().chart
+    assert.equal(ch.dates[0], HC.pairs[pair].d[0]); assert.equal(ch.dates[ch.dates.length - 1], D.asOf)
+    assert.equal(ch.markers.length, HC.pairs[pair].trades['5'].length + D.pairs[pair].trades.length)
+    const b = new (load('Backtesting'))(); b.props = {}; b.state = { D, HC, pair, slip: '5' }
+    const eq = b.renderVals().eq
+    assert.equal(eq.dates[0], HC.from)
+    const clean = HC.pairs[pair].trades['5'].reduce((a, t) => a + t[5], 0)
+    const ours = D.backtest[pair]['5'].curve.reduce((a, c) => a + c[2], 0)
+    assert.ok(Math.abs(eq.series[0].values[eq.series[0].values.length - 1] - (clean + ours)) < 2, pair + ' running total carries on from the clean test')
+    total += clean
+  }
+  assert.ok(Math.abs(total - L.net) < 80, 'clean-test trades add up to the published result: ' + total + ' vs ' + L.net)
+  const g = new (load('Pairs'))(); g.props = {}; g.state = { D, HC, pair: 'M_TEN' }
+  const gv = g.renderVals().chart
+  assert.equal(gv.hasSpans, false); assert.match(gv.spanNote, /first trading day/)
+  const m = new (load('Market'))(); m.props = {}; m.state = { D, HC }
+  const vs = m.renderVals().vsm
+  assert.ok(vs.dates[0] <= '2011-04-19' && vs.dates[vs.dates.length - 1] === D.asOf)
+  assert.ok(vs.series[0].values.slice(0, 100).every((v) => v == null), 'GOLDTEN has no line before it was listed')
+  const t = new (load('Today'))(); t.props = {}; t.state = { D, HC }
+  const r = t.renderVals().replay
+  assert.equal(r.max, HC.replay.d.length + D.replay.d.length - 1)
+  assert.match(r.title, /Replay 15 years/)
+}
+console.log('full-history charts ok')
