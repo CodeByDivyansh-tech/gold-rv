@@ -32,7 +32,7 @@ const states = {
   Explore: [{ E }, { E, xpair: 'M_TEN' }, { E, xpair: 'GUINEA_PETAL', slip: '0' }, { E, pub: '0', ze: '3.0', W: '10', mh: '20', h: '0' },
     { E, xpair: 'ALL', pub: '0', ze: '1.5' }, ...PAIRS.flatMap((xpair) => ['0', '10'].map((slip) => ({ E, xpair, slip, pub: '0' })))],
   DownloadPanel: ['today', 'prices', 'trades', 'backtest', 'report'].flatMap((what) =>
-    ['3m', 'all', 'test'].map((period) => ({ what, period, pair: 'ALL', H, HC }))),
+    ['3m', '3y', 'all', 'test', 'custom'].map((period) => ({ what, period, pair: 'ALL', H, HC }))),
 }
 
 let runs = 0
@@ -244,3 +244,22 @@ console.log('explorer ok')
   console.log('new features ok')
 }
 function L_N() { return D.longrun.n }
+
+// Downloads: a custom date range is respected, kept inside the data, and a reversed range downloads nothing
+{
+  const mk = (st) => { const c = new (load('DownloadPanel'))(); c.props = { dark: true, onClose: () => {} }; c.state = { D, H, HC, ...st }; return c }
+  const c = mk({ what: 'prices', period: 'custom', cFrom: '2015-01-01', cTo: '2015-12-31' })
+  const v = c.renderVals(), tb = c.table(D, 'prices', 'ALL', 'custom', H, HC, '2015-01-01', '2015-12-31')
+  assert.ok(v.custom.on && tb.rows.length > 40 && tb.rows.every((r) => r[0] >= '2015-01-01' && r[0] <= '2015-12-31'))
+  assert.match(v.filename, /2015-01-01-to-2015-12-31/)
+  const tr = c.table(D, 'trades', 'ALL', 'custom', H, HC, '2026-01-01', '2026-03-31')
+  assert.ok(tr.rows.length > 0 && tr.rows.every((r) => r[0] >= '2026-01-01' && r[0] <= '2026-03-31'))
+  const r = mk({ what: 'prices', period: 'custom', cFrom: '2020-05-01', cTo: '2019-01-01' }).renderVals()
+  assert.match(r.custom.note, /start date is after the end date/)
+  assert.match(r.preview.count, /No rows/)
+  const cl = mk({ what: 'prices', period: 'custom', cFrom: '2001-01-01', cTo: '2099-01-01' }).renderVals()
+  assert.equal(cl.custom.from, D.longrun.start); assert.equal(cl.custom.to, D.asOf); assert.match(cl.custom.note, /Moved inside/)
+  const t = mk({ what: 'trades', period: 'test' })
+  assert.ok(t.table(D, 'trades', 'ALL', 'test', H, HC).rows.every((x) => x[0] >= D.split.test_start && x[0] <= D.split.test_end), 'test year stops at its end')
+  console.log('custom download range ok')
+}
