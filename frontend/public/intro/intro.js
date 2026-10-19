@@ -20,7 +20,7 @@ import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
 
 const root = document.documentElement;
 const STILL = root.classList.contains('still');
-const COL = { c1: '#E0A43A', c2: '#3AA4F0', c3: '#E070AE', c4: '#9B6BD6', up: '#6FCF9A', hot: '#FFD27A', gold: '#E5B04A' };
+const COL = { c1: '#BC8424', c2: '#2193E0', c3: '#CD6199', c4: '#7D4DAD', up: '#6FCF9A', hot: '#F3D184', gold: '#E5B04A' };   // the site's own contract colours (app/theme.js)
 const M = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 const fd = (s) => { const p = s.split('-'); return (+p[2]) + ' ' + M[+p[1] - 1] + ' ' + p[0]; };
 const inr = (n) => '₹' + Math.abs(Math.round(n)).toLocaleString('en-IN');
@@ -133,7 +133,7 @@ const tp = await textPoints();
 for (let i = 0; i < N; i++) {
   const q = tp[i % tp.length];
   aTxt.set([q[0] + (Math.random() - 0.5) * 0.03, q[1] + (Math.random() - 0.5) * 0.03, (Math.random() - 0.5) * 0.25], i * 3);
-  tmp.set(COL.hot).lerp(new THREE.Color(COL.c3), clamp(q[0] / 6 + 0.5, 0, 1) * 0.8);
+  tmp.set('#F8DB97').lerp(new THREE.Color('#B98428'), clamp(q[0] / 6 + 0.5, 0, 1) * 0.7);   // gold foil, as the site's headlines
   aCol2.set([tmp.r, tmp.g, tmp.b], i * 3);
 }
 geo.setAttribute('position', new THREE.BufferAttribute(aIng, 3));
@@ -282,12 +282,12 @@ sections.forEach((sec, i) => {
   b.addEventListener('click', () => scrollTo({ top: sec.offsetTop + (i === 2 ? 0 : 1), behavior: 'smooth' })); dots.appendChild(b);
 });
 const WASH = [
-  'radial-gradient(80% 60% at 70% 25%, rgba(229,176,74,.30), transparent 60%), radial-gradient(70% 60% at 15% 85%, rgba(155,107,214,.32), transparent 60%)',
-  'radial-gradient(80% 60% at 75% 30%, rgba(58,164,240,.30), transparent 60%), radial-gradient(70% 60% at 20% 80%, rgba(224,112,174,.28), transparent 60%)',
-  'radial-gradient(90% 70% at 50% 20%, rgba(58,164,240,.30), transparent 60%), radial-gradient(70% 60% at 85% 85%, rgba(155,107,214,.28), transparent 60%)',
-  'radial-gradient(90% 60% at 50% 30%, rgba(255,210,122,.24), transparent 60%), radial-gradient(70% 60% at 10% 80%, rgba(224,112,174,.26), transparent 60%)',
-  'radial-gradient(80% 60% at 30% 30%, rgba(155,107,214,.34), transparent 60%), radial-gradient(70% 60% at 85% 80%, rgba(111,207,154,.26), transparent 60%)',
-  'radial-gradient(80% 60% at 50% 30%, rgba(224,112,174,.32), transparent 60%), radial-gradient(70% 60% at 50% 90%, rgba(229,176,74,.26), transparent 60%)'
+  'radial-gradient(80% 60% at 70% 25%, rgba(229,176,74,.24), transparent 60%), radial-gradient(70% 60% at 15% 85%, rgba(185,132,40,.16), transparent 60%)',
+  'radial-gradient(80% 60% at 75% 30%, rgba(229,176,74,.20), transparent 60%), radial-gradient(60% 50% at 85% 20%, rgba(33,147,224,.10), transparent 60%)',
+  'radial-gradient(90% 70% at 50% 20%, rgba(229,176,74,.16), transparent 60%), radial-gradient(70% 60% at 85% 85%, rgba(33,147,224,.12), transparent 60%)',
+  'radial-gradient(90% 60% at 50% 30%, rgba(243,209,132,.22), transparent 60%), radial-gradient(70% 60% at 10% 80%, rgba(185,132,40,.14), transparent 60%)',
+  'radial-gradient(80% 60% at 30% 30%, rgba(229,176,74,.18), transparent 60%), radial-gradient(70% 60% at 85% 80%, rgba(125,77,173,.14), transparent 60%)',
+  'radial-gradient(80% 60% at 50% 30%, rgba(229,176,74,.26), transparent 60%), radial-gradient(70% 60% at 50% 90%, rgba(185,132,40,.18), transparent 60%)'
 ];
 const wash = document.getElementById('wash'), bar = document.getElementById('bar');
 let target = 0, sNow = 0, chapter = -1;

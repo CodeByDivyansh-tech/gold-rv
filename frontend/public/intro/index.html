@@ -13,8 +13,8 @@
 <style>
   :root {
     --bg: #0E0A05; --fg: #F6ECD8; --muted: #C9B794; --gold: #E5B04A; --line: rgba(229,176,74,.22);
-    --c1: #E0A43A; --c2: #3AA4F0; --c3: #E070AE; --c4: #9B6BD6; --up: #6FCF9A; --hot: #FFD27A;
-    --wash: radial-gradient(80% 60% at 70% 30%, rgba(155,107,214,.20), transparent 60%), radial-gradient(70% 60% at 20% 80%, rgba(58,164,240,.14), transparent 60%);
+    --c1: #BC8424; --c2: #2193E0; --c3: #CD6199; --c4: #7D4DAD; --foil: linear-gradient(100deg, #F8DB97 0%, #E5B04A 38%, #B98428 62%, #F3D184 88%); --up: #6FCF9A; --hot: #FFD27A;
+    --wash: radial-gradient(80% 60% at 70% 25%, rgba(229,176,74,.22), transparent 60%), radial-gradient(70% 60% at 15% 85%, rgba(185,132,40,.14), transparent 60%);
   }
   * { box-sizing: border-box; }
   html { background: var(--bg); color: var(--fg); scroll-behavior: auto; }
@@ -28,7 +28,7 @@
   .brand svg { width: 34px; height: auto; }
   .skip { min-height: 40px; padding: 0 16px; border-radius: 999px; border: 1px solid var(--line); background: rgba(20,14,7,.55); color: var(--fg); font: 600 14px 'Geist', system-ui, sans-serif; display: inline-flex; align-items: center; text-decoration: none; -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); }
   .skip:hover { border-color: var(--gold); }
-  .bar { position: fixed; z-index: 6; left: 0; top: 0; height: 3px; width: 100%; transform-origin: 0 50%; transform: scaleX(0); background: linear-gradient(90deg, var(--c2), var(--c4), var(--c3), var(--c1)); }
+  .bar { position: fixed; z-index: 6; left: 0; top: 0; height: 3px; width: 100%; transform-origin: 0 50%; transform: scaleX(0); background: var(--foil); }
   .dots { position: fixed; z-index: 5; right: clamp(10px, 2vw, 24px); top: 50%; transform: translateY(-50%); display: flex; flex-direction: column; gap: 12px; }
   .dots button { width: 12px; height: 12px; padding: 0; border-radius: 50%; border: 1px solid var(--muted); background: transparent; cursor: pointer; }
   .dots button[aria-current="true"] { background: var(--gold); border-color: var(--gold); box-shadow: 0 0 12px rgba(229,176,74,.7); }
@@ -52,12 +52,12 @@
   .card > * { position: relative; }
   .brand { padding: 8px 14px 8px 10px; border-radius: 999px; border: 1px solid var(--line); background: rgba(20,14,7,.5); -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px); }
   h1 { margin: 0; font-size: clamp(44px, 8vw, 104px); line-height: .95; letter-spacing: -0.045em; font-weight: 800;
-    background: linear-gradient(100deg, #FFE7A8 0%, #E5B04A 35%, #E070AE 70%, #9B6BD6 100%); -webkit-background-clip: text; background-clip: text; color: transparent; }
+    background: var(--foil); -webkit-background-clip: text; background-clip: text; color: transparent; }
   h2 { margin: 0 0 12px; font-size: clamp(26px, 3.4vw, 38px); line-height: 1.08; letter-spacing: -0.025em; font-weight: 700; }
   p { margin: 0 0 12px; font-size: 16px; line-height: 1.6; color: var(--muted); }
   p b, li b { color: var(--fg); font-weight: 600; }
   .lead { font-size: clamp(17px, 1.6vw, 20px); color: #E8D9B8; max-width: 560px; margin-top: 18px; }
-  .tag { display: inline-block; margin-bottom: 14px; padding: 5px 12px; border-radius: 999px; font: 600 13px 'Geist', system-ui, sans-serif; color: #1B1305; background: linear-gradient(90deg, var(--c1), var(--hot)); }
+  .tag { display: inline-block; margin-bottom: 14px; padding: 5px 12px; border-radius: 999px; font: 600 13px 'Geist', system-ui, sans-serif; color: #1B1305; background: var(--foil); }
   .hint { margin-top: 26px; display: inline-flex; align-items: center; gap: 10px; color: var(--muted); font-size: 14px; }
   .hint i { width: 22px; height: 34px; border: 2px solid var(--muted); border-radius: 12px; position: relative; }
   .hint i::after { content: ""; position: absolute; left: 50%; top: 6px; width: 4px; height: 7px; margin-left: -2px; border-radius: 2px; background: var(--gold); animation: wheel 1.6s ease-in-out infinite; }
@@ -112,7 +112,7 @@
 <body>
 <div class="wash" id="wash"></div>
 <canvas id="scene" aria-hidden="true"></canvas>
-<svg class="still-art" viewBox="0 0 400 300" aria-hidden="true"><g transform="translate(40 60)"><path d="M10 70L30 20H120L140 70Z" fill="#E0A43A"/><path d="M170 70L186 30H260L276 70Z" fill="#3AA4F0"/><path d="M20 170L36 130H110L126 170Z" fill="#E070AE"/><path d="M180 170L192 140H246L258 170Z" fill="#9B6BD6"/></g></svg>
+<svg class="still-art" viewBox="0 0 400 300" aria-hidden="true"><g transform="translate(40 60)"><path d="M10 70L30 20H120L140 70Z" fill="#BC8424"/><path d="M170 70L186 30H260L276 70Z" fill="#2193E0"/><path d="M20 170L36 130H110L126 170Z" fill="#CD6199"/><path d="M180 170L192 140H246L258 170Z" fill="#7D4DAD"/></g></svg>
 <div class="bar" id="bar"></div>
 
 <header class="top">
