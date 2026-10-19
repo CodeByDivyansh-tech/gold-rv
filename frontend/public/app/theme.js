@@ -44,7 +44,21 @@
     '.grv-reveal{animation:grv-reveal .75s cubic-bezier(.2,.7,.2,1) both}' +
     '.grv-fade{animation:grv-fade .35s ease-out both}' +
     '@media (prefers-reduced-motion: reduce){.grv-reveal,.grv-fade{animation:none}}' +
-    '@media (forced-colors: active){.grv-foil{background:none;color:CanvasText}.grv-goldbtn{background:ButtonFace !important;color:ButtonText !important}}';
+    '@media (forced-colors: active){.grv-foil{background:none;color:CanvasText}.grv-goldbtn{background:ButtonFace !important;color:ButtonText !important}}' +
+    // keyboard focus is always visible
+    '#app a:focus-visible,#app button:focus-visible,#app input:focus-visible,#app select:focus-visible,#app [tabindex]:focus-visible{outline:2px solid var(--grv-gold);outline-offset:2px}' +
+    // skip link: hidden until focused with the keyboard
+    '.grv-skip{position:fixed;left:12px;top:-80px;z-index:70;background:var(--grv-gold);color:var(--grv-ongold);font:600 14px Geist,system-ui,sans-serif;padding:12px 16px;border-radius:12px;text-decoration:none}' +
+    '.grv-skip:focus{top:12px}' +
+    // loading placeholders shaped like the content that is coming
+    '@keyframes grv-shim{0%{background-position:100% 0}100%{background-position:0 0}}' +
+    '.grv-skel{display:block;border-radius:16px;background:linear-gradient(90deg,var(--grv-raised) 25%,var(--grv-line) 50%,var(--grv-raised) 75%);background-size:400% 100%;animation:grv-shim 1.6s ease-in-out infinite}' +
+    '@media (prefers-reduced-motion: reduce){.grv-skel{animation:none}}' +
+    // Simple view hides the technical deep-dives (marked grv-detail); everything else stays
+    'html.grv-simple .grv-detail{display:none !important}' +
+    // a small "?" next to a technical word opens its plain meaning
+    '.grv-q{display:inline-grid;place-items:center;width:20px;height:20px;margin-left:6px;vertical-align:middle;border-radius:50%;border:1px solid var(--grv-line);background:var(--grv-raised);color:var(--grv-gold);font:700 12px Geist,system-ui,sans-serif;cursor:pointer;padding:0;position:relative}' +
+    '.grv-q::after{content:"";position:absolute;inset:-12px}';
 
   function tokens(dark) {
     var p = P[dark ? 'dark' : 'light'];
@@ -77,5 +91,17 @@
     if (m) m.setAttribute('content', p.meta);
   }
 
-  root.GRVTheme = { tokens: tokens, apply: apply, palettes: P };
+  // Simple view: a per-browser choice (it changes how much is shown, not what the numbers are)
+  var simpleOn = false;
+  try { simpleOn = localStorage.getItem('grv-simple') === '1'; } catch (e) {}
+  function setSimpleClass() { if (typeof document !== 'undefined') document.documentElement.classList.toggle('grv-simple', simpleOn); }
+  setSimpleClass();
+  function simple(v) {
+    if (v === undefined) return simpleOn;
+    simpleOn = !!v; setSimpleClass();
+    try { localStorage.setItem('grv-simple', simpleOn ? '1' : '0'); } catch (e) {}
+    return simpleOn;
+  }
+
+  root.GRVTheme = { tokens: tokens, apply: apply, palettes: P, simple: simple };
 })(typeof window !== 'undefined' ? window : globalThis);
