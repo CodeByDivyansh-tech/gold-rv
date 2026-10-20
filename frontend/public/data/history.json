@@ -857,6 +857,12 @@
       "2020-11-14"
     ]
   },
+  "calendar": {
+    "n": 151,
+    "inside": 151,
+    "closed_roll": 35,
+    "closed_expiry": 24
+  },
   "long": {
     "d": [
       "2003-11-20",

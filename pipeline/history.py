@@ -25,6 +25,7 @@ from pipeline.load import load_clean_bhavcopy
 from pipeline.carry import compute_reference_carry
 from pipeline.pairs import build_pair_series, compute_rolling_z
 from pipeline.backtest import prepare_contract_lookup, run_pair_backtest
+from pipeline.lifecycle import compute_contract_lifecycle, calendar_check
 
 BOOK_PATH = 'data/raw/parity_data_book.csv'
 OURS_PATH = 'data/raw/gold_bhavcopy_clean.csv'
@@ -232,8 +233,10 @@ def build(output_dir: str = 'frontend/public/data', book_path: str = BOOK_PATH, 
     cov = {s: {'first': g['date'].min().strftime('%Y-%m-%d'), 'last': g['date'].max().strftime('%Y-%m-%d'),
                'rows': int(len(g)), 'contracts': int(g['expiry'].nunique())} for s, g in book.groupby('symbol')}
     # data quality on the book's clean-test window, measured the same way as on our own download
-    hdf = history_frame(book, end)[0]
-    hdf = hdf[hdf['date'] >= pd.Timestamp(HISTORY_START)]
+    hdf_all = history_frame(book, end)[0]
+    hdf = hdf_all[hdf_all['date'] >= pd.Timestamp(HISTORY_START)]
+    # every clean-test trade checked against its contracts' calendars, the same check as our own download's trades
+    calendar = calendar_check(T[T['slip'] == BASE_SLIPPAGE], compute_contract_lifecycle(hdf_all)) if len(T) else None
     quality = {'no_trade': int(hdf['no_trade'].sum()), 'thin': int(hdf['thin'].sum()),   # same definitions as meta.json
                'weekend': sorted({d.strftime('%Y-%m-%d') for d in hdf['date'] if d.weekday() >= 5})}
     res = {
@@ -250,6 +253,7 @@ def build(output_dir: str = 'frontend/public/data', book_path: str = BOOK_PATH, 
                    'days': int(book.loc[(book['date'] >= HISTORY_START) & (book['date'] <= end), 'date'].nunique())},
         'result': summarise(T) if len(T) else None,
         'quality': quality,
+        'calendar': calendar,
         'long': long_series(book, end),
     }
     os.makedirs(output_dir, exist_ok=True)
