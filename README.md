@@ -8,7 +8,9 @@
 
 **Hack in Hills '26 · Problem 03: Commodity Derivatives Intelligence**
 A relative-value (RV) research terminal across MCX Gold derivatives (`GOLDM`, `GOLDTEN`, `GOLDGUINEA`, `GOLDPETAL`).
-• **Live site**: [gold-rv.vercel.app](https://gold-rv.vercel.app) · **Pitch**: [interactive 3D deck](https://gold-rv.vercel.app/pitch/) (`/pitch/`)
+• **Live site**: [gold-rv.vercel.app](https://gold-rv.vercel.app) · **3D intro**: [/intro/](https://gold-rv.vercel.app/intro/) · **Demo video**: [/demo/](https://gold-rv.vercel.app/demo/) (3:54, every page on a laptop screen) · **Pitch**: [interactive 3D deck](https://gold-rv.vercel.app/pitch/)
+
+**Team NEXORA**: Divyansh (data and quant pipeline) · Ishant Bhaudhira (frontend) · Noni Gopal Das (research and pitch)
 
 ---
 
@@ -146,6 +148,7 @@ gold-rv/
         ├── pages/*.dc.html     # one file per page; Rail.dc.html and TabBar.dc.html are the shared menus
         ├── pages/Brief.dc.html # "The brief, answered": each line of Problem 03, its status and the page that proves it
         ├── intro/              # the 3D intro shown on a first visit
+        ├── demo/               # the demo video page (gold-rv-demo-video.mp4 + .webm, with chapters)
         ├── pitch/              # the 3D pitch deck
         └── data/               # JSON written by the pipeline (committed)
 ```
