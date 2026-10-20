@@ -44,7 +44,7 @@ button:focus-visible,a:focus-visible,input:focus-visible{outline:2px solid var(-
       <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-start; gap: 20px">
         <div style="display: flex; flex-direction: column; gap: 12px; max-width: 720px">
           <h1 class="grv-foil" style="margin: 0; font-size: clamp(30px, 4vw, 44px); font-weight: 600; letter-spacing: -0.03em; line-height: 1.05">Did it make money?</h1>
-          <p style="margin: 0; font-size: 16px; line-height: 1.6; color: var(--muted); max-width: 62ch">One frozen rule, tested on 15 years of MCX gold prices: tuned on Oct 2023 – Sep 2025, then run on 13 earlier years it never saw (2011–2023, the clean test) and on the 12 months after training (the test year). Every MCX cost and slippage is included.</p>
+          <p style="margin: 0; font-size: 16px; line-height: 1.6; color: var(--muted); max-width: 62ch">One frozen rule, tested on every year of MCX gold prices since 2011: tuned on Oct 2023 – Sep 2025, then run on the earlier years it never saw (2011–2023, the clean test) and on the 12 months after training (the test year). Every MCX cost and slippage is included.</p>
         </div>
         <div class="headmeta" style="align-items: center; gap: 12px">
           <button type="button" data-dl="1" onClick="{{openDl}}" style="min-height: 44px; padding: 0 16px; border-radius: 12px; border: 1px solid var(--line); background: var(--panel); color: var(--fg); font: 600 14px 'Geist', system-ui, sans-serif; cursor: pointer; display: flex; align-items: center; gap: 8px"><svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true" style="fill: none; stroke: currentColor; stroke-width: 2px; stroke-linecap: round; stroke-linejoin: round"><path d="M12 4v11M7 10.5l5 5 5-5M5 20h14"></path></svg>Download</button>
@@ -80,7 +80,7 @@ button:focus-visible,a:focus-visible,input:focus-visible{outline:2px solid var(-
         <sc-if value="{{hist.show}}" hint-placeholder-val="{{ true }}">
         <section class="grv-card" id="clean-test" aria-labelledby="hist-h" style="scroll-margin-top: 16px; background: var(--panel); border: 1px solid var(--line); border-radius: 20px; padding: clamp(18px, 2.5vw, 26px); display: flex; flex-direction: column; gap: 18px">
           <div style="display: flex; flex-direction: column; gap: 4px">
-            <h2 id="hist-h" style="margin: 0; font-size: 18px; font-weight: 600">The clean test: 13 years the rule never saw<button type="button" class="grv-q" data-term="Clean test" aria-label="What does 'Clean test' mean?" title="What does this mean?">?</button></h2>
+            <h2 id="hist-h" style="margin: 0; font-size: 18px; font-weight: 600">{{hist.head}}<button type="button" class="grv-q" data-term="Clean test" aria-label="What does 'Clean test' mean?" title="What does this mean?">?</button></h2>
             <span style="font-size: 13px; color: var(--muted); line-height: 1.6; max-width: 82ch">{{hist.intro}}</span>
           </div>
           <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(140px, 100%), 1fr)); gap: 12px">
@@ -119,6 +119,9 @@ button:focus-visible,a:focus-visible,input:focus-visible{outline:2px solid var(-
             </sc-for>
           </div>
           <p style="margin: 0; font-size: 14px; line-height: 1.6">{{hist.note}}</p>
+          <sc-if value="{{hindsight}}" hint-placeholder-val="{{ true }}">
+            <p style="margin: 0; font-size: 14px; line-height: 1.6; font-weight: 600">{{hindsight}} <a href="Explore.dc.html" style="color: var(--gold); text-decoration: none; white-space: nowrap">Try the settings yourself</a></p>
+          </sc-if>
           <p style="margin: 0; font-size: 12px; line-height: 1.6; color: var(--muted)">{{hist.source}}</p>
         </section>
         </sc-if>
@@ -809,9 +812,9 @@ class Component extends DCLogic {
       const b5 = R.bootstrap['5'], bt = R.bootstrap.train_5;
       const bc = R.bootstrap.clean_5;
       const items = (bc ? [{ name: 'Clean test, ' + D.longrun.start.slice(0, 4) + '–' + D.longrun.end.slice(0, 4), sub: bc.n + ' trades the rule had never seen', x: bc }] : []).concat([
-        { name: 'Test year, all trades', sub: b5.all.n + ' trades, 1 Oct 2025 – 30 Sep 2026', x: b5.all },
+        { name: 'Test year, all trades', sub: b5.all.n + ' trades, ' + this.fd(D.split.test_start) + ' – ' + this.fd(D.split.test_end), x: b5.all },
         { name: 'Test year, without the crash', sub: b5.without_crash.n + ' trades that closed outside ' + D.events.crashShort, x: b5.without_crash },
-        { name: 'Training years', sub: bt.n + ' trades, 10 Oct 2023 – 30 Sep 2025', x: bt }
+        { name: 'Training years', sub: bt.n + ' trades, ' + this.fd(D.split.train_start) + ' – ' + this.fd(D.split.train_end), x: bt }
       ]);
       const lo = Math.min(0, ...items.map((i) => i.x.lo)), hi = Math.max(0, ...items.map((i) => i.x.hi));
       const pad = (hi - lo) * 0.04, a = lo - pad, z = hi + pad;
@@ -833,7 +836,7 @@ class Component extends DCLogic {
     }
 
     const HX = st.H;
-    let hist = { show: false, kpis: [], years: [], pairs: [], nYears: 1, zeroY: '50%', intro: '', note: '', source: '', slipText: '' };
+    let hist = { show: false, kpis: [], years: [], pairs: [], nYears: 1, zeroY: '50%', intro: '', note: '', source: '', slipText: '', head: 'The clean test' };
     if (HX && HX.result && HX.result.by_slip && HX.result.by_slip['5']) {
       const r = HX.result, s = r.by_slip['5'], s0 = r.by_slip['0'], w = HX.window;
       const vals = r.years.map((y) => y.net_rs);
@@ -843,7 +846,8 @@ class Component extends DCLogic {
       const label = (pid) => (D.pairs[pid] ? D.pairs[pid].label : pid);
       hist = {
         show: true, slipText: w.slip + ' bps', nYears: r.years.length, zeroY: pc(top),
-        intro: 'We ran the exact rule from this page, with the same frozen settings, the same five checks and the same costs, on ' + this.fd(w.from) + ' to ' + this.fd(w.to) + ': years no version of the rule had seen. Only the three pairs that existed then can be tested; GOLDTEN started in March 2025.',
+        intro: 'We ran the exact rule from this page, with the same frozen settings, the same five checks and the same costs, on ' + this.fd(w.from) + ' to ' + this.fd(w.to) + ': years no version of the rule had seen. Only the three pairs that existed then can be tested; GOLDTEN was listed on ' + this.fd(D.events.goldtenListed) + '.',
+        head: 'The clean test: ' + r.years_count + ' years the rule never saw',
         kpis: [
           { label: 'Trades', value: String(s.n), note: this.fd(w.from) + ' – ' + this.fd(w.to), color: 'var(--fg)' },
           { label: 'After costs', value: this.srs(s.net_rs), note: 'at ' + w.slip + ' bps slippage, ' + Math.round(s.hit * 100) + '% won', color: s.net_rs >= 0 ? 'var(--up)' : 'var(--down)' },
@@ -869,9 +873,13 @@ class Component extends DCLogic {
       };
     }
 
+    // explorer grid on the clean test (site-data.json → hindsight): even the best settings picked afterwards rarely make money
+    const HS = D.hindsight;
+    const hindsight = HS ? 'At ' + HS.slip + ' bps slippage, only ' + HS.profitable + ' of ' + HS.total + ' settings make money on ' + HS.start.slice(0, 4) + '–' + HS.end.slice(0, 4) + ', even picked with hindsight.' : '';
+
     const EVD = D.evidence;
     const ty = EVD.test_year, mt = EVD.multiple_testing;
-    const testCaveat = 'Read this year with care: it is not a clean test. The original study\'s results for it were known by ' + this.fd(ty.first_results_seen) + ', and the five-check rule was written on ' + this.fd(ty.rule_frozen) + ', after that. The clean test is the 13 years above.';
+    const testCaveat = 'Read this year with care: it is not a clean test. The original study\'s results for it were known by ' + this.fd(ty.first_results_seen) + ', and the five-check rule was written on ' + this.fd(ty.rule_frozen) + ', after that. The clean test is the ' + D.longrun.years + ' years above.';
     const multiNote = 'How many looks? ' + mt.settings_tried_on_training + ' settings were tried on training only (' + mt.grid_per_pair + ' per pair), which is tuning, not testing. On the test year ' + mt.rule_versions_scored_on_test + ' rule versions were scored (the three rows above). The five-check result, t = ' + this.sgn(mt.t, 2) + ' on ' + mt.n + ' trades, has p = ' + mt.p_two_sided.toFixed(2) + '; allowing for ' + mt.rule_versions_scored_on_test + ' looks, p = ' + mt.p_bonferroni.toFixed(2) + '. The usual bar is 0.05.';
     const swd = EVD.switch.detail, swk = Object.keys(swd);
     const switchNote = swk.length ? swk.map((k) => D.pairs[k].label + ' made only ' + this.srs(swd[k].train_net_rs) + ' over ' + swd[k].train_n + ' training trades (t = ' + this.sgn(swd[k].train_t, 2) + '; ' + swd[k].boot_above_zero_pct + '% of resamples above ₹0). That is close to a coin flip, so the switch is a weak filter, not proof.').join(' ') : '';
@@ -903,7 +911,7 @@ class Component extends DCLogic {
     return {
       ...shell, loading: false, ready: true, conclusion: D.conclusion, testCaveat, multiNote, switchNote, slipEv, jumps, pooledN: D.pooled['5'].n, slipBars, zeroY, splitText,
       crashShort: D.events.crashShort, ruleRows, ruleIntro, switchIntro, switchChips, chips, slips, kpis, mismatch, eq, hover, stress, stressNote, attr, attrNote, attrSub, settings, cmp, mp,
-      slipText: slip + ' bps', rob, hist
+      slipText: slip + ' bps', rob, hist, hindsight
     };
   }
 }
