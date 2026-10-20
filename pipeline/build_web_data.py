@@ -204,8 +204,23 @@ def build_web_data(data_dir: str = 'frontend/public/data', out_path: str = None)
     q = hist.get('quality', {})
     longrun['noTrade'], longrun['thin'], longrun['weekend'] = q.get('no_trade', 0), q.get('thin', 0), q.get('weekend', [])
 
+    # explorer grid on the clean test: settings that make money even when picked with hindsight
+    from pipeline.explore import hindsight as count_hindsight
+    hindsight = count_hindsight(J('explore.json'), SL)
+
+    # "The brief, answered" page: proof for the lines the other pages do not already total up
+    cd = [r for s in SYMS for r in J(f'carry_decomposition/{s}.json')]
+    mean_abs = lambda k: round(sum(abs(r[k]) for r in cd) / len(cd), 2) if cd else None
+    contracts = J('contracts.json')
+    brief = dict(
+        carry=dict(rows=len(cd), start=min(r['d'] for r in cd) if cd else None, end=max(r['d'] for r in cd) if cd else None,
+                   rolldown=mean_abs('rolldown'), curve=mean_abs('curve'), gold=mean_abs('gold')),
+        calendar=dict(clean=hist.get('calendar'), ours=contracts.get('calendar')),
+        spec={s: dict(lot=v['lot_grams'], quote=v['quote_grams'], purity=v['purity']) for s, v in contracts['contract_master'].items()},
+    )
+
     data = dict(costs=costs, costTotal=round(cost_total, 2), slip=SL, notional=N, events=events,
-        evidence=evidence, longrun=longrun,
+        evidence=evidence, longrun=longrun, hindsight=hindsight, brief=brief,
                 minVol=C.MIN_VOLUME_LOTS, minOi=C.MIN_OI_LOTS, minTd=C.MIN_ENTRY_TD,
         asOf=meta['coverage_end'], start=meta['coverage_start'], split=meth['split_dates'],
         meta=dict(rows=meta['rows_count'], contracts=meta['contracts_count'], days=meta['trading_dates_count'],

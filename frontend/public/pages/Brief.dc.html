@@ -1,0 +1,277 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Gold RV Intelligence: The brief, answered</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&amp;family=Geist+Mono:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:inherit}a:hover{color:inherit}
+button:focus-visible,a:focus-visible,input:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+.rail{display:flex}.phonebar{display:none}.tabbar{display:none}.headmeta{display:flex}.wide{display:block}.cards{display:none}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+@media (max-width: 899px){.rail{display:none}.phonebar{display:flex}.tabbar{display:flex}.headmeta{display:none}.wide{display:none}.cards{display:flex}.pagepad{padding-bottom:104px !important}}
+.bf-t{width:100%;border-collapse:collapse;font-size:14px}
+.bf-t th{text-align:left;font-weight:500;font-size:12px;color:var(--muted);padding:12px 14px}
+.bf-t td{padding:16px 14px;border-top:1px solid var(--line);vertical-align:top;line-height:1.55}
+.bf-t tr.bf-group td{padding:14px 14px 6px;font-weight:600;font-size:15px;border-top:1px solid var(--line);background:var(--raised)}
+.bf-chip{display:inline-flex;align-items:center;min-height:36px;padding:0 12px;border-radius:999px;border:1px solid var(--line);color:var(--gold);font-weight:600;font-size:13px;text-decoration:none;white-space:nowrap}
+.bf-chip:hover{border-color:var(--gold)}
+.bf-done{display:inline-flex;align-items:center;gap:6px;padding:3px 10px;border-radius:999px;font:600 12px 'Geist',system-ui,sans-serif;background:color-mix(in srgb,var(--up) 16%,transparent);color:var(--up);white-space:nowrap}
+.bf-lab{display:none}
+/* phones: each row becomes a card, so nothing scrolls sideways */
+@media (max-width: 760px){
+  .bf-t thead{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+  .bf-t,.bf-t tbody,.bf-t tr,.bf-t td{display:block;width:100%;box-sizing:border-box}
+  .bf-t tr{border-top:1px solid var(--line);padding:14px 16px}
+  .bf-t td{border-top:0;padding:4px 0}
+  .bf-t tr.bf-group{padding:0}
+  .bf-t tr.bf-group td{padding:14px 16px 10px}
+  .bf-lab{display:block;font-size:12px;color:var(--muted);margin-bottom:2px}
+}
+</style>
+</helmet>
+<div style="--bg: {{t.bg}}; --panel: {{t.panel}}; --raised: {{t.raised}}; --line: {{t.line}}; --fg: {{t.fg}}; --muted: {{t.muted}}; --gold: {{t.gold}}; --glow: {{t.glow}}; --ongold: {{t.ongold}}; --up: {{t.up}}; --down: {{t.down}}; --c1: {{t.c1}}; --c2: {{t.c2}}; --c3: {{t.c3}}; --c4: {{t.c4}}; --area: {{t.area}}; --hover: {{t.hover}}; background: var(--bg); color: var(--fg); font-family: 'Geist', 'Segoe UI', system-ui, sans-serif; min-height: 100vh; display: flex; align-items: stretch">
+
+  <dc-import name="Rail" current="Brief"></dc-import>
+
+  <div style="flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column">
+    <div class="phonebar" style="align-items: center; justify-content: space-between; gap: 8px; padding: 10px 16px; border-bottom: 1px solid var(--line); background: var(--panel)">
+      <a href="Home.dc.html" style="display: flex; align-items: center; gap: 10px; text-decoration: none">
+        <svg class="pb-mark" viewBox="8 18 48 28" aria-hidden="true" style="width: 34px; height: auto; display: block; flex: none"><path d="M8 28L12 18H44L48 28Z M16 46L20 36H52L56 46Z" style="fill: var(--gold)"></path></svg>
+        <span style="display: flex; flex-direction: column; line-height: 1.2"><svg viewBox="0 0.26 158.04 40.74" role="img" aria-label="Gold RV Intelligence" style="width: 78px; height: auto; display: block; margin-bottom: 2px"><path d="M17.05 31.42Q12.14 31.42 8.61 29.49Q5.08 27.56 3.17 24.07Q1.26 20.58 1.26 15.92Q1.26 11.3 3.19 7.79Q5.12 4.29 8.55 2.31Q11.97 0.34 16.51 0.34Q20.24 0.34 23.2 1.68Q26.17 3.03 27.99 5.36Q29.82 7.69 30.16 10.76H23.69Q23.27 8.28 21.36 6.87Q19.45 5.46 16.59 5.46Q13.94 5.46 11.97 6.7Q10 7.94 8.9 10.25Q7.81 12.56 7.81 15.8Q7.81 19.16 8.9 21.53Q10 23.9 12.12 25.14Q14.24 26.38 17.35 26.38Q19.87 26.38 21.63 25.75Q23.39 25.12 24.32 23.99L30.45 26.42Q28.01 28.86 24.8 30.14Q21.59 31.42 17.05 31.42ZM23.98 26.42V18.11L25.28 19.41H17.3V14.45H30.45V26.42ZM43.89 31.42Q40.36 31.42 37.7 30.01Q35.03 28.61 33.54 26.07Q32.05 23.52 32.05 20.21Q32.05 16.89 33.54 14.41Q35.03 11.93 37.7 10.55Q40.36 9.16 43.89 9.16Q47.46 9.16 50.13 10.55Q52.79 11.93 54.26 14.41Q55.73 16.89 55.73 20.21Q55.73 23.52 54.24 26.07Q52.75 28.61 50.09 30.01Q47.42 31.42 43.89 31.42ZM43.89 26.46Q45.36 26.46 46.56 25.71Q47.75 24.95 48.47 23.54Q49.18 22.14 49.18 20.16Q49.18 17.27 47.65 15.69Q46.12 14.12 43.89 14.12Q41.66 14.12 40.13 15.71Q38.6 17.31 38.6 20.16Q38.6 22.14 39.31 23.54Q40.03 24.95 41.22 25.71Q42.42 26.46 43.89 26.46ZM58.25 31V0.76H64.55V31ZM83.92 31V26.25L84.34 26.34Q83.92 28.65 81.84 30.03Q79.76 31.42 76.86 31.42Q73.92 31.42 71.76 30.05Q69.59 28.69 68.42 26.21Q67.24 23.73 67.24 20.37Q67.24 16.97 68.46 14.45Q69.68 11.93 71.88 10.55Q74.09 9.16 77.03 9.16Q80.09 9.16 82.01 10.59Q83.92 12.02 84.25 14.49L83.79 14.54V0.76H90.09V31ZM78.88 26.38Q81.1 26.38 82.49 24.8Q83.87 23.23 83.87 20.29Q83.87 17.35 82.47 15.78Q81.06 14.2 78.79 14.2Q76.61 14.2 75.2 15.8Q73.79 17.39 73.79 20.33Q73.79 23.27 75.2 24.83Q76.61 26.38 78.88 26.38ZM100.84 31V0.76H114.37Q117.64 0.76 120.08 1.87Q122.51 2.99 123.86 5Q125.2 7.02 125.2 9.71Q125.2 12.35 123.86 14.35Q122.51 16.34 120.08 17.45Q117.64 18.57 114.37 18.57H105.97V13.82H114.2Q116.51 13.82 117.75 12.75Q118.99 11.68 118.99 9.75Q118.99 7.77 117.77 6.74Q116.55 5.72 114.2 5.72H107.31V31ZM117.89 31 105.76 15.29H112.6L126.63 31ZM137.97 31 127.13 0.76H133.85L142.13 25.96H141.33L149.65 0.76H156.03L145.19 31Z" style="fill: var(--fg)"></path></svg><span class="pb-sub" style="font-size: 12px; color: var(--muted)">Data to {{asOfText}} · not live</span></span>
+      </a>
+      <button type="button" data-dl="1" onClick="{{openDl}}" aria-label="Download data or a statement" title="Download" style="width: 44px; height: 44px; flex: none; margin-left: auto; border-radius: 12px; border: 1px solid var(--line); background: var(--raised); color: var(--fg); display: grid; place-items: center; cursor: pointer; padding: 0"><svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true" style="fill: none; stroke: currentColor; stroke-width: 2px; stroke-linecap: round; stroke-linejoin: round"><path d="M12 4v11M7 10.5l5 5 5-5M5 20h14"></path></svg></button>
+      <button type="button" class="grv-tool pbtn" data-grv="search" aria-haspopup="dialog" aria-label="Search pages and tools" data-label="Search" style="width: 44px; height: 44px; flex: none; border-radius: 12px; border: 1px solid var(--line); background: var(--raised); color: var(--fg); display: grid; place-items: center; cursor: pointer; padding: 0"><svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true" style="fill: none; stroke: currentColor; stroke-width: 2px; stroke-linecap: round"><circle cx="11" cy="11" r="7"></circle><path d="M20 20l-3.5-3.5"></path></svg></button>
+      <button type="button" onClick="{{toggle}}" aria-label="{{themeLabel}}" title="{{themeLabel}}" style="width: 44px; height: 44px; flex: none; border-radius: 12px; border: 1px solid var(--line); background: var(--raised); color: var(--fg); display: grid; place-items: center; cursor: pointer; padding: 0">
+        <sc-if value="{{dark}}" hint-placeholder-val="{{ true }}"><svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true" style="fill: none; stroke: currentColor; stroke-width: 1.8px; stroke-linecap: round"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"></path></svg></sc-if>
+        <sc-if value="{{light}}" hint-placeholder-val="{{ false }}"><svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true" style="fill: none; stroke: currentColor; stroke-width: 1.8px; stroke-linejoin: round"><path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"></path></svg></sc-if>
+      </button>
+      <button type="button" class="grv-tool pbtn" data-grv="words" aria-haspopup="dialog" aria-label="Words explained" data-label="Words explained (?)" style="width: 44px; height: 44px; flex: none; border-radius: 12px; border: 1px solid var(--line); background: var(--raised); color: var(--fg); display: grid; place-items: center; cursor: pointer; padding: 0"><span aria-hidden="true" style="display: grid; place-items: center; width: 22px; height: 22px; border-radius: 50%; background: var(--gold); color: var(--ongold); font: 700 14px 'Geist', system-ui, sans-serif">?</span></button>
+    </div>
+
+    <main class="pagepad" style="flex: 1 1 auto; box-sizing: border-box; width: 100%; max-width: 1240px; margin: 0 auto; padding: 32px clamp(16px, 4vw, 48px) 48px; display: flex; flex-direction: column; gap: 28px">
+
+      <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-start; gap: 20px">
+        <div style="display: flex; flex-direction: column; gap: 12px; max-width: 720px">
+          <h1 class="grv-foil" style="margin: 0; font-size: clamp(30px, 4vw, 44px); font-weight: 600; letter-spacing: -0.03em; line-height: 1.05">The brief, answered</h1>
+          <p style="margin: 0; font-size: 16px; line-height: 1.6; color: var(--muted); max-width: 62ch">Problem 03 asked for six things. Each row below is one line of the brief, what we built for it, and the page that proves it. Every number here is read from the same data files as the rest of the site.</p>
+        </div>
+        <div class="headmeta" style="align-items: center; gap: 12px">
+          <button type="button" data-dl="1" onClick="{{openDl}}" style="min-height: 44px; padding: 0 16px; border-radius: 12px; border: 1px solid var(--line); background: var(--panel); color: var(--fg); font: 600 14px 'Geist', system-ui, sans-serif; cursor: pointer; display: flex; align-items: center; gap: 8px"><svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true" style="fill: none; stroke: currentColor; stroke-width: 2px; stroke-linecap: round; stroke-linejoin: round"><path d="M12 4v11M7 10.5l5 5 5-5M5 20h14"></path></svg>Download</button>
+          <span title="End-of-day MCX data. We add new Bhavcopy files by hand, so the site does not update live." style="font-size: 13px; color: var(--muted); border: 1px solid var(--line); border-radius: 999px; padding: 8px 14px">Data to <span style="color: var(--fg); font-family: 'Geist Mono', ui-monospace, monospace">{{asOfText}}</span> · not live</span>
+          <button type="button" class="grv-tool" data-grv="search" aria-haspopup="dialog" aria-label="Search pages and tools (Ctrl+O)" data-label="Search pages and tools" style="min-height: 44px; padding: 0 12px 0 14px; border-radius: 12px; border: 1px solid var(--line); background: var(--panel); color: var(--fg); font: 600 14px 'Geist', system-ui, sans-serif; cursor: pointer; display: flex; align-items: center; gap: 8px"><svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true" style="fill: none; stroke: currentColor; stroke-width: 2px; stroke-linecap: round"><circle cx="11" cy="11" r="7"></circle><path d="M20 20l-3.5-3.5"></path></svg>Search<kbd class="grv-k" aria-hidden="true" style="font: 600 11px 'Geist Mono', ui-monospace, monospace; color: var(--gold); border: 1px solid var(--line); border-radius: 6px; padding: 2px 6px"></kbd></button>
+          <button type="button" onClick="{{toggle}}" aria-label="{{themeLabel}}" title="{{themeLabel}}" style="width: 44px; height: 44px; border-radius: 12px; border: 1px solid var(--line); background: var(--panel); color: var(--fg); display: grid; place-items: center; cursor: pointer; padding: 0">
+            <sc-if value="{{dark}}" hint-placeholder-val="{{ true }}"><svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true" style="fill: none; stroke: currentColor; stroke-width: 1.8px; stroke-linecap: round"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"></path></svg></sc-if>
+            <sc-if value="{{light}}" hint-placeholder-val="{{ false }}"><svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true" style="fill: none; stroke: currentColor; stroke-width: 1.8px; stroke-linejoin: round"><path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"></path></svg></sc-if>
+          </button>
+          <button type="button" class="grv-tool" data-grv="words" aria-haspopup="dialog" aria-label="Words explained" data-label="Words explained (?)" style="width: 44px; height: 44px; border-radius: 12px; border: 1px solid var(--line); background: var(--panel); color: var(--fg); display: grid; place-items: center; cursor: pointer; padding: 0"><span aria-hidden="true" style="display: grid; place-items: center; width: 22px; height: 22px; border-radius: 50%; background: var(--gold); color: var(--ongold); font: 700 14px 'Geist', system-ui, sans-serif">?</span></button>
+        </div>
+      </div>
+
+      <sc-if value="{{loading}}" hint-placeholder-val="{{ false }}">
+        <div role="status" style="display: flex; flex-direction: column; gap: 14px"><span style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0)">Loading the brief…</span><span class="grv-skel" style="height: 110px"></span><span class="grv-skel" aria-hidden="true" style="height: 420px"></span></div>
+      </sc-if>
+
+      <sc-if value="{{failed}}" hint-placeholder-val="{{ false }}">
+        <div role="alert" style="background: var(--panel); border: 1px solid var(--down); border-radius: 16px; padding: 18px 20px; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px"><span style="display: flex; flex-direction: column; gap: 4px"><span style="font-weight: 600; font-size: 16px">The data didn't load</span><span style="font-size: 14px; color: var(--muted)">Check your internet connection, then try again.</span></span><button class="grv-goldbtn" type="button" onClick="{{retry}}" style="min-height: 44px; padding: 0 16px; border-radius: 12px; border: 0; background: var(--gold); color: var(--ongold); font: 600 14px 'Geist', system-ui, sans-serif; cursor: pointer">Try again</button></div>
+      </sc-if>
+
+      <sc-if value="{{ready}}" hint-placeholder-val="{{ true }}">
+        <section class="grv-card" aria-labelledby="verdict-h" style="background: var(--panel); border: 1px solid var(--line); border-radius: 20px; padding: clamp(20px, 3vw, 28px); display: flex; flex-direction: column; gap: 10px">
+          <span style="font-size: 13px; color: var(--muted)">{{verdict.kicker}}</span>
+          <h2 id="verdict-h" style="margin: 0; font-size: clamp(22px, 3vw, 28px); font-weight: 600; letter-spacing: -0.02em; line-height: 1.2">{{verdict.head}}</h2>
+          <p style="margin: 0; font-size: 15px; line-height: 1.6; max-width: 90ch">{{verdict.text}}</p>
+          <p style="margin: 0; font-size: 15px; line-height: 1.6; font-weight: 600; max-width: 90ch">{{verdict.hindsight}}</p>
+        </section>
+
+        <section aria-labelledby="table-h" style="display: flex; flex-direction: column; gap: 12px">
+          <div style="display: flex; flex-direction: column; gap: 4px">
+            <h2 id="table-h" style="margin: 0; font-size: 18px; font-weight: 600">Line by line</h2>
+            <span style="font-size: 13px; color: var(--muted); line-height: 1.5">{{tableNote}}</span>
+          </div>
+          <div style="border: 1px solid var(--line); border-radius: 16px; background: var(--panel); overflow: hidden">
+            <table class="bf-t">
+              <caption class="sr">Each line of the problem statement, its status, what we show and where it is proved</caption>
+              <thead>
+                <tr>
+                  <th scope="col" style="width: 26%">The brief asked for</th>
+                  <th scope="col" style="width: 9%">Status</th>
+                  <th scope="col">What we show</th>
+                  <th scope="col" style="width: 22%">Proof</th>
+                </tr>
+              </thead>
+              <tbody>
+                <sc-for list="{{rows}}" as="r" hint-placeholder-count="10">
+                  <sc-if value="{{r.group}}" hint-placeholder-val="{{ false }}">
+                    <tr class="bf-group"><td colspan="4">{{r.title}}</td></tr>
+                  </sc-if>
+                  <sc-if value="{{r.line}}" hint-placeholder-val="{{ true }}">
+                    <tr>
+                      <td><span style="display: flex; gap: 10px; align-items: baseline"><span style="font-family: 'Geist Mono', ui-monospace, monospace; font-size: 13px; color: var(--gold); flex: none">{{r.num}}</span><span style="display: flex; flex-direction: column; gap: 4px"><span style="font-weight: 600; font-size: 15px">{{r.title}}</span><span style="font-size: 13px; color: var(--muted)">{{r.ask}}</span></span></span></td>
+                      <td><span class="bf-lab">Status</span><span class="bf-done"><svg width="12" height="12" viewBox="0 0 24 24" aria-hidden="true" style="fill: none; stroke: currentColor; stroke-width: 3px; stroke-linecap: round; stroke-linejoin: round"><path d="M5 12.5l4.5 4.5L19 7.5"></path></svg>{{r.status}}</span></td>
+                      <td><span class="bf-lab">What we show</span><span style="overflow-wrap: anywhere">{{r.show}}</span></td>
+                      <td><span class="bf-lab">Proof</span><span style="display: flex; flex-wrap: wrap; gap: 8px"><sc-for list="{{r.links}}" as="l" hint-placeholder-count="2"><a class="bf-chip" href="{{l.href}}">{{l.label}}</a></sc-for></span></td>
+                    </tr>
+                  </sc-if>
+                </sc-for>
+              </tbody>
+            </table>
+          </div>
+          <p style="margin: 0; font-size: 12px; line-height: 1.6; color: var(--muted)">{{source}}</p>
+        </section>
+      </sc-if>
+    </main>
+
+    <footer style="border-top: 1px solid var(--line); padding: 20px clamp(16px, 4vw, 48px) 28px; display: flex; flex-wrap: wrap; justify-content: space-between; gap: 10px; font-size: 13px; color: var(--muted)">
+      <span>Team NEXORA · Hack in Hills '26 · Research project, not investment advice</span>
+      <span>Data: MCX Bhavcopy, end of day · <a href="https://github.com/CodeByDivyansh-tech/gold-rv">Data &amp; code on GitHub</a></span>
+    </footer>
+  </div>
+
+  <dc-import name="TabBar" current="Brief"></dc-import>
+  <sc-if value="{{dl}}" hint-placeholder-val="{{ false }}">
+    <dc-import name="DownloadPanel" dark="{{dark}}" on-close="{{closeDl}}" start-what="report" start-pair="{{dlPair}}" hint-size="100%,100%"></dc-import>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"startDark":{"editor":"boolean","default":true},"$preview":{"width":1440,"height":2200}}'>
+class Component extends DCLogic {
+  componentDidMount() {
+    let saved = null;
+    try { saved = localStorage.getItem('grv-theme'); } catch (e) {}
+    if (saved) this.setState({ dark: saved === 'dark' });
+    else { try { if (window.matchMedia) this.setState({ dark: window.matchMedia('(prefers-color-scheme: dark)').matches }); } catch (e) {} }
+    fetch('data/site-data.json')
+      .then((r) => r.json())
+      .then((d) => this.setState({ D: d }))
+      .catch(() => this.setState({ failed: true }));
+    // the 2011-2023 trades, for the all-years attribution total
+    fetch('data/history_charts.json')
+      .then((r) => r.json())
+      .then((h) => this.setState({ HC: h }))
+      .catch(() => this.setState({ HCfail: true }));
+  }
+
+  tokens(dark) {
+    // shared gold-tinted themes (app/theme.js); also puts the tokens on <html> for the overlays
+    if (typeof GRVTheme === 'undefined') return {};
+    GRVTheme.apply(dark);
+    return GRVTheme.tokens(dark);
+  }
+
+  fd(s) { const M = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']; const p = s.split('-'); return (+p[2]) + ' ' + M[+p[1] - 1] + ' ' + p[0]; }
+  srs(v) { return (v < 0 ? '−' : '') + '₹' + Math.abs(Math.round(v)).toLocaleString('en-IN'); }
+  sgn(v, d) { return (v < 0 ? '−' : '+') + Math.abs(v).toFixed(d); }
+
+  renderVals() {
+    const st = this.state || {};
+    const dark = st.dark ?? (this.props.startDark ?? true);
+    const t = this.tokens(dark);
+    const shell = {
+      t, dark, light: !dark, asOfText: st.D ? this.fd(st.D.asOf) : '…',
+      themeLabel: dark ? 'Switch to light mode' : 'Switch to dark mode',
+      toggle: () => { try { localStorage.setItem('grv-theme', dark ? 'light' : 'dark'); } catch (e) {} this.setState({ dark: !dark }); },
+      dl: !!st.dl, openDl: () => this.setState({ dl: true }), closeDl: () => this.setState({ dl: false }), dlPair: 'ALL',
+      retry: () => { this.setState({ failed: false }); this.componentDidMount(); }
+    };
+    const D = st.D;
+    if (!D) return { ...shell, loading: !st.failed, failed: !!st.failed, ready: false };
+
+    const L = D.longrun, R = D.rule.current['5'], B = D.brief || {}, HS = D.hindsight;
+    const n = (x) => x.toLocaleString('en-IN');
+    const yr = (s) => s.slice(0, 4);
+    const span = yr(L.start) + '–' + yr(D.asOf), clean = yr(L.start) + '–' + yr(L.end);
+    const PIDS = Object.keys(D.backtest);
+    const HC = st.HC;
+    const pend = !HC;
+    const wait = st.HCfail ? 'the 2011–2023 trades did not load' : '…';
+
+    // every trade of the whole study at our 5 bps slippage: the clean test (2011-2023) plus our own years
+    const ourSum = (k) => PIDS.reduce((a, p) => { const b = D.backtest[p]['5']; return a + b.train[k] + b.test[k] + b.fwd[k]; }, 0);
+    const allN = L.n + R.train_n + R.test_n + (R.forward_n || 0);
+    const allNet = L.net + ourSum('net_rs');
+    let goldShare = null;
+    if (HC) {
+      const ct = Object.keys(HC.pairs).flatMap((p) => HC.pairs[p].trades['5']);
+      const sp = ct.reduce((a, x) => a + x[11], 0) + ourSum('spread_rs');
+      const gd = ct.reduce((a, x) => a + x[12], 0) + ourSum('gold_rs');
+      goldShare = Math.abs(sp) + Math.abs(gd) ? Math.abs(gd) / (Math.abs(sp) + Math.abs(gd)) * 100 : 0;
+    }
+
+    // 1. normalisation and today's cheap / expensive flags
+    const Q = D.quotes;
+    const norm = Q.map((q) => q.sym + ' quoted per ' + q.quote + ', purity ' + q.purity).join('; ');
+    const vs = Object.keys(D.vsM).map((s) => { const last = D.vsM[s][D.vsM[s].length - 1]; return s + ' ' + this.sgn(last[1], 1) + ' bps'; }).join(', ');
+    const sig = D.today.filter((p) => p.status === 'SIGNAL');
+    const big = D.today.slice().sort((a, b) => b.dev - a.dev)[0];
+
+    // 2. carry: roll-down versus genuine curve change (pipeline/carry.py, on our own MCX download)
+    const C = B.carry;
+    const carryTxt = C && C.rows
+      ? 'Each contract\'s daily price change is split into the gold move, roll-down (carry earned as expiry comes closer) and genuine curve change, using the carry implied by GOLDPETAL calendar spreads. On our own MCX download (' + this.fd(C.start) + ' to ' + this.fd(C.end) + ', ' + n(C.rows) + ' contract-days), roll-down averages ' + C.rolldown.toFixed(2) + ' bps a day and curve changes ' + C.curve.toFixed(2) + ' bps, against ' + C.gold.toFixed(1) + ' bps for gold itself. Every gap on the site, ' + span + ', is measured after removing carry.'
+      : 'Every gap on the site is measured after removing carry.';
+
+    // 5. every trade inside its contracts' calendar (pipeline/lifecycle.py)
+    const K = B.calendar || {}, kc = K.clean, ko = K.ours;
+    const calTxt = kc && ko
+      ? n(kc.inside + ko.inside) + ' of ' + n(kc.n + ko.n) + ' trades, ' + span + ', sit inside both contracts\' calendars: entered on a day both were listed, closed before either stopped trading. ' + n(kc.closed_roll + ko.closed_roll) + ' were closed early for a contract roll and ' + n(kc.closed_expiry + ko.closed_expiry) + ' as expiry and its delivery period came near.'
+      : '';
+
+    const rows = [
+      { line: true, num: '1', title: 'Cross-contract relative value', ask: 'Normalise for size, quote basis and purity; flag which contract is cheap or expensive.', status: 'Done',
+        show: 'Each price is turned into rupees per 10 g of pure gold (' + norm + '). On ' + this.fd(D.asOf) + ', after removing carry, against GOLDM: ' + vs + '. The six pairs are flagged only when a gap is unusual for that pair: today the biggest is ' + big.dev.toFixed(1) + ' bps (' + big.label + ').',
+        links: [{ label: 'Market', href: 'Market.dc.html#norm-h' }, { label: 'Pair Explorer', href: 'Pairs.dc.html' }] },
+      { line: true, num: '2', title: 'Term structure and carry', ask: 'Separate roll-down from real changes in the curve.', status: 'Done',
+        show: carryTxt,
+        links: [{ label: 'Market: gaps after carry', href: 'Market.dc.html#vsm-h' }, { label: 'Pair Explorer', href: 'Pairs.dc.html#hist-h' }] },
+      { line: true, num: '3', title: 'Walk-forward backtesting', ask: 'No look-ahead, real costs, and care on thin days.', status: 'Done',
+        show: 'Settings tuned on ' + this.fd(D.split.train_start) + ' to ' + this.fd(D.split.train_end) + ' and frozen; then run on the test year and on ' + clean + ', years the rule never saw. Signals at one close fill at the next; ' + D.rules.length + ' point-in-time rules. Each round trip pays ' + D.costTotal.toFixed(1) + ' bps (MCX fees, taxes, ' + D.slip + ' bps slippage per order). No entry unless both contracts traded at least ' + D.minVol + ' lots with ' + D.minOi + ' lots open, and no fill on a day either moved ' + D.rule.maxMove.toFixed(0) + '% or more; ' + n(L.thin + D.meta.thin) + ' thin contract-days were flagged, ' + span + '.',
+        links: [{ label: 'Backtesting', href: 'Backtesting.dc.html#clean-test' }, { label: 'Data: no peeking', href: 'Data.dc.html#pit-h' }] },
+      { line: true, num: '4', title: 'Trader-facing intelligence', ask: 'Stay quiet when there is no signal; split strategy from gold.', status: 'Done',
+        show: 'On ' + this.fd(D.asOf) + ' ' + (sig.length ? sig.length + ' of ' + D.today.length + ' pairs pass all five checks.' : 'none of the ' + D.today.length + ' pairs passes all five checks, so the site says "No trade today" and shows which check each pair failed.') + ' Every trade is split into its spread part and its gold part: ' + (pend ? 'gold share ' + wait : 'gold price moves are ' + goldShare.toFixed(1) + '% of the gross result over all ' + n(allN) + ' trades, ' + span + '.'),
+        links: [{ label: 'Today', href: 'Today.dc.html' }, { label: 'Signals', href: 'Signals.dc.html' }, { label: 'Attribution', href: 'Backtesting.dc.html#attr-h' }] },
+      { line: true, num: '5', title: 'Contract lifecycle', ask: 'Listing, liquidity, tender and expiry; every trade inside its calendar.', status: 'Done',
+        show: n(L.allContracts) + ' contracts tracked from listing to expiry, ' + span + '. A trade needs at least ' + D.minTd + ' trading days to expiry on both contracts and is closed before the delivery (tender) period. ' + calTxt,
+        links: [{ label: 'Signals: Timing check', href: 'Signals.dc.html' }, { label: 'Trades and exits', href: 'Pairs.dc.html#trades-h' }, { label: 'Data', href: 'Data.dc.html' }] },
+      { group: true, title: '6. The final challenge' },
+      { line: true, num: '6.1', title: 'A functional prototype', ask: 'Something that runs, not slides.', status: 'Done',
+        show: 'This website: ' + n(L.allRows) + ' official MCX daily prices, ' + this.fd(L.start) + ' to ' + this.fd(D.asOf) + ', today\'s six pairs, a rule explorer and downloads (spreadsheet, PDF), all rebuilt from the raw files by one pipeline.',
+        links: [{ label: 'Today', href: 'Today.dc.html' }, { label: 'Try your own rule', href: 'Explore.dc.html' }] },
+      { line: true, num: '6.2', title: 'Validates on unseen history', ask: 'Test on data the model never saw.', status: 'Done',
+        show: 'The rule and its settings were frozen before the data for ' + this.fd(L.start) + ' to ' + this.fd(L.end) + ' was used: ' + L.n + ' trades, ' + this.srs(L.net) + ' after costs, t = ' + this.sgn(L.t, 2) + '. ' + (R.forward_n ? 'Since the test year ended: ' + R.forward_n + ' more trades, ' + this.srs(R.forward_net_rs) + '.' : ''),
+        links: [{ label: 'The clean test', href: 'Backtesting.dc.html#clean-test' }] },
+      { line: true, num: '6.3', title: 'Performance after costs, on contracts actually held', ask: 'Real contracts, real costs.', status: 'Done',
+        show: 'Every trade is priced on the two exact contracts it held, at their settlement prices, after ' + D.costTotal.toFixed(1) + ' bps per round trip: ' + n(allN) + ' trades, ' + span + ', ' + this.srs(allNet) + ' in total at ' + D.slip + ' bps slippage.' + (kc && ko ? ' Each one sits inside both contracts\' calendars (' + n(kc.inside + ko.inside) + ' of ' + n(kc.n + ko.n) + ').' : ''),
+        links: [{ label: 'Each pair', href: 'Backtesting.dc.html#pairs' }, { label: 'Trades', href: 'Pairs.dc.html#trades-h' }] },
+      { line: true, num: '6.4', title: 'Separates strategy from gold price', ask: 'Show the result is not just a bet on gold.', status: 'Done',
+        show: pend ? 'Both legs hold the same grams of gold; the gold share is ' + wait + '.' : 'Both legs hold the same grams of gold, so gold price moves are only ' + goldShare.toFixed(1) + '% of the gross result over all ' + n(allN) + ' trades, ' + span + '. The rest is the spread the rule bets on.',
+        links: [{ label: 'Attribution', href: 'Backtesting.dc.html#attr-h' }] },
+      { line: true, num: '6.5', title: 'A rigorous no-edge result is valid', ask: 'A careful "no" counts.', status: 'Done',
+        show: 'Our answer is no persistent edge after costs. On ' + clean + ' the rule ' + (L.net < 0 ? 'lost ' : 'made ') + this.srs(Math.abs(L.net)).replace(/^−/, '') + ' and ' + L.losingYears + ' of ' + L.years + ' years lost money; with zero slippage it ' + (L.net0 < 0 ? 'still lost ' : 'made ') + this.srs(Math.abs(L.net0)) + '. ' + (HS ? 'Only ' + HS.profitable + ' of ' + HS.total + ' settings make money there even when picked with hindsight.' : ''),
+        links: [{ label: 'The verdict', href: 'Backtesting.dc.html' }, { label: 'Try your own rule', href: 'Explore.dc.html' }] }
+    ];
+
+    const verdict = {
+      kicker: 'The answer, ' + span,
+      head: L.net < 0 ? 'The gaps are real. No persistent edge is proven after costs.' : 'The gaps are real, and the clean test made money.',
+      text: 'On ' + clean + ', years the rule never saw, it ' + (L.net < 0 ? 'lost ' : 'made ') + this.srs(Math.abs(L.net)).replace(/^−/, '') + ' over ' + L.n + ' trades after costs (t = ' + this.sgn(L.t, 2) + '). The ' + yr(D.split.test_start) + '–' + D.split.test_end.slice(2, 4) + ' test year made ' + this.srs(R.test_net_rs) + ', but it is not a clean test and its profit came from the ' + D.events.crashShort + '.',
+      hindsight: HS ? 'At ' + HS.slip + ' bps slippage, only ' + HS.profitable + ' of ' + HS.total + ' settings make money on ' + yr(HS.start) + '–' + yr(HS.end) + ', even picked with hindsight.' : ''
+    };
+
+    return {
+      ...shell, loading: false, ready: true, rows, verdict,
+      tableNote: 'Five lines of the brief plus the final challenge. The wording is our summary of Problem 03.',
+      source: 'Prices: official MCX Bhavcopy settlements. ' + this.fd(L.start) + ' to ' + this.fd(L.end) + ' from the compiled MCX data book, shared with us with their permission; from ' + this.fd(D.start) + ' on, our own MCX download. A research project, not investment advice.'
+    };
+  }
+}
+</script>
+</body>
+</html>

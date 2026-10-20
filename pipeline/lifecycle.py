@@ -58,3 +58,27 @@ def compute_contract_lifecycle(df: pd.DataFrame) -> pd.DataFrame:
         })
         
     return pd.DataFrame(records).sort_values(['symbol', 'expiry_date']).reset_index(drop=True)
+
+
+def calendar_check(trades: pd.DataFrame, lifecycle_df: pd.DataFrame) -> Dict[str, Any]:
+    """Every trade must sit inside both contracts' calendars: entered on a day both were listed, closed on or
+    before the last day either traded and never after expiry. Also counts trades the calendar closed early
+    (a contract roll or the approach of expiry and its tender period)."""
+    from pipeline.config import PAIR_DEFINITIONS
+    lc = lifecycle_df.set_index(['symbol', 'expiry_date'])
+    ds = lambda v: pd.Timestamp(v).strftime('%Y-%m-%d')
+    inside = 0
+    for _, t in trades.iterrows():
+        a, b, _ = PAIR_DEFINITIONS[t['pair']]
+        e, x = ds(t['entry']), ds(t['exit'])
+        ok = True
+        for sym, exp in ((a, ds(t['expA'])), (b, ds(t['expB']))):
+            if (sym, exp) not in lc.index:
+                ok = False
+                break
+            c = lc.loc[(sym, exp)]
+            ok = ok and c['first_seen'] <= e <= c['last_seen'] and e <= x <= c['last_seen'] and x <= exp
+        inside += bool(ok)
+    reasons = trades['reason'].value_counts() if len(trades) else pd.Series(dtype=int)
+    return {'n': int(len(trades)), 'inside': int(inside),
+            'closed_roll': int(reasons.get('roll', 0)), 'closed_expiry': int(reasons.get('expiry', 0))}

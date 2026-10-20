@@ -1,6 +1,6 @@
 /*
  * keys.js — keyboard shortcuts and a quick menu.
- *   1-8            jump to a page (Home, Today, Market, Pair Explorer, Signals, Backtesting, Try your own rule, Data)
+ *   1-9            jump to a page (Home, Today, Market, Pair Explorer, Signals, Backtesting, Try your own rule, Data, The brief)
  *   Ctrl/Cmd + O   open the quick menu (Ctrl/Cmd + K works too)
  *   Ctrl/Cmd + P   PDF: opens Download with PDF chosen; pressed again while it is open, the PDF downloads
  *                  (this replaces the browser's own Print shortcut on this site; Print stays in the browser menu)
@@ -17,8 +17,9 @@
     ['4', 'Pair Explorer', '#/pairs', 'Every pair\'s history and trades'],
     ['5', 'Signals', '#/signals', 'The five checks and your own cost'],
     ['6', 'Backtesting', '#/backtesting', 'Did it make money?'],
-    ['7', 'Try your own rule', '#/explore', 'Change the settings, see 15 years of real results'],
-    ['8', 'Data', '#/data', 'Where the numbers come from']
+    ['7', 'Try your own rule', '#/explore', 'Change the settings, see every year since 2011'],
+    ['8', 'Data', '#/data', 'Where the numbers come from'],
+    ['9', 'The brief, answered', '#/brief', 'Each line of the problem statement and the page that proves it']
   ];
   var TOOLS = [
     ['?', 'Words explained', 'Plain meanings of bps, z-score, carry…', function () { window.GRVGlossary && window.GRVGlossary.open(''); }],
@@ -108,7 +109,7 @@
     box.innerHTML = '<label for="km-q" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)">Go to a page or tool</label>' +
       '<input id="km-q" class="km-q" type="text" placeholder="Go to a page or tool…" autocomplete="off" role="combobox" aria-expanded="true" aria-controls="km-list">' +
       '<ul id="km-list" class="km-list" role="listbox"></ul>' +
-      '<div class="km-foot"><span><b>1</b>–<b>8</b> pages</span><span><b>↑ ↓</b> move</span><span><b>Enter</b> open</span><span><b>?</b> words</span><span><b>' + (isMac ? '⌘' : 'Ctrl') + ' P</b> PDF</span><span><b>Double-click</b> a box: Goldie explains</span><span><b>Esc</b> close</span></div>';
+      '<div class="km-foot"><span><b>1</b>–<b>9</b> pages</span><span><b>↑ ↓</b> move</span><span><b>Enter</b> open</span><span><b>?</b> words</span><span><b>' + (isMac ? '⌘' : 'Ctrl') + ' P</b> PDF</span><span><b>Double-click</b> a box: Goldie explains</span><span><b>Esc</b> close</span></div>';
     back.appendChild(box); document.body.appendChild(back);
     var q = box.querySelector('.km-q'), list = box.querySelector('.km-list');
     function draw() {
@@ -149,7 +150,7 @@
       else if (e.key === 'Enter') { e.preventDefault(); if (items[sel]) items[sel].act(); }
       else if (e.key === 'Escape') { e.preventDefault(); close(); }
       else if (e.key === 'Tab') { e.preventDefault(); }
-      else if (/^[1-8]$/.test(e.key) && !q.value) { e.preventDefault(); close(); go(PAGES[+e.key - 1]); }
+      else if (/^[1-9]$/.test(e.key) && !q.value) { e.preventDefault(); close(); go(PAGES[+e.key - 1]); }
     });
     draw(); q.focus();
   }
@@ -164,7 +165,7 @@
     }
     if (mod || e.altKey || back || typing()) return;
     if (document.querySelector('.gl-back')) return;       // glossary open: let it handle keys
-    if (/^[1-8]$/.test(e.key)) { e.preventDefault(); go(PAGES[+e.key - 1]); return; }
+    if (/^[1-9]$/.test(e.key)) { e.preventDefault(); go(PAGES[+e.key - 1]); return; }
   });
 
   // The Search and Words explained buttons sit in each page's top bar (data-grv="...")
@@ -186,7 +187,7 @@
       var tip = document.createElement('div'); tip.className = 'km-tip'; tip.setAttribute('role', 'note');
       tip.innerHTML = touch
         ? 'Tip: <b>double-tap</b> any box and Goldie explains it.<br><button type="button">Got it</button>'
-        : 'Tip: <b>double-click</b> any box and Goldie explains it. Press <b>' + (isMac ? '⌘' : 'Ctrl') + ' O</b> to search, <b>' + (isMac ? '⌘' : 'Ctrl') + ' P</b> for a PDF, or <b>1–8</b> to jump between pages.<br><button type="button">Got it</button>';
+        : 'Tip: <b>double-click</b> any box and Goldie explains it. Press <b>' + (isMac ? '⌘' : 'Ctrl') + ' O</b> to search, <b>' + (isMac ? '⌘' : 'Ctrl') + ' P</b> for a PDF, or <b>1–9</b> to jump between pages.<br><button type="button">Got it</button>';
       var done = function () { tip.remove(); try { localStorage.setItem('grv-keys-tip', '1'); } catch (e) {} };
       tip.querySelector('button').addEventListener('click', done);
       // a small popup in the bottom corner (above the tab bar on phones), so it never covers the page's content
