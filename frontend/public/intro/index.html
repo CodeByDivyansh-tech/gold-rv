@@ -93,6 +93,9 @@
   .end { min-height: 120vh; }
   .end .card { top: 56vh; }
   .note { font-size: 12px; color: var(--muted); margin-top: 14px; }
+  .team { margin-top: 18px; }
+  .team-name { font-size: 22px; font-weight: 800; letter-spacing: -.01em; color: var(--gold); }
+  .team-members { margin-top: 4px; font-size: 16px; font-weight: 600; color: var(--fg); }
   /* phones: cards at the bottom, the scene above them */
   @media (max-width: 760px) {
     .top { background: linear-gradient(180deg, rgba(14,10,5,.92), rgba(14,10,5,0)); padding-bottom: 26px; }
@@ -135,6 +138,31 @@
   @media (max-width: 720px) { .hwf-top { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); row-gap: 18px; } .hwf-brand { grid-column: 1 / -1; } }
   @media (prefers-reduced-motion: reduce) { .hwf-col a, .hwf-up { transition: none; } }
   @media (prefers-reduced-motion: reduce) { .flash { display: none; } .hint i::after { animation: none; } .wash { transition: none; } }
+
+  /* ---- glass on everything (same lit glass as the cards and the site's left menu) ---- */
+  .card { border-color: rgba(229,176,74,.30);
+    box-shadow: inset 0 1px 0 rgba(255,236,190,.18), inset 0 0 0 1px rgba(255,255,255,.02), 0 0 0 1px rgba(0,0,0,.25), 0 24px 60px rgba(0,0,0,.38); }
+  .stat, .chip, .btn.ghost, .skip, .brand {
+    border: 1px solid rgba(229,176,74,.28);
+    background: linear-gradient(180deg, rgba(255,236,190,.11), rgba(255,236,190,.03) 60%, rgba(20,14,7,.30));
+    -webkit-backdrop-filter: blur(14px) saturate(140%); backdrop-filter: blur(14px) saturate(140%);
+    box-shadow: inset 0 1px 0 rgba(255,236,190,.18), 0 8px 22px rgba(0,0,0,.22); }
+  .btn.ghost { transition: border-color .2s, box-shadow .2s, color .2s; }
+  .btn.ghost:hover { border-color: rgba(229,176,74,.6); color: var(--gold); box-shadow: inset 0 1px 0 rgba(255,236,190,.25), 0 0 22px rgba(229,176,74,.22); }
+  .team { margin: 18px auto 0; padding: 12px 18px 13px; max-width: 420px; border-radius: 16px; border: 1px solid rgba(229,176,74,.28);
+    background: linear-gradient(180deg, rgba(255,236,190,.10), rgba(255,236,190,.02)); box-shadow: inset 0 1px 0 rgba(255,236,190,.18); }
+  .ctas { justify-content: center; }
+  .hwf-top { margin: clamp(20px, 3vw, 34px) max(16px, env(safe-area-inset-right, 0px)) 0 max(16px, env(safe-area-inset-left, 0px));
+    padding: clamp(18px, 2.4vw, 26px) clamp(18px, 2.4vw, 28px); border-radius: 22px; overflow: hidden;
+    border: 1px solid rgba(229,176,74,.30);
+    background: linear-gradient(180deg, rgba(229,176,74,.14), rgba(30,21,10,.62) 34%, rgba(18,13,6,.55));
+    -webkit-backdrop-filter: blur(18px) saturate(140%); backdrop-filter: blur(18px) saturate(140%);
+    box-shadow: inset 0 1px 0 rgba(255,236,190,.16), 0 18px 44px rgba(0,0,0,.32); }
+  .hwf-top::before { content: ""; position: absolute; left: 0; right: 0; top: 0; height: 120px; pointer-events: none;
+    background: radial-gradient(90% 100% at 50% 0%, rgba(240,197,102,.22), rgba(240,197,102,0) 72%); }
+  .hwf-top > * { position: relative; }
+  .hwf-rule { margin-left: max(34px, env(safe-area-inset-left, 0px)); margin-right: max(34px, env(safe-area-inset-right, 0px)); }
+  @media (prefers-reduced-transparency: reduce) { .card, .stat, .chip, .btn.ghost, .skip, .brand, .hwf-top { -webkit-backdrop-filter: none; backdrop-filter: none; background: rgba(24,17,8,.96); } }
 </style>
 <script type="importmap">
 { "imports": { "three": "../pitch/vendor/three.module.js", "three/addons/": "../pitch/vendor/addons/" } }
@@ -223,11 +251,14 @@
       <h2>So, is there free money?</h2>
       <div class="no">No persistent edge after costs.</div>
       <p>The gaps are real, but they don't pay. In the clean test (<span data-k="cleanLong">18 Apr 2011 to 9 Oct 2023</span>) the frozen rule lost <span class="neg" data-k="net">₹5,49,070</span> over <b data-k="n">151</b> trades, and <span class="neg" data-k="net0">₹2,35,391</span> even with zero slippage. It lost money in <b data-k="losing">11 of 13</b> years.</p>
+      <div class="team">
+        <div class="team-name">Team NEXORA</div>
+        <div class="team-members">Divyansh · Ishant Bhaudhira · Noni Gopal Das</div>
+      </div>
       <div class="ctas">
         <a class="btn gold" href="../" data-enter>Enter the site</a>
-        <a class="btn ghost" href="../#/today" data-enter>Is any gap worth trading today?</a>
+        <a class="btn ghost" href="../demo/">Watch the demo video</a>
       </div>
-      <p class="note">Official MCX Bhavcopy settlements: 2011–2023 from a compiled MCX data book, shared with permission; 2023–2026 our own download. Research, not investment advice.</p>
     </div>
   </section>
 </main>

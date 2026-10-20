@@ -22,6 +22,7 @@ The README explains the research; SPEC.md is the original build spec (data, form
 | `data/raw/` | `mcx_bhavcopy_raw_api.csv` (our MCX rows, source of truth), `gold_bhavcopy_clean.csv`, `contract_calendar.csv`, `retrieval_log.csv`, archived MCX CSVs (`mcx_csv/`), `mcx_history_book.csv` (MCX history book 2003–2026, shared with permission; used for 2011–2023), `mcx_bhavcopy_supplement.csv` (gaps in our download filled from the book) |
 | `frontend/public/` | The static site: `pages/*.dc.html` (one per page), `app/*.js`, `data/*.json` (built by the pipeline) |
 | `frontend/public/app/` | `dc.js` renderer, `theme.js` colours, `keys.js` shortcuts, `prefs.js`, `pdf.js` PDF writer, `rail.js` lit-glass menu, `glossary.js`, `explain.js` (Goldie) |
+| `frontend/public/demo/` | Demo video page (`gold-rv-demo-video.mp4`, laptop walkthrough of every page) with chapters |
 | `frontend/public/intro/` | 3D intro (three.js r160 + GSAP, vendored in `public/pitch/vendor/`) and the halftone footer |
 | `frontend/tests/pages.test.mjs` | Page logic tests against the real data (incl. the partial-period guard) |
 | `frontend/build.mjs` | Copies `index.html` + `public/` into `dist/` (no bundler, no runtime dependencies) |
@@ -66,7 +67,8 @@ Holidays have no rows; that is normal. Then branch, PR, wait for CI, merge (see 
    After any pipeline or data change: rebuild, run `check_data`, commit the JSON with the code.
 4. **Credit the data**: 2011–2023 is a compiled MCX data book, shared with permission; 2023 onward is
    our own MCX download. Every price is an official MCX Bhavcopy settlement. Keep this wording on the Data
-   page, downloads and intro.
+   page and in downloads. The intro's last card shows only the verdict, Team NEXORA, the members and two
+   buttons (Enter the site, Watch the demo video), by the team's request.
 5. Scope is gold only (no silver). Research, not investment advice.
 6. No handover zip files; the GitHub repo is the hand-over.
 
