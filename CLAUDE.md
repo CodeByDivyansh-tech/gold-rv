@@ -67,8 +67,8 @@ Holidays have no rows; that is normal. Then branch, PR, wait for CI, merge (see 
    After any pipeline or data change: rebuild, run `check_data`, commit the JSON with the code.
 4. **Credit the data**: 2011–2023 is a compiled MCX data book, shared with permission; 2023 onward is
    our own MCX download. Every price is an official MCX Bhavcopy settlement. Keep this wording on the Data
-   page and in downloads. The intro's last card shows only the verdict, Team NEXORA, the members and two
-   buttons (Enter the site, Watch the demo video), by the team's request.
+   page and in downloads. The intro's last card shows only the verdict (no team names, no buttons); Team NEXORA,
+   the members, Enter the site and Watch demo video are in the Meet the team section below it, by the team's request.
 5. Scope is gold only (no silver). Research, not investment advice.
 6. No handover zip files; the GitHub repo is the hand-over.
 
