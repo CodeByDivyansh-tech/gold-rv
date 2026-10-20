@@ -869,7 +869,7 @@ class Component extends DCLogic {
             ? 'Before costs, the average trade made ' + this.sgn(s.gross_bps, 1) + ' bps: the gaps do come back, but not by enough to pay for trading.'
             : 'Before costs, the average trade already lost ' + Math.abs(s.gross_bps).toFixed(1) + ' bps: over these years the unusual gaps did not close on average.')
           + ' Even with zero slippage the rule ' + (s0.net_rs < 0 ? 'loses ' : 'makes ') + this.srs(Math.abs(s0.net_rs)).slice(1) + '. The rule and its settings were frozen before this data was used, so this is the cleanest test we have. Past years are charged today\'s MCX fee rates.',
-        source: 'Prices: official MCX Bhavcopy rows from the compiled MCX data book, shared with us with their permission. It matches our own MCX download on all ' + HX.check.shared_rows.toLocaleString('en-IN') + ' rows both cover (' + HX.check.mismatches + ' mismatches).'
+        source: 'Prices: official MCX Bhavcopy rows from a compiled MCX data book, shared with us with permission. It matches our own MCX download on all ' + HX.check.shared_rows.toLocaleString('en-IN') + ' rows both cover (' + HX.check.mismatches + ' mismatches).'
       };
     }
 

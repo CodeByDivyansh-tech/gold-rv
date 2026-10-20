@@ -332,7 +332,7 @@ class Component extends DCLogic {
       const keep = LG.d.map((d, i) => i).filter((i) => LG.d[i] >= cut);
       dts = keep.map((i) => LG.d[i]).concat(dts);
       cols = SYMS.map((s, k) => keep.map((i) => LG[s][i]).concat(cols[k]));
-      longNote = 'Weekly prices before ' + this.fd(D.start) + ' come from the compiled MCX data book (official MCX Bhavcopy); from ' + this.fd(D.start) + ' on, our own MCX download.';
+      longNote = 'Weekly prices before ' + this.fd(D.start) + ' come from a compiled MCX data book (official MCX Bhavcopy); from ' + this.fd(D.start) + ' on, our own MCX download.';
     }
     const flat = cols.flat().filter((v) => v != null);
     const lo = Math.min(...flat), hi = Math.max(...flat);
@@ -419,7 +419,7 @@ class Component extends DCLogic {
       crashX: pct(EV.crashStart), crashW: ((X(EV.crashEnd) - X(EV.crashStart)) / 10).toFixed(2) + '%', crashLabel: EV.crashShort,
       start: this.fd(D.start), end: this.fd(D.asOf), range: 'Scale ' + this.sgn(vlo, 0) + ' to ' + this.sgn(vhi, 0) + ' bps',
       aria: 'Gap of GOLDTEN, GOLDGUINEA and GOLDPETAL versus GOLDM in basis points, after adjusting for expiry, from ' + this.fd(vdates[0]) + ' to ' + this.fd(D.asOf),
-      note: (vspan === 'all' ? 'Before ' + this.fd(D.start) + ' the gaps come from the compiled MCX data book (official MCX Bhavcopy), with the same expiry adjustment; from then on, our own MCX download. ' : '') + 'GOLDTEN only starts on ' + this.fd(EV.goldtenListed) + ', its first trading day. During the ' + EV.crashLabel + ' the gaps swung as far as ' + Math.round(extreme) + ' bps, beyond this scale (' + this.sgn(vlo, 0) + ' to ' + this.sgn(vhi, 0) + ' bps), so the lines are cut off at the edge there. Drag across the chart to zoom into any period.'
+      note: (vspan === 'all' ? 'Before ' + this.fd(D.start) + ' the gaps come from a compiled MCX data book (official MCX Bhavcopy), with the same expiry adjustment; from then on, our own MCX download. ' : '') + 'GOLDTEN only starts on ' + this.fd(EV.goldtenListed) + ', its first trading day. During the ' + EV.crashLabel + ' the gaps swung as far as ' + Math.round(extreme) + ' bps, beyond this scale (' + this.sgn(vlo, 0) + ' to ' + this.sgn(vhi, 0) + ' bps), so the lines are cut off at the edge there. Drag across the chart to zoom into any period.'
     };
     const regimeH = { a: EV.regimeLabels[0], b: EV.regimeLabels[1], c: EV.regimeLabels[2] };
 

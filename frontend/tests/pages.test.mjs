@@ -98,7 +98,7 @@ console.log(`pages ok: ${runs} page states rendered against site-data.json`)
   const w = D2.renderVals()
   assert.equal(w.hx.show, true)
   assert.equal(w.hx.facts[2].value, String(H.check.mismatches))
-  assert.match(w.hx.intro, /data-book team/)
+  assert.match(w.hx.intro, /shared their MCX Gold Futures History Book with us/)
 }
 
 // Long charts: All starts at the first week of the shared book, 10Y about ten years back, and both end on our last day
@@ -394,8 +394,8 @@ function L_N() { return D.longrun.n }
   }
   const tr = mk({}).table(D, 'trades', 'ALL', 'all', H, HC)
   assert.equal(tr.head[11], 'Data source')
-  assert.ok(tr.rows.every((r) => (r[10] === 'Clean test') === /history book/.test(r[11])), 'clean-test trades are credited to the history book, the rest to our download')
+  assert.ok(tr.rows.every((r) => (r[10] === 'Clean test') === /MCX data book/.test(r[11])), 'clean-test trades are credited to the data book, the rest to our download')
   const bt = mk({}).table(D, 'backtest', 'ALL', 'all', H, HC)
-  assert.ok(bt.rows.filter((r) => D.longrun.pairs.includes(Object.keys(D.pairs).find((k) => D.pairs[k].label === r[0]))).every((r) => /history book/.test(r[13])))
+  assert.ok(bt.rows.filter((r) => D.longrun.pairs.includes(Object.keys(D.pairs).find((k) => D.pairs[k].label === r[0]))).every((r) => /data book/i.test(r[13])))
   console.log('download credit ok')
 }

@@ -170,7 +170,7 @@ class Component extends DCLogic {
     const inP = (d) => d >= from && d <= to;
     const WHY = { revert: 'Back to normal', stop: 'Stop-loss', time: 'Time limit', roll: 'Contract roll', expiry: 'Near expiry' };
     // where each row's prices come from (official MCX Bhavcopy settlements either way)
-    const SRC_BOOK = 'compiled MCX data book (shared with permission)', SRC_OURS = 'Our own MCX download';
+    const SRC_BOOK = 'Compiled MCX data book (shared with permission)', SRC_OURS = 'Our own MCX download';
     if (what === 'today') {
       return { title: 'Today\'s six pairs', head: ['Pair', 'Contracts', 'Spread (bps)', 'Spread (Rs per 10 g)', 'Normal level (bps)', 'Gap from normal (bps)', 'Cost line (bps)', 'z', 'z needed', 'Status', 'Checks failed'],
         rows: D.today.map((p) => [p.label, p.contracts, p.spread, p.spreadRs, p.mu, p.dev, p.hurdle, p.z, p.zNeed, p.failed.length ? 'Quiet' : 'Signal', p.failed.join('; ')]) };
@@ -221,7 +221,7 @@ class Component extends DCLogic {
   doc(D, what, pair, periodLabel, t) {
     const HC = (this.state || {}).HC;
     const sub = 'data as of ' + this.fd(D.asOf) + ' · MCX Bhavcopy end-of-day settlements';
-    const foot = 'Team NEXORA · Hack in Hills \'26 · Research project, not investment advice. Results include all MCX costs and 5 bps slippage per order unless stated. Prices: official MCX Bhavcopy settlements; ' + this.fd(D.longrun.start) + ' to ' + this.fd(D.longrun.end) + ' from the compiled MCX data book, shared with permission; from ' + this.fd(D.start) + ' on, our own MCX download. Source: github.com/CodeByDivyansh-tech/nexora-gold-rv-';
+    const foot = 'Team NEXORA · Hack in Hills \'26 · Research project, not investment advice. Results include all MCX costs and 5 bps slippage per order unless stated. Prices: official MCX Bhavcopy settlements; ' + this.fd(D.longrun.start) + ' to ' + this.fd(D.longrun.end) + ' from a compiled MCX data book, shared with permission; from ' + this.fd(D.start) + ' on, our own MCX download. Source: github.com/CodeByDivyansh-tech/nexora-gold-rv-';
     const out = (blocks, landscape) => ({ title: t.title, subtitle: sub, blocks, foot, landscape: !!landscape });
     const n = (v) => (typeof v === 'number' ? v.toLocaleString('en-IN') : v);
     if (what === 'trades') {

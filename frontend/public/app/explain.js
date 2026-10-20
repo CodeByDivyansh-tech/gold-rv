@@ -77,7 +77,7 @@
     [/^From raw files to this website/, 'Eight steps', 'The eight steps our Python code follows, from MCX files to the charts you see.'],
     [/^How we avoid peeking at the future/, 'A fair exam', 'The model only uses past days, never tomorrow\'s answers, like an exam without the answer key.'],
     [/^What this data cannot tell you/, 'Honest limits', 'What our data cannot show. Good research says what it does not know.'],
-    [/^More history, shared by the data-book team/, 'Shared history', 'Another team shared their book of official MCX prices back to 2003. It matches our own data exactly, and we use it only for the long-history check.'],
+    [/^More history, shared with us/, 'Shared history', 'Another team shared their book of official MCX prices back to 2003. It matches our own data exactly, and we use it only for the long-history check.'],
     [/^Download log/, 'Receipts', 'A record of every file we downloaded, so anyone can check our work.'],
     [/^Check it yourself/, 'Check it yourself', 'All our code and data are public on GitHub, so anyone can run it again.']
   ];

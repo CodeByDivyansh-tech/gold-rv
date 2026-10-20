@@ -1,6 +1,6 @@
 """Long-history check: the frozen rule on 2011-2023, years the model never saw.
 
-Source: the MCX Gold Futures History Book (official MCX Bhavcopy rows,
+Source: an MCX Gold Futures History Book (official MCX Bhavcopy rows,
 shared with us with their permission), saved as data/raw/mcx_history_book.csv.
 
 What it does
@@ -33,7 +33,7 @@ HISTORY_START = '2011-04-18'          # first trading day of GOLDPETAL, so all t
 HISTORY_PAIRS = ['M_PETAL', 'M_GUINEA', 'GUINEA_PETAL']
 SOURCE = {
     'name': 'MCX Gold Futures History Book',
-    'by': 'the data-book team',
+    'by': 'another team, shared with permission',
     'note': 'Official MCX Bhavcopy rows, shared with us with their permission. Thank you!',
 }
 CHECK_FIELDS = [('open', 'open'), ('high', 'high'), ('low', 'low'), ('close', 'close'),
