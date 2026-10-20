@@ -64,6 +64,13 @@
     '@media (hover:none),(pointer:coarse){.rail-hl,.grv-light{display:none}.rail-k{display:none}}' +
     '@media (prefers-reduced-motion:reduce){.rail-hl{transition:none}.rail-k{transition:none;transform:none}.grv-nav .rail-a{transition:none}.grv-light{display:none}}' +
     '@media (forced-colors:active){.rail-hl,.grv-light,.grv-glass::before{display:none}}' +
+    // Gold RV wordmark: metallic gold, raised from the page, with a slow light sweep (see the defs added below)
+    'svg.grv-wm path[style*="var(--fg)"],svg.grv-wm path[style*="var(--gold)"]{fill:url(#grvMetal) !important}' +
+    'html.light svg.grv-wm path[style*="var(--fg)"],html.light svg.grv-wm path[style*="var(--gold)"]{fill:url(#grvMetalLight) !important}' +
+    'svg.grv-wm{overflow:visible;filter:drop-shadow(0 1px 0 rgba(255,238,196,.30)) drop-shadow(0 1.5px 1.5px rgba(0,0,0,.55)) drop-shadow(0 0 10px rgba(229,176,74,.12))}' +
+    'html.light svg.grv-wm{filter:drop-shadow(0 1px 0 rgba(255,255,255,.85)) drop-shadow(0 1px 1.2px rgba(80,50,0,.35))}' +
+    'svg.grv-wm .grv-shine{pointer-events:none;mix-blend-mode:screen}' +
+    '@media (prefers-reduced-motion:reduce),(forced-colors:active){svg.grv-wm .grv-shine{display:none}}' +
     // short laptop screens (768-860 px tall): tighten the menu so it fits without its own scroll bar
     '@media (max-height:860px){.grv-rail{gap:12px !important;padding-top:16px !important;padding-bottom:12px !important}.grv-glass{gap:10px;padding-top:10px}' +
     '.grv-nav{gap:8px !important}.grv-nav .rail-a{padding-top:7px !important;padding-bottom:7px !important}' +
@@ -124,4 +131,27 @@
   if (calm.addEventListener) { calm.addEventListener('change', onPref); fine.addEventListener('change', onPref); }
 
   window.GRVRail = { home: home };
+
+  // gradients for the Gold RV wordmark (referenced from CSS as url(#grvMetal) etc.)
+  (function addWordmarkDefs() {
+    if (document.getElementById('grv-wm-defs')) return;
+    var NS = 'http://www.w3.org/2000/svg', d = document.createElementNS(NS, 'svg');
+    d.id = 'grv-wm-defs'; d.setAttribute('aria-hidden', 'true'); d.setAttribute('focusable', 'false');
+    d.style.cssText = 'position:absolute;width:0;height:0;overflow:hidden';
+    d.innerHTML =
+      '<defs>' +
+      '<linearGradient id="grvMetal" x1="0" y1="0" x2="0" y2="1">' +
+        '<stop offset="0" stop-color="#FFF0C4"/><stop offset=".28" stop-color="#F3C862"/><stop offset=".52" stop-color="#D49A33"/>' +
+        '<stop offset=".74" stop-color="#9A6516"/><stop offset="1" stop-color="#E4B24E"/></linearGradient>' +
+      '<linearGradient id="grvMetalLight" x1="0" y1="0" x2="0" y2="1">' +
+        '<stop offset="0" stop-color="#C08A22"/><stop offset=".35" stop-color="#9A6608"/><stop offset=".62" stop-color="#6F4500"/>' +
+        '<stop offset=".82" stop-color="#5A3700"/><stop offset="1" stop-color="#A9761A"/></linearGradient>' +
+      '<linearGradient id="grvShine" x1="0" y1="0" x2="1" y2=".35" gradientTransform="translate(-1.4 0)">' +
+        '<stop offset=".38" stop-color="#fff" stop-opacity="0"/><stop offset=".5" stop-color="#FFF7DF" stop-opacity=".85"/>' +
+        '<stop offset=".62" stop-color="#fff" stop-opacity="0"/>' +
+        '<animateTransform attributeName="gradientTransform" type="translate" values="-1.4 0;1.4 0;1.4 0" keyTimes="0;.22;1" dur="7s" begin="1.2s" repeatCount="indefinite"/>' +
+      '</linearGradient></defs>';
+    (document.body || document.documentElement).appendChild(d);
+    try { if (matchMedia('(prefers-reduced-motion: reduce)').matches && d.pauseAnimations) d.pauseAnimations(); } catch (e) {}
+  })();
 })();
