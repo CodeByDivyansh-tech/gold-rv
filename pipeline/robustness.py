@@ -2,7 +2,7 @@
 
 1. Alert follow-through: after a signal fires, does the gap from normal actually close?
    Compared with days that did not fire, using each pair's own daily series, over every year we have:
-   the clean test 2011-2023 (Parity data book, the three pairs that existed) plus our own download.
+   the clean test 2011-2023 (MCX history book, the three pairs that existed) plus our own download.
 2. How sure can we be: a bootstrap 95% range for the unseen-year result, by resampling
    the closed trades (10,000 draws, fixed seed so the numbers never change), for the clean test,
    training and the test year.

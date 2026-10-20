@@ -19,7 +19,7 @@ The README explains the research; SPEC.md is the original build spec (data, form
 |---|---|
 | `pipeline/` | Python: data cleaning, carry, pairs, backtest, robustness, explorer, site data (`build_site_data.py`) |
 | `pipeline/tests/` | pytest suite |
-| `data/raw/` | `mcx_bhavcopy_raw_api.csv` (our MCX rows, source of truth), `gold_bhavcopy_clean.csv`, `contract_calendar.csv`, `retrieval_log.csv`, archived MCX CSVs (`mcx_csv/`), `parity_data_book.csv` (Parity data book 2003–2026, shared with permission; used for 2011–2023), `mcx_bhavcopy_supplement.csv` (gaps in our download filled from the book) |
+| `data/raw/` | `mcx_bhavcopy_raw_api.csv` (our MCX rows, source of truth), `gold_bhavcopy_clean.csv`, `contract_calendar.csv`, `retrieval_log.csv`, archived MCX CSVs (`mcx_csv/`), `mcx_history_book.csv` (MCX history book 2003–2026, shared with permission; used for 2011–2023), `mcx_bhavcopy_supplement.csv` (gaps in our download filled from the book) |
 | `frontend/public/` | The static site: `pages/*.dc.html` (one per page), `app/*.js`, `data/*.json` (built by the pipeline) |
 | `frontend/public/app/` | `dc.js` renderer, `theme.js` colours, `keys.js` shortcuts, `prefs.js`, `pdf.js` PDF writer, `rail.js` lit-glass menu, `glossary.js`, `explain.js` (Goldie) |
 | `frontend/public/intro/` | 3D intro (three.js r160 + GSAP, vendored in `public/pitch/vendor/`) and the halftone footer |
@@ -64,7 +64,7 @@ Holidays have no rows; that is normal. Then branch, PR, wait for CI, merge (see 
    first results were seen. The clean test is 2011–2023. Data after 30 Sep 2026 is "after the test year".
 3. **Every number on the site comes from the pipeline** (`frontend/public/data/*.json`), never typed in.
    After any pipeline or data change: rebuild, run `check_data`, commit the JSON with the code.
-4. **Credit the data**: 2011–2023 is the Parity team's MCX data book, shared with permission; 2023 onward is
+4. **Credit the data**: 2011–2023 is a compiled MCX data book, shared with permission; 2023 onward is
    our own MCX download. Every price is an official MCX Bhavcopy settlement. Keep this wording on the Data
    page, downloads and intro.
 5. Scope is gold only (no silver). Research, not investment advice.

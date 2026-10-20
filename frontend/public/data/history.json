@@ -1,7 +1,7 @@
 {
   "source": {
-    "name": "Parity MCX Gold Futures Data Book",
-    "by": "the Parity team",
+    "name": "MCX Gold Futures History Book",
+    "by": "another team, shared with permission",
     "note": "Official MCX Bhavcopy rows, shared with us with their permission. Thank you!",
     "rows": 55457,
     "contracts": 710,

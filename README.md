@@ -20,7 +20,7 @@ Every number below is computed by the pipeline (`frontend/public/data/`), not ty
 ### 1.1 The clean test: 2011–2023, rule frozen (151 trades)
 
 The rule and its settings were frozen before this data was used, and nothing was changed afterwards
-(data: the Parity team's MCX Bhavcopy data book, shared with permission). Only the three pairs that existed then
+(data: another team's MCX Bhavcopy data book, shared with permission). Only the three pairs that existed then
 can be tested.
 
 How we know the book is right: where the book and our own MCX download cover the same days (10 Oct 2023 →
@@ -91,9 +91,9 @@ Only real broker fills (a forward test) can settle it.
 | | |
 |---|---|
 | **Coverage (whole study)** | 18 Apr 2011 → 16 Oct 2026: **47,521 daily prices, 599 contracts, 4,138 trading days**, every one an official MCX Bhavcopy settlement (`site-data.json → longrun`) |
-| **Part 1: Parity data book** | 18 Apr 2011 → 9 Oct 2023: 35,014 daily prices, 457 contracts, 3,359 trading days (the clean test). Shared with us by the Parity team, with permission |
-| **Part 2: our own MCX download** | 10 Oct 2023 → 16 Oct 2026: 12,507 daily prices, 150 contracts, 779 trading days (training, test year and after). Every day the Parity book has in this window is present (a test checks this) |
-| **Fixed in Oct 2026** | Our MCX download had skipped 8 contracts: the Oct, Nov and Dec 2023 expiries of GOLDM, GOLDGUINEA and GOLDPETAL (289 traded rows, the busiest contracts in those months). They are now added from the Parity data book, with 1 Oct 2026, in `data/raw/mcx_bhavcopy_supplement.csv`. Effect: training 37 → 38 trades, −₹19,056 → −₹16,514; settings, test year, 2011–2023 check and alerts unchanged |
+| **Part 1: MCX history book** | 18 Apr 2011 → 9 Oct 2023: 35,014 daily prices, 457 contracts, 3,359 trading days (the clean test). Shared with us by another team, with permission |
+| **Part 2: our own MCX download** | 10 Oct 2023 → 16 Oct 2026: 12,507 daily prices, 150 contracts, 779 trading days (training, test year and after). Every day the history book has in this window is present (a test checks this) |
+| **Fixed in Oct 2026** | Our MCX download had skipped 8 contracts: the Oct, Nov and Dec 2023 expiries of GOLDM, GOLDGUINEA and GOLDPETAL (289 traded rows, the busiest contracts in those months). They are now added from the MCX history book, with 1 Oct 2026, in `data/raw/mcx_bhavcopy_supplement.csv`. Effect: training 37 → 38 trades, −₹19,056 → −₹16,514; settings, test year, 2011–2023 check and alerts unchanged |
 | **Checked and fine** | No missing days inside any contract's life; no broken high/low/close; the 6%+ days (Jan–Mar 2026, 19 Mar, 13 May 2026) moved all four contracts together, so they are real; GOLDM's Nov-2024 contract expired early, on 31 Oct 2024 |
 | **Exchange quirk** | 169 rows where MCX's "previous close" differs from the prior day's close, mostly thin contracts and no-trade days; the pipeline never uses that field for signals |
 | **Still missing** | 17 Oct 2026 onward. MCX blocks scripted downloads, so new rows come from Bhavcopy CSVs downloaded by hand (see "Refreshing the data") |
@@ -116,12 +116,12 @@ gold-rv/
 │   └── refresh-data.yml        # manual: download new MCX rows, rebuild, test, commit
 ├── data/raw/
 │   ├── mcx_bhavcopy_raw_api.csv   # rows exactly as the MCX endpoint returns them (source of truth)
-│   ├── mcx_bhavcopy_supplement.csv # 313 official MCX rows our download missed, from the Parity data book
+│   ├── mcx_bhavcopy_supplement.csv # 313 official MCX rows our download missed, from the MCX history book
 │   ├── gold_bhavcopy_clean.csv    # 12,507 rows (our download, Oct 2023 on), derived from the raw file + supplement
 │   ├── contract_calendar.csv      # contract lifecycles, derived from the clean file
 │   ├── mcx_csv/                   # every MCX Bhavcopy CSV imported by hand (pipeline/import_csv.py), kept as received
 │   ├── retrieval_log.csv          # one line per MCX request
-│   └── parity_data_book.csv       # 55,457 MCX rows, Nov-2003 → Oct-2026 (Parity team, with permission)
+│   └── mcx_history_book.csv       # 55,457 MCX rows, Nov-2003 → Oct-2026 (compiled data book, shared with permission)
 ├── reference/                  # reference_check.py + its outputs (the original study's benchmark)
 ├── pipeline/
 │   ├── config.py               # contract master, costs, parameters, split dates, segment_of()

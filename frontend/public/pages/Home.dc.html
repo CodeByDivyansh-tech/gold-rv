@@ -286,7 +286,7 @@ class Component extends DCLogic {
       const old = LG.d.map((d, i) => [d, LG.GOLDM[i]]).filter((p) => p[1] != null && p[0] >= cut);
       pts = old.concat(all);
       period = range === '10Y' ? 'in the last 10 years' : 'since ' + this.fd(pts[0][0]).replace(/^\d+ /, '');
-      longNote = 'Weekly prices before ' + this.fd(D.start) + ' come from the Parity team\'s data book (official MCX Bhavcopy); from ' + this.fd(D.start) + ' on, our own MCX download.';
+      longNote = 'Weekly prices before ' + this.fd(D.start) + ' come from a compiled MCX data book (official MCX Bhavcopy); from ' + this.fd(D.start) + ' on, our own MCX download.';
     }
     const vals = pts.map((p) => p[1]);
     const g = this.path(vals, 1000, 280, 18);
@@ -348,12 +348,12 @@ class Component extends DCLogic {
     }));
 
     // One line for the whole study, 18 Apr 2011 to today: every number is computed from the data files.
-    // The Parity book covers the clean test (2011-2023); our own MCX download covers training and the test year.
+    // The history book covers the clean test (2011-2023); our own MCX download covers training and the test year.
     const R = D.rule.current['5'], L = D.longrun;
     const yrs = Math.round((Date.parse(D.asOf) - Date.parse(L.start)) / 3.15576e10);
     const n = (x) => x.toLocaleString('en-IN');
     const facts = [
-      { value: n(L.rows + D.meta.rows), label: 'official MCX daily prices: ' + n(L.rows) + ' from the Parity book, ' + n(D.meta.rows) + ' from our own download' },
+      { value: n(L.rows + D.meta.rows), label: 'official MCX daily prices: ' + n(L.rows) + ' from the history book, ' + n(D.meta.rows) + ' from our own download' },
       { value: yrs + ' years', label: 'tested, ' + this.fd(L.start) + ' to ' + this.fd(D.asOf) },
       { value: n(L.n + R.train_n + R.test_n + (R.forward_n || 0)) + ' trades', label: L.n + ' in ' + L.start.slice(0, 4) + '–' + L.end.slice(0, 4) + ', ' + R.train_n + ' in training, ' + R.test_n + ' in the test year' + (R.forward_n ? ', ' + R.forward_n + ' after it' : '') },
       { value: this.inr(L.net), label: 'the clean test, ' + L.start.slice(0, 4) + '–' + L.end.slice(0, 4) + ', after costs: ' + L.losingYears + ' of ' + L.years + ' years lost money' },
@@ -394,7 +394,7 @@ class Component extends DCLogic {
         { href: 'Explore.dc.html', label: 'Try other settings', why: 'real backtests, ' + yrs + ' years' },
         { href: 'Data.dc.html', label: 'Check the data', why: 'where each number comes from' }] }
     ];
-    // training is two years of our download; the clean test is the Parity book's years before it
+    // training is two years of our download; the clean test is the history book's years before it
     const deeper = 'Two years to tune, one test year, then ' + L.years + ' earlier years as the clean check. Real MCX costs.';
     return { ...shell, loading: false, ready: true, brief, paths, quotes, answer, bars, chart, hover: hov, ranges, facts, deeper };
   }
