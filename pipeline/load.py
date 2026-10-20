@@ -11,7 +11,7 @@ def load_clean_bhavcopy(csv_path: str = 'data/raw/gold_bhavcopy_clean.csv', end:
     Loads and preprocesses gold_bhavcopy_clean.csv.
     end: if given (YYYY-MM-DD), rows after this date are dropped first. Tests that check the published
          research figures pass end=TEST_END, so a data refresh cannot change what they check.
-    original_only: drop the rows that came from the Parity data book supplement (data/raw/mcx_bhavcopy_supplement.csv),
+    original_only: drop the rows that came from the MCX history book supplement (data/raw/mcx_bhavcopy_supplement.csv),
          giving the dataset the original study (reference/reference_summary.csv) was computed on.
     Returns:
         df: preprocessed dataframe sorted by (symbol, expiry, date)

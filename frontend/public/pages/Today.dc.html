@@ -253,7 +253,7 @@ class Component extends DCLogic {
       .then((r) => r.json())
       .then((d) => this.setState({ D: d }))
       .catch(() => this.setState({ failed: true }));
-    // weekly 2011-2023 frames from the Parity data book, so the replay can start in 2011
+    // weekly 2011-2023 frames from the MCX history book, so the replay can start in 2011
     fetch('data/history_charts.json')
       .then((r) => r.json())
       .then((h) => this.setState({ HC: h }))
@@ -330,7 +330,7 @@ class Component extends DCLogic {
     ];
 
     // replay
-    // Full history: 2011-2023 weeks (Parity data book; only the three pairs that existed then) come before our own weeks
+    // Full history: 2011-2023 weeks (MCX history book; only the three pairs that existed then) come before our own weeks
     const R0 = D.replay, LR = st.HC && st.HC.replay;
     const rspan = LR && st.rspan !== 'ours' ? 'all' : 'ours';
     let R = R0, early = null;

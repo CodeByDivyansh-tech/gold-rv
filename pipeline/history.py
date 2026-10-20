@@ -1,7 +1,7 @@
 """Long-history check: the frozen rule on 2011-2023, years the model never saw.
 
-Source: the Parity team's MCX Gold Futures Data Book (official MCX Bhavcopy rows,
-shared with us with their permission), saved as data/raw/parity_data_book.csv.
+Source: an MCX Gold Futures History Book (official MCX Bhavcopy rows,
+shared with us with their permission), saved as data/raw/mcx_history_book.csv.
 
 What it does
   1. Compares the book with our own MCX download on every day both cover (Oct 2023 - Sep 2026).
@@ -27,13 +27,13 @@ from pipeline.pairs import build_pair_series, compute_rolling_z
 from pipeline.backtest import prepare_contract_lookup, run_pair_backtest
 from pipeline.lifecycle import compute_contract_lifecycle, calendar_check
 
-BOOK_PATH = 'data/raw/parity_data_book.csv'
+BOOK_PATH = 'data/raw/mcx_history_book.csv'
 OURS_PATH = 'data/raw/gold_bhavcopy_clean.csv'
 HISTORY_START = '2011-04-18'          # first trading day of GOLDPETAL, so all three contracts exist
 HISTORY_PAIRS = ['M_PETAL', 'M_GUINEA', 'GUINEA_PETAL']
 SOURCE = {
-    'name': 'Parity MCX Gold Futures Data Book',
-    'by': 'the Parity team',
+    'name': 'MCX Gold Futures History Book',
+    'by': 'another team, shared with permission',
     'note': 'Official MCX Bhavcopy rows, shared with us with their permission. Thank you!',
 }
 CHECK_FIELDS = [('open', 'open'), ('high', 'high'), ('low', 'low'), ('close', 'close'),

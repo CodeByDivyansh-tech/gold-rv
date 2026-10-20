@@ -98,7 +98,8 @@ console.log(`pages ok: ${runs} page states rendered against site-data.json`)
   const w = D2.renderVals()
   assert.equal(w.hx.show, true)
   assert.equal(w.hx.facts[2].value, String(H.check.mismatches))
-  assert.match(w.hx.intro, /Parity team/)
+  assert.match(w.hx.intro, /shared their MCX Gold Futures History Book with us/)
+  assert.doesNotMatch(w.hx.intro, /Parity/i)
 }
 
 // Long charts: All starts at the first week of the shared book, 10Y about ten years back, and both end on our last day
@@ -189,7 +190,7 @@ console.log('explorer ok')
     JSON.stringify(c.renderVals(), (k, x) => { if (typeof x === 'string') strs.push(x); return typeof x === 'function' ? undefined : x })
     for (const t of strs) {
       if (t === ours || t.includes(ours + ' daily') || t.includes(ours + ' rows')) {
-        assert.ok(/download|MCX file|raw MCX|Parity|our own|Oct 2023/i.test(t), `${name}: shows ${ours} (our download only) without saying so: "${t.slice(0, 120)}"`)
+        assert.ok(/download|MCX file|raw MCX|history book|our own|Oct 2023/i.test(t), `${name}: shows ${ours} (our download only) without saying so: "${t.slice(0, 120)}"`)
       }
       assert.ok(!/^\d+ trades in the test year$/.test(t), `${name}: test-year trade count used as a headline: "${t}"`)
     }
@@ -383,19 +384,19 @@ function L_N() { return D.longrun.n }
   console.log('brief ok')
 }
 
-// Downloads credit the data (CLAUDE.md rule 4; Oct-2026 debug: statements and PDFs had no Parity credit)
+// Downloads credit the data (CLAUDE.md rule 4; Oct-2026 debug: statements and PDFs had no data-book credit)
 {
   const mk = (st) => { const c = new (load('DownloadPanel'))(); c.props = { dark: true, onClose: () => {} }; c.state = { D, H, HC, ...st }; return c }
   for (const what of ['today', 'prices', 'trades', 'backtest', 'report']) {
     const c = mk({ what, period: 'all', pair: 'ALL' })
     const d = c.doc(D, what, 'ALL', 'Everything since 2011', c.table(D, what, 'ALL', 'all', H, HC))
-    assert.match(d.foot, /Parity team's MCX data book, shared with permission/, what + ': PDF and printable page credit the data book')
+    assert.match(d.foot, /compiled MCX data book, shared with permission/, what + ': PDF and printable page credit the data book')
     assert.match(d.foot, /our own MCX download/)
   }
   const tr = mk({}).table(D, 'trades', 'ALL', 'all', H, HC)
   assert.equal(tr.head[11], 'Data source')
-  assert.ok(tr.rows.every((r) => (r[10] === 'Clean test') === /Parity/.test(r[11])), 'clean-test trades are credited to the Parity book, the rest to our download')
+  assert.ok(tr.rows.every((r) => (r[10] === 'Clean test') === /MCX data book/.test(r[11])), 'clean-test trades are credited to the data book, the rest to our download')
   const bt = mk({}).table(D, 'backtest', 'ALL', 'all', H, HC)
-  assert.ok(bt.rows.filter((r) => D.longrun.pairs.includes(Object.keys(D.pairs).find((k) => D.pairs[k].label === r[0]))).every((r) => /Parity/.test(r[13])))
+  assert.ok(bt.rows.filter((r) => D.longrun.pairs.includes(Object.keys(D.pairs).find((k) => D.pairs[k].label === r[0]))).every((r) => /data book/i.test(r[13])))
   console.log('download credit ok')
 }

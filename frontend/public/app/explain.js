@@ -77,7 +77,7 @@
     [/^From raw files to this website/, 'Eight steps', 'The eight steps our Python code follows, from MCX files to the charts you see.'],
     [/^How we avoid peeking at the future/, 'A fair exam', 'The model only uses past days, never tomorrow\'s answers, like an exam without the answer key.'],
     [/^What this data cannot tell you/, 'Honest limits', 'What our data cannot show. Good research says what it does not know.'],
-    [/^More history, shared by the Parity team/, 'Shared history', 'Another team shared their book of official MCX prices back to 2003. It matches our own data exactly, and we use it only for the long-history check.'],
+    [/^More history, shared with us/, 'Shared history', 'Another team shared their book of official MCX prices back to 2003. It matches our own data exactly, and we use it only for the long-history check.'],
     [/^Download log/, 'Receipts', 'A record of every file we downloaded, so anyone can check our work.'],
     [/^Check it yourself/, 'Check it yourself', 'All our code and data are public on GitHub, so anyone can run it again.']
   ];
@@ -163,7 +163,7 @@
     [/^([▲▼]) ₹([\d,]+) \(([−+-]?[\d.]+)%\) Prev\. ₹([\d,]+)$/, function (m, el) { return ['Change since yesterday', near(el) + ' went ' + (m[1] === '▲' ? 'up' : 'down') + ' by ₹' + m[2] + ' (' + m[3].replace(/^[−-]/, '') + '%) from yesterday\'s closing price of ₹' + m[4] + '.']; }],
     [/^Per 10 g pure gold ₹([\d,]+)$/, function (m, el) { return ['Price of 10 g of pure gold', 'We turn ' + near(el) + '\'s price into the price of 10 g of 100% pure gold: ₹' + m[1] + '. Now all four contracts can be compared fairly.']; }],
     [new RegExp('^' + P + ' ([\\d.]+) bps$'), function (m) { var c = costLine(), g = n(m[3]); return [m[1] + ' vs ' + m[2], 'The price gap between ' + m[1] + ' and ' + m[2] + ' is ' + m[3] + ' bps (' + pc(m[3]) + ') away from its normal level. To be worth trading it must pass the cost line of ' + c + ' bps' + (g < n(c) ? ', so it is ' + (n(c) - g).toFixed(1) + ' bps short.' : '. It does.')]; }],
-    [/^([\d,]+) official MCX daily prices: ([\d,]+) from the Parity book, ([\d,]+) from our own download$/, function (m) { return ['Prices used', m[1] + ' official end-of-day prices, one per contract per trading day: ' + m[2] + ' from the Parity data book for 2011–2023 and ' + m[3] + ' from our own MCX download since October 2023. Where the two overlap they agree exactly.']; }],
+    [/^([\d,]+) official MCX daily prices: ([\d,]+) from the history book, ([\d,]+) from our own download$/, function (m) { return ['Prices used', m[1] + ' official end-of-day prices, one per contract per trading day: ' + m[2] + ' from the MCX history book for 2011–2023 and ' + m[3] + ' from our own MCX download since October 2023. Where the two overlap they agree exactly.']; }],
     [/^(\d+) years tested, (.+) to (.+)$/, function (m) { return ['How long we tested', m[1] + ' years of gold prices, from ' + m[2] + ' (the first day all three older contracts traded) to ' + m[3] + '.']; }],
     [/^([\d,]+) trades (\d+) in (\d{4})–(\d{4}), (\d+) in training, (\d+) in the test year(?:, \d+ after it)?$/, function (m) { return ['Every trade', 'The rule made ' + m[1] + ' trades in total: ' + m[2] + ' in the clean test (' + m[3] + '–' + m[4] + '), ' + m[5] + ' in the two training years and ' + m[6] + ' in the 12-month test year. Only a few trades a year pass all five checks.']; }],
     [/^([−+-]?₹[\d,]+) the clean test, (\d{4})–(\d{4}), after costs: (\d+) of (\d+) years lost money$/, function (m) { return ['The clean test', 'On ' + m[2] + '–' + m[3] + ', years no version of the rule had seen, it ' + money(m[1]) + ' after costs, and ' + m[4] + ' of ' + m[5] + ' years lost money. This is the most trustworthy result.']; }],
@@ -237,10 +237,10 @@
     [/^Download Data to (.+?) · not live Search(?: Ctrl O| ⌘ O)? \?$/, function (m) { return ['The top bar', 'Download the data, see the date of the latest prices (' + m[1] + '; we add new MCX files by hand, so it is not live), Search to jump to any page (Ctrl O), switch dark or light, and ? for the meaning of words.']; }],
     // Data
     [/^([\d,]+) daily prices (.+)$/, function (m) { return [m[1] + ' prices', 'One official closing price per contract for every trading day since 2011: ' + m[1] + ' in all. ' + m[2]]; }],
-    [/^([\d,]+) daily settlements in the book (.+)$/, function (m) { return ['The Parity data book', m[1] + ' official MCX daily prices in the book. ' + m[2]]; }],
+    [/^([\d,]+) daily settlements in the book (.+)$/, function (m) { return ['The MCX history book', m[1] + ' official MCX daily prices in the book. ' + m[2]]; }],
     [/^(\d+) contracts (.+)$/, function (m) { return [m[1] + ' contracts', 'Each month has its own contract for each symbol. We have every one in the period: ' + m[1] + ' in total.']; }],
     [/^(\d+) trading days (.+)$/, function (m) { return [m[1] + ' trading days', 'Days when MCX was open: ' + m[2]]; }],
-    [/^0 mismatches (.+)$/, function () { return ['0 mismatches', 'Two checks, row by row: our cleaned data against the raw MCX files, and our download against the Parity book where they overlap. Not a single number differs.']; }],
+    [/^0 mismatches (.+)$/, function () { return ['0 mismatches', 'Two checks, row by row: our cleaned data against the raw MCX files, and our download against the history book where they overlap. Not a single number differs.']; }],
     [/^(\d+) days with no trades removed/, function (m) { return [m[1] + ' days removed', 'On these days a contract had zero trades, so its "price" was not real. We left them out.']; }],
     [/^(\d+) thin days flagged/, function (m) { return [m[1] + ' thin days', 'Very little trading on these days. We take no new signals then, and assume 3× slippage if a trade is already open.']; }],
     [/^(\d+) weekend sessions kept (.+)$/, function (m) { return [m[1] + ' weekend sessions', 'MCX sometimes opens at the weekend: every Saturday until early 2014, and later only for Diwali Muhurat and Union Budget days. Those were real trading days, so we kept them. ' + m[2]]; }],

@@ -77,7 +77,7 @@ def cross_check_raw_vs_clean(df: pd.DataFrame, raw_path: str = 'data/raw/mcx_bha
     raw = pd.read_csv(raw_path)
     sup_path = os.path.join(os.path.dirname(raw_path), 'mcx_bhavcopy_supplement.csv')
     n_sup = 0
-    if os.path.exists(sup_path):                     # rows our download missed, from the Parity data book
+    if os.path.exists(sup_path):                     # rows our download missed, from the MCX history book
         sup = pd.read_csv(sup_path)
         n_sup = len(sup)
         raw = pd.concat([raw, sup[[c for c in raw.columns]]], ignore_index=True)
@@ -101,12 +101,12 @@ def cross_check_raw_vs_clean(df: pd.DataFrame, raw_path: str = 'data/raw/mcx_bha
         'mismatches': n_bad,
         'fields_compared': ['open', 'close', 'volume_lots', 'open_interest_lots'],
         'status': (f"Raw MCX rows vs cleaned data: {len(both):,} rows compared on open, close, volume and OI "
-                   f"({n_sup} of them from the Parity data book, filling gaps in our download), "
+                   f"({n_sup} of them from the MCX history book, filling gaps in our download), "
                    f"{n_bad} mismatch{'es' if n_bad != 1 else ''}. Runs on every build."),
     }
 
 def supplement_summary(path: str = 'data/raw/mcx_bhavcopy_supplement.csv') -> Dict[str, Any]:
-    """What the Parity-book supplement adds to our MCX download (see pipeline/download.py)."""
+    """What the history-book supplement adds to our MCX download (see pipeline/download.py)."""
     if not os.path.exists(path):
         return {'rows': 0, 'missing_contracts': [], 'extra_days': []}
     s = pd.read_csv(path)
@@ -710,7 +710,7 @@ def build_all_site_data(output_dir: str = 'frontend/public/data'):
 
     # The verdict needs the cleanest out-of-sample test (2011-2023) and the evidence checks,
     # so both run here, before methodology.json and site-data.json are written.
-    print("--- 7b. Long-history check: frozen rule on 2011-2023 (Parity data book) ---")
+    print("--- 7b. Long-history check: frozen rule on 2011-2023 (MCX history book) ---")
     from pipeline.history import build as build_history
     hist = build_history(output_dir)
     print("--- 7b2. Explorer grid: the real engine over a grid of settings ('Try your own rule') ---")
@@ -774,7 +774,7 @@ def build_all_site_data(output_dir: str = 'frontend/public/data'):
     )
     methodology_data = {
         'stages': [
-            {'step': 1, 'name': 'Load & Validate', 'desc': f'Parse {hist["window"]["rows"] + len(df):,} daily prices: {hist["window"]["rows"]:,} from the Parity data book (2011–2023) and {len(df):,} from our own MCX download (Oct 2023 on). Strip symbols, check primary keys, compare against the raw MCX file and the book, flag no-trade days.'},
+            {'step': 1, 'name': 'Load & Validate', 'desc': f'Parse {hist["window"]["rows"] + len(df):,} daily prices: {hist["window"]["rows"]:,} from the MCX history book (2011–2023) and {len(df):,} from our own MCX download (Oct 2023 on). Strip symbols, check primary keys, compare against the raw MCX file and the book, flag no-trade days.'},
             {'step': 2, 'name': 'Normalize', 'desc': 'Divide close by quote grams and purity to get a price per gram of pure gold.'},
             {'step': 3, 'name': 'Implied Carry', 'desc': 'Estimate the cost of carry from GOLDPETAL calendar spreads; forward-fill only.'},
             {'step': 4, 'name': 'Pair Construction', 'desc': 'Pick contracts using the previous day\'s open interest, so nothing from the future is used.'},

@@ -12,7 +12,7 @@ Writes frontend/public/data/explore.json:
   years  calendar years in the per-year results
   pairs  {pair: {"W|ze|mh|slip|h": [c_n, c_net, c_wins, tr_n, tr_net, tr_wins, te_n, te_net, te_wins, fw_n, fw_net, fw_wins,
                                      net per year...]}}
-         c = clean test 2011-2023 (Parity data book; only the three pairs that existed), tr = training,
+         c = clean test 2011-2023 (MCX history book; only the three pairs that existed), tr = training,
          te = test year, fw = after the test year. Net in rupees after costs; wins = trades that made money.
 """
 import json
