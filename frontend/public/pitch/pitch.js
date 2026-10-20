@@ -77,7 +77,7 @@ const speakerNotes = {
   14: "Slide 14 details our zero-runtime-server architecture. Our automated Python pipeline ingests official MCX Bhavcopy, normalizes contract specifications, and verifies data integrity across 12,267 rows and 149 contracts with 42 automated tests. The entire output compiles to static JSON for instant offline delivery.",
   15: "Slide 15 highlights the commercial scale. MCX gold futures turnover surged 3.4x to ₹28,340 crore daily, with gold accounting for 57% of total exchange bullion turnover. This massive liquidity pool makes even modest relative value strategies viable for proprietary trading desks and hedgers.",
   16: "Slide 16 summarizes our key takeaways and engineering roadmap. The four core principles: normalize first, respect costs, attribute profits honestly, and automate tests. Our roadmap outlines immediate live paper trading, near-term tick-level slippage measurement, and later cross-commodity expansion to silver.",
-  17: "Thank you judges for your time and thoughtful evaluation. We invite you to explore the live terminal at gold-rv.vercel.app or review our audited codebase on GitHub. We are now open for your questions.",
+  17: "Thank you judges for your time and thoughtful evaluation. We invite you to explore the live Gold RV Intelligence terminal or review our audited codebase on GitHub. We are now open for your questions.",
 };
 
 // 4 Contracts Data
