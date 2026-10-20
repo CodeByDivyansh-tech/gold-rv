@@ -163,6 +163,77 @@
   .hwf-top > * { position: relative; }
   .hwf-rule { margin-left: max(34px, env(safe-area-inset-left, 0px)); margin-right: max(34px, env(safe-area-inset-right, 0px)); }
   @media (prefers-reduced-transparency: reduce) { .card, .stat, .chip, .btn.ghost, .skip, .brand, .hwf-top { -webkit-backdrop-filter: none; backdrop-filter: none; background: rgba(24,17,8,.96); } }
+
+  /* ---- Gold RV wordmark: metallic gold with a slow light sweep ---- */
+  .gr-word { background: linear-gradient(105deg, rgba(255,255,255,0) 42%, rgba(255,248,224,.9) 50%, rgba(255,255,255,0) 58%) no-repeat,
+      linear-gradient(180deg, #FFF0C4 0%, #F3C862 30%, #D49A33 55%, #9A6516 78%, #E4B24E 100%);
+    background-size: 260% 100%, 100% 100%; background-position: 160% 0, 0 0;
+    -webkit-background-clip: text; background-clip: text; color: transparent; -webkit-text-fill-color: transparent;
+    filter: drop-shadow(0 1px 0 rgba(255,238,196,.28)) drop-shadow(0 1.5px 1.5px rgba(0,0,0,.6));
+    animation: grShine 7s 1.2s ease-in-out infinite; }
+  @keyframes grShine { 0% { background-position: 160% 0, 0 0 } 22%, 100% { background-position: -60% 0, 0 0 } }
+  .brand .gr-word { font-weight: 700; }
+  /* ---- Watch demo video button ---- */
+  .btn.play { gap: 10px; color: #F6E2B2; border: 1px solid rgba(229,176,74,.55);
+    background: linear-gradient(180deg, rgba(229,176,74,.22), rgba(229,176,74,.06)); box-shadow: inset 0 1px 0 rgba(255,236,190,.25), 0 0 0 rgba(229,176,74,0);
+    -webkit-backdrop-filter: blur(14px) saturate(140%); backdrop-filter: blur(14px) saturate(140%);
+    transition: transform .2s ease, box-shadow .25s ease, border-color .25s ease, color .2s; }
+  .btn.play:hover { color: #FFF3D4; border-color: rgba(240,197,102,.9); box-shadow: inset 0 1px 0 rgba(255,236,190,.3), 0 0 26px rgba(229,176,74,.35); transform: translateY(-1px); }
+  .btn.gold { transition: transform .2s ease, box-shadow .25s ease; }
+  .btn.gold:hover { transform: translateY(-1px); box-shadow: 0 10px 28px rgba(229,176,74,.35); }
+  .play-ic { width: 20px; height: 20px; flex: none; }
+  .play-ic circle { fill: rgba(229,176,74,.22); stroke: #E5B04A; stroke-width: 1.4; }
+  .play-ic path { fill: #FFE7A8; }
+  .hero-ctas { display: flex; align-items: center; gap: 18px; flex-wrap: wrap; margin-top: 18px; }
+  .hero-ctas .hint { margin: 0; }
+  /* ---- Meet the team ---- */
+  .meet { position: relative; z-index: 4; padding: clamp(56px, 9vw, 110px) clamp(16px, 5vw, 64px) clamp(48px, 7vw, 80px); text-align: center;
+    background: linear-gradient(180deg, rgba(14,10,5,.55), rgba(14,10,5,.94) 18%, var(--bg) 40%); }
+  .meet-kicker { margin: 0; font-size: 13px; color: var(--muted); }
+  .meet h2 { margin: 6px 0 4px; font-size: clamp(30px, 4.4vw, 44px); letter-spacing: -.02em; }
+  .meet-team { margin: 0 0 26px; font-size: clamp(20px, 2.6vw, 26px); font-weight: 800; letter-spacing: -.01em; }
+  .meet-grid { list-style: none; margin: 0 auto; padding: 0; max-width: 980px; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+  .person { position: relative; overflow: hidden; display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 26px 18px 22px; border-radius: 22px;
+    border: 1px solid rgba(229,176,74,.30); background: linear-gradient(180deg, rgba(229,176,74,.14), rgba(30,21,10,.66) 38%, rgba(18,13,6,.62));
+    -webkit-backdrop-filter: blur(18px) saturate(140%); backdrop-filter: blur(18px) saturate(140%);
+    box-shadow: inset 0 1px 0 rgba(255,236,190,.18), 0 18px 44px rgba(0,0,0,.32); transition: transform .25s ease, box-shadow .25s ease, border-color .25s ease; }
+  .person::before { content: ""; position: absolute; left: 0; right: 0; top: 0; height: 110px; pointer-events: none;
+    background: radial-gradient(90% 100% at 50% 0%, rgba(240,197,102,.22), rgba(240,197,102,0) 72%); }
+  .person > * { position: relative; }
+  .person:hover { transform: translateY(-3px); border-color: rgba(240,197,102,.55); box-shadow: inset 0 1px 0 rgba(255,236,190,.22), 0 22px 50px rgba(0,0,0,.38), 0 0 28px rgba(229,176,74,.16); }
+  .avatar { width: 64px; height: 64px; margin-bottom: 10px; border-radius: 50%; display: grid; place-items: center; font-weight: 800; font-size: 22px; color: #2A1B05;
+    background: linear-gradient(180deg, #FFF0C4, #F3C862 35%, #D49A33 60%, #9A6516 85%, #E4B24E);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.6), inset 0 -2px 4px rgba(90,55,0,.45), 0 6px 18px rgba(0,0,0,.4), 0 0 0 4px rgba(229,176,74,.12); }
+  .person b { font-size: 18px; color: var(--fg); }
+  .person span:last-child { font-size: 14px; color: var(--muted); }
+  .meet-ctas { display: flex; justify-content: center; gap: 12px; flex-wrap: wrap; margin-top: 28px; }
+  /* entrance: cards rise gently as the section scrolls in */
+  .js .person, .js .meet-head { opacity: 0; transform: translateY(14px); transition: opacity .6s ease, transform .6s ease, box-shadow .25s ease, border-color .25s ease; }
+  .js .meet.in .person, .js .meet.in .meet-head { opacity: 1; transform: none; }
+  .js .meet.in .person:nth-child(2) { transition-delay: .08s; } .js .meet.in .person:nth-child(3) { transition-delay: .16s; }
+  .js .meet.in .person:hover { transform: translateY(-3px); transition-delay: 0s; }
+  @media (max-width: 760px) { .meet-grid { grid-template-columns: 1fr; max-width: 420px; } .hero-ctas { gap: 12px; } }
+  /* ---- video dialog ---- */
+  dialog.vid { width: min(1100px, calc(100vw - 24px)); max-width: none; padding: 0; border: 0; background: transparent; color: var(--fg); }
+  dialog.vid::backdrop { background: rgba(8,5,2,.78); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); }
+  .vid-box { position: relative; overflow: hidden; padding: clamp(12px, 2vw, 18px); border-radius: 22px; border: 1px solid rgba(229,176,74,.32);
+    background: linear-gradient(180deg, rgba(229,176,74,.14), rgba(30,21,10,.86) 26%, rgba(18,13,6,.9));
+    -webkit-backdrop-filter: blur(22px) saturate(150%); backdrop-filter: blur(22px) saturate(150%); box-shadow: inset 0 1px 0 rgba(255,236,190,.18), 0 30px 80px rgba(0,0,0,.55); }
+  .vid-top { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 10px; }
+  .vid-top h2 { margin: 0; font-size: 18px; }
+  .vid-x { width: 40px; height: 40px; border-radius: 12px; border: 1px solid rgba(229,176,74,.35); background: rgba(255,236,190,.06); color: var(--fg); font: 600 16px 'Geist', system-ui, sans-serif; cursor: pointer; }
+  .vid-x:hover { border-color: rgba(240,197,102,.8); color: var(--gold); }
+  .vid-x:focus-visible, .btn.play:focus-visible { outline: 2px solid var(--gold); outline-offset: 3px; }
+  #vid-v { display: block; width: 100%; aspect-ratio: 16 / 9; border-radius: 14px; background: #000; }
+  .vid-note { margin: 10px 2px 0; font-size: 13px; color: var(--muted); } .vid-note a { color: var(--gold); }
+  /* leaving for the site: a short fade */
+  body.leaving main, body.leaving .meet, body.leaving header, body.leaving .dots { opacity: 0; transition: opacity .32s ease; }
+  @media (prefers-reduced-motion: reduce) {
+    .gr-word { animation: none; background-position: 160% 0, 0 0; }
+    .js .person, .js .meet-head { opacity: 1; transform: none; transition: none; }
+    .btn.play, .btn.gold, .person { transition: none; } .btn.play:hover, .btn.gold:hover, .person:hover { transform: none; }
+    body.leaving main, body.leaving .meet, body.leaving header, body.leaving .dots { transition: none; }
+  }
 </style>
 <script type="importmap">
 { "imports": { "three": "../pitch/vendor/three.module.js", "three/addons/": "../pitch/vendor/addons/" } }
@@ -177,7 +248,7 @@
 
 <header class="top">
   <a class="brand" href="../" data-enter aria-label="Gold RV Intelligence, enter the site">
-    <svg viewBox="8 18 48 28" aria-hidden="true"><path d="M8 28L12 18H44L48 28Z M16 46L20 36H52L56 46Z" fill="#E5B04A"/></svg>Gold RV
+    <svg viewBox="8 18 48 28" aria-hidden="true"><path d="M8 28L12 18H44L48 28Z M16 46L20 36H52L56 46Z" fill="url(#introMetal)"/></svg><span class="gr-word">Gold RV</span>
   </a>
   <a class="skip" href="../" data-enter>Skip intro</a>
 </header>
@@ -188,7 +259,7 @@
     <div class="card">
       <h1>Same gold.<br>Four prices.</h1>
       <p class="lead">MCX sells one metal in four contract sizes. Their prices should match, yet they drift apart. We asked whether those gaps are money on the table, and tested it on 15 years of official prices.</p>
-      <span class="hint"><i aria-hidden="true"></i>Scroll to begin</span>
+      <div class="hero-ctas"><a class="btn play" href="../demo/" data-demo><svg class="play-ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="11"/><path d="M10 8.2v7.6l6-3.8z"/></svg>Watch demo video</a><span class="hint"><i aria-hidden="true"></i>Scroll to begin</span></div>
     </div>
   </section>
 
@@ -257,17 +328,45 @@
       </div>
       <div class="ctas">
         <a class="btn gold" href="../" data-enter>Enter the site</a>
-        <a class="btn ghost" href="../demo/">Watch the demo video</a>
+        <a class="btn play" href="../demo/" data-demo><svg class="play-ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="11"/><path d="M10 8.2v7.6l6-3.8z"/></svg>Watch demo video</a>
       </div>
     </div>
   </section>
 </main>
 
+<section class="meet" aria-labelledby="meet-h">
+  <div class="meet-head">
+    <p class="meet-kicker">Hack in Hills '26 · Problem 03</p>
+    <h2 id="meet-h">Meet the team</h2>
+    <p class="meet-team"><span class="gr-word">Team NEXORA</span></p>
+  </div>
+  <ul class="meet-grid">
+    <li class="person"><span class="avatar" aria-hidden="true">D</span><b>Divyansh</b><span>Data and quant pipeline</span></li>
+    <li class="person"><span class="avatar" aria-hidden="true">IB</span><b>Ishant Bhaudhira</b><span>Frontend</span></li>
+    <li class="person"><span class="avatar" aria-hidden="true">NG</span><b>Noni Gopal Das</b><span>Research and pitch</span></li>
+  </ul>
+  <div class="meet-ctas">
+    <a class="btn gold" href="../" data-enter>Enter the site</a>
+    <a class="btn play" href="../demo/" data-demo><svg class="play-ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="11"/><path d="M10 8.2v7.6l6-3.8z"/></svg>Watch demo video</a>
+  </div>
+</section>
+
+<dialog class="vid" id="vid" aria-labelledby="vid-h">
+  <div class="vid-box">
+    <div class="vid-top"><h2 id="vid-h">Gold RV demo video</h2><button type="button" class="vid-x" data-close aria-label="Close the video">✕</button></div>
+    <video id="vid-v" controls playsinline preload="none" src="../demo/gold-rv-demo-video.mp4"></video>
+    <p class="vid-note">Every page on a laptop screen, top to bottom, with real clicks. No sound. <a href="../demo/">Open with chapters</a></p>
+  </div>
+</dialog>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+  <linearGradient id="introMetal" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFF0C4"/><stop offset=".3" stop-color="#F3C862"/><stop offset=".55" stop-color="#D49A33"/><stop offset=".78" stop-color="#9A6516"/><stop offset="1" stop-color="#E4B24E"/></linearGradient>
+</defs></svg>
+
 <footer class="hwf-root" aria-label="Gold RV Intelligence">
   <canvas aria-hidden="true"></canvas>
   <span class="hwf-sr">gold rv</span>
   <div class="hwf-top">
-    <div class="hwf-brand"><strong>Gold RV Intelligence</strong><span>MCX gold relative value · Team NEXORA</span></div>
+    <div class="hwf-brand"><strong><span class="gr-word">Gold RV</span> Intelligence</strong><span>MCX gold relative value · Team NEXORA</span></div>
     <nav class="hwf-col" aria-label="Explore">
       <h3>Explore</h3>
       <ul><li><a href="../#/today" data-enter>Today</a></li><li><a href="../#/market" data-enter>Market</a></li><li><a href="../#/pairs" data-enter>Pair Explorer</a></li><li><a href="../#/signals" data-enter>Signals</a></li></ul>
@@ -288,6 +387,36 @@
   // seen once: the main site stops sending this browser here
   try { localStorage.setItem('grv-intro-seen', '1'); } catch (e) {}
   document.querySelectorAll('[data-enter]').forEach(function (a) { a.addEventListener('click', function () { try { localStorage.setItem('grv-intro-seen', '1'); } catch (e) {} }); });
+
+  document.documentElement.classList.add('js');
+  (function () {
+    var still = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    // Watch demo video: plays in a dialog on this page (the /demo/ page with chapters is the fallback)
+    var dlg = document.getElementById('vid'), v = document.getElementById('vid-v');
+    document.querySelectorAll('[data-demo]').forEach(function (a) {
+      a.addEventListener('click', function (e) {
+        if (!dlg || typeof dlg.showModal !== 'function') return;   // old browsers follow the link instead
+        e.preventDefault(); dlg.showModal(); try { v.currentTime = 0; v.play().catch(function () {}); } catch (err) {}
+      });
+    });
+    if (dlg) {
+      dlg.addEventListener('close', function () { try { v.pause(); } catch (e) {} });
+      dlg.addEventListener('click', function (e) { if (e.target === dlg || e.target.hasAttribute('data-close')) dlg.close(); });
+    }
+    // Meet the team: rise in once when it scrolls into view
+    var meet = document.querySelector('.meet');
+    if (meet && 'IntersectionObserver' in window && !still) {
+      new IntersectionObserver(function (es, ob) { es.forEach(function (x) { if (x.isIntersecting) { meet.classList.add('in'); ob.disconnect(); } }); }, { threshold: .2 }).observe(meet);
+    } else if (meet) meet.classList.add('in');
+    // Enter the site: a short fade before leaving (same-tab, plain left click only)
+    document.querySelectorAll('[data-enter]').forEach(function (a) {
+      a.addEventListener('click', function (e) {
+        if (still || e.metaKey || e.ctrlKey || e.shiftKey || e.button !== 0 || a.target === '_blank') return;
+        e.preventDefault(); document.body.classList.add('leaving');
+        setTimeout(function () { location.href = a.href; }, 300);
+      });
+    });
+  })();
   (function () {
     var still = matchMedia('(prefers-reduced-motion: reduce)').matches;
     var c = document.createElement('canvas'), gl = null;
