@@ -20,14 +20,21 @@ Every number below is computed by the pipeline (`frontend/public/data/`), not ty
 ### 1.1 The clean test: 2011–2023, rule frozen (151 trades)
 
 The rule and its settings were frozen before this data was used, and nothing was changed afterwards
-(data: the data-book team's MCX Bhavcopy data book, shared with permission; it matches our own MCX download on
-all 12,021 shared rows). Only the three pairs that existed then can be tested.
+(data: the data-book team's MCX Bhavcopy data book, shared with permission). Only the three pairs that existed then
+can be tested.
+
+How we know the book is right: where the book and our own MCX download cover the same days (10 Oct 2023 →
+16 Oct 2026), they agree on all **12,021 shared rows**, every field, 0 mismatches (`history.json → check`).
+That overlap check is separate from the raw-vs-clean check of our own download (12,507 rows, section 1.5).
 
 | At 5 bps slippage | Trades | Net after costs | t-stat | Losing years |
 |---|---|---|---|---|
 | GOLDM − GOLDPETAL, GOLDM − GOLDGUINEA, GOLDGUINEA − GOLDPETAL | 151 | **−₹5,49,070** | −3.63 | 11 of 13 |
 
 With **zero** slippage it still loses ₹2,35,391. This is the result to lead with (`history.json`).
+
+Even with hindsight: at 5 bps slippage, only **6 of 216** settings in the explorer grid make money on 2011–2023
+(the three pairs × 72 settings each; `site-data.json → hindsight`, computed from `explore.json`).
 
 ### 1.2 The 2025–26 test year: not a clean test
 
@@ -56,7 +63,7 @@ Slippage (5 bps per order, assumed) is 82% of the 24.4 bps round-trip cost. `pip
 measure it from the daily data with two standard estimators (Roll 1984; Corwin & Schultz 2012). Both find no
 spread on most contracts and months (it is smaller than a day's price noise); with negative readings set to zero
 they give 26–31 bps for every contract alike, which is volatility, not a spread. The hard floor is half a tick,
-at most 0.34 bps. Our trades were a median 0.06% of the day's volume.
+at most 0.34 bps. Our trades were a median 0.07% of the day's volume.
 
 Break-even slippage per order: **training 4.0 bps · test year 14.3 bps · 2011–2023 never (loses at 0)**.
 Only real broker fills (a forward test) can settle it.
@@ -73,18 +80,23 @@ Only real broker fills (a forward test) can settle it.
   level-shift test in `pipeline/evidence.py`; **cause not confirmed** (no MCX notice found). Because the "normal"
   level moves, signals use a rolling point-in-time window, never a fixed zero or full-sample mean.
 - **Carry**: GOLDPETAL calendar spreads imply a median 8.03% a year (IQR 6.18–10.86%).
-- **Gold exposure**: equal grams on both legs; gold-price P&L is ~1.4% of gross; correlation of trade returns
-  with gold moves −0.10.
+- **Gold exposure**: equal grams on both legs; over all 209 trades, 2011–2026 (5 bps), gold-price P&L is 2.9% of
+  the gross result and the spread is the rest. In the test year alone, the correlation of trade returns with gold
+  moves is −0.10 (20 trades).
+- **Contract calendar**: every trade, 2011–2026, sits inside both contracts' calendars (listed on entry, closed
+  before either stopped trading); `history.json → calendar`, `contracts.json → calendar`.
 
 ### 1.5 The data: what we have, what was missing, what we still need
 
 | | |
 |---|---|
-| **Coverage** | 10 Oct 2023 → 1 Oct 2026: 769 trading days, 149 contracts, 12,267 daily settlements; every day the MCX history book has in that window is present (a test checks this) |
+| **Coverage (whole study)** | 18 Apr 2011 → 16 Oct 2026: **47,521 daily prices, 599 contracts, 4,138 trading days**, every one an official MCX Bhavcopy settlement (`site-data.json → longrun`) |
+| **Part 1: MCX history book** | 18 Apr 2011 → 9 Oct 2023: 35,014 daily prices, 457 contracts, 3,359 trading days (the clean test). Shared with us by the data-book team, with permission |
+| **Part 2: our own MCX download** | 10 Oct 2023 → 16 Oct 2026: 12,507 daily prices, 150 contracts, 779 trading days (training, test year and after). Every day the history book has in this window is present (a test checks this) |
 | **Fixed in Oct 2026** | Our MCX download had skipped 8 contracts: the Oct, Nov and Dec 2023 expiries of GOLDM, GOLDGUINEA and GOLDPETAL (289 traded rows, the busiest contracts in those months). They are now added from the MCX history book, with 1 Oct 2026, in `data/raw/mcx_bhavcopy_supplement.csv`. Effect: training 37 → 38 trades, −₹19,056 → −₹16,514; settings, test year, 2011–2023 check and alerts unchanged |
 | **Checked and fine** | No missing days inside any contract's life; no broken high/low/close; the 6%+ days (Jan–Mar 2026, 19 Mar, 13 May 2026) moved all four contracts together, so they are real; GOLDM's Nov-2024 contract expired early, on 31 Oct 2024 |
 | **Exchange quirk** | 169 rows where MCX's "previous close" differs from the prior day's close, mostly thin contracts and no-trade days; the pipeline never uses that field for signals |
-| **Still missing** | 2 Oct 2026 onward. Run `python -m pipeline.download` on a computer that can reach mcxindia.com (MCX blocks most cloud servers) |
+| **Still missing** | 17 Oct 2026 onward. MCX blocks scripted downloads, so new rows come from Bhavcopy CSVs downloaded by hand (see "Refreshing the data") |
 | **Would help most** | Real broker fills or intraday bid/ask, to measure slippage (82% of the cost, and the number that decides the verdict); MCX circulars for Nov 2024 (the GOLDPETAL repricing); MCX's official contract spec sheets (purities, delivery centres) |
 
 ---
@@ -105,28 +117,35 @@ gold-rv/
 ├── data/raw/
 │   ├── mcx_bhavcopy_raw_api.csv   # rows exactly as the MCX endpoint returns them (source of truth)
 │   ├── mcx_bhavcopy_supplement.csv # 313 official MCX rows our download missed, from the MCX history book
-│   ├── gold_bhavcopy_clean.csv    # 12,267 rows, derived from the raw file + supplement (pipeline/download.py)
+│   ├── gold_bhavcopy_clean.csv    # 12,507 rows (our download, Oct 2023 on), derived from the raw file + supplement
 │   ├── contract_calendar.csv      # contract lifecycles, derived from the clean file
+│   ├── mcx_csv/                   # every MCX Bhavcopy CSV imported by hand (pipeline/import_csv.py), kept as received
 │   ├── retrieval_log.csv          # one line per MCX request
 │   └── mcx_history_book.csv       # 55,457 MCX rows, Nov-2003 → Oct-2026 (data-book team, with permission)
 ├── reference/                  # reference_check.py + its outputs (the original study's benchmark)
 ├── pipeline/
 │   ├── config.py               # contract master, costs, parameters, split dates, segment_of()
-│   ├── download.py             # refresh from MCX; raw -> clean -> calendar
+│   ├── download.py             # raw -> clean -> calendar (and a scripted MCX refresh, where MCX allows it)
+│   ├── import_csv.py           # the monthly route: merge hand-downloaded MCX Bhavcopy CSVs, refuse conflicts
 │   ├── load.py · normalize.py · carry.py · pairs.py
 │   ├── backtest.py · attribution.py · alerts.py · lifecycle.py
 │   ├── history.py              # frozen rule on 2011–2023 (history.json)
 │   ├── evidence.py             # test-year status, slippage check, multiple testing, switch, GOLDPETAL break
 │   ├── robustness.py           # alert follow-through and resampled 95% ranges (robustness.json)
+│   ├── explore.py              # the real engine over a grid of settings (explore.json); hindsight count
 │   ├── build_site_data.py      # runs everything, writes frontend/public/data/*.json
 │   ├── build_web_data.py       # site-data.json, the one file the pages read
-│   └── tests/                  # 42 pytest tests
+│   ├── check_data.py           # committed data == a fresh build (CI)
+│   └── tests/                  # 52 pytest tests
 └── frontend/
     ├── index.html · build.mjs · tests/pages.test.mjs
     └── public/
-        ├── app/dc.js           # ~375-line renderer: templates, repeats, conditions, components, DOM morphing
-        ├── app/main.js         # hash router: #/ #/today #/market #/pairs #/signals #/backtesting #/data
+        ├── app/dc.js           # ~400-line renderer: templates, repeats, conditions, components, DOM morphing
+        ├── app/main.js         # hash router: #/ #/today #/market #/pairs #/signals #/backtesting #/explore #/data #/brief
+        ├── app/keys.js         # shortcuts 1–9, Ctrl/Cmd+O search, Ctrl/Cmd+P PDF; theme.js, prefs.js, pdf.js, rail.js, glossary.js, explain.js
         ├── pages/*.dc.html     # one file per page; Rail.dc.html and TabBar.dc.html are the shared menus
+        ├── pages/Brief.dc.html # "The brief, answered": each line of Problem 03, its status and the page that proves it
+        ├── intro/              # the 3D intro shown on a first visit
         ├── pitch/              # the 3D pitch deck
         └── data/               # JSON written by the pipeline (committed)
 ```
@@ -139,8 +158,9 @@ Prerequisites: Python 3.11+, Node.js 18+ (no npm packages needed to build or tes
 
 ```bash
 pip install -r requirements.txt
-python -m pipeline.build_site_data      # writes frontend/public/data/ (about 20 s)
-python -m pytest pipeline/tests/        # 42 tests
+python -m pipeline.build_site_data      # writes frontend/public/data/ (5–10 min or more; the explorer grid is most of it)
+python -m pipeline.check_data           # committed data == fresh build
+python -m pytest pipeline/tests/        # 52 tests
 cd frontend
 npm test                                # page logic against the real data
 npm run build                           # writes dist/
@@ -151,10 +171,17 @@ Open `http://localhost:8000`. (`npm install && npm run dev` also works, using Vi
 
 ### Refreshing the data
 
+MCX blocks scripted downloads, so new data arrives each month as CSVs downloaded by hand from the MCX website
+(Bhavcopy, Commodity-wise, one file per contract) for every live GOLDM, GOLDTEN, GOLDGUINEA and GOLDPETAL expiry,
+starting the day after the last data date:
+
 ```bash
-python -m pipeline.download             # fetch new rows for live and newly listed contracts
-python -m pipeline.build_site_data      # rebuild the website data
+python -m pipeline.import_csv path/to/BhavCopyCommodiyWise_*.csv   # merges, refuses conflicts, archives originals
+python -m pipeline.build_site_data
+python -m pipeline.check_data
 ```
+
+Where MCX does allow it, `python -m pipeline.download` fetches new rows directly.
 
 - Trades entered after 30-Sep-2026 go into a separate **forward** period (the frozen rule on data nobody had
   when it was written). They are never mixed into the training or test-year results, and the site reports them on
@@ -181,7 +208,7 @@ does not match what the pipeline produces from the committed code.
 
 ---
 
-## 5. Verification (pytest, 42 tests)
+## 5. Verification (pytest, 52 tests)
 
 | Requirement | Test module |
 |---|---|
@@ -196,8 +223,11 @@ does not match what the pipeline produces from the committed code.
 | Verdict leads with the clean test and never calls the test year "unseen"; p-values computed; break-evens fit the scenarios; GOLDPETAL break located from data | `test_evidence.py` |
 | Raw MCX file rebuilds the clean CSV and calendar byte for byte; merge refuses conflicts; forward trades never join the test year | `test_download.py` |
 | Prohibited strings (`COMEX`, `USD/INR`, `Confidence`, …) absent from the site | `test_frontend_acceptance.py` |
+| "6 of 216" hindsight count matches the explorer grid it summarises | `test_hindsight.py` |
 
-Plus `npm test`: 94 page and menu states rendered against the real data.
+Plus `npm test` (`frontend/tests/pages.test.mjs`): 183 page and menu states rendered against the real data, then
+checks on full-history charts, the explorer, the partial-period guard, downloads (CSV, PDF), chart file names and
+the Brief page (every row links to a section that exists; every number comes from the data files).
 
 ---
 
