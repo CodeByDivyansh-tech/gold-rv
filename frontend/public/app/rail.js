@@ -64,6 +64,13 @@
     '@media (hover:none),(pointer:coarse){.rail-hl,.grv-light{display:none}.rail-k{display:none}}' +
     '@media (prefers-reduced-motion:reduce){.rail-hl{transition:none}.rail-k{transition:none;transform:none}.grv-nav .rail-a{transition:none}.grv-light{display:none}}' +
     '@media (forced-colors:active){.rail-hl,.grv-light,.grv-glass::before{display:none}}' +
+    // Gold RV logo: a 3D gold ingot and a raised, polished wordmark with a slow light sweep (defs added below)
+    'svg.grv-wm{filter:drop-shadow(0 1px 0 rgba(255,238,196,.18)) drop-shadow(0 0 12px rgba(229,176,74,.10))}' +
+    'html.light svg.grv-wm .wm-text{fill:url(#grvTextLight);filter:drop-shadow(0 1px 0 rgba(255,255,255,.9)) drop-shadow(0 1px .6px rgba(90,55,0,.25))}' +
+    'html.light svg.grv-wm{filter:drop-shadow(0 1px 0 rgba(255,255,255,.8))}' +
+    'svg.grv-wm .grv-shine{pointer-events:none;mix-blend-mode:screen}' +
+    'html.light svg.grv-wm .grv-shine{mix-blend-mode:soft-light}' +
+    '@media (prefers-reduced-motion:reduce),(forced-colors:active){svg.grv-wm .grv-shine{display:none}}' +
     // short laptop screens (768-860 px tall): tighten the menu so it fits without its own scroll bar
     '@media (max-height:860px){.grv-rail{gap:12px !important;padding-top:16px !important;padding-bottom:12px !important}.grv-glass{gap:10px;padding-top:10px}' +
     '.grv-nav{gap:8px !important}.grv-nav .rail-a{padding-top:7px !important;padding-bottom:7px !important}' +
@@ -124,4 +131,28 @@
   if (calm.addEventListener) { calm.addEventListener('change', onPref); fine.addEventListener('change', onPref); }
 
   window.GRVRail = { home: home };
+
+  // gradients and the raised-letter filter for the Gold RV logo (svg.grv-wm in the menu and phone headers)
+  (function addWordmarkDefs() {
+    if (document.getElementById('grv-wm-defs')) return;
+    var NS = 'http://www.w3.org/2000/svg', d = document.createElementNS(NS, 'svg');
+    d.id = 'grv-wm-defs'; d.setAttribute('aria-hidden', 'true'); d.setAttribute('focusable', 'false');
+    d.style.cssText = 'position:absolute;width:0;height:0;overflow:hidden';
+    d.innerHTML =
+      '<defs>' +
+      '<linearGradient id="grvFace" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFF3CF"/><stop offset=".22" stop-color="#F6CF6B"/><stop offset=".5" stop-color="#D99E36"/><stop offset=".78" stop-color="#8E5C12"/><stop offset="1" stop-color="#C9922E"/></linearGradient>' +
+      '<linearGradient id="grvTop" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FFF6DA"/><stop offset=".45" stop-color="#F8D57A"/><stop offset="1" stop-color="#C98E26"/></linearGradient>' +
+      '<linearGradient id="grvText" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFF0C4"/><stop offset=".3" stop-color="#F3C862"/><stop offset=".55" stop-color="#D49A33"/><stop offset=".78" stop-color="#9A6516"/><stop offset="1" stop-color="#E4B24E"/></linearGradient>' +
+      '<linearGradient id="grvTextLight" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#C08A22"/><stop offset=".35" stop-color="#9A6608"/><stop offset=".62" stop-color="#6F4500"/><stop offset=".82" stop-color="#5A3700"/><stop offset="1" stop-color="#A9761A"/></linearGradient>' +
+      '<linearGradient id="grvShine" x1="0" y1="0" x2="1" y2=".35" gradientTransform="translate(-1.4 0)">' +
+        '<stop offset=".38" stop-color="#fff" stop-opacity="0"/><stop offset=".5" stop-color="#FFF7DF" stop-opacity=".85"/><stop offset=".62" stop-color="#fff" stop-opacity="0"/>' +
+        '<animateTransform attributeName="gradientTransform" type="translate" values="-1.4 0;1.4 0;1.4 0" keyTimes="0;.22;1" dur="7s" begin="1.2s" repeatCount="indefinite"/></linearGradient>' +
+      '<filter id="grvEmboss" x="-10%" y="-20%" width="120%" height="150%"><feGaussianBlur in="SourceAlpha" stdDeviation="1.1" result="b"/>' +
+        '<feSpecularLighting in="b" surfaceScale="3" specularConstant=".9" specularExponent="22" lighting-color="#FFF4D6" result="s"><feDistantLight azimuth="235" elevation="48"/></feSpecularLighting>' +
+        '<feComposite in="s" in2="SourceAlpha" operator="in" result="s2"/><feComposite in="SourceGraphic" in2="s2" operator="arithmetic" k1="0" k2="1" k3=".55" k4="0" result="lit"/>' +
+        '<feDropShadow in="lit" dx="0" dy="2" stdDeviation="1.6" flood-color="#000" flood-opacity=".55"/></filter>' +
+      '</defs>';
+    (document.body || document.documentElement).appendChild(d);
+    try { if (matchMedia('(prefers-reduced-motion: reduce)').matches && d.pauseAnimations) d.pauseAnimations(); } catch (e) {}
+  })();
 })();
