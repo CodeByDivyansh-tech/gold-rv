@@ -63,7 +63,11 @@
     // touch screens: no hover effects; reduce motion: nothing moves
     '@media (hover:none),(pointer:coarse){.rail-hl,.grv-light{display:none}.rail-k{display:none}}' +
     '@media (prefers-reduced-motion:reduce){.rail-hl{transition:none}.rail-k{transition:none;transform:none}.grv-nav .rail-a{transition:none}.grv-light{display:none}}' +
-    '@media (forced-colors:active){.rail-hl,.grv-light,.grv-glass::before{display:none}}';
+    '@media (forced-colors:active){.rail-hl,.grv-light,.grv-glass::before{display:none}}' +
+    // short laptop screens (768-860 px tall): tighten the menu so it fits without its own scroll bar
+    '@media (max-height:860px){.grv-rail{gap:12px !important;padding-top:16px !important;padding-bottom:12px !important}.grv-glass{gap:10px;padding-top:10px}' +
+    '.grv-nav{gap:8px !important}.grv-nav .rail-a{padding-top:7px !important;padding-bottom:7px !important}' +
+    '.grv-glass button{min-height:34px !important}.rail-note{display:none}}';
   var st = document.createElement('style'); st.textContent = css; document.head.appendChild(st);
 
   var fine = window.matchMedia ? matchMedia('(hover: hover) and (pointer: fine)') : { matches: true };

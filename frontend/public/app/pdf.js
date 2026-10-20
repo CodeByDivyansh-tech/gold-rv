@@ -231,7 +231,7 @@
     pages.forEach(function (p, i) {
       ops = p;
       hline(M, PW - M, M + 14, RULE);
-      text(M, M + 2, enc('Research project, not investment advice  ·  gold-rv.vercel.app'), false, 7.5, MUTED);
+      text(M, M + 2, enc('Gold RV Intelligence  ·  Team NEXORA  ·  Research project, not investment advice'), false, 7.5, MUTED);
       var pg = enc('Page ' + (i + 1) + ' of ' + N);
       text(PW - M - width(pg, false, 7.5), M + 2, pg, false, 7.5, MUTED);
     });
@@ -251,7 +251,7 @@
     objs[4] = '<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold /Encoding /WinAnsiEncoding >>';
     var d = new Date(), z = function (v) { return ('0' + v).slice(-2); };
     var stamp = 'D:' + d.getUTCFullYear() + z(d.getUTCMonth() + 1) + z(d.getUTCDate()) + z(d.getUTCHours()) + z(d.getUTCMinutes()) + z(d.getUTCSeconds()) + 'Z';
-    objs[5] = '<< /Title ' + lit(enc('Gold RV Intelligence: ') + L.title) + ' /Author (Team NEXORA) /Creator (gold-rv.vercel.app) /Producer (Gold RV Intelligence) /CreationDate (' + stamp + ') >>';
+    objs[5] = '<< /Title ' + lit(enc('Gold RV Intelligence: ') + L.title) + ' /Author (Team NEXORA) /Creator (Gold RV Intelligence, Team NEXORA) /Producer (Gold RV Intelligence) /CreationDate (' + stamp + ') >>';
     var chunks = [], len = 0, off = [];
     function put(x) { var b = typeof x === 'string' ? bin(x) : x; chunks.push(b); len += b.length; }
     put('%PDF-1.4\n%\xE2\xE3\xCF\xD3\n');
