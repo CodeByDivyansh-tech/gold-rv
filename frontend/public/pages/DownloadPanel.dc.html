@@ -157,6 +157,8 @@ class Component extends DCLogic {
     const rg = this.range(D, period, cFrom, cTo), from = rg.from, to = rg.to;
     const inP = (d) => d >= from && d <= to;
     const WHY = { revert: 'Back to normal', stop: 'Stop-loss', time: 'Time limit', roll: 'Contract roll', expiry: 'Near expiry' };
+    // where each row's prices come from (official MCX Bhavcopy settlements either way)
+    const SRC_BOOK = 'compiled MCX data book (shared with permission)', SRC_OURS = 'Our own MCX download';
     if (what === 'today') {
       return { title: 'Today\'s six pairs', head: ['Pair', 'Contracts', 'Spread (bps)', 'Spread (Rs per 10 g)', 'Normal level (bps)', 'Gap from normal (bps)', 'Cost line (bps)', 'z', 'z needed', 'Status', 'Checks failed'],
         rows: D.today.map((p) => [p.label, p.contracts, p.spread, p.spreadRs, p.mu, p.dev, p.hurdle, p.z, p.zNeed, p.failed.length ? 'Quiet' : 'Signal', p.failed.join('; ')]) };
@@ -177,9 +179,9 @@ class Component extends DCLogic {
       let run = 0;
       const rows = list.map(({ id, t }) => {
         run += t.net; const P = D.pairs[id];
-        return [t.e, t.x, P.label, t.side < 0 ? 'Sell ' + P.a + ', buy ' + P.b : 'Buy ' + P.a + ', sell ' + P.b, t.z, t.days, WHY[t.why] || t.why, t.net, t.bps, Math.round(run), t.seg === 'test' ? 'Test year' : (t.seg === 'forward' ? 'Forward' : (t.seg === 'clean' ? 'Clean test' : 'Training'))];
+        return [t.e, t.x, P.label, t.side < 0 ? 'Sell ' + P.a + ', buy ' + P.b : 'Buy ' + P.a + ', sell ' + P.b, t.z, t.days, WHY[t.why] || t.why, t.net, t.bps, Math.round(run), t.seg === 'test' ? 'Test year' : (t.seg === 'forward' ? 'Forward' : (t.seg === 'clean' ? 'Clean test' : 'Training')), t.seg === 'clean' ? SRC_BOOK : SRC_OURS];
       });
-      return { title: 'Trade statement', head: ['Entered', 'Closed', 'Pair', 'Trade', 'z', 'Days', 'Why it closed', 'Result after costs (Rs)', 'Result (bps)', 'Running total (Rs)', 'Period'], rows };
+      return { title: 'Trade statement', head: ['Entered', 'Closed', 'Pair', 'Trade', 'z', 'Days', 'Why it closed', 'Result after costs (Rs)', 'Result (bps)', 'Running total (Rs)', 'Period', 'Data source'], rows };
     }
     if (what === 'backtest') {
       // every pair at every slippage, period by period: the clean test, training and the test year
@@ -190,10 +192,11 @@ class Component extends DCLogic {
         const has = !!(HC && HC.pairs[id]);
         const f = b.fwd || { n_trades: 0, net_rs: 0 };
         rows.push([D.pairs[id].label, s, has ? cn : 'not listed', has ? Math.round(cnet) : '', b.train.n_trades, Math.round(b.train.net_rs), b.test.n_trades, Math.round(b.test.net_rs), b.test.t_stat,
-          f.n_trades, Math.round(f.net_rs), cn + b.train.n_trades + b.test.n_trades + f.n_trades, Math.round(cnet + b.train.net_rs + b.test.net_rs + f.net_rs)]);
+          f.n_trades, Math.round(f.net_rs), cn + b.train.n_trades + b.test.n_trades + f.n_trades, Math.round(cnet + b.train.net_rs + b.test.net_rs + f.net_rs),
+          has ? 'Clean test: ' + SRC_BOOK + '; other periods: ' + SRC_OURS : SRC_OURS]);
       }));
       return { title: 'Backtest by period, ' + D.longrun.start.slice(0, 4) + ' to ' + D.asOf.slice(0, 4),
-        head: ['Pair', 'Slippage (bps)', 'Clean test trades', 'Clean test after costs (Rs)', 'Training trades', 'Training after costs (Rs)', 'Test-year trades', 'Test year after costs (Rs)', 'Test-year t-statistic', 'After the test year: trades', 'After the test year (Rs)', 'All trades', 'All years after costs (Rs)'], rows };
+        head: ['Pair', 'Slippage (bps)', 'Clean test trades', 'Clean test after costs (Rs)', 'Training trades', 'Training after costs (Rs)', 'Test-year trades', 'Test year after costs (Rs)', 'Test-year t-statistic', 'After the test year: trades', 'After the test year (Rs)', 'All trades', 'All years after costs (Rs)', 'Data source'], rows };
     }
     return { title: 'Research report', head: ['Section', 'Contents'], rows: [['Verdict', 'No persistent edge proven after costs'], ['Today', 'Six pairs against the cost line'], ['Backtest', 'Clean test 2011–2023, training and test year, all pairs'], ['Costs', 'Round trip ' + D.costTotal.toFixed(1) + ' bps'], ['Data', D.longrun.allRows + ' daily settlements, ' + D.longrun.start.slice(0, 4) + '–' + D.asOf.slice(0, 4) + ' (' + D.longrun.rows + ' history book 2011–2023, ' + D.meta.rows + ' our MCX download), ' + D.meta.mismatches + ' mismatches']] };
   }
@@ -206,7 +209,7 @@ class Component extends DCLogic {
   doc(D, what, pair, periodLabel, t) {
     const HC = (this.state || {}).HC;
     const sub = 'data as of ' + this.fd(D.asOf) + ' · MCX Bhavcopy end-of-day settlements';
-    const foot = 'Team NEXORA · Hack in Hills \'26 · Research project, not investment advice. Results include all MCX costs and 5 bps slippage per order unless stated. Source: github.com/CodeByDivyansh-tech/gold-rv';
+    const foot = 'Team NEXORA · Hack in Hills \'26 · Research project, not investment advice. Results include all MCX costs and 5 bps slippage per order unless stated. Prices: official MCX Bhavcopy settlements; ' + this.fd(D.longrun.start) + ' to ' + this.fd(D.longrun.end) + ' from the compiled MCX data book, shared with permission; from ' + this.fd(D.start) + ' on, our own MCX download. Source: github.com/CodeByDivyansh-tech/gold-rv';
     const out = (blocks, landscape) => ({ title: t.title, subtitle: sub, blocks, foot, landscape: !!landscape });
     const n = (v) => (typeof v === 'number' ? v.toLocaleString('en-IN') : v);
     if (what === 'trades') {
@@ -214,7 +217,7 @@ class Component extends DCLogic {
       const label = pair === 'ALL' ? 'All six pairs' : D.pairs[pair].label;
       return out([
         { t: 'box', lines: [[[label, true], [' · ' + periodLabel, false]], [[t.rows.length + ' trades · ' + won + ' made money after costs · total after costs ', false], [this.rs(net), true]]] },
-        { t: 'table', head: t.head, rows: t.rows.map((r) => r.slice(0, 7).concat([this.rs(r[7]), r[8], this.rs(r[9]), r[10]])) }
+        { t: 'table', head: t.head.slice(0, 11), rows: t.rows.map((r) => r.slice(0, 7).concat([this.rs(r[7]), r[8], this.rs(r[9]), r[10]])) }
       ], true);
     }
     if (what === 'today') {
@@ -236,7 +239,7 @@ class Component extends DCLogic {
     if (what === 'backtest') {
       return out([
         { t: 'box', lines: [[['Every pair at 0, 2, 5 and 10 bps slippage per order', true]], 'Clean test ' + this.fd(D.longrun.start) + ' to ' + this.fd(D.longrun.end) + ' (MCX history book; only the three pairs that were listed then), training, the test year and everything after it, to ' + this.fd(D.asOf) + '. Results in rupees after all MCX costs.'] },
-        { t: 'table', head: t.head, rows: t.rows.map((r) => r.map((v, j) => ([3, 5, 7, 10, 12].includes(j) && typeof v === 'number' ? this.rs(v) : n(v)))) }
+        { t: 'table', head: t.head.slice(0, 13), rows: t.rows.map((r) => r.slice(0, 13).map((v, j) => ([3, 5, 7, 10, 12].includes(j) && typeof v === 'number' ? this.rs(v) : n(v)))) }
       ], true);
     }
     // full research report
