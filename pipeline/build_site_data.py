@@ -43,7 +43,7 @@ from pipeline.attribution import (
     compute_t_stat_and_ci,
 )
 from pipeline.alerts import generate_today_alerts, generate_signals_history
-from pipeline.lifecycle import compute_contract_lifecycle
+from pipeline.lifecycle import compute_contract_lifecycle, calendar_check
 
 class CustomJSONEncoder(json.JSONEncoder):
     """Encodes numpy and pandas data types safely to standard JSON."""
@@ -254,6 +254,8 @@ def build_all_site_data(output_dir: str = 'frontend/public/data'):
             for sym, spec in CONTRACT_SPECS.items()
         },
         'lifecycle': lifecycle_df.to_dict(orient='records'),
+        # every published trade (5 bps, all periods of our download) checked against its contracts' calendars
+        'calendar': calendar_check(all_trades_df[all_trades_df['slip'] == BASE_SLIPPAGE], lifecycle_df),
     }
     save_json(os.path.join(output_dir, 'contracts.json'), contracts_data)
     

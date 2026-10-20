@@ -29,6 +29,7 @@ const states = {
   Signals: PAIRS.map((pair) => ({ pair, allPast: true })).concat([{ R }, { R, cs: '0', cb: '0', cz: '1' }, { R, cs: '', cb: 'abc', cz: '0' }, { cs: '10', cb: '50', cz: '25' }]),
   Backtesting: PAIRS.flatMap((pair) => SLIPS.map((slip) => ({ pair, slip, hover: 0 }))).concat([{ R }, { R, H }, { H, pair: 'GUINEA_TEN', slip: '10' }]).concat(PAIRS.flatMap((pair) => SLIPS.map((slip) => ({ pair, slip, HC })))).concat([{ HC, espan: 'ours' }]),
   Data: [{}, { all: true }, { H }, { H, all: true }],
+  Brief: [{}, { HC }, { HCfail: true }, { dark: false, HC }],
   Explore: [{ E }, { E, xpair: 'M_TEN' }, { E, xpair: 'GUINEA_PETAL', slip: '0' }, { E, pub: '0', ze: '3.0', W: '10', mh: '20', h: '0' },
     { E, xpair: 'ALL', pub: '0', ze: '1.5' }, ...PAIRS.flatMap((xpair) => ['0', '10'].map((slip) => ({ E, xpair, slip, pub: '0' })))],
   DownloadPanel: ['today', 'prices', 'trades', 'backtest', 'report'].flatMap((what) =>
@@ -70,7 +71,7 @@ for (const [name, list] of Object.entries(states)) {
 // Shared menus: exactly one item is marked as the current page, on every page
 for (const name of ['Rail', 'TabBar']) {
   const C = load(name)
-  for (const cur of ['Home', 'Today', 'Market', 'Pairs', 'Signals', 'Backtesting', 'Data']) {
+  for (const cur of ['Home', 'Today', 'Market', 'Pairs', 'Signals', 'Backtesting', 'Explore', 'Data', 'Brief']) {
     const c = new C(); c.props = { current: cur }; c.state = {}
     const v = c.renderVals()
     assert.deepEqual(Object.keys(v.nav).filter((k) => v.nav[k].cur === 'page'), [cur], `${name} highlights ${cur}`)
@@ -78,7 +79,7 @@ for (const name of ['Rail', 'TabBar']) {
   }
 }
 // Every page uses the shared menus instead of its own copy
-for (const name of ['Home', 'Today', 'Market', 'Pairs', 'Signals', 'Backtesting', 'Explore', 'Data']) {
+for (const name of ['Home', 'Today', 'Market', 'Pairs', 'Signals', 'Backtesting', 'Explore', 'Data', 'Brief']) {
   const src = readFileSync(`public/pages/${name}.dc.html`, 'utf8')
   assert.ok(src.includes(`<dc-import name="Rail" current="${name}">`) && src.includes(`<dc-import name="TabBar" current="${name}">`), `${name} uses the shared menus`)
   assert.ok(!src.includes('<aside class="rail"') && !src.includes('<nav class="tabbar"'), `${name} still has its own menu copy`)
@@ -171,7 +172,7 @@ console.log('explorer ok')
 // The study runs 2011 to today. The 12-month test year and our own 3-year MCX download are parts of it:
 // they may be shown, but always named as parts, never as the headline result or the dataset size.
 {
-  const PAGES = ['Home', 'Today', 'Market', 'Pairs', 'Signals', 'Backtesting', 'Explore', 'Data', 'DownloadPanel']
+  const PAGES = ['Home', 'Today', 'Market', 'Pairs', 'Signals', 'Backtesting', 'Explore', 'Data', 'Brief', 'DownloadPanel']
   // 1) phrases that presented a part as the whole, in the page files themselves
   const BANNED = [/On the 12-month test year/, /Trades in the test year/, /Results on the test year/, /Training period, for comparison/,
     /tested it on the next twelve months/, /'daily settlements checked'/, /'Everything'\]/, /Backtest on the test year/]
@@ -304,7 +305,7 @@ function L_N() { return D.longrun.n }
   // Ctrl/Cmd+P: keys.js opens the panel with PDF chosen, or downloads when it is open
   const keys = readFileSync('public/app/keys.js', 'utf8')
   assert.ok(/e\.key === 'p' \|\| e\.key === 'P'/.test(keys) && /grv:pdf/.test(keys) && /GRVWantPdf/.test(keys))
-  for (const name of ['Home', 'Today', 'Market', 'Pairs', 'Signals', 'Backtesting', 'Explore', 'Data'])
+  for (const name of ['Home', 'Today', 'Market', 'Pairs', 'Signals', 'Backtesting', 'Explore', 'Data', 'Brief'])
     assert.ok(readFileSync(`public/pages/${name}.dc.html`, 'utf8').includes('data-dl="1" onClick="{{openDl}}"'), name + ': download button reachable by Ctrl+P')
   globalThis.GRVWantPdf = true
   const p = mk({}); p.componentDidMount = p.componentDidMount; globalThis.fetch = () => new Promise(() => {}); globalThis.addEventListener = () => {}
@@ -323,4 +324,78 @@ function L_N() { return D.longrun.n }
     assert.ok(n.length <= 60 && !/-$/.test(n) && !/-(and|of|for|from|to|\d{1,2}|oct)$/.test(n), `chart file name "${n}"`)
   }
   console.log('chart file names ok')
+}
+
+// The brief, answered: one row per line of the problem statement, each proved by a real page section,
+// and every number read from the data files (Oct-2026 request)
+{
+  const sentence = (h) => 'At ' + h.slip + ' bps slippage, only ' + h.profitable + ' of ' + h.total + ' settings make money on ' + h.start.slice(0, 4) + '–' + h.end.slice(0, 4) + ', even picked with hindsight.'
+  // the "N of M" count matches the explorer grid it summarises
+  const fi = E.fields.indexOf('clean_n'), fn = E.fields.indexOf('clean_net')
+  let tot = 0, pos = 0
+  for (const p of D.longrun.pairs) for (const [k, v] of Object.entries(E.pairs[p])) if (+k.split('|')[3] === D.hindsight.slip) { tot++; if (v[fi] > 0 && v[fn] > 0) pos++ }
+  assert.deepEqual([D.hindsight.profitable, D.hindsight.total], [pos, tot])
+  const want = sentence(D.hindsight)
+  assert.match(want, /^At 5 bps slippage, only \d+ of \d+ settings make money on 2011–2023, even picked with hindsight\.$/)
+  const hm = new (load('Home'))(); hm.props = {}; hm.state = { D }
+  assert.equal(hm.renderVals().brief[1].note, want, 'Home: the sentence sits under the 15-year headline')
+  const bt = new (load('Backtesting'))(); bt.props = {}; bt.state = { D, H }
+  assert.equal(bt.renderVals().hindsight, want, 'Backtesting: the sentence sits in the clean test')
+
+  const C = load('Brief')
+  const c = new C(); c.props = {}; c.state = { D, HC }
+  const v = c.renderVals()
+  const lines = v.rows.filter((r) => r.line)
+  assert.equal(lines.length, 10); assert.equal(v.rows.filter((r) => r.group).length, 1)
+  assert.deepEqual(lines.map((r) => r.num), ['1', '2', '3', '4', '5', '6.1', '6.2', '6.3', '6.4', '6.5'])
+  assert.equal(v.verdict.hindsight, want)
+  for (const r of lines) {
+    assert.equal(r.status, 'Done')
+    assert.ok(r.show.length > 40 && r.links.length >= 1, r.num + ': says what we show and links to its proof')
+    for (const l of r.links) {
+      const m = /^([A-Za-z]+)\.dc\.html(?:#([a-z0-9-]+))?$/.exec(l.href)
+      assert.ok(m, r.num + ': link ' + l.href)
+      const src = readFileSync(`public/pages/${m[1]}.dc.html`, 'utf8')
+      if (m[2]) assert.ok(src.includes(`id="${m[2]}"`), r.num + ': ' + l.href + ' points at a section that exists')
+    }
+  }
+  // the numbers on the page are the data files' numbers
+  const L = D.longrun, inr = (x) => (x < 0 ? '−' : '') + '₹' + Math.abs(Math.round(x)).toLocaleString('en-IN')
+  const r62 = lines.find((r) => r.num === '6.2').show
+  assert.ok(r62.includes(L.n + ' trades') && r62.includes(inr(L.net)), r62)
+  const K = D.brief.calendar
+  assert.equal(K.clean.inside, K.clean.n, 'every clean-test trade sits inside its contracts\' calendars')
+  assert.equal(K.ours.inside, K.ours.n, 'every trade on our download sits inside its contracts\' calendars')
+  assert.ok(lines.find((r) => r.num === '5').show.includes((K.clean.n + K.ours.n).toLocaleString('en-IN') + ' trades, ' + L.start.slice(0, 4) + '–' + D.asOf.slice(0, 4)))
+  assert.equal(K.clean.n, L.n, 'the calendar check covers every clean-test trade')
+  assert.match(lines.find((r) => r.num === '6.4').show, /% of the gross result over all [\d,]+ trades, 2011–20\d\d/)
+  // headline covers every year; the carry figures are named as our own download
+  assert.equal(v.verdict.kicker, 'The answer, ' + L.start.slice(0, 4) + '–' + D.asOf.slice(0, 4))
+  assert.match(lines.find((r) => r.num === '2').show, /On our own MCX download \(/)
+  // without the 2011-2023 trades the all-years attribution waits; it never falls back to our years alone
+  const w = new C(); w.props = {}; w.state = { D }
+  assert.match(w.renderVals().rows.find((r) => r.num === '6.4').show, /…/)
+  // route, menus, keyboard and search
+  assert.match(readFileSync('public/app/main.js', 'utf8'), /brief: 'Brief'/)
+  const keys = readFileSync('public/app/keys.js', 'utf8')
+  assert.ok(keys.includes("['9', 'The brief, answered', '#/brief'") && keys.includes('/^[1-9]$/'), 'key 9 and the search list open the brief')
+  assert.ok(readFileSync('public/pages/Rail.dc.html', 'utf8').includes('href="Brief.dc.html"') && readFileSync('public/pages/TabBar.dc.html', 'utf8').includes('href="Brief.dc.html"'))
+  console.log('brief ok')
+}
+
+// Downloads credit the data (CLAUDE.md rule 4; Oct-2026 debug: statements and PDFs had no Parity credit)
+{
+  const mk = (st) => { const c = new (load('DownloadPanel'))(); c.props = { dark: true, onClose: () => {} }; c.state = { D, H, HC, ...st }; return c }
+  for (const what of ['today', 'prices', 'trades', 'backtest', 'report']) {
+    const c = mk({ what, period: 'all', pair: 'ALL' })
+    const d = c.doc(D, what, 'ALL', 'Everything since 2011', c.table(D, what, 'ALL', 'all', H, HC))
+    assert.match(d.foot, /Parity team's MCX data book, shared with permission/, what + ': PDF and printable page credit the data book')
+    assert.match(d.foot, /our own MCX download/)
+  }
+  const tr = mk({}).table(D, 'trades', 'ALL', 'all', H, HC)
+  assert.equal(tr.head[11], 'Data source')
+  assert.ok(tr.rows.every((r) => (r[10] === 'Clean test') === /Parity/.test(r[11])), 'clean-test trades are credited to the Parity book, the rest to our download')
+  const bt = mk({}).table(D, 'backtest', 'ALL', 'all', H, HC)
+  assert.ok(bt.rows.filter((r) => D.longrun.pairs.includes(Object.keys(D.pairs).find((k) => D.pairs[k].label === r[0]))).every((r) => /Parity/.test(r[13])))
+  console.log('download credit ok')
 }

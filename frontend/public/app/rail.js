@@ -5,7 +5,7 @@
  *   Current page  a glowing gold pill (pure CSS on aria-current, so it works without this script too)
  *   Hover         a soft highlight slides up and down to the item under the cursor (or keyboard focus),
  *                 and slides back to the current page when the cursor leaves the menu
- *   Badge         the hovered item shows its shortcut key, 1–8 (keys.js)
+ *   Badge         the hovered item shows its shortcut key, 1–9 (keys.js)
  *   Page light    a faint gold glow follows the cursor across the page
  *
  * Mouse and trackpad only: on touch screens there is no hover highlight and no page light.

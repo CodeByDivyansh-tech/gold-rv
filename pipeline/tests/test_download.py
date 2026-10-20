@@ -13,9 +13,10 @@ from pipeline.download import (RAW_COLS, contract_calendar, fetch, merge_raw, pl
 def test_raw_file_and_supplement_rebuild_the_committed_clean_csv_and_calendar_byte_for_byte():
     from pipeline.download import load_raw
     clean = raw_to_clean(load_raw())
-    buf = io.StringIO(); clean.to_csv(buf, index=False)
+    # pandas ends lines with os.linesep ("\r\n" on Windows); reading in text mode gives "\n" on every platform
+    buf = io.StringIO(); clean.to_csv(buf, index=False, lineterminator='\n')
     assert buf.getvalue() == open(CLEAN_PATH, encoding='utf-8').read()
-    buf = io.StringIO(); contract_calendar(clean).to_csv(buf, index=False)
+    buf = io.StringIO(); contract_calendar(clean).to_csv(buf, index=False, lineterminator='\n')
     assert buf.getvalue() == open(CAL_PATH, encoding='utf-8').read()
 
 
