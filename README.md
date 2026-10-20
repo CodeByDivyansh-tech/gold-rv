@@ -20,7 +20,7 @@ Every number below is computed by the pipeline (`frontend/public/data/`), not ty
 ### 1.1 The clean test: 2011–2023, rule frozen (151 trades)
 
 The rule and its settings were frozen before this data was used, and nothing was changed afterwards
-(data: the data-book team's MCX Bhavcopy data book, shared with permission). Only the three pairs that existed then
+(data: another team's MCX Bhavcopy data book, shared with permission). Only the three pairs that existed then
 can be tested.
 
 How we know the book is right: where the book and our own MCX download cover the same days (10 Oct 2023 →
@@ -91,7 +91,7 @@ Only real broker fills (a forward test) can settle it.
 | | |
 |---|---|
 | **Coverage (whole study)** | 18 Apr 2011 → 16 Oct 2026: **47,521 daily prices, 599 contracts, 4,138 trading days**, every one an official MCX Bhavcopy settlement (`site-data.json → longrun`) |
-| **Part 1: MCX history book** | 18 Apr 2011 → 9 Oct 2023: 35,014 daily prices, 457 contracts, 3,359 trading days (the clean test). Shared with us by the data-book team, with permission |
+| **Part 1: MCX history book** | 18 Apr 2011 → 9 Oct 2023: 35,014 daily prices, 457 contracts, 3,359 trading days (the clean test). Shared with us by another team, with permission |
 | **Part 2: our own MCX download** | 10 Oct 2023 → 16 Oct 2026: 12,507 daily prices, 150 contracts, 779 trading days (training, test year and after). Every day the history book has in this window is present (a test checks this) |
 | **Fixed in Oct 2026** | Our MCX download had skipped 8 contracts: the Oct, Nov and Dec 2023 expiries of GOLDM, GOLDGUINEA and GOLDPETAL (289 traded rows, the busiest contracts in those months). They are now added from the MCX history book, with 1 Oct 2026, in `data/raw/mcx_bhavcopy_supplement.csv`. Effect: training 37 → 38 trades, −₹19,056 → −₹16,514; settings, test year, 2011–2023 check and alerts unchanged |
 | **Checked and fine** | No missing days inside any contract's life; no broken high/low/close; the 6%+ days (Jan–Mar 2026, 19 Mar, 13 May 2026) moved all four contracts together, so they are real; GOLDM's Nov-2024 contract expired early, on 31 Oct 2024 |
@@ -121,7 +121,7 @@ gold-rv/
 │   ├── contract_calendar.csv      # contract lifecycles, derived from the clean file
 │   ├── mcx_csv/                   # every MCX Bhavcopy CSV imported by hand (pipeline/import_csv.py), kept as received
 │   ├── retrieval_log.csv          # one line per MCX request
-│   └── mcx_history_book.csv       # 55,457 MCX rows, Nov-2003 → Oct-2026 (data-book team, with permission)
+│   └── mcx_history_book.csv       # 55,457 MCX rows, Nov-2003 → Oct-2026 (compiled data book, shared with permission)
 ├── reference/                  # reference_check.py + its outputs (the original study's benchmark)
 ├── pipeline/
 │   ├── config.py               # contract master, costs, parameters, split dates, segment_of()

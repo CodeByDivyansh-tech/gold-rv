@@ -117,7 +117,7 @@ button:focus-visible,a:focus-visible,input:focus-visible{outline:2px solid var(-
         <sc-if value="{{hx.show}}" hint-placeholder-val="{{ true }}">
         <section class="grv-card" aria-labelledby="hx-h" style="background: var(--panel); border: 1px solid var(--line); border-radius: 20px; padding: clamp(18px, 2.5vw, 26px); display: flex; flex-direction: column; gap: 14px">
           <div style="display: flex; flex-direction: column; gap: 4px">
-            <h2 id="hx-h" style="margin: 0; font-size: 18px; font-weight: 600">More history, shared by the data-book team<button type="button" class="grv-q" data-term="Bhavcopy" aria-label="What does 'Bhavcopy' mean?" title="What does this mean?">?</button></h2>
+            <h2 id="hx-h" style="margin: 0; font-size: 18px; font-weight: 600">More history, shared with us<button type="button" class="grv-q" data-term="Bhavcopy" aria-label="What does 'Bhavcopy' mean?" title="What does this mean?">?</button></h2>
             <span style="font-size: 13px; color: var(--muted); line-height: 1.6; max-width: 82ch">{{hx.intro}}</span>
           </div>
           <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(240px, 100%), 1fr)); gap: 12px">
@@ -327,7 +327,7 @@ class Component extends DCLogic {
       const since = ['GOLDM', 'GOLDGUINEA', 'GOLDPETAL', 'GOLDTEN'].filter((x) => cv[x]).map((x) => x + ' from ' + this.fd(cv[x].first).replace(/^\d+ /, '')).join(', ');
       hx = {
         show: true,
-        intro: 'The data-book team shared their MCX Gold Futures Data Book with us: official MCX Bhavcopy rows from ' + this.fd(HX.source.first) + ' to ' + this.fd(HX.source.last) + '. Thank you!',
+        intro: 'Another team shared their MCX Gold Futures History Book with us: official MCX Bhavcopy rows from ' + this.fd(HX.source.first) + ' to ' + this.fd(HX.source.last) + '. Thank you!',
         facts: [
           { value: n(HX.source.rows), label: 'daily settlements in the book', note: since + '. We use ' + n(D.longrun.rows) + ' of them (' + this.fd(HX.window.from) + ' to ' + this.fd(HX.window.to) + ') for the clean test, and the ' + n(k.shared_rows) + ' that overlap our download to check it.', color: 'var(--fg)' },
           { value: n(HX.source.contracts), label: 'contracts in the book', note: 'Each contract listed under its own expiry, exactly as MCX published it.', color: 'var(--fg)' },
