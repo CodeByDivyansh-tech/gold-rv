@@ -3,7 +3,7 @@
 [![Static Site](https://img.shields.io/badge/Architecture-Static%20Site%20(Zero%20Runtime%20Server)-success)](https://gold-rv.vercel.app)
 [![Python Pipeline](https://img.shields.io/badge/Pipeline-Python%203.11%2B%20%7C%20Pandas%20%7C%20NumPy-blue)](#3-how-to-run-locally)
 [![Frontend](https://img.shields.io/badge/Frontend-Static%20HTML%20%7C%20no%20runtime%20deps-orange)](#3-how-to-run-locally)
-[![CI](https://github.com/CodeByDivyansh-tech/gold-rv/actions/workflows/ci.yml/badge.svg)](https://github.com/CodeByDivyansh-tech/gold-rv/actions/workflows/ci.yml)
+[![CI](https://github.com/CodeByDivyansh-tech/nexora-gold-rv-/actions/workflows/ci.yml/badge.svg)](https://github.com/CodeByDivyansh-tech/nexora-gold-rv-/actions/workflows/ci.yml)
 [![Pitch Presentation](https://img.shields.io/badge/Pitch-Interactive%203D%20Deck-gold)](https://gold-rv.vercel.app/pitch/)
 
 **Hack in Hills '26 · Problem 03: Commodity Derivatives Intelligence**
