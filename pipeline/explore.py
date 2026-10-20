@@ -39,6 +39,20 @@ def key(W, ze, mh, slip, h) -> str:
     return f'{W}|{ze}|{mh}|{slip}|{h}'
 
 
+def hindsight(ex: Dict[str, Any], slip: int = 5) -> Dict[str, Any]:
+    """How many grid settings make money on the clean test, even picked after seeing every result.
+
+    Counts settings (W, entry z, hold, cost line) of the pairs that existed in the clean window, at one slippage,
+    with at least one clean-test trade and a positive clean-test net.
+    """
+    f = ex['fields']
+    i_n, i_net = f.index('clean_n'), f.index('clean_net')
+    pairs = [p for p in ORDER if p in HISTORY_PAIRS]
+    cells = [v for p in pairs for k, v in ex['pairs'][p].items() if int(k.split('|')[3]) == slip]
+    return dict(profitable=sum(1 for v in cells if v[i_n] > 0 and v[i_net] > 0), total=len(cells), slip=slip,
+                pairs=pairs, start=ex['cleanFrom'], end=ex['cleanTo'])
+
+
 def _seg(t: pd.DataFrame):
     return [int(len(t)), round(float(t['net'].sum())), int((t['net'] > 0).sum())] if len(t) else [0, 0, 0]
 
