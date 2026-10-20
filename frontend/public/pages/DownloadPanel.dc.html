@@ -15,7 +15,7 @@ body{margin:0}
 </style>
 </helmet>
 <div style="{{rootStyle}}">
-  <div role="dialog" aria-modal="true" aria-labelledby="dl-h" onKeyDown="{{onKey}}" style="width: 100%; max-width: 600px; max-height: calc(100vh - 32px); overflow-y: auto; box-sizing: border-box; background: var(--panel); border: 1px solid var(--line); border-radius: 22px; box-shadow: 0 24px 64px rgba(0,0,0,0.35); padding: 22px; display: flex; flex-direction: column; gap: 18px; color: var(--fg); font-family: 'Geist', 'Segoe UI', system-ui, sans-serif">
+  <div role="dialog" aria-modal="true" aria-labelledby="dl-h" tabindex="-1" data-dl-dialog onKeyDown="{{onKey}}" style="outline: none; width: 100%; max-width: 600px; max-height: calc(100vh - 32px); overflow-y: auto; box-sizing: border-box; background: var(--panel); border: 1px solid var(--line); border-radius: 22px; box-shadow: 0 24px 64px rgba(0,0,0,0.35); padding: 22px; display: flex; flex-direction: column; gap: 18px; color: var(--fg); font-family: 'Geist', 'Segoe UI', system-ui, sans-serif">
     <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 12px">
       <div style="display: flex; flex-direction: column; gap: 4px">
         <h2 id="dl-h" style="margin: 0; font-size: 20px; font-weight: 600; letter-spacing: -0.01em">Download</h2>
@@ -120,6 +120,14 @@ class Component extends DCLogic {
       this.setState({ format: 'pdf', status: 'PDF chosen. Pick what you want, then press ' + key + ' P again or Download.', bad: false });
     }
     this.onPdf = () => this.pdfNow();
+    // Escape closes the panel wherever focus is, and focus moves into the dialog so keyboard and
+    // screen-reader users start inside it; it returns to the button that opened it on close
+    if (typeof document !== 'undefined') {
+      this.opener = document.activeElement;
+      this.onEsc = (e) => { if (e.key === 'Escape' && typeof this.props.onClose === 'function') { e.preventDefault(); this.props.onClose(); } };
+      document.addEventListener('keydown', this.onEsc);
+      setTimeout(() => { const d = document.querySelector('[data-dl-dialog]'); if (d && !d.contains(document.activeElement)) d.focus(); }, 0);
+    }
     if (typeof window !== 'undefined' && window.addEventListener) window.addEventListener('grv:pdf', this.onPdf);
     fetch('data/site-data.json')
       .then((r) => r.json())
@@ -130,7 +138,11 @@ class Component extends DCLogic {
     fetch('data/history_charts.json').then((r) => r.json()).then((h) => this.setState({ HC: h })).catch(() => this.setState({ failed: true }));
   }
 
-  componentWillUnmount() { if (this.onPdf && window.removeEventListener) window.removeEventListener('grv:pdf', this.onPdf); }
+  componentWillUnmount() {
+    if (this.onPdf && window.removeEventListener) window.removeEventListener('grv:pdf', this.onPdf);
+    if (this.onEsc && typeof document !== 'undefined') document.removeEventListener('keydown', this.onEsc);
+    if (this.opener && this.opener.focus && document.contains(this.opener)) this.opener.focus();
+  }
 
   pdfNow() {
     this.setState({ format: 'pdf', status: 'Making your PDF…', bad: false });
@@ -333,7 +345,7 @@ class Component extends DCLogic {
       ? 'position: fixed; inset: 0; z-index: 50; background: rgba(18,12,4,0.62); display: flex; align-items: center; justify-content: center; padding: 16px; box-sizing: border-box'
       : 'min-height: 100vh; background: var(--bg); display: flex; align-items: center; justify-content: center; padding: 24px; box-sizing: border-box');
     const close = () => { if (overlay) this.props.onClose(); };
-    const base = { rootStyle, close, onKey: (e) => { if (e.key === 'Escape') close(); } };
+    const base = { rootStyle, close, onKey: (e) => { if (e.key === 'Escape' && !this.onEsc) close(); } };
     const D = st.D;
     if (!D || !st.H || !st.HC) return { ...base, loading: !st.failed, failed: !!st.failed, ready: false, asOf: '…' };
 
