@@ -383,6 +383,20 @@ function L_N() { return D.longrun.n }
   console.log('brief ok')
 }
 
+// Pair Explorer: a pair the model never traded says so instead of showing an empty table (Oct-2026 report)
+{
+  for (const pair of Object.keys(D.pairs)) {
+    const p = new (load('Pairs'))(); p.props = {}; p.state = { D, HC, pair }
+    const v = p.renderVals()
+    const none = D.pairs[pair].trades.length === 0
+    assert.equal(v.hasTrades, !none, pair + ': table shown only when there are trades')
+    assert.equal(v.noTrades.show, none, pair + ': empty-state message shown only when there are no trades')
+    if (none) assert.match(v.noTrades.text, /never traded .+ from \d+ \w+ \d{4} to \d+ \w+ \d{4}/)
+  }
+  assert.ok(Object.values(D.pairs).some((x) => x.trades.length === 0), 'at least one pair (GOLDM · GOLDTEN) has no trades today')
+  console.log('pair empty state ok')
+}
+
 // Downloads credit the data (CLAUDE.md rule 4; Oct-2026 debug: statements and PDFs had no data-book credit)
 {
   const mk = (st) => { const c = new (load('DownloadPanel'))(); c.props = { dark: true, onClose: () => {} }; c.state = { D, H, HC, ...st }; return c }

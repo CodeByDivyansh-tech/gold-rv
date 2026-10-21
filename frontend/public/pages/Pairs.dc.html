@@ -116,6 +116,7 @@ button:focus-visible,a:focus-visible,input:focus-visible{outline:2px solid var(-
               <span style="font-size: 13px; color: var(--muted)">{{tradeCount}} · 5 bps slippage · ₹10 lakh per leg</span>
             </div>
             <p class="grv-detail" style="margin: 0; font-size: 13px; line-height: 1.6; color: var(--muted)">{{entryRule}}</p>
+            <sc-if value="{{hasTrades}}" hint-placeholder-val="{{ true }}">
             <p style="margin: 0; font-size: 13px; color: var(--muted)">Tap or click a trade to see its story.</p>
             <sc-if value="{{story.on}}" hint-placeholder-val="{{ false }}">
               <section id="story" class="grv-card" aria-labelledby="story-h" style="background: var(--panel); border: 1px solid var(--gold); border-radius: 18px; padding: 18px; display: flex; flex-direction: column; gap: 12px">
@@ -172,6 +173,13 @@ button:focus-visible,a:focus-visible,input:focus-visible{outline:2px solid var(-
                 </tbody>
               </table>
             </div>
+            </sc-if>
+            <sc-if value="{{noTrades.show}}" hint-placeholder-val="{{ false }}">
+              <div role="status" style="border: 1px solid var(--line); border-radius: 16px; background: var(--panel); padding: 18px 20px; display: flex; flex-direction: column; gap: 6px">
+                <strong style="font-size: 15px; font-weight: 600">{{noTrades.title}}</strong>
+                <p style="margin: 0; font-size: 14px; line-height: 1.6; color: var(--muted)">{{noTrades.text}}</p>
+              </div>
+            </sc-if>
             <sc-if value="{{moreTrades.show}}" hint-placeholder-val="{{ true }}">
               <button type="button" onClick="{{moreTrades.toggle}}" aria-expanded="{{moreTrades.expanded}}" style="align-self: flex-start; min-height: 44px; padding: 0 16px; border-radius: 12px; border: 1px solid var(--line); background: var(--panel); color: var(--fg); font: 600 14px 'Geist', system-ui, sans-serif; cursor: pointer">{{moreTrades.label}}</button>
             </sc-if>
@@ -446,6 +454,13 @@ class Component extends DCLogic {
       };
     }
     const keyOf = (tr) => tr.sig + '|' + tr.e;
+    const hasTrades = P.trades.length > 0;
+    const noTrades = {
+      show: !hasTrades,
+      title: 'No trades for this pair',
+      text: 'The model never traded ' + P.label + ' from ' + this.fd(P.d[0]) + ' to ' + this.fd(P.d[P.d.length - 1]) +
+        ': on no day did its gap pass all five checks, so the model stayed out. That is the rule working as designed (quiet when there is nothing worth trading), not missing data. The gap history above covers every one of those days.'
+    };
     const trades = P.trades.slice().reverse().slice(0, allTrades ? P.trades.length : SHOW).map((tr) => ({
       open: () => { this.setState({ story: keyOf(tr) }); setTimeout(() => { const el = document.getElementById('story'); if (el) el.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); }, 60); },
       aria: 'Story of the trade entered ' + this.fd(tr.e), bg: st.story === keyOf(tr) ? 'var(--glow)' : 'var(--panel)', border: st.story === keyOf(tr) ? 'var(--gold)' : 'var(--line)', rowBg: st.story === keyOf(tr) ? 'var(--glow)' : 'transparent',
@@ -513,7 +528,7 @@ class Component extends DCLogic {
     const entryRule = 'The model enters only when all five checks pass: the gap is unusual (|z| from ' + pr.ze + ' up to the stop-loss at ' + pr.stop_z + '), it beats the ' + pr.hurdle_bps + ' bps cost line, both contracts are liquid and expiry is at least ' + D.minTd + ' trading days away. It never buys or sells on a day either contract moved ' + pr.max_fill_move_pct.toFixed(0) + '% or more. Training switch for this pair: ' + (P.switch.on ? 'on' : 'off') + ' (' + P.switch.reason + ').';
 
     return {
-      ...shell, loading: false, ready: true, chips, facts, chart, hover, trades, moreTrades, entryRule, testKpis, verdict, periods, sumTitle, story,
+      ...shell, loading: false, ready: true, chips, facts, chart, hover, trades, hasTrades, noTrades, moreTrades, entryRule, testKpis, verdict, periods, sumTitle, story,
       tradeCount: P.trades.length + ' trades' + (span === 'all' ? ' (' + HP.trades['5'].length + ' in the clean test ' + st.HC.from.slice(0, 4) + '–' + st.HC.to.slice(0, 4) + ')' : '') + ', ' + nt + ' in the test year',
       split: '5 bps slippage · settings chosen on training, then frozen'
     };
