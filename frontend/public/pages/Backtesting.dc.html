@@ -558,8 +558,8 @@ class Component extends DCLogic {
 
     const B = D.backtest[pid][slip];
     const T = B.test;
-    // This pair over every year we have: the clean test (2011-2023, MCX archive) + training + the test year.
-    // Until the archive's trades have loaded the totals are "pending" and show "…", never the test year alone.
+    // This pair over every year we have: the clean test (2011-2023) + training + the test year.
+    // Until the 2011-2023 trades have loaded the totals are "pending" and show "…", never the test year alone.
     const CLEANPAIR = ['M_PETAL', 'M_GUINEA', 'GUINEA_PETAL'].indexOf(pid) >= 0;
     const HCp = st.HC && st.HC.pairs && st.HC.pairs[pid];
     const pend = CLEANPAIR && !HCp;
@@ -601,7 +601,7 @@ class Component extends DCLogic {
     const W = 1000, H = 320, pad = 16;
     const t0 = Date.parse(D.start), t1 = Date.parse(D.asOf);
     const X = (d) => ((Date.parse(d) - t0) / (t1 - t0)) * W;
-    // Full history: the clean-test trades (2011-2023, MCX archive) come first and the running total carries on
+    // Full history: the clean-test trades (2011-2023) come first and the running total carries on
     // through training and the test year, so the line shows the frozen rule over every year we have.
     const HPq = st.HC && st.HC.pairs && st.HC.pairs[pid];
     const espan = HPq && st.espan !== 'ours' ? 'all' : 'ours';
@@ -869,7 +869,7 @@ class Component extends DCLogic {
             ? 'Before costs, the average trade made ' + this.sgn(s.gross_bps, 1) + ' bps: the gaps do come back, but not by enough to pay for trading.'
             : 'Before costs, the average trade already lost ' + Math.abs(s.gross_bps).toFixed(1) + ' bps: over these years the unusual gaps did not close on average.')
           + ' Even with zero slippage the rule ' + (s0.net_rs < 0 ? 'loses ' : 'makes ') + this.srs(Math.abs(s0.net_rs)).slice(1) + '. The rule and its settings were frozen before this data was used, so this is the cleanest test we have. Past years are charged today\'s MCX fee rates.',
-        source: 'Prices: official MCX Bhavcopy rows from an MCX archive shared with us with permission. It matches our own MCX download on all ' + HX.check.shared_rows.toLocaleString('en-IN') + ' rows both cover (' + HX.check.mismatches + ' mismatches).'
+        source: 'Prices: official MCX Bhavcopy rows, downloaded by us from MCX one contract at a time. A second copy of the same MCX rows agrees on all ' + HX.check.shared_rows.toLocaleString('en-IN') + ' rows both have (' + HX.check.mismatches + ' mismatches).'
       };
     }
 

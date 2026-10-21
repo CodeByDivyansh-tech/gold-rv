@@ -1,43 +1,37 @@
 {
   "source": {
-    "name": "MCX Bhavcopy archive",
-    "by": "another team, shared with permission",
-    "note": "Official MCX Bhavcopy rows, shared with us with their permission. Thank you!",
-    "rows": 55457,
-    "contracts": 710,
+    "name": "MCX Bhavcopy",
+    "by": "our own download from the MCX website",
+    "note": "Official MCX Bhavcopy settlements, downloaded from MCX's Bhavcopy service one contract at a time (every request is in data/raw/retrieval_log.csv).",
+    "rows": 43728,
+    "contracts": 569,
     "first": "2003-11-20",
-    "last": "2026-10-01",
+    "last": "2023-12-29",
     "coverage": {
       "GOLDGUINEA": {
         "first": "2008-05-08",
-        "last": "2026-10-01",
-        "rows": 18509,
-        "contracts": 225
+        "last": "2023-12-29",
+        "rows": 15148,
+        "contracts": 186
       },
       "GOLDM": {
         "first": "2003-11-20",
-        "last": "2026-10-01",
-        "rows": 18977,
-        "contracts": 270
+        "last": "2023-12-05",
+        "rows": 15998,
+        "contracts": 231
       },
       "GOLDPETAL": {
         "first": "2011-04-18",
-        "last": "2026-10-01",
-        "rows": 16007,
-        "contracts": 191
-      },
-      "GOLDTEN": {
-        "first": "2025-03-31",
-        "last": "2026-10-01",
-        "rows": 1964,
-        "contracts": 24
+        "last": "2023-12-29",
+        "rows": 12582,
+        "contracts": 152
       }
     }
   },
   "check": {
-    "from": "2023-10-10",
+    "from": "2003-11-20",
     "to": "2026-10-16",
-    "shared_rows": 12021,
+    "shared_rows": 55457,
     "mismatches": 0,
     "fields": [
       "open",
@@ -51,7 +45,7 @@
     ],
     "only_in_book": 0,
     "only_in_book_contracts": 0,
-    "only_in_ours": 486
+    "only_in_ours": 489
   },
   "window": {
     "from": "2011-04-18",
@@ -79,7 +73,7 @@
       }
     },
     "slip": 5,
-    "rows": 35014,
+    "rows": 35017,
     "contracts": [
       "GOLDGUINEA|2011-04-30",
       "GOLDGUINEA|2011-05-31",

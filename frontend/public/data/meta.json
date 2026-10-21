@@ -25,7 +25,7 @@
       "volume_lots",
       "open_interest_lots"
     ],
-    "status": "Raw MCX rows vs cleaned data: 12,507 rows compared on open, close, volume and OI (313 of them from the MCX archive, filling gaps in our download), 0 mismatches. Runs on every build."
+    "status": "Raw MCX rows vs cleaned data: 12,507 rows compared on open, close, volume and OI (313 of them from a second MCX download that filled gaps in the first), 0 mismatches. Runs on every build."
   },
   "supplement": {
     "rows": 313,
@@ -94,6 +94,6 @@
       "oi": 192717
     }
   ],
-  "build_time": "2026-10-21T14:25:23.052891+00:00",
+  "build_time": "2026-10-21T15:50:06.387865+00:00",
   "source": "MCX Bhavcopy (EOD) \u00b7 Data to 16-Oct-2026"
 }

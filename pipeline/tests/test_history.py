@@ -1,25 +1,43 @@
-"""Checks for pipeline/history.py: the MCX archive agrees with our MCX download, and the history check is fair."""
+"""Checks for pipeline/history.py: our 2004-2023 MCX download is complete and agrees with a second copy of the same
+MCX rows, and the history check is fair."""
 import json
 import os
 
 import pandas as pd
 
-from pipeline.history import load_book, cross_check, frozen_params, HISTORY_START, HISTORY_PAIRS
+from pipeline.history import load_book, load_archive, as_ours, cross_check, frozen_params, HISTORY_START, HISTORY_PAIRS
 
 DATA = 'frontend/public/data'
 
 
 def test_book_has_no_duplicate_rows():
     b = load_book()
-    assert len(b) == 55457
+    assert len(b) == 43728                                    # 569 contracts, Feb 2004 to Dec 2023 expiries
+    assert b.groupby(['symbol', 'expiry']).ngroups == 569
     assert not b.duplicated(['symbol', 'expiry', 'date']).any()
     assert (b['date'] <= b['expiry']).all()
 
 
-def test_book_matches_our_mcx_download_on_every_shared_row():
+def test_every_history_row_traces_to_a_logged_mcx_request():
+    """Each request in the log returned exactly the rows we keep for that contract and date range."""
+    log = pd.read_csv('data/raw/retrieval_log.csv')
+    log = log[log['expiry'] <= '2023-12-31']
+    b = load_book()
+    keys = set(zip(b['symbol'], b['expiry'].dt.strftime('%Y-%m-%d')))
+    assert keys == set(zip(log['symbol'], log['expiry']))
+    for r in log.sample(40, random_state=1).itertuples():
+        f, t = pd.to_datetime(r.requested_from, dayfirst=True), pd.to_datetime(r.requested_to, dayfirst=True)
+        g = b[(b['symbol'] == r.symbol) & (b['expiry'] == r.expiry) & (b['date'] >= f) & (b['date'] <= t)]
+        if r.requested_from == '10/10/2023':                  # second download of the Oct-Dec 2023 contracts: in the supplement
+            continue
+        assert len(g) == r.rows, r
+
+
+def test_all_our_mcx_data_matches_the_second_copy_on_every_shared_row():
     ours = pd.read_csv('data/raw/gold_bhavcopy_clean.csv', parse_dates=['date', 'expiry_date'])
-    c = cross_check(load_book(), ours)
-    assert c['shared_rows'] > 11000
+    b = load_book()
+    c = cross_check(load_archive(), pd.concat([as_ours(b[b['date'] < ours['date'].min()]), ours], ignore_index=True))
+    assert c['shared_rows'] == 55457 and c['only_in_book'] == 0   # every row of the second copy is in our download
     assert c['mismatches'] == 0
 
 
@@ -57,7 +75,7 @@ def test_long_chart_series_is_weekly_and_stops_before_our_data():
 def test_our_data_has_every_contract_and_day_the_data_book_has_in_our_window():
     """Completeness: the Oct-Dec 2023 contracts were once missing from our download. Never again."""
     ours = pd.read_csv('data/raw/gold_bhavcopy_clean.csv', parse_dates=['date', 'expiry_date'])
-    b = load_book()
+    b = load_archive()
     w = b[(b['date'] >= ours['date'].min()) & (b['date'] <= ours['date'].max())]
     have = set(zip(ours['symbol'], ours['expiry_date'], ours['date']))
     missing = [k for k in zip(w['symbol'], w['expiry'], w['date']) if k not in have]

@@ -246,7 +246,7 @@ class Component extends DCLogic {
       .then((r) => r.json())
       .then((d) => this.setState({ D: d }))
       .catch(() => this.setState({ failed: true }));
-    // 2011-2023 daily spreads and clean-test trades (MCX archive), for the full-history view
+    // 2011-2023 daily spreads and clean-test trades, for the full-history view
     fetch('data/history_charts.json')
       .then((r) => r.json())
       .then((h) => this.setState({ HC: h, HCfail: false }))
@@ -298,7 +298,7 @@ class Component extends DCLogic {
     const ORDER = ['M_PETAL', 'M_GUINEA', 'M_TEN', 'GUINEA_TEN', 'TEN_PETAL', 'GUINEA_PETAL'];
     const pid = st.pair || this.props.startPair || 'M_PETAL';
     const P0 = D.pairs[pid];
-    // Full history: for the three pairs that existed before GOLDTEN, put 2011-2023 (MCX archive, the clean test)
+    // Full history: for the three pairs that existed before GOLDTEN, put 2011-2023 (the clean test)
     // in front of our own download, so the chart and trade list cover every day we have.
     const HP = st.HC && st.HC.pairs && st.HC.pairs[pid];
     const span = HP && st.span !== 'ours' ? 'all' : 'ours';
@@ -472,7 +472,7 @@ class Component extends DCLogic {
     }));
     const nt = P.trades.filter((x) => x.seg === 'test').length;
     // Results for this pair over every year we have, never the test year alone. The clean test (2011-2023)
-    // comes from the MCX archive; it is "pending" until that file has loaded, so a part never stands in for the whole.
+    // comes from history_charts.json; it is "pending" until that file has loaded, so a part never stands in for the whole.
     const CLEANPAIR = ['M_PETAL', 'M_GUINEA', 'GUINEA_PETAL'].indexOf(pid) >= 0;
     const cleanList = HP ? HP.trades['5'].map(toTrade) : null;
     const pending = CLEANPAIR && !cleanList;

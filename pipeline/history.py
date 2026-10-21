@@ -1,10 +1,12 @@
 """Long-history check: the frozen rule on 2011-2023, years the model never saw.
 
-Source: an archive of MCX Bhavcopy settlements (official MCX Bhavcopy rows,
-shared with us with their permission), saved as data/raw/mcx_bhavcopy_archive.csv.
+Source: our own download from MCX's Bhavcopy service (one request per contract, logged in
+data/raw/retrieval_log.csv), saved as data/raw/mcx_bhavcopy_2003_2023.csv: every GOLDM, GOLDGUINEA and
+GOLDPETAL contract that expired from Feb 2004 to Dec 2023, exactly as MCX returned it.
 
 What it does
-  1. Compares the archive with our own MCX download on every day both cover (Oct 2023 - Sep 2026).
+  1. Checks all of our MCX data, row by row, against a second copy of the same MCX rows
+     (data/raw/mcx_bhavcopy_archive.csv, shared with us by another team; used only for this check).
   2. Takes the settings the main build chose on our training years (read from its backtest files,
      so nothing is re-tuned) and runs the same five-check rule, with the same costs,
      on 18 Apr 2011 (first GOLDPETAL day) to the day before our own data starts.
@@ -27,14 +29,16 @@ from pipeline.pairs import build_pair_series, compute_rolling_z
 from pipeline.backtest import prepare_contract_lookup, run_pair_backtest
 from pipeline.lifecycle import compute_contract_lifecycle, calendar_check
 
-BOOK_PATH = 'data/raw/mcx_bhavcopy_archive.csv'
+BOOK_PATH = 'data/raw/mcx_bhavcopy_2003_2023.csv'      # our MCX download of the 2004-2023 contracts
+ARCHIVE_PATH = 'data/raw/mcx_bhavcopy_archive.csv'      # a second copy of MCX rows, used only as a check
 OURS_PATH = 'data/raw/gold_bhavcopy_clean.csv'
 HISTORY_START = '2011-04-18'          # first trading day of GOLDPETAL, so all three contracts exist
 HISTORY_PAIRS = ['M_PETAL', 'M_GUINEA', 'GUINEA_PETAL']
 SOURCE = {
-    'name': 'MCX Bhavcopy archive',
-    'by': 'another team, shared with permission',
-    'note': 'Official MCX Bhavcopy rows, shared with us with their permission. Thank you!',
+    'name': 'MCX Bhavcopy',
+    'by': 'our own download from the MCX website',
+    'note': "Official MCX Bhavcopy settlements, downloaded from MCX's Bhavcopy service one contract at a time "
+            '(every request is in data/raw/retrieval_log.csv).',
 }
 CHECK_FIELDS = [('open', 'open'), ('high', 'high'), ('low', 'low'), ('close', 'close'),
                 ('prev_close', 'prev_close'), ('volume', 'volume_lots'), ('oi', 'open_interest_lots'),
@@ -42,10 +46,36 @@ CHECK_FIELDS = [('open', 'open'), ('high', 'high'), ('low', 'low'), ('close', 'c
 
 
 def load_book(path: str = BOOK_PATH) -> pd.DataFrame:
+    """Our 2004-2023 MCX download (MCX's own columns) in the long-history layout. A day with no trades has
+    no open, high or low (MCX reports them as 0)."""
+    r = pd.read_csv(path)
+    b = pd.DataFrame({
+        'symbol': r['Symbol'].astype(str).str.strip(), 'expiry': pd.to_datetime(r['ExpiryDate'], format='%d%b%Y'),
+        'date': pd.to_datetime(r['Date'], format='%m/%d/%Y'),
+        'open': r['Open'], 'high': r['High'], 'low': r['Low'], 'close': r['Close'], 'prev_close': r['PreviousClose'],
+        'volume': r['Volume'], 'oi': r['OpenInterest'], 'value_lakh': r['Value']})
+    for c in ['open', 'high', 'low', 'close', 'prev_close', 'volume', 'oi', 'value_lakh']:
+        b[c] = pd.to_numeric(b[c], errors='coerce')
+    b['traded'] = (b['volume'] > 0).map({True: 'yes', False: 'no'})
+    for c in ['open', 'high', 'low']:
+        b.loc[b['traded'] == 'no', c] = np.nan
+    return b.sort_values(['symbol', 'expiry', 'date']).reset_index(drop=True)
+
+
+def load_archive(path: str = ARCHIVE_PATH) -> pd.DataFrame:
+    """The second copy of MCX rows (same layout as load_book), used only by archive_check()."""
     b = pd.read_csv(path, parse_dates=['date', 'expiry'])
     for c in ['open', 'high', 'low', 'close', 'prev_close', 'volume', 'oi', 'value_lakh']:
         b[c] = pd.to_numeric(b[c], errors='coerce')
     return b
+
+
+def as_ours(book: pd.DataFrame) -> pd.DataFrame:
+    """Long-history rows in the column names of our cleaned download, for cross_check()."""
+    return pd.DataFrame({'symbol': book['symbol'], 'expiry_date': book['expiry'], 'date': book['date'],
+                         'open': book['open'].fillna(0), 'high': book['high'].fillna(0), 'low': book['low'].fillna(0),
+                         'close': book['close'], 'prev_close': book['prev_close'], 'volume_lots': book['volume'],
+                         'open_interest_lots': book['oi'], 'value_lakhs': book['value_lakh']})
 
 
 QUOTE = {'GOLDM': (10, 0.995), 'GOLDTEN': (10, 0.999), 'GOLDGUINEA': (8, 0.999), 'GOLDPETAL': (1, 0.999)}
@@ -76,7 +106,7 @@ def tstat(x) -> Optional[float]:
 
 
 def cross_check(book: pd.DataFrame, ours: pd.DataFrame) -> Dict[str, Any]:
-    """Every row both sources share, compared field by field."""
+    """Every row both sources share, compared field by field (book = the second copy, ours = our MCX download)."""
     o = ours.rename(columns={'expiry_date': 'expiry'})
     lo, hi = o['date'].min(), o['date'].max()
     b = book[(book['date'] >= lo) & (book['date'] <= hi)]
@@ -128,7 +158,7 @@ def history_frame(book: pd.DataFrame, end: pd.Timestamp):
 
 
 def run_history(book: pd.DataFrame, end: pd.Timestamp, params: Dict[str, Dict[str, float]]) -> pd.DataFrame:
-    """Same rule, same costs, frozen settings, on the archive's rows before our own data starts."""
+    """Same rule, same costs, frozen settings, on the 2011-2023 rows, before the training years start."""
     df, dates, tdi, carry = history_frame(book, end)
     P = prepare_contract_lookup(df)
     start = pd.Timestamp(HISTORY_START)
@@ -243,7 +273,9 @@ def build(output_dir: str = 'frontend/public/data', book_path: str = BOOK_PATH, 
         'source': dict(SOURCE, rows=int(len(book)), contracts=int(book.groupby(['symbol', 'expiry']).ngroups),
                        first=book['date'].min().strftime('%Y-%m-%d'), last=book['date'].max().strftime('%Y-%m-%d'),
                        coverage=cov),
-        'check': cross_check(book, ours),
+        # all of our MCX data (2004-2023 contracts + Oct 2023 onward) against the second copy, row by row
+        'check': cross_check(load_archive(), pd.concat([as_ours(book[book['date'] < ours['date'].min()]), ours],
+                                                       ignore_index=True)) if os.path.exists(ARCHIVE_PATH) else None,
         'window': {'from': HISTORY_START, 'to': end.strftime('%Y-%m-%d'), 'pairs': HISTORY_PAIRS, 'params': params,
                    'slip': BASE_SLIPPAGE,
                    'rows': int(((book['date'] >= HISTORY_START) & (book['date'] <= end)).sum()),   # book prices the clean test ran on

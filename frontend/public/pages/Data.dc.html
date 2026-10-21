@@ -117,7 +117,7 @@ button:focus-visible,a:focus-visible,input:focus-visible{outline:2px solid var(-
         <sc-if value="{{hx.show}}" hint-placeholder-val="{{ true }}">
         <section class="grv-card" aria-labelledby="hx-h" style="background: var(--panel); border: 1px solid var(--line); border-radius: 20px; padding: clamp(18px, 2.5vw, 26px); display: flex; flex-direction: column; gap: 14px">
           <div style="display: flex; flex-direction: column; gap: 4px">
-            <h2 id="hx-h" style="margin: 0; font-size: 18px; font-weight: 600">More history, shared with us<button type="button" class="grv-q" data-term="Bhavcopy" aria-label="What does 'Bhavcopy' mean?" title="What does this mean?">?</button></h2>
+            <h2 id="hx-h" style="margin: 0; font-size: 18px; font-weight: 600">2003 to 2023, downloaded from MCX<button type="button" class="grv-q" data-term="Bhavcopy" aria-label="What does 'Bhavcopy' mean?" title="What does this mean?">?</button></h2>
             <span style="font-size: 13px; color: var(--muted); line-height: 1.6; max-width: 82ch">{{hx.intro}}</span>
           </div>
           <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(240px, 100%), 1fr)); gap: 12px">
@@ -170,7 +170,7 @@ button:focus-visible,a:focus-visible,input:focus-visible{outline:2px solid var(-
           <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 8px">
             <div style="display: flex; flex-direction: column; gap: 4px">
               <h2 id="log-h" style="margin: 0; font-size: 18px; font-weight: 600">Download log</h2>
-              <span style="font-size: 13px; color: var(--muted)">One request per contract and expiry, {{logCount}} in total. Every row can be traced back to its request. The contracts filled from the MCX archive are not in this log; their rows are in the supplement file.</span>
+              <span style="font-size: 13px; color: var(--muted)">One request per contract and expiry, {{logCount}} in total, all to MCX's own Bhavcopy service. Every row can be traced back to its request.</span>
             </div>
             <button type="button" onClick="{{toggleLog}}" aria-expanded="{{logExpanded}}" style="min-height: 44px; padding: 0 16px; border-radius: 12px; border: 1px solid var(--line); background: var(--panel); color: var(--fg); font: 600 14px 'Geist', system-ui, sans-serif; cursor: pointer">{{logButton}}</button>
           </div>
@@ -278,20 +278,20 @@ class Component extends DCLogic {
     const n = (x) => x.toLocaleString('en-IN');
     // The whole study first (2011 to today); the two sources it is built from come right after.
     const big = [
-      { value: n(L.allRows), label: 'daily prices', note: 'One official settlement per contract per trading day, ' + this.fd(L.start) + ' to ' + this.fd(D.asOf) + ': ' + n(L.rows) + ' from the MCX archive and ' + n(m.rows) + ' from our own MCX download.', color: 'var(--fg)' },
+      { value: n(L.allRows), label: 'daily prices', note: 'One official settlement per contract per trading day, ' + this.fd(L.start) + ' to ' + this.fd(D.asOf) + ': ' + n(L.rows) + ' for 2011–2023 and ' + n(m.rows) + ' since Oct 2023, all downloaded by us from MCX.', color: 'var(--fg)' },
       { value: n(L.allContracts), label: 'contracts', note: 'Every expiry of GOLDM, GOLDGUINEA and GOLDPETAL since 2011, and of GOLDTEN since it was listed in 2025.', color: 'var(--fg)' },
       { value: n(L.allDays), label: 'trading days', note: this.fd(L.start) + ' to ' + this.fd(D.asOf) + ': ' + n(L.days) + ' in the clean-test years and ' + n(m.days) + ' since ' + this.fd(D.start) + '.', color: 'var(--fg)' },
-      { value: String((m.mismatches || 0) + (L.checkMismatches || 0)), label: 'mismatches', note: n(L.checked) + ' rows where our download and the MCX archive overlap agree on every field, and ' + n(m.checkRows) + ' rows of our raw MCX files match our cleaned data. Both checks run on every build.', color: (m.mismatches || 0) + (L.checkMismatches || 0) === 0 ? 'var(--up)' : 'var(--down)' }
+      { value: String((m.mismatches || 0) + (L.checkMismatches || 0)), label: 'mismatches', note: n(L.checked) + ' rows of our MCX download match a second copy of the same MCX rows on every field, and ' + n(m.checkRows) + ' rows of our raw MCX files match our cleaned data. Both checks run on every build.', color: (m.mismatches || 0) + (L.checkMismatches || 0) === 0 ? 'var(--up)' : 'var(--down)' }
     ];
     const parts = [
-      { name: 'MCX Bhavcopy archive', when: this.fd(L.start) + ' to ' + this.fd(L.end), what: n(L.rows) + ' daily prices from the archive · ' + n(L.contracts) + ' contracts · ' + n(L.days) + ' trading days', use: 'The clean test: years the rule never saw. GOLDTEN was not listed yet, so three contracts.' },
-      { name: 'Our own MCX Bhavcopy download', when: this.fd(D.start) + ' to ' + this.fd(D.asOf), what: n(m.rows) + ' daily prices from our own download · ' + n(m.contracts) + ' contracts · ' + n(m.days) + ' trading days', use: 'Training (to ' + this.fd(D.split.train_end) + '), the test year (to ' + this.fd(D.split.test_end) + ') and today\'s numbers. All four contracts.' }
+      { name: 'Our MCX Bhavcopy download: 2011–2023', when: this.fd(L.start) + ' to ' + this.fd(L.end), what: n(L.rows) + ' daily prices · ' + n(L.contracts) + ' contracts · ' + n(L.days) + ' trading days', use: 'The clean test: years the rule never saw. GOLDTEN was not listed yet, so three contracts.' },
+      { name: 'Our MCX Bhavcopy download: Oct 2023 on', when: this.fd(D.start) + ' to ' + this.fd(D.asOf), what: n(m.rows) + ' daily prices since Oct 2023 · ' + n(m.contracts) + ' contracts · ' + n(m.days) + ' trading days', use: 'Training (to ' + this.fd(D.split.train_end) + '), the test year (to ' + this.fd(D.split.test_end) + ') and today\'s numbers. All four contracts.' }
     ];
     const C = D.rule.current['5'];
     const srs = (x) => (x < 0 ? '−' : '+') + '₹' + Math.abs(Math.round(x)).toLocaleString('en-IN');
     const how = [
-      { value: n(L.allRows), color: 'var(--fg)', what: 'daily prices, ' + L.start.slice(0, 4) + ' to ' + D.asOf.slice(0, 4), source: 'Counted row by row from the two source files: the MCX archive (data/raw/mcx_bhavcopy_archive.csv, 2011–2023 part) and our MCX download (data/raw/gold_bhavcopy_clean.csv).' },
-      { value: String((m.mismatches || 0) + (L.checkMismatches || 0)), color: 'var(--up)', what: 'mismatches', source: 'pipeline/history.py compares the ' + n(L.checked) + ' rows both sources cover, field by field; pipeline/download.py rebuilds our clean file from the raw MCX files and must match it byte for byte.' },
+      { value: n(L.allRows), color: 'var(--fg)', what: 'daily prices, ' + L.start.slice(0, 4) + ' to ' + D.asOf.slice(0, 4), source: 'Counted row by row from our two MCX files: data/raw/mcx_bhavcopy_2003_2023.csv (its 2011–2023 part) and data/raw/gold_bhavcopy_clean.csv.' },
+      { value: String((m.mismatches || 0) + (L.checkMismatches || 0)), color: 'var(--up)', what: 'mismatches', source: 'pipeline/history.py compares ' + n(L.checked) + ' rows of our download with a second copy of the same MCX rows, field by field; pipeline/download.py rebuilds our clean file from the raw MCX files and must match it byte for byte.' },
       { value: srs(L.net), color: L.net < 0 ? 'var(--down)' : 'var(--up)', what: 'the clean test: ' + L.n + ' trades, ' + L.start.slice(0, 4) + '–' + L.end.slice(0, 4), source: 'The frozen rule run on years it never saw (pipeline/history.py). Every trade is in history_charts.json, and a test checks they add up to this total.' },
       { value: srs(C.test_net_rs), color: C.test_net_rs < 0 ? 'var(--down)' : 'var(--up)', what: 'the 12-month test year: ' + C.test_n + ' trades (one part of the study, not a clean test)', source: 'pipeline/build_site_data.py. Trades closed in the ' + D.events.crashShort + ' made ' + srs(C.crash_net_rs) + '; the rest ' + srs(C.ex_crash_net_rs) + '.' },
       { value: D.rt.toFixed(1) + ' bps', color: 'var(--fg)', what: 'round-trip cost, the basis of the cost line', source: 'MCX, SEBI and government rates plus our 5 bps slippage assumption per order (pipeline/attribution.py); the Signals page lets you change it.' },
@@ -327,14 +327,14 @@ class Component extends DCLogic {
       const since = ['GOLDM', 'GOLDGUINEA', 'GOLDPETAL', 'GOLDTEN'].filter((x) => cv[x]).map((x) => x + ' from ' + this.fd(cv[x].first).replace(/^\d+ /, '')).join(', ');
       hx = {
         show: true,
-        intro: 'An archive of official MCX Bhavcopy settlements was shared with us, with permission: official MCX Bhavcopy rows from ' + this.fd(HX.source.first) + ' to ' + this.fd(HX.source.last) + '. Thank you!',
+        intro: 'Official MCX Bhavcopy settlements we downloaded from MCX\'s Bhavcopy service, one contract at a time: every GOLDM, GOLDGUINEA and GOLDPETAL contract with trading days from ' + this.fd(HX.source.first) + ' to ' + this.fd(HX.source.last) + '.',
         facts: [
-          { value: n(HX.source.rows), label: 'daily settlements in the archive', note: since + '. We use ' + n(D.longrun.rows) + ' of them (' + this.fd(HX.window.from) + ' to ' + this.fd(HX.window.to) + ') for the clean test, and the ' + n(k.shared_rows) + ' that overlap our download to check it.', color: 'var(--fg)' },
-          { value: n(HX.source.contracts), label: 'contracts in the archive', note: 'Each contract listed under its own expiry, exactly as MCX published it.', color: 'var(--fg)' },
-          { value: String(k.mismatches), label: 'mismatches with our data', note: n(k.shared_rows) + ' rows both sources cover, compared on open, high, low, close, volume, open interest and value.', color: k.mismatches === 0 ? 'var(--up)' : 'var(--down)' },
-          { value: String(SUP.missing_contracts.length), label: 'contracts our download missed, now added', note: (SUP.missing_rows || 0) + ' traded rows: ' + SUP.missing_contracts.join(', ') + '. They were the busiest contracts in Oct–Dec 2023.', color: 'var(--fg)' }
+          { value: n(HX.source.rows), label: 'daily settlements downloaded', note: since + '. We use ' + n(D.longrun.rows) + ' of them (' + this.fd(HX.window.from) + ' to ' + this.fd(HX.window.to) + ') for the clean test; the earlier years go into the long price charts.', color: 'var(--fg)' },
+          { value: n(HX.source.contracts), label: 'contracts, one request each', note: 'Each contract under its own expiry, exactly as MCX returns it. Every request is in the download log below.', color: 'var(--fg)' },
+          { value: String(k.mismatches), label: 'mismatches with a second copy', note: n(k.shared_rows) + ' rows of our MCX download also appear in a second copy of the same MCX rows, which another team shared with us. We compared open, high, low, close, volume, open interest and value.', color: k.mismatches === 0 ? 'var(--up)' : 'var(--down)' },
+          { value: String(SUP.missing_contracts.length), label: 'contracts our first download missed, now added', note: (SUP.missing_rows || 0) + ' traded rows: ' + SUP.missing_contracts.join(', ') + '. They were the busiest contracts in Oct–Dec 2023.', color: 'var(--fg)' }
         ],
-        note: 'We use the archive for three things: the long-history check on the Backtesting page (' + this.fd(HX.window.from) + ' to ' + this.fd(HX.window.to) + '), the 2011–2023 part of every chart ("All data" on the Market, Pairs, Backtesting and Today pages), and to fill gaps in our own MCX download: the ' + SUP.missing_contracts.length + ' contracts above' + (SUP.extra_days && SUP.extra_days.length ? ' and ' + SUP.extra_days.map((d) => this.fd(d)).join(', ') + ', the day after our download ended' : '') + '. Those rows are kept in a separate, labelled file. Everything else comes from our own MCX download, listed below.'
+        note: 'Every price on this site comes from our own downloads from MCX. The ' + SUP.missing_contracts.length + ' contracts above' + (SUP.extra_days && SUP.extra_days.length ? ' and ' + SUP.extra_days.map((d) => this.fd(d)).join(', ') : '') + ' were missing from our first download; we downloaded them from MCX later and keep them in a separate, labelled file. The 2011–2023 rows drive the long-history check on the Backtesting page and the 2011–2023 part of every chart ("All data" on the Market, Pairs, Backtesting and Today pages).'
       };
     }
     return {
