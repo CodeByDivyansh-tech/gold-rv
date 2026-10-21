@@ -105,7 +105,7 @@ def test_petal_break_is_located_from_the_data():
 def test_home_counts_add_up_from_the_data():
     """Home's one-line summary: prices used and trades are the sum of the book part and our own part."""
     site, h = _j('site-data.json'), _j('history.json')
-    book = pd.read_csv('data/raw/mcx_history_book.csv', parse_dates=['date'])
+    book = pd.read_csv('data/raw/mcx_bhavcopy_archive.csv', parse_dates=['date'])
     win = (book['date'] >= h['window']['from']) & (book['date'] <= h['window']['to'])
     assert site['longrun']['rows'] == int(win.sum()) == h['window']['rows']
     assert site['meta']['rows'] == len(pd.read_csv('data/raw/gold_bhavcopy_clean.csv'))

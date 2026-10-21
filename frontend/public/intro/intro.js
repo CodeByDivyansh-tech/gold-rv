@@ -43,7 +43,10 @@ const fill = {
   hurdle: hurdle.toFixed(1), pct: Math.round(above / days.length * 100) + '%',
   rows: L.allRows.toLocaleString('en-IN'), contracts: String(L.allContracts), days: L.allDays.toLocaleString('en-IN'),
   clean: L.start.slice(0, 4) + '–' + L.end.slice(0, 4), cleanLong: fd(L.start) + ' to ' + fd(L.end),
-  net: inr(L.net), net0: inr(L.net0), n: String(L.n), losing: L.losingYears + ' of ' + L.years
+  net: inr(L.net), net0: inr(L.net0), n: String(L.n), losing: L.losingYears + ' of ' + L.years,
+  // the tested span: first day all three original contracts traded (L.start) to the latest settlement
+  spanYears: String(Math.floor((Date.parse(D.asOf) - Date.parse(L.start)) / 3.15576e10)),
+  spanFrom: fd(L.start).replace(/^\d+ /, ''), spanTo: fd(D.asOf).replace(/^\d+ /, '')
 };
 document.querySelectorAll('[data-k]').forEach((el) => { const v = fill[el.dataset.k]; if (v != null) el.textContent = v; });
 if (STILL) await new Promise(() => {});   // reduced motion or no WebGL: the text above is the whole page

@@ -315,7 +315,7 @@ class Component extends DCLogic {
     const COL = { GOLDM: 'var(--c1)', GOLDTEN: 'var(--c2)', GOLDGUINEA: 'var(--c3)', GOLDPETAL: 'var(--c4)' };
     const P = D.pure4;
 
-    // chart 1: four contracts per 10 g pure (10Y and All add weekly prices from the shared data book before our own data)
+    // chart 1: four contracts per 10 g pure (10Y and All add weekly prices from the shared MCX archive before our own data)
     const LG = st.H && st.H.long && st.H.long.d && st.H.long.d.length ? st.H.long : null;
     const RANGES = LG ? ['3M', '1Y', '3Y', '10Y', 'All'] : ['3M', '1Y', '3Y'];
     const range = RANGES.indexOf(st.range) >= 0 ? st.range : '1Y';
@@ -332,7 +332,7 @@ class Component extends DCLogic {
       const keep = LG.d.map((d, i) => i).filter((i) => LG.d[i] >= cut);
       dts = keep.map((i) => LG.d[i]).concat(dts);
       cols = SYMS.map((s, k) => keep.map((i) => LG[s][i]).concat(cols[k]));
-      longNote = 'Weekly prices before ' + this.fd(D.start) + ' come from a compiled MCX data book (official MCX Bhavcopy); from ' + this.fd(D.start) + ' on, our own MCX download.';
+      longNote = 'Weekly prices before ' + this.fd(D.start) + ' come from the MCX archive (official MCX Bhavcopy settlements, shared with permission); from ' + this.fd(D.start) + ' on, our own MCX download.';
     }
     const flat = cols.flat().filter((v) => v != null);
     const lo = Math.min(...flat), hi = Math.max(...flat);
@@ -380,7 +380,7 @@ class Component extends DCLogic {
     const t0 = Date.parse(D.start), t1 = Date.parse(D.asOf);
     const X = (d) => ((Date.parse(d) - t0) / (t1 - t0)) * 1000;
     const VS = ['GOLDTEN', 'GOLDGUINEA', 'GOLDPETAL'];
-    // Full history: 2011-2023 gaps from the MCX history book (same carry adjustment) in front of our own download.
+    // Full history: 2011-2023 gaps from the MCX archive (same carry adjustment) in front of our own download.
     // GOLDTEN was listed only in March 2025, so it has no earlier line.
     const HCP = st.HC && st.HC.pairs;
     const vspan = HCP && st.vspan !== 'ours' ? 'all' : 'ours';
@@ -419,7 +419,7 @@ class Component extends DCLogic {
       crashX: pct(EV.crashStart), crashW: ((X(EV.crashEnd) - X(EV.crashStart)) / 10).toFixed(2) + '%', crashLabel: EV.crashShort,
       start: this.fd(D.start), end: this.fd(D.asOf), range: 'Scale ' + this.sgn(vlo, 0) + ' to ' + this.sgn(vhi, 0) + ' bps',
       aria: 'Gap of GOLDTEN, GOLDGUINEA and GOLDPETAL versus GOLDM in basis points, after adjusting for expiry, from ' + this.fd(vdates[0]) + ' to ' + this.fd(D.asOf),
-      note: (vspan === 'all' ? 'Before ' + this.fd(D.start) + ' the gaps come from a compiled MCX data book (official MCX Bhavcopy), with the same expiry adjustment; from then on, our own MCX download. ' : '') + 'GOLDTEN only starts on ' + this.fd(EV.goldtenListed) + ', its first trading day. During the ' + EV.crashLabel + ' the gaps swung as far as ' + Math.round(extreme) + ' bps, beyond this scale (' + this.sgn(vlo, 0) + ' to ' + this.sgn(vhi, 0) + ' bps), so the lines are cut off at the edge there. Drag across the chart to zoom into any period.'
+      note: (vspan === 'all' ? 'Before ' + this.fd(D.start) + ' the gaps come from the MCX archive (official MCX Bhavcopy settlements, shared with permission), with the same expiry adjustment; from then on, our own MCX download. ' : '') + 'GOLDTEN only starts on ' + this.fd(EV.goldtenListed) + ', its first trading day. During the ' + EV.crashLabel + ' the gaps swung as far as ' + Math.round(extreme) + ' bps, beyond this scale (' + this.sgn(vlo, 0) + ' to ' + this.sgn(vhi, 0) + ' bps), so the lines are cut off at the edge there. Drag across the chart to zoom into any period.'
     };
     const regimeH = { a: EV.regimeLabels[0], b: EV.regimeLabels[1], c: EV.regimeLabels[2] };
 

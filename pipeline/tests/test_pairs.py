@@ -8,7 +8,7 @@ from pipeline.carry import compute_reference_carry
 from pipeline.pairs import build_pair_series, compute_rolling_z, build_all_pairs
 
 def test_pair_counts_and_spreads():
-    """Pair counts and last spreads match the reference on the original rows; the history-book supplement only
+    """Pair counts and last spreads match the reference on the original rows; the archive supplement only
     adds days (the Oct-Dec 2023 contracts our download missed) and changes nothing on 2026-09-30."""
     df, dates, tdi = load_clean_bhavcopy('data/raw/gold_bhavcopy_clean.csv', end=TEST_END, original_only=True)
     carry_series, _ = compute_reference_carry(df, dates)

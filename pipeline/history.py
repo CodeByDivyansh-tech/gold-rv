@@ -1,10 +1,10 @@
 """Long-history check: the frozen rule on 2011-2023, years the model never saw.
 
-Source: an MCX Gold Futures History Book (official MCX Bhavcopy rows,
-shared with us with their permission), saved as data/raw/mcx_history_book.csv.
+Source: an archive of MCX Bhavcopy settlements (official MCX Bhavcopy rows,
+shared with us with their permission), saved as data/raw/mcx_bhavcopy_archive.csv.
 
 What it does
-  1. Compares the book with our own MCX download on every day both cover (Oct 2023 - Sep 2026).
+  1. Compares the archive with our own MCX download on every day both cover (Oct 2023 - Sep 2026).
   2. Takes the settings the main build chose on our training years (read from its backtest files,
      so nothing is re-tuned) and runs the same five-check rule, with the same costs,
      on 18 Apr 2011 (first GOLDPETAL day) to the day before our own data starts.
@@ -27,12 +27,12 @@ from pipeline.pairs import build_pair_series, compute_rolling_z
 from pipeline.backtest import prepare_contract_lookup, run_pair_backtest
 from pipeline.lifecycle import compute_contract_lifecycle, calendar_check
 
-BOOK_PATH = 'data/raw/mcx_history_book.csv'
+BOOK_PATH = 'data/raw/mcx_bhavcopy_archive.csv'
 OURS_PATH = 'data/raw/gold_bhavcopy_clean.csv'
 HISTORY_START = '2011-04-18'          # first trading day of GOLDPETAL, so all three contracts exist
 HISTORY_PAIRS = ['M_PETAL', 'M_GUINEA', 'GUINEA_PETAL']
 SOURCE = {
-    'name': 'MCX Gold Futures History Book',
+    'name': 'MCX Bhavcopy archive',
     'by': 'another team, shared with permission',
     'note': 'Official MCX Bhavcopy rows, shared with us with their permission. Thank you!',
 }
@@ -85,7 +85,7 @@ def cross_check(book: pd.DataFrame, ours: pd.DataFrame) -> Dict[str, Any]:
     traded = both[both['traded'] == 'yes']
     mism = 0
     for bf, of in CHECK_FIELDS:
-        a = both if bf not in ('open', 'high', 'low') else traded   # no-trade days have no open/high/low in the book
+        a = both if bf not in ('open', 'high', 'low') else traded   # no-trade days have no open/high/low in the archive
         ca = a[bf + '_b'] if bf + '_b' in a else a[bf]
         cb = a[of + '_o'] if of + '_o' in a else a[of]
         mism += int(((ca - cb).abs() > 0.011).sum())
@@ -128,7 +128,7 @@ def history_frame(book: pd.DataFrame, end: pd.Timestamp):
 
 
 def run_history(book: pd.DataFrame, end: pd.Timestamp, params: Dict[str, Dict[str, float]]) -> pd.DataFrame:
-    """Same rule, same costs, frozen settings, on the book's rows before our own data starts."""
+    """Same rule, same costs, frozen settings, on the archive's rows before our own data starts."""
     df, dates, tdi, carry = history_frame(book, end)
     P = prepare_contract_lookup(df)
     start = pd.Timestamp(HISTORY_START)
