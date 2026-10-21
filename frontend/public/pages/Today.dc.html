@@ -253,7 +253,7 @@ class Component extends DCLogic {
       .then((r) => r.json())
       .then((d) => this.setState({ D: d }))
       .catch(() => this.setState({ failed: true }));
-    // weekly 2011-2023 frames from the MCX archive, so the replay can start in 2011
+    // weekly 2011-2023 frames (history_charts.json), so the replay can start in 2011
     fetch('data/history_charts.json')
       .then((r) => r.json())
       .then((h) => this.setState({ HC: h }))
@@ -330,7 +330,7 @@ class Component extends DCLogic {
     ];
 
     // replay
-    // Full history: 2011-2023 weeks (MCX archive; only the three pairs that existed then) come before our own weeks
+    // Full history: 2011-2023 weeks (only the three pairs that existed then) come before our own weeks
     const R0 = D.replay, LR = st.HC && st.HC.replay;
     const rspan = LR && st.rspan !== 'ours' ? 'all' : 'ours';
     let R = R0, early = null;
@@ -404,7 +404,7 @@ class Component extends DCLogic {
       }
     };
 
-    // what would change today's answer, and how often that has happened (every week since 2011 once the archive has loaded)
+    // what would change today's answer, and how often that has happened (every week since 2011 once the 2011-2023 file has loaded)
     const near = list.slice().sort((a, b) => (b.dev / b.hurdle) - (a.dev / a.hurdle))[0];
     const wk = early ? { cross: early.cross + R0.crossWeeks, weeks: early.weeks + R0.weeks, traded: early.traded + R0.signalWeeks, from: LR.d[0] } : { cross: R0.crossWeeks, weeks: R0.weeks, traded: R0.signalWeeks, from: R0.d[0] };
     const next = nSignal ? {

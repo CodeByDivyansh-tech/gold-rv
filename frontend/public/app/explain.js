@@ -77,7 +77,7 @@
     [/^From raw files to this website/, 'Eight steps', 'The eight steps our Python code follows, from MCX files to the charts you see.'],
     [/^How we avoid peeking at the future/, 'A fair exam', 'The model only uses past days, never tomorrow\'s answers, like an exam without the answer key.'],
     [/^What this data cannot tell you/, 'Honest limits', 'What our data cannot show. Good research says what it does not know.'],
-    [/^More history, shared with us/, 'Shared history', 'An archive of official MCX prices was shared with us, with permission, going back to 2003. It matches our own data exactly, and we use it only for the long-history check.'],
+    [/^2003 to 2023, downloaded from MCX/, 'The older years', 'We downloaded every older gold contract from MCX\'s Bhavcopy service, one request per contract, going back to 2003. These years drive the long-history check and the long charts.'],
     [/^Download log/, 'Receipts', 'A record of every file we downloaded, so anyone can check our work.'],
     [/^Check it yourself/, 'Check it yourself', 'All our code and data are public on GitHub, so anyone can run it again.']
   ];
@@ -147,23 +147,23 @@
       if (!m[4]) return [m[1], m[3] === 'No trades' ? 'These settings made no trades in this period: no gap passed every check.' : 'GOLDTEN only started trading in 2025, so pairs with it have no 2011–2023 years.'];
       return [m[1], m[2].charAt(0).toUpperCase() + m[2].slice(1) + '. With these settings the rule made ' + m[4] + ' trades here and ' + money(m[3]) + ' after costs; ' + m[5] + '% of trades made money.'];
     }],
-    // Long history (Backtesting) and the shared MCX archive (Data)
+    // Long history (Backtesting) and the 2004-2023 download (Data)
     [/^Trades (\d+) (\d+ \w+ \d{4}) – (\d+ \w+ \d{4})$/, function (m) { return ['13 more years', 'The same frozen rule made ' + m[1] + ' trades between ' + m[2] + ' and ' + m[3] + ', years the model never saw. That is far more than the 20 in our test year, so the answer is much more certain.']; }],
     [/^After costs ([−+-]₹[\d,]+) at (\d+) bps slippage, (\d+)% won$/, function (m) { return ['After costs, 13 years', 'Added up over all those trades, the rule ' + money(m[1]) + ' after paying every cost, at ' + m[2] + ' bps slippage. Only ' + m[3] + '% of trades made money.']; }],
     [/^Losing years (\d+) of (\d+) (.+)$/, function (m) { return ['Losing years', 'The rule lost money in ' + m[1] + ' of ' + m[2] + ' years; it ' + m[3] + '. A real edge would win in most years.']; }],
     [/^(\d{4}): ([−+-]₹[\d,]+), (\d+) trades$/, function (m) { return ['The year ' + m[1], 'In ' + m[1] + ' the rule made ' + m[3] + ' trades and ' + money(m[2]) + ' after costs. Green bars are years that made money; red bars lost.']; }],
     [new RegExp('^' + P + ' (\\d+) trades before costs ([−+-][\\d.]+) bps a trade ([−+-]₹[\\d,]+) after costs$'), function (m) { return [m[1] + ' vs ' + m[2] + ', 2011–2023', m[3] + ' trades. Before costs the average trade made ' + m[4] + ' bps, which is about zero: the gap does come back, but not by more than the cost of trading. After costs it ' + money(m[5]) + '.']; }],
 
-    [/^(\d+) contracts in the archive (.+)$/, function (m) { return [m[1] + ' contracts', 'Every monthly contract in the shared MCX archive, each with its own expiry date, as MCX published it.']; }],
-    [/^(\d+) mismatches with our data ([\d,]+) rows (.+)$/, function (m) { return ['Does it match our data?', 'On the ' + m[2] + ' rows both sources cover, we compared every number: ' + m[1] + ' differences. So the archive and our own MCX download are the same official prices.']; }],
-    [/^(\d+) contracts our download missed (.+)$/, function (m) { return ['What we had missed', 'The archive showed ' + m[1] + ' near-month contracts from Oct–Dec 2023 that our own download left out. They only touch the first weeks of training, not the test year.']; }],
+    [/^(\d+) contracts, one request each (.+)$/, function (m) { return [m[1] + ' contracts', 'Every monthly contract from 2004 to 2023, each with its own expiry date. We asked MCX for each one separately, and every request is in the download log.']; }],
+    [/^(\d+) mismatches with a second copy ([\d,]+) rows (.+)$/, function (m) { return ['A second check', 'Another team shared their copy of the same MCX prices with us. On the ' + m[2] + ' rows both copies have, we compared every number: ' + m[1] + ' differences.']; }],
+    [/^(\d+) contracts our first download missed (.+)$/, function (m) { return ['What we had missed', 'Our first download left out ' + m[1] + ' near-month contracts from Oct–Dec 2023. We downloaded them from MCX later. They only touch the first weeks of training, not the test year.']; }],
     // Home: contract cards
     [/^(GOLDM|GOLDTEN|GOLDGUINEA|GOLDPETAL) Gold \w+ · (\d+ g) lot$/, function (m) { return [m[1], CON[m[1]]]; }],
     [/^₹([\d,]+) per (\d+) g$/, function (m, el) { return ['Today\'s price', near(el) + '\'s official closing price today: ₹' + m[1] + ' for ' + m[2] + ' g. Each contract is quoted for a different weight, so these raw prices cannot be compared directly.']; }],
     [/^([▲▼]) ₹([\d,]+) \(([−+-]?[\d.]+)%\) Prev\. ₹([\d,]+)$/, function (m, el) { return ['Change since yesterday', near(el) + ' went ' + (m[1] === '▲' ? 'up' : 'down') + ' by ₹' + m[2] + ' (' + m[3].replace(/^[−-]/, '') + '%) from yesterday\'s closing price of ₹' + m[4] + '.']; }],
     [/^Per 10 g pure gold ₹([\d,]+)$/, function (m, el) { return ['Price of 10 g of pure gold', 'We turn ' + near(el) + '\'s price into the price of 10 g of 100% pure gold: ₹' + m[1] + '. Now all four contracts can be compared fairly.']; }],
     [new RegExp('^' + P + ' ([\\d.]+) bps$'), function (m) { var c = costLine(), g = n(m[3]); return [m[1] + ' vs ' + m[2], 'The price gap between ' + m[1] + ' and ' + m[2] + ' is ' + m[3] + ' bps (' + pc(m[3]) + ') away from its normal level. To be worth trading it must pass the cost line of ' + c + ' bps' + (g < n(c) ? ', so it is ' + (n(c) - g).toFixed(1) + ' bps short.' : '. It does.')]; }],
-    [/^([\d,]+) official MCX daily prices: ([\d,]+) from the MCX archive, ([\d,]+) from our own download$/, function (m) { return ['Prices used', m[1] + ' official end-of-day prices, one per contract per trading day: ' + m[2] + ' from the MCX archive for 2011–2023 and ' + m[3] + ' from our own MCX download since October 2023. Where the two overlap they agree exactly.']; }],
+    [/^([\d,]+) official MCX daily prices: ([\d,]+) for 2011–2023, ([\d,]+) since Oct 2023$/, function (m) { return ['Prices used', m[1] + ' official end-of-day prices, one per contract per trading day, all downloaded by us from MCX: ' + m[2] + ' for 2011–2023 and ' + m[3] + ' since October 2023.']; }],
     [/^(\d+) years tested, (.+) to (.+)$/, function (m) { return ['How long we tested', m[1] + ' years of gold prices, from ' + m[2] + ' (the first day all three older contracts traded) to ' + m[3] + '.']; }],
     [/^([\d,]+) trades (\d+) in (\d{4})–(\d{4}), (\d+) in training, (\d+) in the test year(?:, \d+ after it)?$/, function (m) { return ['Every trade', 'The rule made ' + m[1] + ' trades in total: ' + m[2] + ' in the clean test (' + m[3] + '–' + m[4] + '), ' + m[5] + ' in the two training years and ' + m[6] + ' in the 12-month test year. Only a few trades a year pass all five checks.']; }],
     [/^([−+-]?₹[\d,]+) the clean test, (\d{4})–(\d{4}), after costs: (\d+) of (\d+) years lost money$/, function (m) { return ['The clean test', 'On ' + m[2] + '–' + m[3] + ', years no version of the rule had seen, it ' + money(m[1]) + ' after costs, and ' + m[4] + ' of ' + m[5] + ' years lost money. This is the most trustworthy result.']; }],
@@ -237,10 +237,10 @@
     [/^Download Data to (.+?) · not live Search(?: Ctrl O| ⌘ O)? \?$/, function (m) { return ['The top bar', 'Download the data, see the date of the latest prices (' + m[1] + '; we add new MCX files by hand, so it is not live), Search to jump to any page (Ctrl O), switch dark or light, and ? for the meaning of words.']; }],
     // Data
     [/^([\d,]+) daily prices (.+)$/, function (m) { return [m[1] + ' prices', 'One official closing price per contract for every trading day since 2011: ' + m[1] + ' in all. ' + m[2]]; }],
-    [/^([\d,]+) daily settlements in the archive (.+)$/, function (m) { return ['The MCX archive', m[1] + ' official MCX daily prices in the archive. ' + m[2]]; }],
+    [/^([\d,]+) daily settlements downloaded (.+)$/, function (m) { return ['2004 to 2023', m[1] + ' official MCX daily prices we downloaded for the older contracts. ' + m[2]]; }],
     [/^(\d+) contracts (.+)$/, function (m) { return [m[1] + ' contracts', 'Each month has its own contract for each symbol. We have every one in the period: ' + m[1] + ' in total.']; }],
     [/^(\d+) trading days (.+)$/, function (m) { return [m[1] + ' trading days', 'Days when MCX was open: ' + m[2]]; }],
-    [/^0 mismatches (.+)$/, function () { return ['0 mismatches', 'Two checks, row by row: our cleaned data against the raw MCX files, and our download against the MCX archive where they overlap. Not a single number differs.']; }],
+    [/^0 mismatches (.+)$/, function () { return ['0 mismatches', 'Two checks, row by row: our cleaned data against the raw MCX files, and our download against a second copy of the same MCX prices. Not a single number differs.']; }],
     [/^(\d+) days with no trades removed/, function (m) { return [m[1] + ' days removed', 'On these days a contract had zero trades, so its "price" was not real. We left them out.']; }],
     [/^(\d+) thin days flagged/, function (m) { return [m[1] + ' thin days', 'Very little trading on these days. We take no new signals then, and assume 3× slippage if a trade is already open.']; }],
     [/^(\d+) weekend sessions kept (.+)$/, function (m) { return [m[1] + ' weekend sessions', 'MCX sometimes opens at the weekend: every Saturday until early 2014, and later only for Diwali Muhurat and Union Budget days. Those were real trading days, so we kept them. ' + m[2]]; }],

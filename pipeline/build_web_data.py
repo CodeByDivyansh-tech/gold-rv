@@ -195,7 +195,7 @@ def build_web_data(data_dir: str = 'frontend/public/data', out_path: str = None)
                    net0=hr['by_slip']['0']['net_rs'], losingYears=hr['years_count'] - hr['years_positive'], years=hr['years_count'],
                    rows=hist['window']['rows'], checked=hist['check']['shared_rows'], checkMismatches=hist['check']['mismatches'],
                    contracts=len(hist['window']['contracts']), days=hist['window']['days'])
-    # the whole study, 2011 to today: the book's clean-test window plus our own download (they do not overlap in time;
+    # the whole study, 2011 to today: the 2011-2023 clean-test window plus our own download (they do not overlap in time;
     # a contract trading on both sides of the join counts once)
     ours_c = {f"{c['symbol']}|{c['expiry_date']}" for c in J('contracts.json')['lifecycle']}
     longrun['allRows'] = longrun['rows'] + meta['rows_count']

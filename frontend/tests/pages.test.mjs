@@ -98,7 +98,8 @@ console.log(`pages ok: ${runs} page states rendered against site-data.json`)
   const w = D2.renderVals()
   assert.equal(w.hx.show, true)
   assert.equal(w.hx.facts[2].value, String(H.check.mismatches))
-  assert.match(w.hx.intro, /archive of official MCX Bhavcopy settlements was shared with us, with permission/)
+  assert.match(w.hx.intro, /we downloaded from MCX's Bhavcopy service, one contract at a time/)
+  assert.equal(w.hx.facts[1].value, String(H.source.contracts))
 }
 
 // Long charts: All starts at the first week of the shared book, 10Y about ten years back, and both end on our last day
@@ -189,7 +190,7 @@ console.log('explorer ok')
     JSON.stringify(c.renderVals(), (k, x) => { if (typeof x === 'string') strs.push(x); return typeof x === 'function' ? undefined : x })
     for (const t of strs) {
       if (t === ours || t.includes(ours + ' daily') || t.includes(ours + ' rows')) {
-        assert.ok(/download|MCX file|raw MCX|MCX archive|our own|Oct 2023/i.test(t), `${name}: shows ${ours} (our download only) without saying so: "${t.slice(0, 120)}"`)
+        assert.ok(/download|MCX file|raw MCX|our own|Oct 2023/i.test(t), `${name}: shows ${ours} (our download only) without saying so: "${t.slice(0, 120)}"`)
       }
       assert.ok(!/^\d+ trades in the test year$/.test(t), `${name}: test-year trade count used as a headline: "${t}"`)
     }
@@ -407,23 +408,25 @@ function L_N() { return D.longrun.n }
   for (const f of files) {
     const t = fs2.readFileSync(f, 'utf8').replace(/order[- ]book|book fill|only_in_book\w*|SRC_BOOK|load_book|BOOK_PATH/gi, '')
     assert.doesNotMatch(t, /\bdata book\b|\bhistory book\b|\bthe book\b|\bbook\b/i, path2.relative(root, f) + ' mentions a book')
+    // every price is our own MCX download (Oct 2026): no page may name anything else as the source
+    if (!/[\/]data[\/]/.test(f)) assert.doesNotMatch(t, /\barchive\b|shared with permission|with their permission/i, path2.relative(root, f) + ' credits another data source')
   }
   console.log('no book names ok')
 }
 
-// Downloads credit the data (CLAUDE.md rule 4; Oct-2026 debug: statements and PDFs had no archive credit)
+// Downloads credit the data (CLAUDE.md rule 4): every price is MCX Bhavcopy, downloaded by us from MCX
 {
   const mk = (st) => { const c = new (load('DownloadPanel'))(); c.props = { dark: true, onClose: () => {} }; c.state = { D, H, HC, ...st }; return c }
   for (const what of ['today', 'prices', 'trades', 'backtest', 'report']) {
     const c = mk({ what, period: 'all', pair: 'ALL' })
     const d = c.doc(D, what, 'ALL', 'Everything since 2011', c.table(D, what, 'ALL', 'all', H, HC))
-    assert.match(d.foot, /MCX archive shared with permission/, what + ': PDF and printable page credit the MCX archive')
-    assert.match(d.foot, /our own MCX download/)
+    assert.match(d.foot, /official MCX Bhavcopy settlements, .+ all downloaded by us from MCX/, what + ': PDF and printable page credit MCX')
+    assert.doesNotMatch(d.foot, /archive|shared with/i)
   }
   const tr = mk({}).table(D, 'trades', 'ALL', 'all', H, HC)
   assert.equal(tr.head[11], 'Data source')
-  assert.ok(tr.rows.every((r) => (r[10] === 'Clean test') === /MCX archive/.test(r[11])), 'clean-test trades are credited to the MCX archive, the rest to our download')
+  assert.ok(tr.rows.every((r) => (r[10] === 'Clean test') === /2011–2023/.test(r[11]) && /Our MCX download/.test(r[11])), 'every trade is credited to our MCX download, with its part of the study')
   const bt = mk({}).table(D, 'backtest', 'ALL', 'all', H, HC)
-  assert.ok(bt.rows.filter((r) => D.longrun.pairs.includes(Object.keys(D.pairs).find((k) => D.pairs[k].label === r[0]))).every((r) => /MCX archive/i.test(r[13])))
+  assert.ok(bt.rows.filter((r) => D.longrun.pairs.includes(Object.keys(D.pairs).find((k) => D.pairs[k].label === r[0]))).every((r) => /Our MCX download, 2011–2023/.test(r[13])))
   console.log('download credit ok')
 }

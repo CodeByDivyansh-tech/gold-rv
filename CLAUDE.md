@@ -19,7 +19,7 @@ The README explains the research; SPEC.md is the original build spec (data, form
 |---|---|
 | `pipeline/` | Python: data cleaning, carry, pairs, backtest, robustness, explorer, site data (`build_site_data.py`) |
 | `pipeline/tests/` | pytest suite |
-| `data/raw/` | `mcx_bhavcopy_raw_api.csv` (our MCX rows, source of truth), `gold_bhavcopy_clean.csv`, `contract_calendar.csv`, `retrieval_log.csv`, archived MCX CSVs (`mcx_csv/`), `mcx_bhavcopy_archive.csv` (MCX archive 2003–2026, shared with permission; used for 2011–2023), `mcx_bhavcopy_supplement.csv` (gaps in our download filled from the book) |
+| `data/raw/` | `mcx_bhavcopy_raw_api.csv` (our MCX rows, source of truth), `gold_bhavcopy_clean.csv`, `contract_calendar.csv`, `retrieval_log.csv`, archived MCX CSVs (`mcx_csv/`), `mcx_bhavcopy_2003_2023.csv` (our MCX download of every 2004–2023 contract; used for 2011–2023 and the long charts), `mcx_bhavcopy_supplement.csv` (rows our first download missed, downloaded from MCX later), `mcx_bhavcopy_archive.csv` (a second copy of MCX rows, shared by another team; used only as a check) |
 | `frontend/public/` | The static site: `pages/*.dc.html` (one per page), `app/*.js`, `data/*.json` (built by the pipeline) |
 | `frontend/public/app/` | `dc.js` renderer, `theme.js` colours, `keys.js` shortcuts, `prefs.js`, `pdf.js` PDF writer, `rail.js` lit-glass menu, `glossary.js`, `explain.js` (Goldie) |
 | `frontend/public/demo/` | Demo video page (`gold-rv-demo-video.mp4`, laptop walkthrough of every page) with chapters |
@@ -58,16 +58,17 @@ Holidays have no rows; that is normal. Then branch, PR, wait for CI, merge (see 
 ## Rules (these came from real mistakes; do not break them)
 
 1. **Never present a part of the study as the whole.** The study runs 18 Apr 2011 → latest date.
-   Headlines, totals and dataset sizes cover every year (47,521 daily prices, 599 contracts, 4,138 days as of
+   Headlines, totals and dataset sizes cover every year (47,524 daily prices, 599 contracts, 4,138 days as of
    16 Oct 2026). The 12-month test year and our own 3-year download may be shown, but always named as parts.
    `frontend/tests/pages.test.mjs` has a guard test for this; keep it passing and extend it, never weaken it.
 2. **The test year (Oct 2025–Sep 2026) is not a clean test**: the five-check rule was written after its
    first results were seen. The clean test is 2011–2023. Data after 30 Sep 2026 is "after the test year".
 3. **Every number on the site comes from the pipeline** (`frontend/public/data/*.json`), never typed in.
    After any pipeline or data change: rebuild, run `check_data`, commit the JSON with the code.
-4. **Credit the data**: 2011–2023 is an MCX archive, shared with permission; 2023 onward is
-   our own MCX download. Every price is an official MCX Bhavcopy settlement. Keep this wording on the Data
-   page and in downloads. The intro's last card shows only the verdict (no team names, no buttons); Team NEXORA,
+4. **Credit the data**: every price is an official MCX Bhavcopy settlement that we downloaded from MCX's
+   Bhavcopy service (2004–2023 contracts on 21 Oct 2026; Oct 2023 onward from Oct 2026), one logged request per
+   contract. Say so on the Data page and in downloads. Never name another source for the prices; the second copy
+   (`mcx_bhavcopy_archive.csv`) is only a check. A page test guards this. The intro's last card shows only the verdict (no team names, no buttons); Team NEXORA,
    the members, Enter the site and Watch demo video are in the Meet the team section below it, by the team's request.
 5. Scope is gold only (no silver). Research, not investment advice.
 6. No handover zip files; the GitHub repo is the hand-over.

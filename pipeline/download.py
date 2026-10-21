@@ -2,7 +2,7 @@
 
 How the data is laid out
   data/raw/mcx_bhavcopy_raw_api.csv   rows exactly as the MCX endpoint returns them (the source of truth)
-  data/raw/mcx_bhavcopy_supplement.csv official MCX rows our download missed, taken from the MCX archive
+  data/raw/mcx_bhavcopy_supplement.csv official MCX rows our first download missed, downloaded from MCX on 21 Oct 2026
                                       (same columns plus Source): the Oct/Nov/Dec-2023 contracts and 1 Oct 2026
   data/raw/gold_bhavcopy_clean.csv    derived from the raw file by raw_to_clean() below
   data/raw/contract_calendar.csv      derived from the clean file by contract_calendar() below
@@ -32,7 +32,7 @@ import pandas as pd
 from pipeline.config import CONTRACT_SPECS, THIN_OI_THRESHOLD, THIN_VOLUME_THRESHOLD
 
 RAW_PATH = 'data/raw/mcx_bhavcopy_raw_api.csv'
-SUPPLEMENT_PATH = 'data/raw/mcx_bhavcopy_supplement.csv'   # official MCX rows from the MCX archive, same format + Source
+SUPPLEMENT_PATH = 'data/raw/mcx_bhavcopy_supplement.csv'   # MCX rows our first download missed (second download), same format + Source
 CLEAN_PATH = 'data/raw/gold_bhavcopy_clean.csv'
 CAL_PATH = 'data/raw/contract_calendar.csv'
 LOG_PATH = 'data/raw/retrieval_log.csv'
