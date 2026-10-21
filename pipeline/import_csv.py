@@ -94,7 +94,7 @@ def import_files(paths: List[str], retrieved: str = None, archive: bool = True) 
     if new.duplicated(['Symbol', 'ExpiryDate', 'Date']).any():
         raise ValueError('two different files contain the same contract and day with different numbers')
     raw = pd.read_csv(RAW_PATH, dtype=str)
-    # the supplement (history-book rows) must not be duplicated into the MCX store either
+    # the supplement (archive rows) must not be duplicated into the MCX store either
     stored = load_raw().astype(str)
     merge_raw(stored, new)                                    # raises on any conflict with stored rows
     key = lambda x: x['Symbol'].str.strip() + '|' + x['ExpiryDate'].str.strip() + '|' + x['Date']

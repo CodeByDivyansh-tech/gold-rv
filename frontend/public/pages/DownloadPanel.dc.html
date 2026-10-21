@@ -170,15 +170,15 @@ class Component extends DCLogic {
     const inP = (d) => d >= from && d <= to;
     const WHY = { revert: 'Back to normal', stop: 'Stop-loss', time: 'Time limit', roll: 'Contract roll', expiry: 'Near expiry' };
     // where each row's prices come from (official MCX Bhavcopy settlements either way)
-    const SRC_BOOK = 'Compiled MCX data book (shared with permission)', SRC_OURS = 'Our own MCX download';
+    const SRC_BOOK = 'MCX archive (shared with permission)', SRC_OURS = 'Our own MCX download';
     if (what === 'today') {
       return { title: 'Today\'s six pairs', head: ['Pair', 'Contracts', 'Spread (bps)', 'Spread (Rs per 10 g)', 'Normal level (bps)', 'Gap from normal (bps)', 'Cost line (bps)', 'z', 'z needed', 'Status', 'Checks failed'],
         rows: D.today.map((p) => [p.label, p.contracts, p.spread, p.spreadRs, p.mu, p.dev, p.hurdle, p.z, p.zNeed, p.failed.length ? 'Quiet' : 'Signal', p.failed.join('; ')]) };
     }
     if (what === 'prices') {
       const P = D.pure4, rows = [], L = H && H.long;
-      // before our own download: the MCX history book, one price per week (the last trading day)
-      if (L) L.d.forEach((d, i) => { if (inP(d)) rows.push([d, L.GOLDM[i], L.GOLDTEN[i], L.GOLDGUINEA[i], L.GOLDPETAL[i], 'MCX history book, weekly']); });
+      // before our own download: the MCX archive, one price per week (the last trading day)
+      if (L) L.d.forEach((d, i) => { if (inP(d)) rows.push([d, L.GOLDM[i], L.GOLDTEN[i], L.GOLDGUINEA[i], L.GOLDPETAL[i], 'MCX archive, weekly']); });
       P.d.forEach((d, i) => { if (inP(d)) rows.push([d, P.GOLDM[i], P.GOLDTEN[i], P.GOLDGUINEA[i], P.GOLDPETAL[i], 'Our MCX download, daily']); });
       return { title: 'Price of 10 g of pure gold by contract', head: ['Date', 'GOLDM', 'GOLDTEN', 'GOLDGUINEA', 'GOLDPETAL', 'Source'], rows };
     }
@@ -210,7 +210,7 @@ class Component extends DCLogic {
       return { title: 'Backtest by period, ' + D.longrun.start.slice(0, 4) + ' to ' + D.asOf.slice(0, 4),
         head: ['Pair', 'Slippage (bps)', 'Clean test trades', 'Clean test after costs (Rs)', 'Training trades', 'Training after costs (Rs)', 'Test-year trades', 'Test year after costs (Rs)', 'Test-year t-statistic', 'After the test year: trades', 'After the test year (Rs)', 'All trades', 'All years after costs (Rs)', 'Data source'], rows };
     }
-    return { title: 'Research report', head: ['Section', 'Contents'], rows: [['Verdict', 'No persistent edge proven after costs'], ['Today', 'Six pairs against the cost line'], ['Backtest', 'Clean test 2011–2023, training and test year, all pairs'], ['Costs', 'Round trip ' + D.costTotal.toFixed(1) + ' bps'], ['Data', D.longrun.allRows + ' daily settlements, ' + D.longrun.start.slice(0, 4) + '–' + D.asOf.slice(0, 4) + ' (' + D.longrun.rows + ' history book 2011–2023, ' + D.meta.rows + ' our MCX download), ' + D.meta.mismatches + ' mismatches']] };
+    return { title: 'Research report', head: ['Section', 'Contents'], rows: [['Verdict', 'No persistent edge proven after costs'], ['Today', 'Six pairs against the cost line'], ['Backtest', 'Clean test 2011–2023, training and test year, all pairs'], ['Costs', 'Round trip ' + D.costTotal.toFixed(1) + ' bps'], ['Data', D.longrun.allRows + ' daily settlements, ' + D.longrun.start.slice(0, 4) + '–' + D.asOf.slice(0, 4) + ' (' + D.longrun.rows + ' MCX archive 2011–2023, ' + D.meta.rows + ' our MCX download), ' + D.meta.mismatches + ' mismatches']] };
   }
 
   // The leading byte-order mark makes Excel read the file as UTF-8 (so "·" and "–" display correctly).
@@ -221,7 +221,7 @@ class Component extends DCLogic {
   doc(D, what, pair, periodLabel, t) {
     const HC = (this.state || {}).HC;
     const sub = 'data as of ' + this.fd(D.asOf) + ' · MCX Bhavcopy end-of-day settlements';
-    const foot = 'Team NEXORA · Hack in Hills \'26 · Research project, not investment advice. Results include all MCX costs and 5 bps slippage per order unless stated. Prices: official MCX Bhavcopy settlements; ' + this.fd(D.longrun.start) + ' to ' + this.fd(D.longrun.end) + ' from a compiled MCX data book, shared with permission; from ' + this.fd(D.start) + ' on, our own MCX download. Source: github.com/CodeByDivyansh-tech/nexora-gold-rv-';
+    const foot = 'Team NEXORA · Hack in Hills \'26 · Research project, not investment advice. Results include all MCX costs and 5 bps slippage per order unless stated. Prices: official MCX Bhavcopy settlements; ' + this.fd(D.longrun.start) + ' to ' + this.fd(D.longrun.end) + ' from an MCX archive shared with permission; from ' + this.fd(D.start) + ' on, our own MCX download. Source: github.com/CodeByDivyansh-tech/nexora-gold-rv-';
     const out = (blocks, landscape) => ({ title: t.title, subtitle: sub, blocks, foot, landscape: !!landscape });
     const n = (v) => (typeof v === 'number' ? v.toLocaleString('en-IN') : v);
     if (what === 'trades') {
@@ -243,14 +243,14 @@ class Component extends DCLogic {
       const first = t.rows.length ? t.rows[0][0] : null, last = t.rows.length ? t.rows[t.rows.length - 1][0] : null;
       return out([
         { t: 'box', lines: [[['Price of 10 g of pure gold', true], [' · ' + periodLabel, false]],
-          t.rows.length.toLocaleString('en-IN') + ' rows' + (first ? ', ' + this.fd(first) + ' to ' + this.fd(last) : '') + '. Weekly from the MCX history book before ' + this.fd(D.start) + ' (the last trading day of each week); daily from our own MCX download after that.',
+          t.rows.length.toLocaleString('en-IN') + ' rows' + (first ? ', ' + this.fd(first) + ' to ' + this.fd(last) : '') + '. Weekly from the MCX archive before ' + this.fd(D.start) + ' (the last trading day of each week); daily from our own MCX download after that.',
           'Price = settlement price ÷ grams quoted ÷ purity × 10, using each contract\'s month with the most open interest that day.'] },
         { t: 'table', head: t.head, rows: t.rows.map((r) => [this.fd(r[0])].concat(r.slice(1, 5).map(n), [r[5]])) }
       ]);
     }
     if (what === 'backtest') {
       return out([
-        { t: 'box', lines: [[['Every pair at 0, 2, 5 and 10 bps slippage per order', true]], 'Clean test ' + this.fd(D.longrun.start) + ' to ' + this.fd(D.longrun.end) + ' (MCX history book; only the three pairs that were listed then), training, the test year and everything after it, to ' + this.fd(D.asOf) + '. Results in rupees after all MCX costs.'] },
+        { t: 'box', lines: [[['Every pair at 0, 2, 5 and 10 bps slippage per order', true]], 'Clean test ' + this.fd(D.longrun.start) + ' to ' + this.fd(D.longrun.end) + ' (MCX archive; only the three pairs that were listed then), training, the test year and everything after it, to ' + this.fd(D.asOf) + '. Results in rupees after all MCX costs.'] },
         { t: 'table', head: t.head.slice(0, 13), rows: t.rows.map((r) => r.slice(0, 13).map((v, j) => ([3, 5, 7, 10, 12].includes(j) && typeof v === 'number' ? this.rs(v) : n(v)))) }
       ], true);
     }
@@ -289,7 +289,7 @@ class Component extends DCLogic {
       { t: 'h2', text: 'Cost of one round trip (bps of one ₹10 lakh leg)' },
       { t: 'table', head: ['Item', 'How', 'bps'], rows: D.costs.map((c) => [c.name, c.how, c.bps.toFixed(2)]) },
       { t: 'h2', text: 'Data' },
-      { t: 'p', text: D.longrun.allRows.toLocaleString('en-IN') + ' official MCX daily settlements, ' + D.longrun.allContracts + ' contracts and ' + D.longrun.allDays.toLocaleString('en-IN') + ' trading days (' + this.fd(D.longrun.start) + ' to ' + this.fd(D.asOf) + '): ' + D.longrun.rows.toLocaleString('en-IN') + ' from the MCX history book for the clean test (' + this.fd(D.longrun.start) + ' to ' + this.fd(D.longrun.end) + '), and our own MCX download: ' + D.meta.rows.toLocaleString('en-IN') + ' daily settlements, ' + D.meta.contracts + ' contracts, ' + D.meta.days + ' trading days (' + this.fd(D.start) + ' to ' + this.fd(D.asOf) + '). ' + D.meta.checkText },
+      { t: 'p', text: D.longrun.allRows.toLocaleString('en-IN') + ' official MCX daily settlements, ' + D.longrun.allContracts + ' contracts and ' + D.longrun.allDays.toLocaleString('en-IN') + ' trading days (' + this.fd(D.longrun.start) + ' to ' + this.fd(D.asOf) + '): ' + D.longrun.rows.toLocaleString('en-IN') + ' from the MCX archive for the clean test (' + this.fd(D.longrun.start) + ' to ' + this.fd(D.longrun.end) + '), and our own MCX download: ' + D.meta.rows.toLocaleString('en-IN') + ' daily settlements, ' + D.meta.contracts + ' contracts, ' + D.meta.days + ' trading days (' + this.fd(D.start) + ' to ' + this.fd(D.asOf) + '). ' + D.meta.checkText },
       { t: 'h2', text: 'Limits' }, { t: 'ul', items: D.limits }
     ]);
   }
@@ -410,7 +410,7 @@ class Component extends DCLogic {
       noteColor: badOrder ? 'var(--down)' : 'var(--muted)',
       note: badOrder ? 'The start date is after the end date. Pick a start on or before ' + this.fd(cTo) + '.'
         : (clamped ? 'Moved inside the dates we have. ' : '') + 'Data runs from ' + this.fd(minD) + ' to ' + this.fd(maxD) + '.' +
-          (what === 'prices' && cFrom < D.start ? ' Before ' + this.fd(D.start) + ' prices are weekly (MCX history book); after that, daily.' : '') +
+          (what === 'prices' && cFrom < D.start ? ' Before ' + this.fd(D.start) + ' prices are weekly (MCX archive); after that, daily.' : '') +
           (what === 'trades' ? ' Trades are included by the day they were entered.' : '')
     };
     const download = async () => {

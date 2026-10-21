@@ -170,7 +170,7 @@ button:focus-visible,a:focus-visible,input:focus-visible{outline:2px solid var(-
           <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 8px">
             <div style="display: flex; flex-direction: column; gap: 4px">
               <h2 id="log-h" style="margin: 0; font-size: 18px; font-weight: 600">Download log</h2>
-              <span style="font-size: 13px; color: var(--muted)">One request per contract and expiry, {{logCount}} in total. Every row can be traced back to its request. The contracts filled from the MCX history book are not in this log; their rows are in the supplement file.</span>
+              <span style="font-size: 13px; color: var(--muted)">One request per contract and expiry, {{logCount}} in total. Every row can be traced back to its request. The contracts filled from the MCX archive are not in this log; their rows are in the supplement file.</span>
             </div>
             <button type="button" onClick="{{toggleLog}}" aria-expanded="{{logExpanded}}" style="min-height: 44px; padding: 0 16px; border-radius: 12px; border: 1px solid var(--line); background: var(--panel); color: var(--fg); font: 600 14px 'Geist', system-ui, sans-serif; cursor: pointer">{{logButton}}</button>
           </div>
@@ -278,19 +278,19 @@ class Component extends DCLogic {
     const n = (x) => x.toLocaleString('en-IN');
     // The whole study first (2011 to today); the two sources it is built from come right after.
     const big = [
-      { value: n(L.allRows), label: 'daily prices', note: 'One official settlement per contract per trading day, ' + this.fd(L.start) + ' to ' + this.fd(D.asOf) + ': ' + n(L.rows) + ' from the MCX history book and ' + n(m.rows) + ' from our own MCX download.', color: 'var(--fg)' },
+      { value: n(L.allRows), label: 'daily prices', note: 'One official settlement per contract per trading day, ' + this.fd(L.start) + ' to ' + this.fd(D.asOf) + ': ' + n(L.rows) + ' from the MCX archive and ' + n(m.rows) + ' from our own MCX download.', color: 'var(--fg)' },
       { value: n(L.allContracts), label: 'contracts', note: 'Every expiry of GOLDM, GOLDGUINEA and GOLDPETAL since 2011, and of GOLDTEN since it was listed in 2025.', color: 'var(--fg)' },
       { value: n(L.allDays), label: 'trading days', note: this.fd(L.start) + ' to ' + this.fd(D.asOf) + ': ' + n(L.days) + ' in the clean-test years and ' + n(m.days) + ' since ' + this.fd(D.start) + '.', color: 'var(--fg)' },
-      { value: String((m.mismatches || 0) + (L.checkMismatches || 0)), label: 'mismatches', note: n(L.checked) + ' rows where our download and the history book overlap agree on every field, and ' + n(m.checkRows) + ' rows of our raw MCX files match our cleaned data. Both checks run on every build.', color: (m.mismatches || 0) + (L.checkMismatches || 0) === 0 ? 'var(--up)' : 'var(--down)' }
+      { value: String((m.mismatches || 0) + (L.checkMismatches || 0)), label: 'mismatches', note: n(L.checked) + ' rows where our download and the MCX archive overlap agree on every field, and ' + n(m.checkRows) + ' rows of our raw MCX files match our cleaned data. Both checks run on every build.', color: (m.mismatches || 0) + (L.checkMismatches || 0) === 0 ? 'var(--up)' : 'var(--down)' }
     ];
     const parts = [
-      { name: 'MCX Gold Futures History Book', when: this.fd(L.start) + ' to ' + this.fd(L.end), what: n(L.rows) + ' daily prices from the book · ' + n(L.contracts) + ' contracts · ' + n(L.days) + ' trading days', use: 'The clean test: years the rule never saw. GOLDTEN was not listed yet, so three contracts.' },
+      { name: 'MCX Bhavcopy archive', when: this.fd(L.start) + ' to ' + this.fd(L.end), what: n(L.rows) + ' daily prices from the archive · ' + n(L.contracts) + ' contracts · ' + n(L.days) + ' trading days', use: 'The clean test: years the rule never saw. GOLDTEN was not listed yet, so three contracts.' },
       { name: 'Our own MCX Bhavcopy download', when: this.fd(D.start) + ' to ' + this.fd(D.asOf), what: n(m.rows) + ' daily prices from our own download · ' + n(m.contracts) + ' contracts · ' + n(m.days) + ' trading days', use: 'Training (to ' + this.fd(D.split.train_end) + '), the test year (to ' + this.fd(D.split.test_end) + ') and today\'s numbers. All four contracts.' }
     ];
     const C = D.rule.current['5'];
     const srs = (x) => (x < 0 ? '−' : '+') + '₹' + Math.abs(Math.round(x)).toLocaleString('en-IN');
     const how = [
-      { value: n(L.allRows), color: 'var(--fg)', what: 'daily prices, ' + L.start.slice(0, 4) + ' to ' + D.asOf.slice(0, 4), source: 'Counted row by row from the two source files: the MCX history book (data/raw/mcx_history_book.csv, 2011–2023 part) and our MCX download (data/raw/gold_bhavcopy_clean.csv).' },
+      { value: n(L.allRows), color: 'var(--fg)', what: 'daily prices, ' + L.start.slice(0, 4) + ' to ' + D.asOf.slice(0, 4), source: 'Counted row by row from the two source files: the MCX archive (data/raw/mcx_bhavcopy_archive.csv, 2011–2023 part) and our MCX download (data/raw/gold_bhavcopy_clean.csv).' },
       { value: String((m.mismatches || 0) + (L.checkMismatches || 0)), color: 'var(--up)', what: 'mismatches', source: 'pipeline/history.py compares the ' + n(L.checked) + ' rows both sources cover, field by field; pipeline/download.py rebuilds our clean file from the raw MCX files and must match it byte for byte.' },
       { value: srs(L.net), color: L.net < 0 ? 'var(--down)' : 'var(--up)', what: 'the clean test: ' + L.n + ' trades, ' + L.start.slice(0, 4) + '–' + L.end.slice(0, 4), source: 'The frozen rule run on years it never saw (pipeline/history.py). Every trade is in history_charts.json, and a test checks they add up to this total.' },
       { value: srs(C.test_net_rs), color: C.test_net_rs < 0 ? 'var(--down)' : 'var(--up)', what: 'the 12-month test year: ' + C.test_n + ' trades (one part of the study, not a clean test)', source: 'pipeline/build_site_data.py. Trades closed in the ' + D.events.crashShort + ' made ' + srs(C.crash_net_rs) + '; the rest ' + srs(C.ex_crash_net_rs) + '.' },
@@ -327,14 +327,14 @@ class Component extends DCLogic {
       const since = ['GOLDM', 'GOLDGUINEA', 'GOLDPETAL', 'GOLDTEN'].filter((x) => cv[x]).map((x) => x + ' from ' + this.fd(cv[x].first).replace(/^\d+ /, '')).join(', ');
       hx = {
         show: true,
-        intro: 'Another team shared their MCX Gold Futures History Book with us: official MCX Bhavcopy rows from ' + this.fd(HX.source.first) + ' to ' + this.fd(HX.source.last) + '. Thank you!',
+        intro: 'An archive of official MCX Bhavcopy settlements was shared with us, with permission: official MCX Bhavcopy rows from ' + this.fd(HX.source.first) + ' to ' + this.fd(HX.source.last) + '. Thank you!',
         facts: [
-          { value: n(HX.source.rows), label: 'daily settlements in the book', note: since + '. We use ' + n(D.longrun.rows) + ' of them (' + this.fd(HX.window.from) + ' to ' + this.fd(HX.window.to) + ') for the clean test, and the ' + n(k.shared_rows) + ' that overlap our download to check it.', color: 'var(--fg)' },
-          { value: n(HX.source.contracts), label: 'contracts in the book', note: 'Each contract listed under its own expiry, exactly as MCX published it.', color: 'var(--fg)' },
+          { value: n(HX.source.rows), label: 'daily settlements in the archive', note: since + '. We use ' + n(D.longrun.rows) + ' of them (' + this.fd(HX.window.from) + ' to ' + this.fd(HX.window.to) + ') for the clean test, and the ' + n(k.shared_rows) + ' that overlap our download to check it.', color: 'var(--fg)' },
+          { value: n(HX.source.contracts), label: 'contracts in the archive', note: 'Each contract listed under its own expiry, exactly as MCX published it.', color: 'var(--fg)' },
           { value: String(k.mismatches), label: 'mismatches with our data', note: n(k.shared_rows) + ' rows both sources cover, compared on open, high, low, close, volume, open interest and value.', color: k.mismatches === 0 ? 'var(--up)' : 'var(--down)' },
           { value: String(SUP.missing_contracts.length), label: 'contracts our download missed, now added', note: (SUP.missing_rows || 0) + ' traded rows: ' + SUP.missing_contracts.join(', ') + '. They were the busiest contracts in Oct–Dec 2023.', color: 'var(--fg)' }
         ],
-        note: 'We use the book for three things: the long-history check on the Backtesting page (' + this.fd(HX.window.from) + ' to ' + this.fd(HX.window.to) + '), the 2011–2023 part of every chart ("All data" on the Market, Pairs, Backtesting and Today pages), and to fill gaps in our own MCX download: the ' + SUP.missing_contracts.length + ' contracts above' + (SUP.extra_days && SUP.extra_days.length ? ' and ' + SUP.extra_days.map((d) => this.fd(d)).join(', ') + ', the day after our download ended' : '') + '. Those rows are kept in a separate, labelled file. Everything else comes from our own MCX download, listed below.'
+        note: 'We use the archive for three things: the long-history check on the Backtesting page (' + this.fd(HX.window.from) + ' to ' + this.fd(HX.window.to) + '), the 2011–2023 part of every chart ("All data" on the Market, Pairs, Backtesting and Today pages), and to fill gaps in our own MCX download: the ' + SUP.missing_contracts.length + ' contracts above' + (SUP.extra_days && SUP.extra_days.length ? ' and ' + SUP.extra_days.map((d) => this.fd(d)).join(', ') + ', the day after our download ended' : '') + '. Those rows are kept in a separate, labelled file. Everything else comes from our own MCX download, listed below.'
       };
     }
     return {

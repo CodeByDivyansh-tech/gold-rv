@@ -1,4 +1,4 @@
-"""Checks for pipeline/history.py: the data book agrees with our MCX download, and the history check is fair."""
+"""Checks for pipeline/history.py: the MCX archive agrees with our MCX download, and the history check is fair."""
 import json
 import os
 

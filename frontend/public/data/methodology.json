@@ -3,7 +3,7 @@
     {
       "step": 1,
       "name": "Load & Validate",
-      "desc": "Parse 47,521 daily prices: 35,014 from the MCX history book (2011\u20132023) and 12,507 from our own MCX download (Oct 2023 on). Strip symbols, check primary keys, compare against the raw MCX file and the book, flag no-trade days."
+      "desc": "Parse 47,521 daily prices: 35,014 from the MCX archive (2011\u20132023) and 12,507 from our own MCX download (Oct 2023 on). Strip symbols, check primary keys, compare against the raw MCX file and the archive, flag no-trade days."
     },
     {
       "step": 2,
@@ -56,7 +56,7 @@
     "Carry rate c_t is forward-filled only; never backward-filled"
   ],
   "limitations": [
-    "EOD settlement close is an official reference, not an executable book fill.",
+    "EOD settlement close is an official reference, not an executable fill.",
     "Bhavcopy volume indicates activity but does not measure order-book depth. Slippage is assumed at 5 bps per order: daily data cannot measure it (see the slippage check), only real broker fills can.",
     "The 2025\u201326 test year is not a clean out-of-sample test: the five-check rule was written on 2026-10-04, after the original study's test-year results were known. The 2011\u20132023 check is the clean one.",
     "GOLDTEN contracts listed only on 31-Mar-2025, offering limited historical depth.",
