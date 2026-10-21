@@ -177,7 +177,7 @@
     "seg": "test",
     "n": 0,
     "net": 0.0,
-    "net_bps": NaN
+    "net_bps": null
   },
   {
     "pair": "GUINEA_PETAL",
@@ -197,7 +197,7 @@
     "seg": "test",
     "n": 0,
     "net": 0.0,
-    "net_bps": NaN
+    "net_bps": null
   },
   {
     "pair": "GUINEA_PETAL",
@@ -297,7 +297,7 @@
     "seg": "test",
     "n": 0,
     "net": 0.0,
-    "net_bps": NaN
+    "net_bps": null
   },
   {
     "pair": "GUINEA_PETAL",
@@ -317,7 +317,7 @@
     "seg": "test",
     "n": 0,
     "net": 0.0,
-    "net_bps": NaN
+    "net_bps": null
   },
   {
     "pair": "GUINEA_PETAL",
@@ -337,7 +337,7 @@
     "seg": "test",
     "n": 0,
     "net": 0.0,
-    "net_bps": NaN
+    "net_bps": null
   },
   {
     "pair": "GUINEA_PETAL",
@@ -357,7 +357,7 @@
     "seg": "test",
     "n": 0,
     "net": 0.0,
-    "net_bps": NaN
+    "net_bps": null
   },
   {
     "pair": "TEN_PETAL",
@@ -367,7 +367,7 @@
     "seg": "train",
     "n": 0,
     "net": 0.0,
-    "net_bps": NaN
+    "net_bps": null
   },
   {
     "pair": "TEN_PETAL",
@@ -387,7 +387,7 @@
     "seg": "train",
     "n": 0,
     "net": 0.0,
-    "net_bps": NaN
+    "net_bps": null
   },
   {
     "pair": "TEN_PETAL",
@@ -487,7 +487,7 @@
     "seg": "train",
     "n": 0,
     "net": 0.0,
-    "net_bps": NaN
+    "net_bps": null
   },
   {
     "pair": "TEN_PETAL",
@@ -507,7 +507,7 @@
     "seg": "train",
     "n": 0,
     "net": 0.0,
-    "net_bps": NaN
+    "net_bps": null
   },
   {
     "pair": "TEN_PETAL",
@@ -527,7 +527,7 @@
     "seg": "train",
     "n": 0,
     "net": 0.0,
-    "net_bps": NaN
+    "net_bps": null
   },
   {
     "pair": "TEN_PETAL",
@@ -547,7 +547,7 @@
     "seg": "train",
     "n": 0,
     "net": 0.0,
-    "net_bps": NaN
+    "net_bps": null
   },
   {
     "pair": "TEN_PETAL",
@@ -567,7 +567,7 @@
     "seg": "train",
     "n": 0,
     "net": 0.0,
-    "net_bps": NaN
+    "net_bps": null
   },
   {
     "pair": "TEN_PETAL",
@@ -587,7 +587,7 @@
     "seg": "train",
     "n": 0,
     "net": 0.0,
-    "net_bps": NaN
+    "net_bps": null
   },
   {
     "pair": "TEN_PETAL",
@@ -767,7 +767,7 @@
     "seg": "train",
     "n": 0,
     "net": 0.0,
-    "net_bps": NaN
+    "net_bps": null
   },
   {
     "pair": "GUINEA_TEN",
@@ -787,7 +787,7 @@
     "seg": "train",
     "n": 0,
     "net": 0.0,
-    "net_bps": NaN
+    "net_bps": null
   },
   {
     "pair": "GUINEA_TEN",
@@ -807,7 +807,7 @@
     "seg": "train",
     "n": 0,
     "net": 0.0,
-    "net_bps": NaN
+    "net_bps": null
   },
   {
     "pair": "GUINEA_TEN",
@@ -827,7 +827,7 @@
     "seg": "train",
     "n": 0,
     "net": 0.0,
-    "net_bps": NaN
+    "net_bps": null
   },
   {
     "pair": "GUINEA_TEN",
@@ -847,7 +847,7 @@
     "seg": "train",
     "n": 0,
     "net": 0.0,
-    "net_bps": NaN
+    "net_bps": null
   },
   {
     "pair": "GUINEA_TEN",
@@ -867,7 +867,7 @@
     "seg": "train",
     "n": 0,
     "net": 0.0,
-    "net_bps": NaN
+    "net_bps": null
   },
   {
     "pair": "GUINEA_TEN",
@@ -887,7 +887,7 @@
     "seg": "train",
     "n": 0,
     "net": 0.0,
-    "net_bps": NaN
+    "net_bps": null
   },
   {
     "pair": "GUINEA_TEN",
@@ -907,7 +907,7 @@
     "seg": "train",
     "n": 0,
     "net": 0.0,
-    "net_bps": NaN
+    "net_bps": null
   },
   {
     "pair": "GUINEA_TEN",
@@ -927,7 +927,7 @@
     "seg": "train",
     "n": 0,
     "net": 0.0,
-    "net_bps": NaN
+    "net_bps": null
   },
   {
     "pair": "GUINEA_TEN",
@@ -947,7 +947,7 @@
     "seg": "train",
     "n": 0,
     "net": 0.0,
-    "net_bps": NaN
+    "net_bps": null
   },
   {
     "pair": "GUINEA_TEN",
@@ -967,7 +967,7 @@
     "seg": "train",
     "n": 0,
     "net": 0.0,
-    "net_bps": NaN
+    "net_bps": null
   },
   {
     "pair": "GUINEA_TEN",
@@ -987,7 +987,7 @@
     "seg": "train",
     "n": 0,
     "net": 0.0,
-    "net_bps": NaN
+    "net_bps": null
   },
   {
     "pair": "GUINEA_TEN",
@@ -1007,7 +1007,7 @@
     "seg": "train",
     "n": 0,
     "net": 0.0,
-    "net_bps": NaN
+    "net_bps": null
   },
   {
     "pair": "GUINEA_TEN",
@@ -1027,7 +1027,7 @@
     "seg": "train",
     "n": 0,
     "net": 0.0,
-    "net_bps": NaN
+    "net_bps": null
   },
   {
     "pair": "GUINEA_TEN",
@@ -1047,7 +1047,7 @@
     "seg": "train",
     "n": 0,
     "net": 0.0,
-    "net_bps": NaN
+    "net_bps": null
   },
   {
     "pair": "GUINEA_TEN",
@@ -1067,7 +1067,7 @@
     "seg": "train",
     "n": 0,
     "net": 0.0,
-    "net_bps": NaN
+    "net_bps": null
   },
   {
     "pair": "GUINEA_TEN",
@@ -1447,7 +1447,7 @@
     "seg": "train",
     "n": 0,
     "net": 0.0,
-    "net_bps": NaN
+    "net_bps": null
   },
   {
     "pair": "M_TEN",
@@ -1467,7 +1467,7 @@
     "seg": "train",
     "n": 0,
     "net": 0.0,
-    "net_bps": NaN
+    "net_bps": null
   },
   {
     "pair": "M_TEN",
@@ -1487,7 +1487,7 @@
     "seg": "train",
     "n": 0,
     "net": 0.0,
-    "net_bps": NaN
+    "net_bps": null
   },
   {
     "pair": "M_TEN",
@@ -1507,7 +1507,7 @@
     "seg": "train",
     "n": 0,
     "net": 0.0,
-    "net_bps": NaN
+    "net_bps": null
   },
   {
     "pair": "M_TEN",
@@ -1527,7 +1527,7 @@
     "seg": "train",
     "n": 0,
     "net": 0.0,
-    "net_bps": NaN
+    "net_bps": null
   },
   {
     "pair": "M_TEN",
@@ -1547,7 +1547,7 @@
     "seg": "train",
     "n": 0,
     "net": 0.0,
-    "net_bps": NaN
+    "net_bps": null
   },
   {
     "pair": "M_TEN",
@@ -1567,7 +1567,7 @@
     "seg": "train",
     "n": 0,
     "net": 0.0,
-    "net_bps": NaN
+    "net_bps": null
   },
   {
     "pair": "M_TEN",
@@ -1587,7 +1587,7 @@
     "seg": "train",
     "n": 0,
     "net": 0.0,
-    "net_bps": NaN
+    "net_bps": null
   },
   {
     "pair": "M_TEN",
@@ -1607,7 +1607,7 @@
     "seg": "train",
     "n": 0,
     "net": 0.0,
-    "net_bps": NaN
+    "net_bps": null
   },
   {
     "pair": "M_TEN",
@@ -1617,7 +1617,7 @@
     "seg": "test",
     "n": 0,
     "net": 0.0,
-    "net_bps": NaN
+    "net_bps": null
   },
   {
     "pair": "M_TEN",
@@ -1627,7 +1627,7 @@
     "seg": "train",
     "n": 0,
     "net": 0.0,
-    "net_bps": NaN
+    "net_bps": null
   },
   {
     "pair": "M_TEN",
@@ -1637,7 +1637,7 @@
     "seg": "test",
     "n": 0,
     "net": 0.0,
-    "net_bps": NaN
+    "net_bps": null
   },
   {
     "pair": "M_TEN",
@@ -1647,7 +1647,7 @@
     "seg": "train",
     "n": 0,
     "net": 0.0,
-    "net_bps": NaN
+    "net_bps": null
   },
   {
     "pair": "M_TEN",
@@ -1657,7 +1657,7 @@
     "seg": "test",
     "n": 0,
     "net": 0.0,
-    "net_bps": NaN
+    "net_bps": null
   },
   {
     "pair": "M_TEN",
@@ -1667,7 +1667,7 @@
     "seg": "train",
     "n": 0,
     "net": 0.0,
-    "net_bps": NaN
+    "net_bps": null
   },
   {
     "pair": "M_TEN",
@@ -1677,7 +1677,7 @@
     "seg": "test",
     "n": 0,
     "net": 0.0,
-    "net_bps": NaN
+    "net_bps": null
   },
   {
     "pair": "M_TEN",
@@ -1687,7 +1687,7 @@
     "seg": "train",
     "n": 0,
     "net": 0.0,
-    "net_bps": NaN
+    "net_bps": null
   },
   {
     "pair": "M_TEN",
@@ -1707,7 +1707,7 @@
     "seg": "train",
     "n": 0,
     "net": 0.0,
-    "net_bps": NaN
+    "net_bps": null
   },
   {
     "pair": "M_TEN",
@@ -1727,7 +1727,7 @@
     "seg": "train",
     "n": 0,
     "net": 0.0,
-    "net_bps": NaN
+    "net_bps": null
   },
   {
     "pair": "M_TEN",
@@ -1747,7 +1747,7 @@
     "seg": "train",
     "n": 0,
     "net": 0.0,
-    "net_bps": NaN
+    "net_bps": null
   },
   {
     "pair": "M_TEN",
@@ -1767,7 +1767,7 @@
     "seg": "train",
     "n": 0,
     "net": 0.0,
-    "net_bps": NaN
+    "net_bps": null
   },
   {
     "pair": "M_TEN",
@@ -1777,7 +1777,7 @@
     "seg": "test",
     "n": 0,
     "net": 0.0,
-    "net_bps": NaN
+    "net_bps": null
   },
   {
     "pair": "M_TEN",
@@ -1787,7 +1787,7 @@
     "seg": "train",
     "n": 0,
     "net": 0.0,
-    "net_bps": NaN
+    "net_bps": null
   },
   {
     "pair": "M_TEN",
@@ -1797,7 +1797,7 @@
     "seg": "test",
     "n": 0,
     "net": 0.0,
-    "net_bps": NaN
+    "net_bps": null
   },
   {
     "pair": "M_GUINEA",
