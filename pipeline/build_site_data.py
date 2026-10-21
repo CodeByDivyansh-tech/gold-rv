@@ -62,11 +62,22 @@ class CustomJSONEncoder(json.JSONEncoder):
             return None
         return super().default(obj)
 
+def _no_nan(o: Any) -> Any:
+    """NaN and infinity are not valid JSON (browsers refuse them); an undefined value is written as null."""
+    if isinstance(o, dict):
+        return {k: _no_nan(v) for k, v in o.items()}
+    if isinstance(o, (list, tuple)):
+        return [_no_nan(v) for v in o]
+    if isinstance(o, (float, np.floating)) and not np.isfinite(o):
+        return None
+    return o
+
+
 def save_json(filepath: str, data: Any):
-    """Writes data to filepath as JSON, ensuring parent directories exist."""
+    """Writes data to filepath as strict JSON (no NaN/Infinity), ensuring parent directories exist."""
     os.makedirs(os.path.dirname(filepath), exist_ok=True)
     with open(filepath, 'w', encoding='utf-8') as f:
-        json.dump(data, f, indent=2, cls=CustomJSONEncoder)
+        json.dump(_no_nan(data), f, indent=2, cls=CustomJSONEncoder, allow_nan=False)
 
 def cross_check_raw_vs_clean(df: pd.DataFrame, raw_path: str = 'data/raw/mcx_bhavcopy_raw_api.csv') -> Dict[str, Any]:
     """Compares every row of the raw MCX download with the cleaned dataset the pipeline uses.
