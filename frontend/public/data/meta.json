@@ -1,20 +1,20 @@
 {
   "coverage_start": "2023-10-10",
-  "coverage_end": "2026-10-16",
-  "trading_dates_count": 779,
-  "rows_count": 12507,
+  "coverage_end": "2026-10-21",
+  "trading_dates_count": 782,
+  "rows_count": 12579,
   "contracts_count": 150,
   "no_trade_rows_count": 185,
-  "thin_rows_count": 866,
+  "thin_rows_count": 869,
   "weekend_sessions": [
     "2023-11-12",
     "2025-02-01",
     "2026-02-01"
   ],
   "raw_cross_check": {
-    "raw_rows": 12507,
+    "raw_rows": 12579,
     "supplement_rows": 313,
-    "matched_rows": 12507,
+    "matched_rows": 12579,
     "value_mismatches": 0,
     "rows_only_in_raw": 0,
     "rows_only_in_clean": 0,
@@ -25,7 +25,7 @@
       "volume_lots",
       "open_interest_lots"
     ],
-    "status": "Raw MCX rows vs cleaned data: 12,507 rows compared on open, close, volume and OI (313 of them from a second MCX download that filled gaps in the first), 0 mismatches. Runs on every build."
+    "status": "Raw MCX rows vs cleaned data: 12,579 rows compared on open, close, volume and OI (313 of them from a second MCX download that filled gaps in the first), 0 mismatches. Runs on every build."
   },
   "supplement": {
     "rows": 313,
@@ -51,49 +51,49 @@
   "latest_quotes": [
     {
       "symbol": "GOLDM",
-      "close": 146425.0,
+      "close": 144584.0,
       "quote_grams": 10,
-      "px_per_10g_pure": 147160.8,
-      "change_rs": 265.0,
-      "change_pct": 0.18,
+      "px_per_10g_pure": 145310.55,
+      "change_rs": -431.0,
+      "change_pct": -0.3,
       "expiry": "2026-11-05",
-      "vol": 37203,
-      "oi": 49954
+      "vol": 26349,
+      "oi": 50749
     },
     {
       "symbol": "GOLDTEN",
-      "close": 146819.0,
+      "close": 145015.0,
       "quote_grams": 10,
-      "px_per_10g_pure": 146965.97,
-      "change_rs": 298.0,
-      "change_pct": 0.2,
+      "px_per_10g_pure": 145160.16,
+      "change_rs": -458.0,
+      "change_pct": -0.31,
       "expiry": "2026-10-30",
-      "vol": 17302,
-      "oi": 29161
+      "vol": 11545,
+      "oi": 27919
     },
     {
       "symbol": "GOLDGUINEA",
-      "close": 118009.0,
+      "close": 116648.0,
       "quote_grams": 8,
-      "px_per_10g_pure": 147658.91,
-      "change_rs": 184.0,
-      "change_pct": 0.16,
+      "px_per_10g_pure": 145955.96,
+      "change_rs": -372.0,
+      "change_pct": -0.32,
       "expiry": "2026-10-30",
-      "vol": 7252,
-      "oi": 13938
+      "vol": 5329,
+      "oi": 13034
     },
     {
       "symbol": "GOLDPETAL",
-      "close": 14755.0,
+      "close": 14581.0,
       "quote_grams": 1,
-      "px_per_10g_pure": 147697.7,
-      "change_rs": 28.0,
-      "change_pct": 0.19,
+      "px_per_10g_pure": 145955.96,
+      "change_rs": -46.0,
+      "change_pct": -0.31,
       "expiry": "2026-10-30",
-      "vol": 161865,
-      "oi": 192717
+      "vol": 103087,
+      "oi": 180244
     }
   ],
-  "build_time": "2026-10-21T15:50:06.387865+00:00",
-  "source": "MCX Bhavcopy (EOD) \u00b7 Data to 16-Oct-2026"
+  "build_time": "2026-10-22T09:03:02.064335+00:00",
+  "source": "MCX Bhavcopy (EOD) \u00b7 Data to 21-Oct-2026"
 }
