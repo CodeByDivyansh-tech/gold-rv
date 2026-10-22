@@ -40,18 +40,18 @@
   "unusual_small": {
    "n": 773,
    "halfway_pct": 58,
-   "median_closed_bps": 14.9,
+   "median_closed_bps": 14.7,
    "mean_closed_bps": 11.5,
    "median_gap_bps": 66.8,
    "median_days_to_half": 2.0
   },
   "ordinary": {
-   "n": 7273,
-   "halfway_pct": 80,
-   "median_closed_bps": -10.8,
+   "n": 7280,
+   "halfway_pct": 79,
+   "median_closed_bps": -10.7,
    "mean_closed_bps": -20.8,
    "median_gap_bps": 11.6,
-   "median_days_to_half": 2.0
+   "median_days_to_half": 2
   }
  },
  "groups_from": "2011-04-18",
