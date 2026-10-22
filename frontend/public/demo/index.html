@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Gold RV Intelligence: demo video</title>
-<meta name="description" content="A full walkthrough of Gold RV Intelligence: every page, top to bottom, with real clicks. Team NEXORA, Hack in Hills '26.">
+<title>Gold RV Intelligence: pitch video</title>
+<meta name="description" content="The Gold RV Intelligence pitch video: the problem, the data, every page of the real site and the verdict. Team NEXORA, Hack in Hills '26.">
 <link rel="icon" href="../favicon.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -62,15 +62,15 @@
     </nav>
   </header>
 
-  <h1>Demo video</h1>
-  <p class="sub">The whole site on a laptop screen: every page from top to bottom, with real clicks. No sound.</p>
+  <h1>Pitch video</h1>
+  <p class="sub">The real site as of 22 Oct 2026: the problem, the data, every page and the verdict, with captions and background music.</p>
 
   <div class="grid">
     <div class="glass player">
       <video id="v" controls preload="metadata" playsinline>
-        <source src="gold-rv-demo-video.mp4" type="video/mp4">
-        <source src="gold-rv-demo-video.webm" type="video/webm">
-        Your browser can't play this video. <a href="gold-rv-demo-video.mp4">Download it</a> instead.
+        <source src="gold-rv-pitch-video-2026-10-22.mp4" type="video/mp4">
+        <source src="gold-rv-pitch-video-2026-10-22.webm" type="video/webm">
+        Your browser can't play this video. <a href="gold-rv-pitch-video-2026-10-22.mp4">Download it</a> instead.
       </video>
     </div>
     <aside class="glass chapters" aria-label="Chapters">
@@ -86,14 +86,13 @@
   </div>
 </div>
 <script>
-  // chapter start times (seconds), from the recording script
-  var CH = [[0, 'Home'], [25, 'Today'], [44, 'Market'], [63, 'Pair Explorer'], [91, 'Signals'], [114, 'Backtesting'],
-            [162, 'Try your own rule'], [184, 'Data'], [202, 'The brief, answered'], [210, 'Tools on every page']];
+  // chapter start times (seconds), from the recording script (pitch video, 22 Oct 2026)
+  var CH = [[0, 'Gold RV Intelligence'], [5, 'The problem'], [13, 'The data: MCX Bhavcopy'], [21, 'Home'], [33, 'Today'], [45, 'Market'], [57, 'Pair Explorer'], [72, 'Signals'], [85, 'Backtesting'], [102, 'Try your own rule'], [116, 'Data'], [128, 'The brief, answered'], [133, 'Tools on every page'], [149, 'What changed this week'], [157, 'The verdict'], [165, 'Team NEXORA']];
   var v = document.getElementById('v'), ol = document.getElementById('ch');
   function mmss(s) { return Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0'); }
   CH.forEach(function (c, i) {
     var li = document.createElement('li'), b = document.createElement('button');
-    b.type = 'button'; b.innerHTML = '<time>' + mmss(c[0]) + '</time><span>' + (i < 9 ? (i + 1) + '. ' : '') + c[1] + '</span>';
+    b.type = 'button'; b.innerHTML = '<time>' + mmss(c[0]) + '</time><span>' + c[1] + '</span>';
     b.addEventListener('click', function () { v.currentTime = c[0]; v.play && v.play().catch(function () {}); });
     li.appendChild(b); ol.appendChild(li);
   });
